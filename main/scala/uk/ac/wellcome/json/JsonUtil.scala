@@ -6,6 +6,7 @@ import io.circe.java8.time.TimeInstances
 import io.circe.parser._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder, Json}
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 
 import scala.util.Try
 
@@ -31,6 +32,10 @@ object JsonUtil extends AutoDerivation with TimeInstances with Logging {
 
   def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = {
     assert(decoder != null)
-    decode[T](json).toTry
+    decode[T](json).toTry.recover {
+      case e: Exception =>
+        warn(s"Error when trying to decode $json", e)
+        throw JsonDecodingError(e)
+    }
   }
 }

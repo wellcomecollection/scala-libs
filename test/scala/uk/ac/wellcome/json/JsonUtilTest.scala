@@ -2,6 +2,7 @@ package uk.ac.wellcome.json
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.json.utils.JsonAssertions
 
 class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
@@ -10,7 +11,7 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
   case class C(ints: List[Int])
 
   describe("fromJson") {
-    it("successfully parses a json string into an instance of a case class") {
+    it("successfully parses a JSON string into an instance of a case class") {
       val aId = "a"
       val bId = "b"
 
@@ -32,19 +33,18 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
       triedA.get shouldBe A(aId, B(bId, C(List(1, 2, 3))))
     }
 
-    it("fails with GracefulFailureException if the json is invalid") {
+    it("fails with JsonDecodingError if the json is invalid") {
       val triedA = fromJson[A]("not a valid json string")
 
       triedA.isFailure shouldBe true
-      triedA.failed.get shouldBe a[GracefulFailureException]
+      triedA.failed.get shouldBe a[JsonDecodingError]
     }
 
-    it(
-      "fails with GracefulFailureException if the json does not match the structure of the case class") {
+    it("fails with JsonDecodingError if the json doesn'tt match case class") {
       val triedA = fromJson[A]("""{"something": "else"}""")
 
       triedA.isFailure shouldBe true
-      triedA.failed.get shouldBe a[GracefulFailureException]
+      triedA.failed.get shouldBe a[JsonDecodingError]
     }
 
   }
