@@ -13,7 +13,7 @@ import scala.util.Try
 object JsonUtil extends AutoDerivation with TimeInstances with Logging {
 
   implicit val customConfig: Configuration =
-    Configuration.default.withDefaults
+                  Configuration.default.withDefaults
       .withDiscriminator("type")
 
   def toJson[T](value: T)(implicit encoder: Encoder[T]): Try[String] = {
