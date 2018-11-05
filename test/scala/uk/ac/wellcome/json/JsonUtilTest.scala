@@ -1,6 +1,7 @@
 package uk.ac.wellcome.json
 
 import java.net.URI
+import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -105,5 +106,44 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
       val website = fromJson[Website](jsonString).get
       website.uri shouldBe new URI("https://json.org/")
     }
+  }
+
+  describe("UUID conversion") {
+    case class Shipment(name: String, id: UUID)
+
+    it("converts a shipment to JSON") {
+      val uuid = uuidFromString("transport")
+      val shipment = Shipment(
+        name = "Red cars and yellow cars",
+        id = uuid
+      )
+
+      assertJsonStringsAreEqual(
+        toJson(shipment).get,
+        s"""
+          |{
+          |  "name": "Red cars and yellow cars",
+          |  "id": "${uuid.toString}"
+          |}
+        """.stripMargin
+      )
+    }
+
+    it("serialises a JSON string as a URI") {
+      val uuid = uuidFromString("electronics")
+      val jsonString =
+        s"""
+          |{
+          |  "name": "Laptops and phones",
+          |  "id": "${uuid.toString}"
+          |}
+        """.stripMargin
+
+      val website = fromJson[Shipment](jsonString).get
+      website.id shouldBe uuid
+    }
+
+    def uuidFromString(s: String): UUID =
+      UUID.nameUUIDFromBytes(s.getBytes())
   }
 }
