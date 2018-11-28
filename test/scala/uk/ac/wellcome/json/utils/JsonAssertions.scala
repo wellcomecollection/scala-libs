@@ -21,6 +21,9 @@ trait JsonAssertions extends Matchers {
   private def parseOrElse(jsonString: String): Json =
     parse(jsonString) match {
       case Right(t) => t
-      case Left(err) => throw err
+      case Left(err) => {
+        println(s"Error trying to parse string <<$jsonString>>")
+        throw err
+      }
     }
 }
