@@ -11,10 +11,10 @@ import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import scala.util.Try
 
 object JsonUtil
-  extends AutoDerivation
-  with TimeInstances
-  with Logging
-  with URIConverters {
+    extends AutoDerivation
+    with TimeInstances
+    with Logging
+    with URIConverters {
 
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults
