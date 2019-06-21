@@ -1,6 +1,7 @@
 package uk.ac.wellcome.json
 
 import java.net.URI
+import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
@@ -145,5 +146,37 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
 
     def uuidFromString(s: String): UUID =
       UUID.nameUUIDFromBytes(s.getBytes())
+  }
+
+  describe("Instant conversion") {
+    case class Event(name: String, time: Instant)
+
+    it("converts an event to JSON") {
+      val now = Instant.now()
+      val event = Event(name = "this test", time = now)
+
+      assertJsonStringsAreEqual(
+        toJson(event).get,
+        s"""
+           |{
+           |  "name": "this test",
+           |  "time": ${now.getEpochSecond}
+           |}
+        """.stripMargin
+      )
+    }
+
+    it("serialises a JSON string as an Instant") {
+      val jsonString =
+        s"""
+           |{
+           |  "name": "this test",
+           |  "id": 1
+           |}
+        """.stripMargin
+
+      val event = fromJson[Event](jsonString).get
+      event.time shouldBe Instant.ofEpochSecond(1)
+    }
   }
 }

@@ -2,17 +2,18 @@ package uk.ac.wellcome.json
 
 import grizzled.slf4j.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
-import io.circe.java8.time.TimeInstances
+import io.circe.java8.time.{JavaTimeDecoders, JavaTimeEncoders}
 import io.circe.parser._
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 
 import scala.util.Try
 
 object JsonUtil
     extends AutoDerivation
-    with TimeInstances
+    with JavaTimeDecoders
+    with JavaTimeEncoders
     with Logging
     with URIConverters {
 
@@ -30,9 +31,6 @@ object JsonUtil
     assert(decoder != null)
     fromJson[Map[String, T]](json)
   }
-
-  def fromJson(json: String): Try[Json] =
-    parse(json).toTry
 
   def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] = {
     assert(decoder != null)
