@@ -2,7 +2,6 @@ package uk.ac.wellcome.json
 
 import grizzled.slf4j.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
-import io.circe.java8.time.{JavaTimeDecoders, JavaTimeEncoders}
 import io.circe.parser._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder}
@@ -12,8 +11,6 @@ import scala.util.Try
 
 object JsonUtil
     extends AutoDerivation
-    with JavaTimeDecoders
-    with JavaTimeEncoders
     with Logging
     with URIConverters {
 
