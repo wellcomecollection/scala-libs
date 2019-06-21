@@ -152,7 +152,7 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
     case class Event(name: String, time: Instant)
 
     it("converts an event to JSON") {
-      val now = Instant.now()
+      val now = Instant.parse("2019-06-21T15:51:41.256Z")
       val event = Event(name = "this test", time = now)
 
       assertJsonStringsAreEqual(
@@ -160,7 +160,7 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
         s"""
            |{
            |  "name": "this test",
-           |  "time": ${now.getEpochSecond}
+           |  "time": "2019-06-21T15:51:41.256Z"
            |}
         """.stripMargin
       )
@@ -171,12 +171,12 @@ class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
         s"""
            |{
            |  "name": "this test",
-           |  "id": 1
+           |  "time": "2019-06-21T15:51:41.256Z"
            |}
         """.stripMargin
 
       val event = fromJson[Event](jsonString).get
-      event.time shouldBe Instant.ofEpochSecond(1)
+      event.time shouldBe Instant.parse("2019-06-21T15:51:41.256Z")
     }
   }
 }
