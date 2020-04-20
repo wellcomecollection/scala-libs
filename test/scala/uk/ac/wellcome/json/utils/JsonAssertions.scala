@@ -1,8 +1,9 @@
 package uk.ac.wellcome.json.utils
 
 import io.circe.Json
-import org.scalatest.{Assertion, Matchers}
+import org.scalatest.Assertion
 import io.circe.parser._
+import org.scalatest.matchers.should.Matchers
 
 trait JsonAssertions extends Matchers {
 

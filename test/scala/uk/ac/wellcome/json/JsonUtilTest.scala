@@ -4,12 +4,13 @@ import java.net.URI
 import java.time.Instant
 import java.util.UUID
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.json.utils.JsonAssertions
 
-class JsonUtilTest extends FunSpec with Matchers with JsonAssertions {
+class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
   case class A(id: String, b: B)
   case class B(id: String, c: C)
   case class C(ints: List[Int])
