@@ -1,7 +1,7 @@
 package uk.ac.wellcome.typesafe.config.builders
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 
 import scala.concurrent.ExecutionContext
 
@@ -11,8 +11,8 @@ object AkkaBuilder {
   def buildActorSystem(): ActorSystem =
     actorSystem
 
-  def buildActorMaterializer(): ActorMaterializer =
-    ActorMaterializer()
+  def buildMaterializer(): Materializer =
+    Materializer(actorSystem)
 
   def buildExecutionContext(): ExecutionContext =
     actorSystem.dispatcher

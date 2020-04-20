@@ -1,7 +1,7 @@
 package uk.ac.wellcome.akka.fixtures
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import uk.ac.wellcome.fixtures._
 
 import scala.concurrent.Await
@@ -14,13 +14,13 @@ trait Akka {
   )
 
   def withMaterializer[R](
-    actorSystem: ActorSystem): Fixture[ActorMaterializer, R] =
-    fixture[ActorMaterializer, R](
-      create = ActorMaterializer()(actorSystem),
+    actorSystem: ActorSystem): Fixture[Materializer, R] =
+    fixture[Materializer, R](
+      create = Materializer(actorSystem),
       destroy = _.shutdown()
     )
 
-  def withMaterializer[R](testWith: TestWith[ActorMaterializer, R]): R =
+  def withMaterializer[R](testWith: TestWith[Materializer, R]): R =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         testWith(materializer)
