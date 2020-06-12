@@ -8,10 +8,6 @@ val projectVersion = "1.0.0"
 
 enablePlugins(DockerComposePlugin)
 
-// Everything below this line is generic boilerplate that should be reusable,
-// unmodified, in all of our Scala libraries that have a "core" and a "typesafe"
-// version.
-
 val settings: Seq[Def.Setting[_]] = Seq(
   scalaVersion := "2.12.6",
   organization := "uk.ac.wellcome",
@@ -28,9 +24,6 @@ val settings: Seq[Def.Setting[_]] = Seq(
     "-language:postfixOps"
   ),
   parallelExecution in Test := false,
-  resolvers ++= Seq(
-    "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
-  ),
   publishMavenStyle := true,
   publishTo := Some(
     "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
@@ -39,17 +32,19 @@ val settings: Seq[Def.Setting[_]] = Seq(
   version := projectVersion
 )
 
-// Temporarily commented out until https://github.com/wellcometrust/platform/issues/3806
-// In order to access our libraries in S3 we need to set the following:
+lazy val fixtures =
+  project
+    .withId("fixtures")
+    .in(new File("fixtures"))
+    .settings(settings)
+    .settings(libraryDependencies ++= Dependencies.fixturesDependencies)
 
-s3CredentialsProvider := { _ =>
-  val builder = new STSAssumeRoleSessionCredentialsProvider.Builder(
-    "arn:aws:iam::760097843905:role/platform-read_only",
-    UUID.randomUUID().toString
-  )
-
-  builder.build()
-}
+lazy val json =
+  project
+    .withId("json")
+    .in(new File("json"))
+    .settings(settings)
+    .settings(libraryDependencies ++= Dependencies.jsonDependencies)
 
 lazy val typesafe_app =
   project
@@ -57,7 +52,23 @@ lazy val typesafe_app =
     .in(new File("typesafe_app"))
     .settings(settings)
     .settings(libraryDependencies ++= Dependencies.typesafeAppDependencies)
+    .dependsOn(fixtures % "compile->compile;test->test")
 
+lazy val monitoring =
+  project
+    .withId("monitoring")
+    .in(new File("monitoring"))
+    .settings(settings)
+    .settings(libraryDependencies ++= Dependencies.monitoringDependencies)
+    .dependsOn(typesafe_app % "compile->compile;test->test")
+    .dependsOn(fixtures % "compile->compile;test->test")
+
+lazy val monitoring_typesafe =
+  project
+    .withId(s"monitoring_typesafe")
+    .in(new File(s"monitoring_typesafe"))
+    .settings(settings)
+    .dependsOn(monitoring % "compile->compile;test->test")
 
 lazy val storage =
   project
@@ -66,6 +77,8 @@ lazy val storage =
     .settings(settings)
     .settings(libraryDependencies ++= Dependencies.storageDependencies)
     .dependsOn(typesafe_app % "compile->compile;test->test")
+    .dependsOn(fixtures % "compile->compile;test->test")
+    .dependsOn(json % "compile->compile;test->test")
 
 lazy val storage_typesafe =
   project
@@ -74,9 +87,28 @@ lazy val storage_typesafe =
     .settings(settings)
     .dependsOn(storage % "compile->compile;test->test")
 
+lazy val messaging =
+  project
+    .withId("messaging")
+    .in(new File("messaging"))
+    .settings(settings)
+    .settings(libraryDependencies ++= Dependencies.messagingDependencies)
+    .dependsOn(monitoring % "compile->compile;test->test")
+    .dependsOn(typesafe_app % "compile->compile;test->test")
+    .dependsOn(fixtures % "compile->compile;test->test")
+    .dependsOn(json % "compile->compile;test->test")
+
+lazy val messaging_typesafe =
+  project
+    .withId(s"messaging_typesafe")
+    .in(new File(s"messaging_typesafe"))
+    .settings(settings)
+    .dependsOn(messaging % "compile->compile;test->test")
+    .dependsOn(monitoring_typesafe % "compile->compile;test->test")
+
 lazy val root = (project in file("."))
   .withId("scala-libs")
-  .aggregate(typesafe_app, storage, storage_typesafe)
+  .aggregate(fixtures, json, typesafe_app, storage, storage_typesafe, messaging, messaging_typesafe)
   .settings(
     Seq(
       // We don't want to publish the aggregate project, just the sub projects.
