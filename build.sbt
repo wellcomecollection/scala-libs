@@ -28,6 +28,7 @@ val settings: Seq[Def.Setting[_]] = Seq(
   publishTo := Some(
     "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
   ),
+  isSnapshot := true,
   publishArtifact in Test := true,
   version := projectVersion
 )
@@ -108,7 +109,7 @@ lazy val messaging_typesafe =
 
 lazy val root = (project in file("."))
   .withId("scala-libs")
-  .aggregate(fixtures, json, typesafe_app, storage, storage_typesafe, messaging, messaging_typesafe)
+  .aggregate(fixtures, json, typesafe_app, storage, storage_typesafe, messaging, messaging_typesafe, monitoring, monitoring_typesafe)
   .settings(
     Seq(
       // We don't want to publish the aggregate project, just the sub projects.
