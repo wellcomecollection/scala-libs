@@ -16,3 +16,5 @@ secrets
 awscredentials
 id_rsa
 id_rsa.pub
+
+.bloop
