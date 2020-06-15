@@ -28,6 +28,7 @@ val settings: Seq[Def.Setting[_]] = Seq(
   publishTo := Some(
     "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
   ),
+  isSnapshot := true,
   publishArtifact in Test := true,
   version := projectVersion
 )
