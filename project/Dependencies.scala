@@ -12,6 +12,8 @@ object Dependencies {
     // Moving what we can to version 2 of the AWS SDKs
     val aws2 = "2.11.14"
 
+    val azure = "12.7.0"
+
     val circe = "0.13.0"
     val typesafe = "1.3.2"
     val logback = "1.1.8"
@@ -113,6 +115,7 @@ object Dependencies {
       testDependencies
 
   val storageDependencies: Seq[ModuleID] = Seq(
+    "com.azure" % "azure-storage-blob" % versions.azure,
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++
