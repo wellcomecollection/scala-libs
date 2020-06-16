@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v10.0.4 - 2020-06-16
+
+### Libraries affected
+
+`messaging`
+
+### Description
+
+Localstack is not compatable with the SQS fixtures here, so remove it.
+
 ## v10.0.3 - 2020-06-16
 
 ### Libraries affected
