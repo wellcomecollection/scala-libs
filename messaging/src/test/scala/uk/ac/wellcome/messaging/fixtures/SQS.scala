@@ -72,8 +72,9 @@ trait SQS extends Matchers with Logging {
       }
 
   private def getQueueAttribute(queueUrl: String,
-                                attributeName: QueueAttributeName): String =
-    sqsClient
+                                attributeName: QueueAttributeName,
+                                client: SqsClient): String =
+    client
       .getQueueAttributes { builder: GetQueueAttributesRequest.Builder =>
         builder
           .queueUrl(queueUrl)
@@ -83,8 +84,11 @@ trait SQS extends Matchers with Logging {
       .get(attributeName)
 
   def getQueueAttribute(queue: Queue,
-                        attributeName: QueueAttributeName): String =
-    getQueueAttribute(queueUrl = queue.url, attributeName = attributeName)
+                        attributeName: QueueAttributeName,
+                        client: SqsClient = sqsClient): String =
+    getQueueAttribute(queueUrl = queue.url,
+                      attributeName = attributeName,
+                      client = client)
 
   def withLocalSqsQueue[R](
     client: SqsClient = sqsClient,
@@ -100,7 +104,8 @@ trait SQS extends Matchers with Logging {
 
         val arn = getQueueAttribute(
           queueUrl = response.queueUrl(),
-          attributeName = QueueAttributeName.QUEUE_ARN
+          attributeName = QueueAttributeName.QUEUE_ARN,
+          client = client
         )
 
         val queue = Queue(
