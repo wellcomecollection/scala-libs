@@ -42,6 +42,12 @@ To release from this repository, please create a pull request with a `RELEASE.md
 ```md
 RELEASE_TYPE: major|minor|patch
 
+### Libraries affected
+
+`first_lib`, `second_lib`
+
+### Description
+
 A detailed description of the chnages in this release
 ```
 
