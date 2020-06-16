@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.model.{
   SetObjectTaggingRequest,
   Tag
 }
-import uk.ac.wellcome.storage.s3.S3Get
 import uk.ac.wellcome.storage.{
   ObjectLocation,
   ReadError,
@@ -21,6 +20,7 @@ import scala.util.{Failure, Success, Try}
 
 class S3Tags(maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     extends Tags[ObjectLocation] {
+
   override def get(
     location: ObjectLocation): Either[ReadError, Map[String, String]] =
     for {

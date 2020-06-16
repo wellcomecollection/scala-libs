@@ -3,42 +3,21 @@ package uk.ac.wellcome.storage.store.azure
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.BlobStorageException
 import com.azure.storage.blob.specialized.BlobInputStream
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.store.Readable
+import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
-import scala.util.{Failure, Success, Try}
 
-trait AzureStreamReadable
-    extends Readable[ObjectLocation, InputStreamWithLength]
-    with Logging {
+trait AzureStreamReadable extends RetryableReadable[InputStreamWithLength] {
   implicit val blobClient: BlobServiceClient
   val maxRetries: Int
 
-  import RetryOps._
+  def retryableGetFunction(location: ObjectLocation): InputStreamWithLength = {
+    val blobInputStream = blobClient
+      .getBlobContainerClient(location.namespace)
+      .getBlobClient(location.path)
+      .openInputStream()
 
-  override def get(location: ObjectLocation): ReadEither = {
-    val retryableGet = (getOnce _).retry(maxRetries)
-
-    retryableGet(location)
-  }
-
-  private def getOnce(location: ObjectLocation): ReadEither = {
-    val openResult =
-      Try {
-        blobClient
-          .getBlobContainerClient(location.namespace)
-          .getBlobClient(location.path)
-          .openInputStream()
-      }
-
-    openResult match {
-      case Success(blobInputStream) =>
-        Right(
-          Identified(location, buildInputStream(blobInputStream))
-        )
-      case Failure(err) => Left(buildOpenError(err))
-    }
+    buildInputStream(blobInputStream)
   }
 
   private def buildInputStream(
@@ -49,7 +28,7 @@ trait AzureStreamReadable
     )
   }
 
-  private def buildOpenError(throwable: Throwable): ReadError =
+  def buildGetError(throwable: Throwable): ReadError =
     throwable match {
       case exc: BlobStorageException if exc.getStatusCode == 404 =>
         DoesNotExistError(exc)
