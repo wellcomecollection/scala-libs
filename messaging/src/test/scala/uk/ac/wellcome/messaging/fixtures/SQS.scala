@@ -20,7 +20,7 @@ import scala.concurrent.Future
 import scala.util.Random
 
 object SQS {
-  case class Queue(url: String, arn: String, visibilityTimeout: Int) {
+  case class Queue(url: String, arn: String, visibilityTimeout: Option[Int]) {
     override def toString = s"SQS.Queue(url = $url, name = $name)"
     def name: String = url.split("/").toList.last
   }
@@ -93,7 +93,7 @@ trait SQS extends Matchers with Logging {
   def withLocalSqsQueue[R](
     client: SqsClient = sqsClient,
     queueName: String = Random.alphanumeric take 10 mkString,
-    visibilityTimeout: Int = 1
+    visibilityTimeout: Option[Int] = None
   ): Fixture[Queue, R] =
     fixture[Queue, R](
       create = {
@@ -114,11 +114,13 @@ trait SQS extends Matchers with Logging {
           visibilityTimeout = visibilityTimeout
         )
 
-        setQueueAttribute(
-          queueUrl = queue.url,
-          attributeName = QueueAttributeName.VISIBILITY_TIMEOUT,
-          attributeValue = visibilityTimeout.toString
-        )
+        visibilityTimeout.map { timeout =>
+          setQueueAttribute(
+            queueUrl = queue.url,
+            attributeName = QueueAttributeName.VISIBILITY_TIMEOUT,
+            attributeValue = timeout.toString
+          )
+        }
 
         queue
       },
@@ -132,7 +134,7 @@ trait SQS extends Matchers with Logging {
       }
     )
 
-  def withLocalSqsQueuePair[R](visibilityTimeout: Int = 1)(
+  def withLocalSqsQueuePair[R](visibilityTimeout: Option[Int] = Some(1))(
     testWith: TestWith[QueuePair, R]): R = {
     val queueName = Random.alphanumeric take 10 mkString
 
@@ -169,7 +171,7 @@ trait SQS extends Matchers with Logging {
     )
 
   def withLocalStackSqsQueue[R](testWith: TestWith[Queue, R]): R =
-    withLocalSqsQueue(localStackSqsClient) { queue =>
+    withLocalSqsQueue(localStackSqsClient, visibilityTimeout = None) { queue =>
       testWith(queue)
     }
 
@@ -274,7 +276,7 @@ trait SQS extends Matchers with Logging {
   private def waitVisibilityTimeoutExpiry(queue: Queue): Unit = {
     // Wait slightly longer than the visibility timeout to ensure that messages
     // that fail processing become visible again before asserting.
-    val millisecondsToWait = queue.visibilityTimeout * 1500
+    val millisecondsToWait = queue.visibilityTimeout.getOrElse(1) * 1500
     Thread.sleep(millisecondsToWait)
   }
 
