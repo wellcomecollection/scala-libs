@@ -42,9 +42,6 @@ trait SQS extends Matchers with Logging {
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
 
-  def localStackEndpoint(queue: Queue) =
-    s"sqs://${queue.name}"
-
   implicit val sqsClient: SqsClient = SQSClientFactory.createSyncClient(
     region = regionName,
     endpoint = sqsEndpointUrl,
@@ -152,26 +149,6 @@ trait SQS extends Matchers with Logging {
       }
     }
   }
-
-  val localStackSqsClient: SqsClient = SQSClientFactory.createSyncClient(
-    region = "localhost",
-    endpoint = "http://localhost:4576",
-    accessKey = sqsAccessKey,
-    secretKey = sqsSecretKey
-  )
-
-  val localStackSqsAsyncClient: SqsAsyncClient =
-    SQSClientFactory.createAsyncClient(
-      region = "localhost",
-      endpoint = "http://localhost:4576",
-      accessKey = sqsAccessKey,
-      secretKey = sqsSecretKey
-    )
-
-  def withLocalStackSqsQueue[R](testWith: TestWith[Queue, R]): R =
-    withLocalSqsQueue(localStackSqsClient) { queue =>
-      testWith(queue)
-    }
 
   def withSQSStream[T, R](
     queue: Queue,
