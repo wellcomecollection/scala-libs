@@ -49,9 +49,13 @@ trait StreamStoreTestCases[
     )
   }
 
+  // Storage providers may not verify stream length
+  // _or_ we may not be able to test for it
+  lazy val skipStreamLengthTests = false
+
   describe("it behaves as a StreamStore") {
     describe("get") {
-      it("can get a stream without metadata") {
+      it("can get a stream") {
         withNamespace { implicit namespace =>
           val id = createId
           val initialEntry = ReplayableStream(randomBytes())
@@ -63,24 +67,10 @@ trait StreamStoreTestCases[
           }
         }
       }
-
-      it("can get a stream with metadata") {
-        withNamespace { implicit namespace =>
-          val id = createId
-          val initialEntry =
-            ReplayableStream(randomBytes())
-
-          withStoreImpl(initialEntries = Map(id -> initialEntry)) { store =>
-            val retrievedEntry = store.get(id).right.value
-
-            assertEqualT(initialEntry, retrievedEntry.identifiedT)
-          }
-        }
-      }
     }
 
     describe("put") {
-      it("can put a stream without metadata") {
+      it("can put a stream") {
         withNamespace { implicit namespace =>
           val id = createId
           val entry = ReplayableStream(randomBytes())
@@ -91,45 +81,38 @@ trait StreamStoreTestCases[
         }
       }
 
-      it("can put a stream with metadata") {
-        withNamespace { implicit namespace =>
-          val id = createId
-          val entry = ReplayableStream(randomBytes())
+      if (skipStreamLengthTests) {
+        it("skips stream length tests") {}
+      } else {
+        it("errors if the stream length is too long") {
+          withNamespace { implicit namespace =>
+            val bytes = randomBytes()
+            val brokenStream = new ReplayableStream(
+              bytes,
+              length = bytes.length + 1
+            )
 
-          withStoreImpl(initialEntries = Map.empty) { store =>
-            store.put(id)(entry) shouldBe a[Right[_, _]]
+            withStoreImpl(initialEntries = Map.empty) { store =>
+              val result = store.put(createId)(brokenStream).left.value
+
+              result shouldBe a[IncorrectStreamLengthError]
+            }
           }
         }
-      }
 
-      it("errors if the stream length is too long") {
-        withNamespace { implicit namespace =>
-          val bytes = randomBytes()
-          val brokenStream = new ReplayableStream(
-            bytes,
-            length = bytes.length + 1
-          )
+        it("errors if the stream length is too short") {
+          withNamespace { implicit namespace =>
+            val bytes = randomBytes()
+            val brokenStream = new ReplayableStream(
+              bytes,
+              length = bytes.length - 1
+            )
 
-          withStoreImpl(initialEntries = Map.empty) { store =>
-            val result = store.put(createId)(brokenStream).left.value
+            withStoreImpl(initialEntries = Map.empty) { store =>
+              val result = store.put(createId)(brokenStream).left.value
 
-            result shouldBe a[IncorrectStreamLengthError]
-          }
-        }
-      }
-
-      it("errors if the stream length is too short") {
-        withNamespace { implicit namespace =>
-          val bytes = randomBytes()
-          val brokenStream = new ReplayableStream(
-            bytes,
-            length = bytes.length - 1
-          )
-
-          withStoreImpl(initialEntries = Map.empty) { store =>
-            val result = store.put(createId)(brokenStream).left.value
-
-            result shouldBe a[IncorrectStreamLengthError]
+              result shouldBe a[IncorrectStreamLengthError]
+            }
           }
         }
       }

@@ -9,6 +9,10 @@ import uk.ac.wellcome.storage.store.StreamStoreTestCases
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
 class AzureStreamStoreTest extends StreamStoreTestCases[ObjectLocation, Container, AzureStreamStore, Unit] with AzureFixtures with ObjectLocationGenerators {
+
+  // Azurite test container does not error when handed incorrect stream lengths
+  override lazy val skipStreamLengthTests = true
+
   override def withNamespace[R](testWith: TestWith[Container, R]): R =
     withAzureContainer { container =>
       testWith(container)
