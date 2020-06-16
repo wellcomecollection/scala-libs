@@ -9,7 +9,9 @@ import uk.ac.wellcome.storage.store.Readable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 import scala.util.{Failure, Success, Try}
 
-trait AzureStreamReadable extends Readable[ObjectLocation, InputStreamWithLength] with Logging {
+trait AzureStreamReadable
+    extends Readable[ObjectLocation, InputStreamWithLength]
+    with Logging {
   implicit val blobClient: BlobServiceClient
   val maxRetries: Int
 
@@ -23,10 +25,11 @@ trait AzureStreamReadable extends Readable[ObjectLocation, InputStreamWithLength
 
   private def getOnce(location: ObjectLocation): ReadEither = {
     val openResult =
-      Try { blobClient
-        .getBlobContainerClient(location.namespace)
-        .getBlobClient(location.path)
-        .openInputStream()
+      Try {
+        blobClient
+          .getBlobContainerClient(location.namespace)
+          .getBlobClient(location.path)
+          .openInputStream()
       }
 
     openResult match {
@@ -38,7 +41,8 @@ trait AzureStreamReadable extends Readable[ObjectLocation, InputStreamWithLength
     }
   }
 
-  private def buildInputStream(blobInputStream: BlobInputStream): InputStreamWithLength = {
+  private def buildInputStream(
+    blobInputStream: BlobInputStream): InputStreamWithLength = {
     new InputStreamWithLength(
       blobInputStream,
       length = blobInputStream.getProperties.getBlobSize,

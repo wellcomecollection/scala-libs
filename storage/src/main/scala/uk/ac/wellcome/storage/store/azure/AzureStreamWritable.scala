@@ -8,11 +8,13 @@ import uk.ac.wellcome.storage.{Identified, ObjectLocation, OverwriteError, Store
 
 import scala.util.{Failure, Success, Try}
 
-trait AzureStreamWritable extends Writable[ObjectLocation, InputStreamWithLength] {
+trait AzureStreamWritable
+    extends Writable[ObjectLocation, InputStreamWithLength] {
   implicit val blobClient: BlobServiceClient
   val allowOverwrites: Boolean
 
-  override def put(location: ObjectLocation)(inputStream: InputStreamWithLength): WriteEither =
+  override def put(location: ObjectLocation)(
+    inputStream: InputStreamWithLength): WriteEither =
     Try {
       val individualBlobClient =
         blobClient
