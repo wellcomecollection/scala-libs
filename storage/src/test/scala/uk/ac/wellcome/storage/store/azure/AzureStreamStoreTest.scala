@@ -1,14 +1,25 @@
 package uk.ac.wellcome.storage.store.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.{ObjectLocation, OverwriteError}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
-class AzureStreamStoreTest extends StreamStoreTestCases[ObjectLocation, Container, AzureStreamStore, Unit] with AzureFixtures with ObjectLocationGenerators {
+case class AzureStreamStoreContext(
+  allowOverwrite: Option[Boolean] = None
+)
+
+class AzureStreamStoreTest
+    extends StreamStoreTestCases[
+      ObjectLocation,
+      Container,
+      AzureStreamStore,
+      AzureStreamStoreContext]
+    with AzureFixtures
+    with ObjectLocationGenerators {
 
   // Azurite test container does not error when handed incorrect stream lengths
   override lazy val skipStreamLengthTests = true
@@ -21,24 +32,51 @@ class AzureStreamStoreTest extends StreamStoreTestCases[ObjectLocation, Containe
   override def createId(implicit container: Container): ObjectLocation =
     createObjectLocationWith(namespace = container.name)
 
-  override def withStreamStoreImpl[R](context: Unit, initialEntries: Map[ObjectLocation, InputStreamWithLength])(
+  override def withStreamStoreImpl[R](
+    context: AzureStreamStoreContext,
+    initialEntries: Map[ObjectLocation, InputStreamWithLength])(
     testWith: TestWith[AzureStreamStore, R]): R = {
-    initialEntries.foreach { case (location, data) =>
-      azureClient
-        .getBlobContainerClient(location.namespace)
-        .getBlobClient(location.path)
-        .upload(data, data.length)
+    initialEntries.foreach {
+      case (location, data) =>
+        azureClient
+          .getBlobContainerClient(location.namespace)
+          .getBlobClient(location.path)
+          .upload(data, data.length)
 
-      azureClient
-        .getBlobContainerClient(location.namespace)
-        .getBlobClient(location.path)
+        azureClient
+          .getBlobContainerClient(location.namespace)
+          .getBlobClient(location.path)
     }
 
-    testWith(
-      new AzureStreamStore()
-    )
+    val store = context.allowOverwrite.map { allowOverwrites =>
+      new AzureStreamStore(allowOverwrites = allowOverwrites)
+    } getOrElse (new AzureStreamStore())
+
+    testWith(store)
   }
 
-  override def withStreamStoreContext[R](testWith: TestWith[Unit, R]): R =
-    testWith(())
+  override def withStreamStoreContext[R](
+    testWith: TestWith[AzureStreamStoreContext, R]): R =
+    testWith(AzureStreamStoreContext())
+
+  describe("allowOverwrites is false") {
+
+    it("will not overwrite an existing object") {
+      withNamespace { implicit namespace =>
+        val id = createId
+        val entry = ReplayableStream(randomBytes())
+
+        withStoreImpl(
+          initialEntries = Map(id -> entry),
+          storeContext = AzureStreamStoreContext(
+            allowOverwrite = Some(false)
+          )
+        ) { store =>
+          val result = store.put(id)(entry).left.value
+
+          result shouldBe a[OverwriteError]
+        }
+      }
+    }
+  }
 }
