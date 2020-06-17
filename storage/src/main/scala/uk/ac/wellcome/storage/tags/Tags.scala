@@ -12,7 +12,7 @@ trait Updatable[Ident, T] {
 }
 
 trait Tags[Ident]
-  extends Readable[Ident, Map[String, String]]
+    extends Readable[Ident, Map[String, String]]
     with Updatable[Ident, Map[String, String]]
     with Logging {
 

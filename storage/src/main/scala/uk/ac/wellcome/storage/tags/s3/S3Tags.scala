@@ -1,11 +1,21 @@
 package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{GetObjectTaggingRequest, ObjectTagging, SetObjectTaggingRequest, Tag}
+import com.amazonaws.services.s3.model.{
+  GetObjectTaggingRequest,
+  ObjectTagging,
+  SetObjectTaggingRequest,
+  Tag
+}
 import uk.ac.wellcome.storage.s3.S3Errors
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
-import uk.ac.wellcome.storage.{ObjectLocation, ReadError, StoreWriteError, WriteError}
+import uk.ac.wellcome.storage.{
+  ObjectLocation,
+  ReadError,
+  StoreWriteError,
+  WriteError
+}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}

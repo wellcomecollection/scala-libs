@@ -27,10 +27,10 @@ trait RetryableReadable[T] extends Readable[ObjectLocation, T] with Logging {
       Try {
         retryableGetFunction(location)
       } match {
-        case Success(t)   => Right(t)
+        case Success(t) => Right(t)
         case Failure(err) =>
           val error = buildGetError(err)
           warn(s"$error when trying to get $location")
           Left(error)
-      }
+    }
 }
