@@ -4,7 +4,7 @@ import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{DoesNotExistError, UpdateNoSourceError, UpdateNotApplied}
+import uk.ac.wellcome.storage.{DoesNotExistError, Identified, UpdateNoSourceError, UpdateNotApplied}
 import uk.ac.wellcome.storage.generators.RandomThings
 
 trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with EitherValues with RandomThings {
@@ -32,7 +32,7 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
           val objectTags = createTags
 
           withTags(initialTags = Map(objectIdent -> objectTags)) { tags =>
-            tags.get(id = objectIdent).right.value shouldBe objectTags
+            tags.get(id = objectIdent).right.value shouldBe Identified(objectIdent, objectTags)
           }
         }
       }
@@ -59,9 +59,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               .update(id = objectIdent) { existingTags =>
                 Right(existingTags ++ newTag)
               }
-              .right.value shouldBe objectTags ++ newTag
+              .right.value shouldBe Identified(objectIdent, objectTags ++ newTag)
 
-            tags.get(id = objectIdent).right.value shouldBe objectTags ++ newTag
+            tags.get(id = objectIdent).right.value shouldBe Identified(objectIdent, objectTags ++ newTag)
           }
         }
       }
@@ -76,9 +76,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               .update(id = objectIdent) { existingTags =>
                 Right(Map.empty)
               }
-              .right.value shouldBe Map.empty
+              .right.value shouldBe Identified(objectIdent, Map.empty)
 
-            tags.get(id = objectIdent).right.value shouldBe Map.empty
+            tags.get(id = objectIdent).right.value shouldBe Identified(objectIdent, Map.empty)
           }
         }
       }
@@ -95,7 +95,7 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               }
               .left.value shouldBe a[UpdateNotApplied]
 
-            tags.get(id = objectIdent).right.value shouldBe objectTags
+            tags.get(id = objectIdent).right.value shouldBe Identified(objectIdent, objectTags)
           }
         }
       }
@@ -110,9 +110,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               .update(id = objectIdent) {
                 Right(_)
               }
-              .right.value shouldBe objectTags
+              .right.value shouldBe Identified(objectIdent, objectTags)
 
-            tags.get(id = objectIdent).right.value shouldBe objectTags
+            tags.get(id = objectIdent).right.value shouldBe Identified(objectIdent, objectTags)
           }
         }
       }
