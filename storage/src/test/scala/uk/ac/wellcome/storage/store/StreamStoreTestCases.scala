@@ -1,18 +1,18 @@
 package uk.ac.wellcome.storage.store
 
-import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.Assertion
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.IncorrectStreamLengthError
-import uk.ac.wellcome.storage.store.fixtures.{ReplayableStreamFixtures, StreamStoreFixtures}
+import uk.ac.wellcome.storage.store.fixtures.{
+  ReplayableStreamFixtures,
+  StreamStoreFixtures
+}
 import uk.ac.wellcome.storage.streaming._
 
 trait StreamStoreTestCases[
-  Ident,
-  Namespace,
-  StreamStoreImpl <: StreamStore[Ident],
-  StreamStoreContext]
+  Ident, Namespace, StreamStoreImpl <: StreamStore[Ident], StreamStoreContext]
     extends AnyFunSpec
     with Matchers
     with StreamAssertions
@@ -40,7 +40,8 @@ trait StreamStoreTestCases[
   override def createT: ReplayableStream =
     createReplayableStream
 
-  override def assertEqualT(original: InputStreamWithLength, stored: InputStreamWithLength): Assertion = {
+  override def assertEqualT(original: InputStreamWithLength,
+                            stored: InputStreamWithLength): Assertion = {
     val originalBytes = original.asInstanceOf[ReplayableStream].originalBytes
     assertStreamEquals(
       stored,
@@ -81,38 +82,38 @@ trait StreamStoreTestCases[
         }
       }
 
-      if (skipStreamLengthTests) {
-        it("skips stream length tests") {}
-      } else {
-        it("errors if the stream length is too long") {
-          withNamespace { implicit namespace =>
-            val bytes = randomBytes()
-            val brokenStream = new ReplayableStream(
-              bytes,
-              length = bytes.length + 1
-            )
+      it("errors if the stream length is too long") {
+        assume(!skipStreamLengthTests)
 
-            withStoreImpl(initialEntries = Map.empty) { store =>
-              val result = store.put(createId)(brokenStream).left.value
+        withNamespace { implicit namespace =>
+          val bytes = randomBytes()
+          val brokenStream = new ReplayableStream(
+            bytes,
+            length = bytes.length + 1
+          )
 
-              result shouldBe a[IncorrectStreamLengthError]
-            }
+          withStoreImpl(initialEntries = Map.empty) { store =>
+            val result = store.put(createId)(brokenStream).left.value
+
+            result shouldBe a[IncorrectStreamLengthError]
           }
         }
+      }
 
-        it("errors if the stream length is too short") {
-          withNamespace { implicit namespace =>
-            val bytes = randomBytes()
-            val brokenStream = new ReplayableStream(
-              bytes,
-              length = bytes.length - 1
-            )
+      it("errors if the stream length is too short") {
+        assume(!skipStreamLengthTests)
 
-            withStoreImpl(initialEntries = Map.empty) { store =>
-              val result = store.put(createId)(brokenStream).left.value
+        withNamespace { implicit namespace =>
+          val bytes = randomBytes()
+          val brokenStream = new ReplayableStream(
+            bytes,
+            length = bytes.length - 1
+          )
 
-              result shouldBe a[IncorrectStreamLengthError]
-            }
+          withStoreImpl(initialEntries = Map.empty) { store =>
+            val result = store.put(createId)(brokenStream).left.value
+
+            result shouldBe a[IncorrectStreamLengthError]
           }
         }
       }
