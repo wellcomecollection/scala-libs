@@ -2,18 +2,25 @@ package uk.ac.wellcome.storage.tags
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage._
+import uk.ac.wellcome.storage.store.Readable
 
-trait Tags[Ident] extends Logging {
-  def get(id: Ident): Either[ReadError, Map[String, String]]
+trait Updatable[Ident, T] {
+  type UpdateEither = Either[UpdateError, Identified[Ident, T]]
+  type UpdateFunction = T => Either[UpdateFunctionError, T]
 
-  protected def put(
+  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither
+}
+
+trait Tags[Ident]
+    extends Readable[Ident, Map[String, String]]
+    with Updatable[Ident, Map[String, String]]
+    with Logging {
+
+  protected def writeTags(
     id: Ident,
     tags: Map[String, String]): Either[WriteError, Map[String, String]]
 
-  def update(id: Ident)(
-    updateFunction: Map[String, String] => Either[UpdateFunctionError,
-                                                  Map[String, String]])
-    : Either[UpdateError, Map[String, String]] = {
+  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither = {
     info(s"Tags on $id: updating tags")
 
     for {
@@ -25,17 +32,17 @@ trait Tags[Ident] extends Logging {
 
       _ = debug(s"Tags on $id: existing tags = $existingTags")
 
-      newTags <- updateFunction(existingTags)
+      newTags <- updateFunction(existingTags.identifiedT)
 
       _ = debug(s"Tags on $id: new tags      = $newTags")
 
-      result <- if (newTags == existingTags) {
+      result <- if (newTags == existingTags.identifiedT) {
         debug(s"Tags on $id: no change, so skipping a write")
         Right(existingTags)
       } else {
         debug(s"Tags on $id: tags have changed, so writing new tags")
-        put(id = id, tags = newTags) match {
-          case Right(value) => Right(value)
+        writeTags(id = id, tags = newTags) match {
+          case Right(value) => Right(Identified(id, value))
           case Left(err)    => Left(UpdateWriteError(err))
         }
       }
