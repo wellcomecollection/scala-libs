@@ -36,7 +36,7 @@ trait Tags[Ident]
         debug(s"Tags on $id: tags have changed, so writing new tags")
         writeTags(id = id, tags = newTags) match {
           case Right(value) => Right(Identified(id, value))
-          case Left(err)    => {
+          case Left(err) => {
             warn(s"Error when trying to write tags to $id: $err")
             Left(UpdateWriteError(err))
           }
