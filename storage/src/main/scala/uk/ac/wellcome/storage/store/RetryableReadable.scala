@@ -30,7 +30,7 @@ trait RetryableReadable[T] extends Readable[ObjectLocation, T] with Logging {
         case Success(t) => Right(t)
         case Failure(err) =>
           val error = buildGetError(err)
-          warn(s"$error when trying to get $location")
+          warn(s"Error when trying to get $location: $error")
           Left(error)
     }
 }
