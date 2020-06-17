@@ -35,9 +35,9 @@ trait AzureStreamWritable
     } match {
       case Success(_) => Right(Identified(location, inputStream))
       case Failure(
-          error: BlobStorageException
-          ) if error.getErrorCode == BlobErrorCode.BLOB_ALREADY_EXISTS =>
-        Left(OverwriteError(error))
+          exc: BlobStorageException
+          ) if exc.getErrorCode == BlobErrorCode.BLOB_ALREADY_EXISTS =>
+        Left(OverwriteError(exc))
       case Failure(throwable) => Left(StoreWriteError(throwable))
     }
 }
