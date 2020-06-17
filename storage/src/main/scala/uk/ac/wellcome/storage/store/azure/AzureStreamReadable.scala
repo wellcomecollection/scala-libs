@@ -1,7 +1,6 @@
 package uk.ac.wellcome.storage.store.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import com.azure.storage.blob.models.BlobStorageException
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.azure.AzureStorageErrors
 import uk.ac.wellcome.storage.store.RetryableReadable

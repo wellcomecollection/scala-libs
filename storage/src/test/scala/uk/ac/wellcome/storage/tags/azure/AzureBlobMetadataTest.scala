@@ -34,9 +34,10 @@ class AzureBlobMetadataTest
 
     individualBlobClient
       .setMetadata(metadata.asJava)
+
+
   }
 
-  // TODO: TagsTestCases needs to handle Azure metadata
   override def withTags[R](initialTags: Map[ObjectLocation, Map[String, String]])(testWith: TestWith[Tags[ObjectLocation], R]): R = {
     initialTags
       .foreach { case (location, tags) =>
@@ -46,10 +47,15 @@ class AzureBlobMetadataTest
         )
       }
 
+    testWith(new AzureBlobMetadata())
   }
 
-  override def createIdent(context: Container): ObjectLocation = ???
+  override def createIdent(context: Container): ObjectLocation =
+    createObjectLocationWith(context)
 
-  override def withContext[R](testWith: TestWith[Container, R]): R = ???
+  override def withContext[R](testWith: TestWith[Container, R]): R =
+    withAzureContainer { container =>
+      testWith(container)
+    }
 
 }
