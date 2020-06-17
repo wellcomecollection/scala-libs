@@ -7,34 +7,39 @@ import com.amazonaws.services.s3.model.{
   SetObjectTaggingRequest,
   Tag
 }
+import uk.ac.wellcome.storage.s3.S3Errors
+import uk.ac.wellcome.storage.store.RetryableGet
+import uk.ac.wellcome.storage.tags.Tags
 import uk.ac.wellcome.storage.{
   ObjectLocation,
   ReadError,
   StoreWriteError,
   WriteError
 }
-import uk.ac.wellcome.storage.tags.Tags
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Tags(maxRetries: Int = 3)(implicit s3Client: AmazonS3)
-    extends Tags[ObjectLocation] {
+class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
+    extends Tags[ObjectLocation]
+    with RetryableGet[Map[String, String]] {
 
-  override def get(
-    location: ObjectLocation): Either[ReadError, Map[String, String]] =
-    for {
-      response <- S3Get.get(location, maxRetries = maxRetries) {
-        location: ObjectLocation =>
-          s3Client.getObjectTagging(
-            new GetObjectTaggingRequest(location.namespace, location.path)
-          )
-      }
+  override def get(id: ObjectLocation): Either[ReadError, Map[String, String]] =
+    retryableGet(id)
 
-      tags = response.getTagSet.asScala.map { tag: Tag =>
-        tag.getKey -> tag.getValue
-      }.toMap
-    } yield tags
+  override def retryableGetFunction(
+    location: ObjectLocation): Map[String, String] = {
+    val response = s3Client.getObjectTagging(
+      new GetObjectTaggingRequest(location.namespace, location.path)
+    )
+
+    response.getTagSet.asScala.map { tag: Tag =>
+      tag.getKey -> tag.getValue
+    }.toMap
+  }
+
+  override def buildGetError(throwable: Throwable): ReadError =
+    S3Errors.readErrors(throwable)
 
   override protected def put(
     location: ObjectLocation,
