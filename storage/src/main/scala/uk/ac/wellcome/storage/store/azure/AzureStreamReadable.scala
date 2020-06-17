@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.store.azure
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.BlobStorageException
 import uk.ac.wellcome.storage._
+import uk.ac.wellcome.storage.azure.AzureStorageErrors
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
@@ -23,11 +24,5 @@ trait AzureStreamReadable extends RetryableReadable[InputStreamWithLength] {
   }
 
   def buildGetError(throwable: Throwable): ReadError =
-    throwable match {
-      case exc: BlobStorageException if exc.getStatusCode == 404 =>
-        DoesNotExistError(exc)
-      case _ =>
-        warn(s"Unrecognised error inside AzureReadable.get: $throwable")
-        StoreReadError(throwable)
-    }
+    AzureStorageErrors.readErrors(throwable)
 }

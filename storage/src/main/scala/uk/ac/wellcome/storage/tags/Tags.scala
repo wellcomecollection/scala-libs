@@ -2,14 +2,7 @@ package uk.ac.wellcome.storage.tags
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.store.Readable
-
-trait Updatable[Ident, T] {
-  type UpdateEither = Either[UpdateError, Identified[Ident, T]]
-  type UpdateFunction = T => Either[UpdateFunctionError, T]
-
-  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither
-}
+import uk.ac.wellcome.storage.store.{Readable, Updatable}
 
 trait Tags[Ident]
     extends Readable[Ident, Map[String, String]]
