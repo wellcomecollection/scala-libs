@@ -37,6 +37,8 @@ sealed trait EncoderError extends WriteError
 
 case class StoreWriteError(e: Throwable) extends WriteError with BackendError
 
+case class OverwriteError(e: Throwable) extends WriteError with BackendError
+
 case class IncorrectStreamLengthError(e: Throwable = new Error())
     extends DecoderError
     with EncoderError
