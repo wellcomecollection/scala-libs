@@ -1,31 +1,18 @@
 package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{
-  GetObjectTaggingRequest,
-  ObjectTagging,
-  SetObjectTaggingRequest,
-  Tag
-}
+import com.amazonaws.services.s3.model.{GetObjectTaggingRequest, ObjectTagging, SetObjectTaggingRequest, Tag}
 import uk.ac.wellcome.storage.s3.S3Errors
-import uk.ac.wellcome.storage.store.RetryableGet
+import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
-import uk.ac.wellcome.storage.{
-  ObjectLocation,
-  ReadError,
-  StoreWriteError,
-  WriteError
-}
+import uk.ac.wellcome.storage.{ObjectLocation, ReadError, StoreWriteError, WriteError}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     extends Tags[ObjectLocation]
-    with RetryableGet[Map[String, String]] {
-
-  override def get(id: ObjectLocation): Either[ReadError, Map[String, String]] =
-    retryableGet(id)
+    with RetryableReadable[Map[String, String]] {
 
   override def retryableGetFunction(
     location: ObjectLocation): Map[String, String] = {
@@ -41,7 +28,7 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
   override def buildGetError(throwable: Throwable): ReadError =
     S3Errors.readErrors(throwable)
 
-  override protected def put(
+  override protected def writeTags(
     location: ObjectLocation,
     tags: Map[String, String]): Either[WriteError, Map[String, String]] = {
     val tagSet = tags

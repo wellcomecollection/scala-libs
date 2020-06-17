@@ -25,7 +25,7 @@ class TagsTest extends AnyFunSpec with Matchers with EitherValues with RandomThi
 
       class BrokenReadTags()
         extends MemoryTags[UUID](initialTags = Map.empty) {
-        override def get(id: UUID): Either[ReadError, Map[String, String]] =
+        override def get(id: UUID): ReadEither =
           Left(readError)
       }
 
@@ -43,7 +43,7 @@ class TagsTest extends AnyFunSpec with Matchers with EitherValues with RandomThi
 
       class BrokenWriteTags(initialTags: Map[UUID, Map[String, String]])
         extends MemoryTags[UUID](initialTags = initialTags) {
-        override protected def put(id: UUID, tags: Map[String, String]): Either[WriteError, Map[String, String]] =
+        override protected def writeTags(id: UUID, tags: Map[String, String]): Either[WriteError, Map[String, String]] =
           Left(writeError)
       }
 

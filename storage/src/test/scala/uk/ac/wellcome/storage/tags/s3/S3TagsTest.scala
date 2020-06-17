@@ -5,10 +5,10 @@ import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{ObjectLocation, UpdateError, UpdateWriteError}
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.tags.{Tags, TagsTestCases}
+import uk.ac.wellcome.storage.{ObjectLocation, UpdateWriteError}
 
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -117,7 +117,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[ObjectLocat
         val location = createObjectLocationWith(bucket)
         putObject(location)
 
-        val result =
+        val result: s3Tags.UpdateEither =
           s3Tags
             .update(location) { existingTags: Map[String, String] =>
               Right(existingTags ++ Map("key" -> randomAlphanumericWithLength(257)))
@@ -133,7 +133,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[ObjectLocat
   private def putObject(location: ObjectLocation): Unit =
     s3Client.putObject(location.namespace, location.path, s"<Written by ${this.getClass.getName}")
 
-  private def assertIsS3Exception(result: Either[UpdateError, Map[String, String]])(assert: String => Assertion): Assertion = {
+  private def assertIsS3Exception(result: s3Tags.UpdateEither)(assert: String => Assertion): Assertion = {
     val err = result.left.value
 
     err shouldBe a[UpdateWriteError]
