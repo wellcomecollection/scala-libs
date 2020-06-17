@@ -64,7 +64,8 @@ class AzureStreamStoreTest
     it("will not overwrite an existing object") {
       withNamespace { implicit namespace =>
         val id = createId
-        val entry = ReplayableStream(randomBytes())
+        val entry = ReplayableStream(randomBytes(256))
+        val updatedEntry = ReplayableStream(randomBytes(256))
 
         withStoreImpl(
           initialEntries = Map(id -> entry),
@@ -72,7 +73,7 @@ class AzureStreamStoreTest
             allowOverwrite = Some(false)
           )
         ) { store =>
-          val result = store.put(id)(entry).left.value
+          val result = store.put(id)(updatedEntry).left.value
 
           result shouldBe a[OverwriteError]
         }
