@@ -1,4 +1,4 @@
-RELEASE_TYPE: major
+RELEASE_TYPE: minor
 
 ### Libraries affected
 
@@ -6,19 +6,22 @@ RELEASE_TYPE: major
 
 ### Description
 
-`RetryableGet` has been replaced in favour of `RetryableReadable`. 
-
-A new trait `Updatable` has been made available and is used in `Tags`.
+Adds Azure support for `Tags` in the shape of `AzureBlobMetadata`.
 
 ```scala
-trait Updatable[Ident, T] {
-  type UpdateEither = Either[UpdateError, Identified[Ident, T]]
-  type UpdateFunction = T => Either[UpdateFunctionError, T]
+implicit val azureClient: BlobServiceClient =
+  new BlobServiceClientBuilder()
+    .connectionString("UseDevelopmentStorage=true;")
+    .buildClient()
 
-  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither
+val azureBlobMetadata = new AzureBlobMetadata()
+
+// Get tags
+val objectLocation = ObjectLocation("mycontainer","myobject.txt")
+val getResult: Either[ReadError, Identified[Ident, T]]  = azureBlobMetadata.get(objectLocation)
+
+val newTags = Map("owner" -> "jill")
+val updateResult: Either[UpdateError, Identified[Ident, T]] = azureBlobMetadata.update(objectLocation) { oldTags =>
+    oldTags ++ newTags 
 }
 ```
-
-`Tags` now meets the interfaces of  to `RetryableReadable` and `Updatable`.
-
-Consumers will need to update code where `update` and `get` have been used on `S3Tags`.
