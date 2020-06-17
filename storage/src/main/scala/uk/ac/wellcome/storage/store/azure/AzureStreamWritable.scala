@@ -4,7 +4,12 @@ import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobErrorCode, BlobStorageException}
 import uk.ac.wellcome.storage.store.Writable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
-import uk.ac.wellcome.storage.{Identified, ObjectLocation, OverwriteError, StoreWriteError}
+import uk.ac.wellcome.storage.{
+  Identified,
+  ObjectLocation,
+  OverwriteError,
+  StoreWriteError
+}
 
 import scala.util.{Failure, Success, Try}
 
@@ -30,8 +35,8 @@ trait AzureStreamWritable
     } match {
       case Success(_) => Right(Identified(location, inputStream))
       case Failure(
-        error: BlobStorageException
-      ) if error.getErrorCode == BlobErrorCode.BLOB_ALREADY_EXISTS =>
+          error: BlobStorageException
+          ) if error.getErrorCode == BlobErrorCode.BLOB_ALREADY_EXISTS =>
         Left(OverwriteError(error))
       case Failure(throwable) => Left(StoreWriteError(throwable))
     }
