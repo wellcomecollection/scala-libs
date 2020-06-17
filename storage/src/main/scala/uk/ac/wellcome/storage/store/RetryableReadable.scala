@@ -12,7 +12,7 @@ trait RetryableReadable[T] extends Readable[ObjectLocation, T] with Logging {
 
   def retryableGetFunction(location: ObjectLocation): T
 
-  def buildGetError(location: ObjectLocation)(throwable: Throwable): ReadError
+  def buildGetError(throwable: Throwable): ReadError
 
   def get(location: ObjectLocation): ReadEither =
     retryableGet(location) map { t =>
@@ -29,7 +29,7 @@ trait RetryableReadable[T] extends Readable[ObjectLocation, T] with Logging {
       } match {
         case Success(t)   => Right(t)
         case Failure(err) =>
-          val error = buildGetError(location)(err)
+          val error = buildGetError(err)
           warn(s"$error when trying to get $location")
           Left(error)
       }

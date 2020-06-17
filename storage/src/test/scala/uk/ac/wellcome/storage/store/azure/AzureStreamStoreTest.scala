@@ -36,16 +36,11 @@ class AzureStreamStoreTest
     context: AzureStreamStoreContext,
     initialEntries: Map[ObjectLocation, InputStreamWithLength])(
     testWith: TestWith[AzureStreamStore, R]): R = {
-    initialEntries.foreach {
-      case (location, data) =>
+    initialEntries.foreach { case (location, data) =>
         azureClient
           .getBlobContainerClient(location.namespace)
           .getBlobClient(location.path)
           .upload(data, data.length)
-
-        azureClient
-          .getBlobContainerClient(location.namespace)
-          .getBlobClient(location.path)
     }
 
     val store = context.allowOverwrite.map { allowOverwrites =>
@@ -64,18 +59,22 @@ class AzureStreamStoreTest
     it("will not overwrite an existing object") {
       withNamespace { implicit namespace =>
         val id = createId
-        val entry = ReplayableStream(randomBytes(256))
+        val initialEntry = ReplayableStream(randomBytes(256))
         val updatedEntry = ReplayableStream(randomBytes(256))
 
         withStoreImpl(
-          initialEntries = Map(id -> entry),
+          initialEntries = Map(id -> initialEntry),
           storeContext = AzureStreamStoreContext(
             allowOverwrite = Some(false)
           )
         ) { store =>
-          val result = store.put(id)(updatedEntry).left.value
+          val putResult = store.put(id)(updatedEntry).left.value
 
-          result shouldBe a[OverwriteError]
+          putResult shouldBe a[OverwriteError]
+
+          val retrievedEntry = store.get(id).right.get
+
+          assertEqualT(initialEntry, retrievedEntry.identifiedT)
         }
       }
     }
