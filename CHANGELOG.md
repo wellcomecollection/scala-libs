@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v11.2.0 - 2020-06-18
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Adds support for listing the blobs in an Azure Blob Storage container through `AzureBlobItemListing` and `AzureObjectLocationListing`.
+
 ## v11.1.0 - 2020-06-18
 
 ### Libraries affected
