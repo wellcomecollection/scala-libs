@@ -8,4 +8,7 @@
   <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
+
+  <logger name="io.netty" level="INFO"/>
+  <logger name="reactor.netty" level="INFO"/>
 </configuration>

@@ -46,7 +46,7 @@ class S3toAzureTransfer(
             )
 
             // Remember to close the streams afterwards, or we might get
-            // errors like
+            // errors from the S3 SDK like:
             //
             //    Unable to execute HTTP request: Timeout waiting for
             //    connection from pool
