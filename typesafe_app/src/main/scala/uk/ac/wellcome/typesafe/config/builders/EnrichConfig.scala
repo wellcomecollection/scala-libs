@@ -3,10 +3,11 @@ package uk.ac.wellcome.typesafe.config.builders
 import com.typesafe.config.Config
 
 object EnrichConfig {
+
   implicit class RichConfig(val underlying: Config) extends AnyVal {
     def get[T](path: String): Option[T] =
       if (underlying.hasPath(tidyPath(path))) {
-        Some(underlying.getAnyRef(tidyPath(path)).asInstanceOf[T])
+        Some(underlying.get(tidyPath(path)).asInstanceOf[T])
       } else {
         None
       }
