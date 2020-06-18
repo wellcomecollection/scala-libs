@@ -4,18 +4,23 @@ import java.io.InputStream
 
 import com.azure.storage.blob.BlobServiceClient
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.storage.store.azure.{AzureStreamReadable, AzureStreamStore, AzureStreamWritable}
+import uk.ac.wellcome.storage.store.azure.{
+  AzureStreamReadable,
+  AzureStreamStore,
+  AzureStreamWritable
+}
 import uk.ac.wellcome.storage.store.s3.S3StreamReadable
 import uk.ac.wellcome.storage.transfer._
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, ObjectLocation}
 
-class S3toAzureTransfer(
-    implicit
-    s3Readable: S3StreamReadable,
-    blobClient: BlobServiceClient) extends Transfer[ObjectLocation] {
+class S3toAzureTransfer(implicit
+                        s3Readable: S3StreamReadable,
+                        blobClient: BlobServiceClient)
+    extends Transfer[ObjectLocation] {
   import uk.ac.wellcome.storage.RetryOps._
 
-  private val azureStreamStore: AzureStreamStore = new AzureStreamStore(allowOverwrites = true)
+  private val azureStreamStore: AzureStreamStore = new AzureStreamStore(
+    allowOverwrites = true)
 
   private val azureWritable: AzureStreamWritable = azureStreamStore
   private val azureReadable: AzureStreamReadable = azureStreamStore
@@ -67,7 +72,9 @@ class S3toAzureTransfer(
         }
     }
 
-  override protected def transferWithOverwrites(src: ObjectLocation, dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
+  override protected def transferWithOverwrites(
+    src: ObjectLocation,
+    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
     def singleTransfer: Either[TransferFailure, TransferSuccess] =
       runTransfer(src, dst)
 
@@ -79,7 +86,7 @@ class S3toAzureTransfer(
     dst: ObjectLocation,
     srcStream: InputStream,
     dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation],
-    TransferNoOp[ObjectLocation]] =
+                                    TransferNoOp[ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {

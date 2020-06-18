@@ -8,4 +8,3 @@ class AzureTypedStore[T](
   implicit val codec: Codec[T],
   val streamStore: AzureStreamStore
 ) extends TypedStore[ObjectLocation, T]
-

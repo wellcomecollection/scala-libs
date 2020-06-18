@@ -44,13 +44,14 @@ trait AzureStreamWritable
       // I added this after failures in the S3toAzureTransfer tests; I don't know how
       // to test the need for this wrapper directly.
       //
-      val bufferedStream: BufferedInputStream = new BufferedInputStream(inputStream) {
-        override def available(): Int = {
-          val remaining = inputStream.length - pos
+      val bufferedStream: BufferedInputStream =
+        new BufferedInputStream(inputStream) {
+          override def available(): Int = {
+            val remaining = inputStream.length - pos
 
-          if (remaining > Int.MaxValue) Int.MaxValue else remaining.toInt
+            if (remaining > Int.MaxValue) Int.MaxValue else remaining.toInt
+          }
         }
-      }
 
       individualBlobClient.upload(
         bufferedStream,
