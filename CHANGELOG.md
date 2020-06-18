@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v11.3.0 - 2020-06-18
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Adds support for transferring objects between S3 and Azure Blob Storage with `S3toAzureTransfer` and `S3toAzurePrefixTransfer`.
+
 ## v11.2.0 - 2020-06-18
 
 ### Libraries affected
