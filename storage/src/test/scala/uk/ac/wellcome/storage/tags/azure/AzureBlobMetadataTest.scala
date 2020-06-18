@@ -65,7 +65,7 @@ class AzureBlobMetadataTest
       testWith(container)
     }
 
-  it("if the tags are larger than 8KB in total") {
+  it("throws an error if the tags are larger than 8KB in total") {
     withAzureContainer { container =>
       val location = createObjectLocationWith(container)
       putObject(location)
