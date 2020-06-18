@@ -2,14 +2,7 @@ package uk.ac.wellcome.storage.tags
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.store.Readable
-
-trait Updatable[Ident, T] {
-  type UpdateEither = Either[UpdateError, Identified[Ident, T]]
-  type UpdateFunction = T => Either[UpdateFunctionError, T]
-
-  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither
-}
+import uk.ac.wellcome.storage.store.{Readable, Updatable}
 
 trait Tags[Ident]
     extends Readable[Ident, Map[String, String]]
@@ -43,7 +36,10 @@ trait Tags[Ident]
         debug(s"Tags on $id: tags have changed, so writing new tags")
         writeTags(id = id, tags = newTags) match {
           case Right(value) => Right(Identified(id, value))
-          case Left(err)    => Left(UpdateWriteError(err))
+          case Left(err) => {
+            warn(s"Tags on $id: error when trying to write: $err")
+            Left(UpdateWriteError(err))
+          }
         }
       }
     } yield result

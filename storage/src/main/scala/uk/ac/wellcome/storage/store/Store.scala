@@ -15,3 +15,10 @@ trait Writable[Ident, T] {
 
   def put(id: Ident)(t: T): WriteEither
 }
+
+trait Updatable[Ident, T] {
+  type UpdateEither = Either[UpdateError, Identified[Ident, T]]
+  type UpdateFunction = T => Either[UpdateFunctionError, T]
+
+  def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither
+}
