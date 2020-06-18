@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.store.azure
 
+import java.io.BufferedInputStream
+
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobErrorCode, BlobStorageException}
 import uk.ac.wellcome.storage.store.Writable
@@ -26,8 +28,33 @@ trait AzureStreamWritable
           .getBlobContainerClient(location.namespace)
           .getBlobClient(location.path)
 
+      // We need to buffer the input stream, or we get errors from the Azure SDK:
+      //
+      //    java.io.IOException: mark/reset not supported
+      //
+      // The Azure SDK checks the length by counting how many bytes it's already read,
+      // and how many are remaining according to `available()`.  That's an estimate
+      // of how many bytes can be read without blocking; it guesses wrong and you
+      // get a different error from the Azure SDK, of the form:
+      //
+      //    Request body emitted 20 bytes, more than the expected 19 bytes
+      //
+      // Taking control of this manually gets it to work.
+      //
+      // I added this after failures in the S3toAzureTransfer tests; I don't know how
+      // to test the need for this wrapper directly.
+      //
+      val bufferedStream: BufferedInputStream =
+        new BufferedInputStream(inputStream) {
+          override def available(): Int = {
+            val remaining = inputStream.length - pos
+
+            if (remaining > Int.MaxValue) Int.MaxValue else remaining.toInt
+          }
+        }
+
       individualBlobClient.upload(
-        inputStream,
+        bufferedStream,
         inputStream.length.toLong,
         allowOverwrites
       )

@@ -30,7 +30,7 @@ class AzureStreamStoreTest
     }
 
   override def createId(implicit container: Container): ObjectLocation =
-    createObjectLocationWith(namespace = container.name)
+    createAzureObjectLocationWith(container)
 
   override def withStreamStoreImpl[R](
     context: AzureStreamStoreContext,
@@ -43,9 +43,10 @@ class AzureStreamStoreTest
           .upload(data, data.length)
     }
 
-    val store = context.allowOverwrite.map { allowOverwrites =>
-      new AzureStreamStore(allowOverwrites = allowOverwrites)
-    } getOrElse (new AzureStreamStore())
+    val store = context.allowOverwrite match {
+      case Some(allowOverwrites) => new AzureStreamStore(allowOverwrites = allowOverwrites)
+      case None                  => new AzureStreamStore()
+    }
 
     testWith(store)
   }
@@ -55,7 +56,6 @@ class AzureStreamStoreTest
     testWith(AzureStreamStoreContext())
 
   describe("allowOverwrites is false") {
-
     it("will not overwrite an existing object") {
       withNamespace { implicit namespace =>
         val id = createId
