@@ -1,105 +1,115 @@
 package uk.ac.wellcome.storage.transfer.memory
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.ListingFailure
-import uk.ac.wellcome.storage.listing.memory.MemoryListingFixtures
-import uk.ac.wellcome.storage.store.fixtures.StringNamespaceFixtures
+import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.memory.MemoryStore
 import uk.ac.wellcome.storage.transfer._
 
 class MemoryPrefixTransferTest
     extends PrefixTransferTestCases[
+      ObjectLocation,
+      ObjectLocationPrefix,
+      Record,
       String,
       String,
-      String,
-      Array[Byte],
-      MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[String,
-                                                                 String,
-                                                                 Array[Byte]]]
-    with MemoryListingFixtures[Array[Byte]]
-    with MemoryTransferFixtures[String, Array[Byte]]
-    with StringNamespaceFixtures {
-  override def createPrefix(implicit namespace: String): String = createId
+      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record],
+      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record],
+      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]]
+  with RecordGenerators
+  with ObjectLocationGenerators {
 
-  override def createLocationFrom(prefix: String, suffix: String): String =
-    prefix + "/" + suffix
+  type MemoryRecordStore =
+    MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]
 
-  override def createT: Array[Byte] = randomBytes()
+  override def withSrcNamespace[R](testWith: TestWith[String, R]): R =
+    testWith(randomAlphanumeric)
 
-  class InnerMemoryPrefixTransfer(initialEntries: Map[String, Array[Byte]])
-      extends MemoryStore[String, Array[Byte]](initialEntries)
-      with MemoryPrefixTransfer[String, String, Array[Byte]] {
+  override def withDstNamespace[R](testWith: TestWith[String, R]): R =
+    testWith(randomAlphanumeric)
 
-    override protected def startsWith(id: String, prefix: String): Boolean =
-      id.startsWith(prefix)
+  override def createSrcLocation(srcNamespace: String): ObjectLocation =
+    createObjectLocationWith(srcNamespace)
 
-    override protected def buildDstLocation(srcPrefix: String,
-                                            dstPrefix: String,
-                                            srcLocation: String): String =
-      srcLocation.replaceAll("^" + srcPrefix, dstPrefix)
+  override def createDstLocation(dstNamespace: String): ObjectLocation =
+    createObjectLocationWith(dstNamespace)
+
+  override def createSrcPrefix(srcNamespace: String): ObjectLocationPrefix =
+    createObjectLocationPrefixWith(srcNamespace)
+
+  override def createDstPrefix(dstNamespace: String): ObjectLocationPrefix =
+    createObjectLocationPrefixWith(dstNamespace)
+
+  override def createSrcLocationFrom(srcPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+    srcPrefix.asLocation(suffix)
+
+  override def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+    dstPrefix.asLocation(suffix)
+
+  override def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
+    initialEntries.foreach { case (location, record) =>
+      underlying.put(location)(record) shouldBe a[Right[_, _]]
+    }
+
+    testWith(underlying)
   }
 
-  override def withPrefixTransferStore[R](
-    initialEntries: Map[String, Array[Byte]])(
-    testWith: TestWith[
-      MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[String,
-                                                                 String,
-                                                                 Array[Byte]],
-      R]): R =
-    testWith(new InnerMemoryPrefixTransfer(initialEntries))
+  override def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
+    initialEntries.foreach { case (location, record) =>
+      underlying.put(location)(record) shouldBe a[Right[_, _]]
+    }
 
-  override def withPrefixTransfer[R](
-    testWith: TestWith[PrefixTransfer[String, String], R])(
-    implicit store: MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[
-      String,
-      String,
-      Array[Byte]]): R =
-    testWith(store)
+    testWith(underlying)
+  }
 
-  override def withExtraListingTransfer[R](
-    testWith: TestWith[PrefixTransfer[String, String], R])(
-    implicit store: MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[
-      String,
-      String,
-      Array[Byte]]): R =
-    testWith(
-      new InnerMemoryPrefixTransfer(store.entries) {
-        override def list(prefix: String): ListingResult = {
-          val matchingIdentifiers = entries
-            .filter { case (ident, _) => startsWith(ident, prefix) }
-            .map { case (ident, _) => ident }
+  class MemoryObjectLocationPrefixTransfer(initialEntries: Map[ObjectLocation, Record])
+    extends MemoryStore[ObjectLocation, Record](initialEntries = initialEntries)
+      with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]
+      with ObjectLocationPrefixTransfer {
+    override protected def startsWith(location: ObjectLocation, prefix: ObjectLocationPrefix): Boolean = {
+      location.namespace == prefix.namespace && location.path.startsWith(prefix.path)
+    }
+  }
 
-          Right(matchingIdentifiers ++ Seq(randomAlphanumeric))
-        }
+  override def withPrefixTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation], R]): R =
+    testWith(srcStore)
+
+  override def withExtraListingTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation], R]): R = {
+    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def list(prefix: ObjectLocationPrefix): ListingResult = {
+        val matchingLocations = entries
+          .filter { case (location, _) => startsWith(location, prefix) }
+          .map { case (location, _) => location }
+
+        Right(matchingLocations ++ Seq(createObjectLocation))
       }
+    }
+
+    testWith(prefixTransfer)
+  }
+
+  override def withBrokenListingTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation], R]): R = {
+    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def list(prefix: ObjectLocationPrefix): ListingResult =
+        Left(ListingFailure(prefix))
+    }
+
+    testWith(prefixTransfer)
+  }
+
+  override def withBrokenTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation], R]): R =  {
+    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): Either[TransferFailure, TransferSuccess] =
+        Left(TransferSourceFailure(src, dst))
+    }
+
+    testWith(prefixTransfer)
+  }
+
+  override def withContext[R](testWith: TestWith[MemoryRecordStore, R]): R =
+    testWith(
+      new MemoryObjectLocationPrefixTransfer(initialEntries = Map.empty)
     )
 
-  override def withBrokenListingTransfer[R](
-    testWith: TestWith[PrefixTransfer[String, String], R])(
-    implicit store: MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[
-      String,
-      String,
-      Array[Byte]]): R =
-    testWith(
-      new InnerMemoryPrefixTransfer(store.entries) {
-        override def list(prefix: String): ListingResult =
-          Left(ListingFailure(prefix))
-      }
-    )
-
-  override def withBrokenTransfer[R](
-    testWith: TestWith[PrefixTransfer[String, String], R])(
-    implicit store: MemoryStore[String, Array[Byte]] with MemoryPrefixTransfer[
-      String,
-      String,
-      Array[Byte]]): R =
-    testWith(
-      new InnerMemoryPrefixTransfer(store.entries) {
-        override def transfer(
-          src: String,
-          dst: String,
-          checkForExisting: Boolean = true): Either[TransferFailure, TransferSuccess] =
-          Left(TransferSourceFailure(src, dst))
-      }
-    )
+  override def createT: Record = createRecord
 }

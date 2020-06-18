@@ -6,283 +6,301 @@ import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
-import uk.ac.wellcome.storage.store.fixtures.NamespaceFixtures
 
 trait PrefixTransferTestCases[
-  Location, Prefix, Namespace, T, StoreImpl <: Store[Location, T]]
+  Location, Prefix, T,
+  SrcNamespace, DstNamespace,
+  SrcStore <: Store[Location, T],
+  DstStore <: Store[Location, T],
+  Context]
     extends AnyFunSpec
     with Matchers
-    with EitherValues
-    with NamespaceFixtures[Location, Namespace] {
-  def withPrefixTransferStore[R](initialEntries: Map[Location, T])(
-    testWith: TestWith[StoreImpl, R]): R
+    with EitherValues {
+  def withSrcNamespace[R](testWith: TestWith[SrcNamespace, R]): R
+  def withDstNamespace[R](testWith: TestWith[DstNamespace, R]): R
 
-  def withPrefixTransfer[R](
-    testWith: TestWith[PrefixTransfer[Prefix, Location], R])(
-    implicit store: StoreImpl): R
+  def withNamespacePair[R](testWith: TestWith[(SrcNamespace, DstNamespace), R]): R =
+    withSrcNamespace { srcNamespace =>
+      withDstNamespace { dstNamespace =>
+        testWith((srcNamespace, dstNamespace))
+      }
+    }
 
-  def withExtraListingTransfer[R](
-    testWith: TestWith[PrefixTransfer[Prefix, Location], R])(
-    implicit store: StoreImpl): R
-  def withBrokenListingTransfer[R](
-    testWith: TestWith[PrefixTransfer[Prefix, Location], R])(
-    implicit store: StoreImpl): R
-  def withBrokenTransfer[R](
-    testWith: TestWith[PrefixTransfer[Prefix, Location], R])(
-    implicit store: StoreImpl): R
+  def createSrcLocation(srcNamespace: SrcNamespace): Location
+  def createDstLocation(dstNamespace: DstNamespace): Location
 
-  def createPrefix(implicit namespace: Namespace): Prefix
+  def createSrcPrefix(srcNamespace: SrcNamespace): Prefix
+  def createDstPrefix(dstNamespace: DstNamespace): Prefix
 
-  def createLocationFrom(prefix: Prefix, suffix: String): Location
+  def createSrcLocationFrom(srcPrefix: Prefix, suffix: String): Location
+  def createDstLocationFrom(dstPrefix: Prefix, suffix: String): Location
+
+  def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
+  def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
+
+  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+
+  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
 
   def createT: T
 
+  def withContext[R](testWith: TestWith[Context, R]): R
+
   describe("behaves as a PrefixTransfer") {
     it("does nothing if the prefix is empty") {
-      withNamespace { implicit namespace =>
-        withPrefixTransferStore(initialEntries = Map.empty) { implicit store =>
-          withPrefixTransfer { prefixTransfer =>
-            val result = prefixTransfer.transferPrefix(
-              srcPrefix = createPrefix,
-              dstPrefix = createPrefix
-            )
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-            result.right.value shouldBe PrefixTransferSuccess(0)
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map.empty) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(
+                    srcPrefix = srcPrefix,
+                    dstPrefix = dstPrefix
+                  )
+                }
+
+              result.right.value shouldBe PrefixTransferSuccess(0)
+            }
           }
         }
       }
     }
 
-    it("copies a single item") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val dstPrefix = createPrefix
+    it("copies a single object") {
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-        val srcLocation = createLocationFrom(srcPrefix, suffix = "1.txt")
-        val dstLocation = createLocationFrom(dstPrefix, suffix = "1.txt")
+        val srcLocation = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
+        val dstLocation = createDstLocationFrom(dstPrefix, suffix = "1.txt")
 
         val t = createT
 
-        withPrefixTransferStore(initialEntries = Map(srcLocation -> t)) {
-          implicit store =>
-            withPrefixTransfer { prefixTransfer =>
-              val result = prefixTransfer.transferPrefix(
-                srcPrefix = srcPrefix,
-                dstPrefix = dstPrefix
-              )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(srcLocation -> t)) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(
+                    srcPrefix = srcPrefix,
+                    dstPrefix = dstPrefix
+                  )
+                }
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              store.get(srcLocation).right.value shouldBe Identified(
-                srcLocation,
-                t)
-              store.get(dstLocation).right.value shouldBe Identified(
-                dstLocation,
-                t)
+              srcStore.get(srcLocation) shouldBe Right(Identified(srcLocation, t))
+              dstStore.get(dstLocation) shouldBe Right(Identified(dstLocation, t))
             }
+          }
         }
       }
     }
 
-    it("copies multiple items") {
+    it("copies multiple objects") {
       val objectCount = 5
 
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val dstPrefix = createPrefix
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
         val srcLocations = (1 to objectCount).map { i =>
-          createLocationFrom(srcPrefix, suffix = s"$i.txt")
+          createSrcLocationFrom(srcPrefix, suffix = s"$i.txt")
         }
 
-        val valuesT = (1 to objectCount).map { _ =>
+        val valuesT: Seq[T] = (1 to objectCount).map { _ =>
           createT
         }
 
-        withPrefixTransferStore(
-          initialEntries = srcLocations.zip(valuesT).toMap) { implicit store =>
-          withPrefixTransfer { prefixTransfer =>
-            val result = prefixTransfer.transferPrefix(
-              srcPrefix = srcPrefix,
-              dstPrefix = dstPrefix
-            )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = srcLocations.zip(valuesT).toMap) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
 
-            val transferResult = result.right.value
-            transferResult shouldBe a[PrefixTransferSuccess]
-            transferResult
-              .asInstanceOf[PrefixTransferSuccess]
-              .successes shouldBe srcLocations.size
+              result.right.value shouldBe PrefixTransferSuccess(objectCount)
+
+              // TODO: Check the objects were copied correctly
+            }
           }
         }
       }
     }
 
     it("does not copy items from outside the prefix") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val dstPrefix = createPrefix
+      val objectCount = 5
 
-        val srcLocations = (1 to 5).map { i =>
-          createLocationFrom(srcPrefix, suffix = s"$i.txt")
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
+
+        val srcLocations = (1 to objectCount).map { i =>
+          createSrcLocationFrom(srcPrefix, suffix = s"$i.txt")
         }
 
-        val valuesT = (1 to 5).map { _ =>
-          createT
-        }
+        val valuesT: Seq[T] = (1 to objectCount).map { _ => createT }
 
-        val otherPrefix = createPrefix
-        val otherLocation =
-          createLocationFrom(otherPrefix, suffix = "other.txt")
+        val otherPrefix = createSrcPrefix(srcNamespace)
+        val otherLocation = createSrcLocationFrom(otherPrefix, suffix = "other.txt")
 
         val initialEntries = srcLocations.zip(valuesT).toMap ++ Map(
           otherLocation -> createT)
 
-        withPrefixTransferStore(initialEntries = initialEntries) {
-          implicit store =>
-            withPrefixTransfer { prefixTransfer =>
-              val result = prefixTransfer.transferPrefix(
-                srcPrefix = srcPrefix,
-                dstPrefix = dstPrefix
-              )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = initialEntries) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
 
-              val transferResult = result.right.value
+              result.right.value shouldBe PrefixTransferSuccess(objectCount)
 
-              transferResult shouldBe a[PrefixTransferSuccess]
-              val transferSuccess =
-                transferResult.asInstanceOf[PrefixTransferSuccess]
-              transferSuccess.successes shouldBe srcLocations.size
+              // TODO: Check only the prefixed objects were copied correctly
             }
+          }
         }
       }
     }
 
     it("fails if the listing includes an item that doesn't exist") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
+      val actualLocationCount = 25
 
-        val actualLocationCount = 25
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
         val srcLocations = (1 to actualLocationCount).map { i =>
-          createLocationFrom(srcPrefix, suffix = s"$i.txt")
+          createSrcLocationFrom(srcPrefix, suffix = s"$i.txt")
         }
 
-        withPrefixTransferStore(
-          initialEntries = srcLocations.map { _ -> createT }.toMap) { implicit store =>
-          withExtraListingTransfer { prefixTransfer =>
-            val result = prefixTransfer.transferPrefix(
-              srcPrefix = srcPrefix,
-              dstPrefix = createPrefix
-            )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = srcLocations.map { _ -> createT }.toMap) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withExtraListingTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
 
-            val transferResult = result.left.value
+              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
 
-            transferResult shouldBe a[PrefixTransferFailure]
-            val failure = transferResult.asInstanceOf[PrefixTransferFailure]
-            println(s"failure = $failure")
-            failure.successes shouldBe actualLocationCount
-            failure.failures shouldBe 1
+              failure.successes shouldBe actualLocationCount
+              failure.failures shouldBe 1
+            }
           }
         }
       }
     }
 
     it("fails if the underlying transfer is broken") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val srcLocation = createLocationFrom(srcPrefix, suffix = "1.txt")
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-        val t = createT
+        val srcLocation = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
 
-        withPrefixTransferStore(initialEntries = Map(srcLocation -> t)) {
-          implicit store =>
-            withBrokenTransfer { prefixTransfer =>
-              val result = prefixTransfer.transferPrefix(
-                srcPrefix = srcPrefix,
-                dstPrefix = createPrefix
-              )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(srcLocation -> createT)) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withBrokenTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
 
               result.left.value shouldBe a[PrefixTransferFailure]
             }
+          }
         }
       }
     }
 
     it("fails if the underlying listing is broken") {
-      withNamespace { implicit namespace =>
-        withPrefixTransferStore(initialEntries = Map.empty) { implicit store =>
-          withBrokenListingTransfer { prefixTransfer =>
-            val result = prefixTransfer.transferPrefix(
-              srcPrefix = createPrefix,
-              dstPrefix = createPrefix
-            )
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-            result.left.value shouldBe a[PrefixTransferListingFailure[_]]
+        val srcLocation = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
+
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(srcLocation -> createT)) { srcStore =>
+            withDstStore(initialEntries = Map.empty) { dstStore =>
+              val result =
+                withBrokenListingTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
+
+              result.left.value shouldBe a[PrefixTransferListingFailure[_]]
+            }
           }
         }
       }
     }
 
     it("fails if you try to overwrite an existing object") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val dstPrefix = createPrefix
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-        val srcLocation = createLocationFrom(srcPrefix, suffix = "1.txt")
-        val dstLocation = createLocationFrom(dstPrefix, suffix = "1.txt")
+        val src = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
+        val dst = createDstLocationFrom(dstPrefix, suffix = "1.txt")
 
         val srcT = createT
         val dstT = createT
 
-        withPrefixTransferStore(initialEntries = Map(srcLocation -> srcT, dstLocation -> dstT)) {
-          implicit store =>
-            withPrefixTransfer { prefixTransfer =>
-              val result = prefixTransfer.transferPrefix(
-                srcPrefix = srcPrefix,
-                dstPrefix = dstPrefix
-              )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(src -> srcT)) { srcStore =>
+            withDstStore(initialEntries = Map(dst -> dstT)) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
+                }
 
-              result.left.value shouldBe a[PrefixTransferFailure]
+              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
 
-              store.get(srcLocation).right.value shouldBe Identified(
-                srcLocation,
-                srcT)
-              store.get(dstLocation).right.value shouldBe Identified(
-                dstLocation,
-                dstT)
+              failure.successes shouldBe 0
+              failure.failures shouldBe 1
+
+              srcStore.get(src).right.value shouldBe Identified(src, srcT)
+              dstStore.get(dst).right.value shouldBe Identified(dst, dstT)
             }
+          }
         }
       }
     }
 
     it("overwrites an existing object if checkForExisting=false") {
-      withNamespace { implicit namespace =>
-        val srcPrefix = createPrefix
-        val dstPrefix = createPrefix
+      withNamespacePair { case (srcNamespace, dstNamespace) =>
+        val srcPrefix = createSrcPrefix(srcNamespace)
+        val dstPrefix = createDstPrefix(dstNamespace)
 
-        val srcLocation = createLocationFrom(srcPrefix, suffix = "1.txt")
-        val dstLocation = createLocationFrom(dstPrefix, suffix = "1.txt")
+        val src = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
+        val dst = createDstLocationFrom(dstPrefix, suffix = "1.txt")
 
         val srcT = createT
         val dstT = createT
 
-        withPrefixTransferStore(initialEntries = Map(srcLocation -> srcT, dstLocation -> dstT)) {
-          implicit store =>
-            withPrefixTransfer { prefixTransfer =>
-              val result = prefixTransfer.transferPrefix(
-                srcPrefix = srcPrefix,
-                dstPrefix = dstPrefix,
-                checkForExisting = false
-              )
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(src -> srcT)) { srcStore =>
+            withDstStore(initialEntries = Map(dst -> dstT)) { dstStore =>
+              val result =
+                withPrefixTransfer(srcStore, dstStore) {
+                  _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix, checkForExisting = false)
+                }
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              store.get(srcLocation).right.value shouldBe Identified(
-                srcLocation,
-                srcT)
-              store.get(dstLocation).right.value shouldBe Identified(
-                dstLocation,
-                srcT)
+              srcStore.get(src).right.value shouldBe Identified(src, srcT)
+              dstStore.get(dst).right.value shouldBe Identified(dst, srcT)
             }
+          }
         }
       }
     }
