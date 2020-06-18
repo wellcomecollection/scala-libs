@@ -9,7 +9,8 @@ import uk.ac.wellcome.storage.{ListingFailure, ObjectLocationPrefix}
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class AzureBlobItemListing(implicit blobClient: BlobServiceClient) extends AzureListing[BlobItem] {
+class AzureBlobItemListing(implicit blobClient: BlobServiceClient)
+    extends AzureListing[BlobItem] {
   override def list(prefix: ObjectLocationPrefix): ListingResult =
     Try {
       val containerClient = blobClient.getBlobContainerClient(prefix.namespace)
