@@ -58,7 +58,7 @@ class AzureBlobMetadataTest
   val azureBlobMetadata = new AzureBlobMetadata()
 
   override def createIdent(context: Container): ObjectLocation =
-    createObjectLocationWith(context)
+    createAzureObjectLocationWith(context)
 
   override def withContext[R](testWith: TestWith[Container, R]): R =
     withAzureContainer { container =>
@@ -67,7 +67,7 @@ class AzureBlobMetadataTest
 
   it("throws an error if the tags are larger than 8KB in total") {
     withAzureContainer { container =>
-      val location = createObjectLocationWith(container)
+      val location = createAzureObjectLocationWith(container)
       putObject(location)
 
       val tooManyBytes =

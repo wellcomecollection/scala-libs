@@ -63,5 +63,5 @@ class AzureTypedStoreTest extends TypedStoreTestCases[ObjectLocation, Record, Co
     }
 
   override def createId(implicit container: Container): ObjectLocation =
-    createObjectLocationWith(container.name)
+    createAzureObjectLocationWith(container)
 }

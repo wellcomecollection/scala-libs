@@ -36,9 +36,7 @@ trait AzureFixtures extends RandomThings with Eventually with IntegrationPatienc
   def createContainerName: String =
     randomAlphanumeric.toLowerCase
 
-  def createObjectLocationWith(
-                                container: Container
-                              ): ObjectLocation =
+  def createAzureObjectLocationWith(container: Container): ObjectLocation =
     ObjectLocation(
       namespace = container.name,
       path = randomAlphanumeric

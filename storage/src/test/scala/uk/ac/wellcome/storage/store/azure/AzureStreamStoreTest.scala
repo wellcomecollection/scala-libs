@@ -30,7 +30,7 @@ class AzureStreamStoreTest
     }
 
   override def createId(implicit container: Container): ObjectLocation =
-    createObjectLocationWith(namespace = container.name)
+    createAzureObjectLocationWith(container)
 
   override def withStreamStoreImpl[R](
     context: AzureStreamStoreContext,
