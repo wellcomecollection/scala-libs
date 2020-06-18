@@ -15,7 +15,7 @@ class S3toAzureTransfer(
     blobClient: BlobServiceClient) extends Transfer[ObjectLocation] {
   import uk.ac.wellcome.storage.RetryOps._
 
-  private val azureStreamStore: AzureStreamStore = new AzureStreamStore(allowOverwrites = false)
+  private val azureStreamStore: AzureStreamStore = new AzureStreamStore(allowOverwrites = true)
 
   private val azureWritable: AzureStreamWritable = azureStreamStore
   private val azureReadable: AzureStreamReadable = azureStreamStore
@@ -89,15 +89,15 @@ class S3toAzureTransfer(
   private def runTransfer(
     src: ObjectLocation,
     dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-    val transferResult = for {
-      s3src <- s3Readable.get(src)
-      srcStream = s3src.identifiedT
-      _ <- azureWritable.put(dst)(srcStream)
-    } yield ()
 
-    transferResult match {
-      case Right(_)  => Right(TransferPerformed(src, dst))
-      case Left(err) => Left(TransferDestinationFailure(src, dst, err.e))
+    s3Readable.get(src) match {
+      case Right(Identified(_, srcStream)) =>
+        azureWritable.put(dst)(srcStream) match {
+          case Right(_)  => Right(TransferPerformed(src, dst))
+          case Left(err) => Left(TransferDestinationFailure(src, dst, err.e))
+        }
+
+      case Left(err) => Left(TransferSourceFailure(src, dst, err.e))
     }
   }
 }
