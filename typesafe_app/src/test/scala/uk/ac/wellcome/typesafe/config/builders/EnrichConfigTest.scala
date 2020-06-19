@@ -36,19 +36,6 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
     }
   }
 
-  describe("getStringOrElse") {
-    it("returns the value when a path is available") {
-      val myConfig = ConfigFactory.parseString(configString)
-
-      myConfig.getStringOrElse("example.config.string")("default") shouldBe "somevalue"
-    }
-
-    it("returns the default value when a path is unavailable") {
-      val myConfig = ConfigFactory.parseString(configString)
-
-      myConfig.getStringOrElse("example.config.nopath")("default") shouldBe "default"
-    }
-  }
 
   describe("getIntOption") {
     it("returns the value when a path is available") {
@@ -61,20 +48,6 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
       val myConfig = ConfigFactory.parseString(configString)
 
       myConfig.getIntOption("example.config.nopath") shouldBe None
-    }
-  }
-
-  describe("getIntOrElse") {
-    it("returns the value when a path is available") {
-      val myConfig = ConfigFactory.parseString(configString)
-
-      myConfig.getIntOrElse("example.config.int")(10) shouldBe 1
-    }
-
-    it("returns the default value when a path is unavailable") {
-      val myConfig = ConfigFactory.parseString(configString)
-
-      myConfig.getIntOrElse("example.config.nopath")(10) shouldBe 10
     }
   }
 

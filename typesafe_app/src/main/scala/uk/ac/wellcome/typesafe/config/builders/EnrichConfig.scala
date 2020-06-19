@@ -31,20 +31,8 @@ object EnrichConfig {
       }
     }
 
-    def getStringOrElse(path: String)(default: String): String = {
-      pathExists(path) { cleanPath =>
-        underlying.getString(cleanPath)
-      } getOrElse(default)
-    }
-
     def requiredString(path: String): String = {
-      val result = pathExists(path) { cleanPath =>
-        underlying.getString(cleanPath)
-      }
-
-      if(result.isDefined) {
-        result.get
-      } else {
+      getStringOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
           s"No value found for path ${cleanUpPath(path)}"
@@ -58,20 +46,8 @@ object EnrichConfig {
       }
     }
 
-    def getIntOrElse(path: String)(default: Int): Int = {
-      pathExists(path) { cleanPath =>
-        underlying.getInt(cleanPath)
-      } getOrElse(default)
-    }
-
     def requiredInt(path: String): Int = {
-      val result = pathExists(path) { cleanPath =>
-        underlying.getInt(cleanPath)
-      }
-
-      if(result.isDefined) {
-        result.get
-      } else {
+      getIntOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
           s"No value found for path ${cleanUpPath(path)}"
