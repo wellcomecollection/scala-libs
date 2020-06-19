@@ -15,14 +15,14 @@ import scala.concurrent.ExecutionContext
 object SQSBuilder extends AWSClientConfigBuilder {
   def buildSQSConfig(config: Config, namespace: String = ""): SQSConfig = {
     val queueUrl = config
-      .required[String](s"aws.$namespace.sqs.queue.url")
+      .requireString(s"aws.$namespace.sqs.queue.url")
     val parallelism = config
-      .getOrElse[String](s"aws.$namespace.sqs.queue.parallelism")(
-        default = "10")
-    // TODO: revisit to support default and config.getInt, cannot cast String to Integer here
+      .getIntOption(s"aws.$namespace.sqs.queue.parallelism")
+      .getOrElse(10)
+
     SQSConfig(
       queueUrl = queueUrl,
-      parallelism = Integer.parseInt(parallelism)
+      parallelism = parallelism
     )
   }
 

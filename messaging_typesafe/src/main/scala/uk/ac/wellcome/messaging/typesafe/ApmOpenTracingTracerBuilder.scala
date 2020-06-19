@@ -11,9 +11,9 @@ object ApmOpenTracingTracerBuilder {
     ElasticApmAttacher.attach(
       Map(
         "application_packages" -> "uk.ac.wellcome",
-        "service_name" -> config.required[String](s"apm.tracing.service"),
-        "server_urls" -> config.required[String](s"apm.tracing.url"),
-        "secret_token" -> config.required[String](s"apm.tracing.secret_token")
+        "service_name" -> config.requireString(s"apm.tracing.service"),
+        "server_urls" -> config.requireString(s"apm.tracing.url"),
+        "secret_token" -> config.requireString(s"apm.tracing.secret_token")
       ).asJava)
 
     new ElasticApmTracer()

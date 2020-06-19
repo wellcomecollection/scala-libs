@@ -10,7 +10,7 @@ import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 object SNSBuilder extends AWSClientConfigBuilder {
   def buildSNSConfig(config: Config, namespace: String = ""): SNSConfig = {
     val topicArn = config
-      .required[String](s"aws.$namespace.sns.topic.arn")
+      .requireString(s"aws.$namespace.sns.topic.arn")
 
     SNSConfig(topicArn = topicArn)
   }
