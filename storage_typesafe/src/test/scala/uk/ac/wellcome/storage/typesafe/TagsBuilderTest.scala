@@ -45,4 +45,22 @@ class TagsBuilderTest extends AnyFunSpec with Matchers {
       tags shouldBe a[AzureBlobMetadata]
     }
   }
+
+  describe("with no provider supplied") {
+    val awsConfigString =
+      """
+        |somepath {
+        |  aws.s3.region = "eu-west-1"
+        |}
+        |""".stripMargin
+
+
+    it("creates S3Tags") {
+      val awsConfig = ConfigFactory.parseString(awsConfigString)
+      val targetConfig = awsConfig.getConfig("somepath")
+      val tags = TagsBuilder.buildClient(targetConfig)
+
+      tags shouldBe a[S3Tags]
+    }
+  }
 }
