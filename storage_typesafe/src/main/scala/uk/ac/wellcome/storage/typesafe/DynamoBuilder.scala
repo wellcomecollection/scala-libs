@@ -13,7 +13,8 @@ object DynamoBuilder extends AWSClientConfigBuilder {
     val tableName = config
       .requireString(s"aws.$namespace.dynamo.tableName")
     val tableIndex = config
-      .getStringOption(s"aws.$namespace.dynamo.tableIndex").getOrElse("")
+      .getStringOption(s"aws.$namespace.dynamo.tableIndex")
+      .getOrElse("")
 
     DynamoConfig(
       tableName = tableName,
