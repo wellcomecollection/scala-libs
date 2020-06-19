@@ -10,7 +10,7 @@ object EnrichConfig {
     // empty namespace -- in this case, elide the two dots into one.
       p.replaceAllLiterally("..", ".")
 
-    private def pathExists[T](path: String)(f: String => T): Option[T] = {
+    private def getPathValue[T](path: String)(f: String => T): Option[T] = {
       val cleanPath = cleanUpPath(path)
 
       if(underlying.hasPath(cleanPath)) {
@@ -26,7 +26,7 @@ object EnrichConfig {
     }
 
     def getStringOption(path: String): Option[String] = {
-      pathExists(path) { cleanPath =>
+      getPathValue(path) { cleanPath =>
         underlying.getString(cleanPath)
       }
     }
@@ -41,7 +41,7 @@ object EnrichConfig {
     }
 
     def getIntOption(path: String): Option[Int] = {
-      pathExists(path) { cleanPath =>
+      getPathValue(path) { cleanPath =>
         underlying.getInt(cleanPath)
       }
     }
