@@ -18,7 +18,7 @@ object SQSBuilder extends AWSClientConfigBuilder {
       .requireString(s"aws.$namespace.sqs.queue.url")
     val parallelism = config
       .getIntOption(s"aws.$namespace.sqs.queue.parallelism")
-        .getOrElse(10)
+      .getOrElse(10)
 
     SQSConfig(
       queueUrl = queueUrl,
