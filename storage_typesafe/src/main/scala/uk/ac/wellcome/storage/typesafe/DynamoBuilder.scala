@@ -11,9 +11,9 @@ object DynamoBuilder extends AWSClientConfigBuilder {
   def buildDynamoConfig(config: Config,
                         namespace: String = ""): DynamoConfig = {
     val tableName = config
-      .required[String](s"aws.$namespace.dynamo.tableName")
+      .requireString(s"aws.$namespace.dynamo.tableName")
     val tableIndex = config
-      .getOrElse[String](s"aws.$namespace.dynamo.tableIndex")(default = "")
+      .getStringOption(s"aws.$namespace.dynamo.tableIndex").getOrElse("")
 
     DynamoConfig(
       tableName = tableName,

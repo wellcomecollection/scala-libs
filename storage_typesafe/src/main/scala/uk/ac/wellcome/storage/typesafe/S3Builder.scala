@@ -23,7 +23,7 @@ object S3Builder extends AWSClientConfigBuilder {
 
   def buildS3Config(config: Config, namespace: String = ""): S3Config = {
     val bucketName = config
-      .required[String](s"aws.$namespace.s3.bucketName")
+      .requireString(s"aws.$namespace.s3.bucketName")
 
     S3Config(
       bucketName = bucketName
