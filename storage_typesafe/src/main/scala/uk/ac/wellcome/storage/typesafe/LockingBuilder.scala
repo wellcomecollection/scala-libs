@@ -24,7 +24,10 @@ object LockingBuilder {
         dynamoConfig =
           DynamoBuilder.buildDynamoConfig(config, namespace = "locking"),
         expiryTime = Duration.ofSeconds(
-          config.getIntOption("locking.expiryTime").getOrElse(180)
+          config
+            .getIntOption("locking.expiryTime")
+            .getOrElse(180)
+            .toLong
         )
       )
     )
