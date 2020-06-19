@@ -12,11 +12,12 @@ object MetricsBuilder {
     val namespace =
       config.getStringOption("aws.metrics.namespace").getOrElse("")
 
-    val flushInterval = config.getStringOption("aws.metrics.flushInterval")
+    val flushInterval = config
+      .getStringOption("aws.metrics.flushInterval")
       .flatMap(s => Try(Duration(s)).toOption)
       .collect { case d: FiniteDuration => d }
       .getOrElse(10 minutes)
-    
+
     MetricsConfig(
       namespace = namespace,
       flushInterval = flushInterval
