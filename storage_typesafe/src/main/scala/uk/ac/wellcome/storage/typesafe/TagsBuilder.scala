@@ -24,7 +24,8 @@ object TagsBuilder {
   //  }
   //
 
-  def buildClient(config: Config): Tags[ObjectLocation] with RetryableReadable[Map[String, String]] = {
+  def buildClient(config: Config)
+    : Tags[ObjectLocation] with RetryableReadable[Map[String, String]] = {
 
     val cloudProvider = config
       .getStringOption("cloudProvider")
