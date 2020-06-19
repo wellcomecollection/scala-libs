@@ -11,8 +11,10 @@ trait AWSClientConfigBuilder {
     val accessKey = config.getStringOption(s"aws.$namespace.key")
     val secretKey = config.getStringOption(s"aws.$namespace.secret")
     val endpoint = config.getStringOption(s"aws.$namespace.endpoint")
-    val maxConnections = config.getStringOption(s"aws.$namespace.max-connections")
-    val region = config.getStringOption(s"aws.$namespace.region")
+    val maxConnections =
+      config.getStringOption(s"aws.$namespace.max-connections")
+    val region = config
+      .getStringOption(s"aws.$namespace.region")
       .getOrElse("eu-west-1")
 
     AWSClientConfig(
