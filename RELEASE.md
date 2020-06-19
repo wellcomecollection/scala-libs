@@ -9,9 +9,9 @@ RELEASE_TYPE: minor
 Updates `EnrichConfig` to add:
 
 - `getStringOption`
-- `requiredString`
+- `requireString`
 - `getIntOption`
-- `requiredInt`
+- `requireInt`
 
 Deprecates:
 

@@ -31,7 +31,7 @@ object EnrichConfig {
       }
     }
 
-    def requiredString(path: String): String = {
+    def requireString(path: String): String = {
       getStringOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
@@ -46,7 +46,7 @@ object EnrichConfig {
       }
     }
 
-    def requiredInt(path: String): Int = {
+    def requireInt(path: String): Int = {
       getIntOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
