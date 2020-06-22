@@ -1,6 +1,5 @@
 package uk.ac.wellcome.storage.typesafe
 
-import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import com.typesafe.config.Config
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.store.RetryableReadable
@@ -38,14 +37,7 @@ object TagsBuilder {
         new S3Tags()(s3Client)
       }
       case Azure => {
-        val connectionString = config
-          .requireString("azure.blobStore.connectionString")
-
-        val azureClient: BlobServiceClient =
-          new BlobServiceClientBuilder()
-            .connectionString(connectionString)
-            .buildClient()
-
+        val azureClient = AzureBlobServiceClientBuilder.build(config)
         new AzureBlobMetadata()(azureClient)
       }
     }
