@@ -1,7 +1,9 @@
 package uk.ac.wellcome.storage
 
-trait Location
+trait Location {
+  def join(parts: String*): Location
+}
 
-trait Prefix[OfLocation] {
+trait Prefix[OfLocation <: Location] {
   def asLocation(parts: String*): OfLocation
 }

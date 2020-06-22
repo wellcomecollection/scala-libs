@@ -5,17 +5,17 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.listing.ListingTestCases
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 trait S3ListingTestCases[ListingResult]
     extends ListingTestCases[
-      ObjectLocation,
-      ObjectLocationPrefix,
+      S3ObjectLocation,
+      S3ObjectLocationPrefix,
       ListingResult,
       S3Listing[ListingResult],
       Bucket]
     with S3ListingFixtures[ListingResult] {
-  def withListing[R](bucket: Bucket, initialEntries: Seq[ObjectLocation])(
+  def withListing[R](bucket: Bucket, initialEntries: Seq[S3ObjectLocation])(
     testWith: TestWith[S3Listing[ListingResult], R]): R = {
     createInitialEntries(bucket, initialEntries)
 
@@ -40,8 +40,10 @@ trait S3ListingTestCases[ListingResult]
 
         // Now create the same keys but in a different bucket
         withLocalS3Bucket { queryBucket =>
-          val queryLocation = location.copy(namespace = queryBucket.name)
-          val prefix = queryLocation.asPrefix
+          val prefix = S3ObjectLocationPrefix(
+            namespace = queryBucket.name,
+            path = location.path
+          )
 
           listing.list(prefix).right.value shouldBe empty
         }
@@ -63,7 +65,7 @@ trait S3ListingTestCases[ListingResult]
         val location = createObjectLocationWith(bucket)
         s3Client.putObject(location.namespace, location.path, "hello world")
 
-        val prefix = createObjectLocationWith(bucket).asPrefix
+        val prefix = createObjectLocationPrefixWith(bucket)
         listing.list(prefix).right.value shouldBe empty
       }
     }
@@ -77,9 +79,14 @@ trait S3ListingTestCases[ListingResult]
         }
         createInitialEntries(bucket, locations)
 
+        val prefix = S3ObjectLocationPrefix(
+          namespace = location.namespace,
+          path = location.path
+        )
+
         val smallBatchListing = createS3Listing(batchSize = 5)
         assertResultCorrect(
-          smallBatchListing.list(location.asPrefix).right.value,
+          smallBatchListing.list(prefix).right.value,
           entries = locations
         )
       }

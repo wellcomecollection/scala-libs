@@ -1,12 +1,16 @@
 package uk.ac.wellcome.storage.transfer
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.Prefix
+import uk.ac.wellcome.storage.{Location, Prefix}
 import uk.ac.wellcome.storage.listing.Listing
 
 import scala.collection.parallel.ParIterable
 
-trait PrefixTransfer[SrcLocation, SrcPrefix <: Prefix[SrcLocation], DstLocation, DstPrefix <: Prefix[DstLocation]] extends Logging {
+trait PrefixTransfer[
+    SrcLocation <: Location,
+    SrcPrefix <: Prefix[SrcLocation],
+    DstLocation <: Location,
+    DstPrefix <: Prefix[DstLocation]] extends Logging {
   implicit val transfer: Transfer[SrcLocation, DstLocation]
   implicit val listing: Listing[SrcPrefix, SrcLocation]
 

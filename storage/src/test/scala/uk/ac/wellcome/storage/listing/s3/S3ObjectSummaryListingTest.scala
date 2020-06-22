@@ -3,15 +3,15 @@ package uk.ac.wellcome.storage.listing.s3
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import org.scalatest.Assertion
-import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 
 class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
   override def assertResultCorrect(result: Iterable[S3ObjectSummary],
-                                   entries: Seq[ObjectLocation]): Assertion = {
+                                   entries: Seq[S3ObjectLocation]): Assertion = {
     val actualLocations =
       result.toSeq
         .map { summary =>
-          ObjectLocation(summary.getBucketName, summary.getKey)
+          S3ObjectLocation(summary.getBucketName, summary.getKey)
         }
 
     actualLocations should contain theSameElementsAs entries

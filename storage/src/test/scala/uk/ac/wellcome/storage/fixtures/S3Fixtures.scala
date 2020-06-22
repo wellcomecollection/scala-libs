@@ -11,9 +11,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
-import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config}
+import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
@@ -36,7 +35,7 @@ trait S3Fixtures
     with IntegrationPatience
     with Matchers
     with EitherValues
-    with ObjectLocationGenerators {
+    with RandomThings {
 
   import S3Fixtures._
 
@@ -88,7 +87,7 @@ trait S3Fixtures
       }
     )
 
-  def getContentFromS3(location: ObjectLocation): String = {
+  def getContentFromS3(location: S3ObjectLocation): String = {
     val s3Object = s3Client.getObject(location.namespace, location.path)
 
     val inputStream = new InputStreamWithLength(
@@ -98,10 +97,10 @@ trait S3Fixtures
     stringCodec.fromStream(inputStream).right.value
   }
 
-  def getJsonFromS3(location: ObjectLocation): Json =
+  def getJsonFromS3(location: S3ObjectLocation): Json =
     parse(getContentFromS3(location)).right.get
 
-  def getObjectFromS3[T](location: ObjectLocation)(
+  def getObjectFromS3[T](location: S3ObjectLocation)(
     implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(location)).get
 
@@ -128,24 +127,28 @@ trait S3Fixtures
   def createBucket: Bucket =
     Bucket(createBucketName)
 
-  def createObjectLocationWith(
-    bucket: Bucket
-  ): ObjectLocation =
-    ObjectLocation(
-      namespace = bucket.name,
-      path = randomAlphanumeric
-    )
+  def createInvalidBucket: Bucket =
+    Bucket(createInvalidBucketName)
 
   def createObjectLocationWith(
-    bucket: Bucket,
-    key: String
-  ): ObjectLocation =
-    ObjectLocation(
+    bucket: Bucket = createBucket,
+    key: String = randomAlphanumeric
+  ): S3ObjectLocation =
+    S3ObjectLocation(
       namespace = bucket.name,
       path = key
     )
 
-  def putStream(location: ObjectLocation, inputStream: InputStreamWithLength): Unit = {
+  def createObjectLocation: S3ObjectLocation =
+    createObjectLocationWith()
+
+  def createObjectLocationPrefixWith(bucket: Bucket): S3ObjectLocationPrefix =
+    S3ObjectLocationPrefix(
+      namespace = bucket.name,
+      path = randomAlphanumeric
+    )
+
+  def putStream(location: S3ObjectLocation, inputStream: InputStreamWithLength): Unit = {
     val metadata = new ObjectMetadata()
     metadata.setContentLength(inputStream.length)
 
@@ -161,7 +164,7 @@ trait S3Fixtures
     inputStream.close()
   }
 
-  def assertEqualObjects(x: ObjectLocation, y: ObjectLocation): Assertion =
+  def assertEqualObjects(x: S3ObjectLocation, y: S3ObjectLocation): Assertion =
     getContentFromS3(x) shouldBe getContentFromS3(y)
 
   /** Returns a list of keys in an S3 bucket.

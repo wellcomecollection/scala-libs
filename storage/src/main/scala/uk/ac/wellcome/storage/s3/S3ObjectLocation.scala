@@ -12,7 +12,12 @@ import uk.ac.wellcome.storage.{Location, Prefix}
 case class S3ObjectLocation(
   namespace: String,
   path: String
-) extends Location
+) extends Location {
+
+  def join(parts: String*): S3ObjectLocation = this.copy(
+    path = Paths.get(this.path, parts: _*).normalize().toString
+  )
+}
 
 case class S3ObjectLocationPrefix(
   namespace: String,
@@ -20,8 +25,5 @@ case class S3ObjectLocationPrefix(
 ) extends Prefix[S3ObjectLocation] {
 
   override def asLocation(parts: String*): S3ObjectLocation =
-    S3ObjectLocation(
-      namespace = namespace,
-      path = Paths.get(path, parts: _*).normalize().toString
-    )
+    S3ObjectLocation(namespace = namespace, path = path).join(parts: _*)
 }

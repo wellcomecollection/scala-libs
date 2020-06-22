@@ -5,31 +5,35 @@ import com.amazonaws.services.s3.model.PutObjectResult
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
-import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
 import uk.ac.wellcome.storage.listing.fixtures.ListingFixtures
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 trait S3ListingFixtures[ListingResult]
-    extends ObjectLocationGenerators
-    with S3Fixtures
+    extends S3Fixtures
     with ListingFixtures[
-      ObjectLocation,
-      ObjectLocationPrefix,
+      S3ObjectLocation,
+      S3ObjectLocationPrefix,
       ListingResult,
       S3Listing[ListingResult],
       Bucket] {
-  def createIdent(implicit bucket: Bucket): ObjectLocation =
-    createObjectLocationWith(namespace = bucket.name)
+  def createIdent(implicit bucket: Bucket): S3ObjectLocation =
+    createObjectLocationWith(bucket)
 
-  def extendIdent(location: ObjectLocation,
-                  extension: String): ObjectLocation =
+  def extendIdent(location: S3ObjectLocation,
+                  extension: String): S3ObjectLocation =
     location.join(extension)
 
-  def createPrefix: ObjectLocationPrefix =
-    createObjectLocationPrefixWith(namespace = createBucketName)
+  def createPrefix: S3ObjectLocationPrefix =
+    S3ObjectLocationPrefix(
+      namespace = createBucketName,
+      path = randomAlphanumeric
+    )
 
-  def createPrefixMatching(location: ObjectLocation): ObjectLocationPrefix =
-    location.asPrefix
+  def createPrefixMatching(location: S3ObjectLocation): S3ObjectLocationPrefix =
+    S3ObjectLocationPrefix(
+      namespace = location.namespace,
+      path = location.path
+    )
 
   def withListingContext[R](testWith: TestWith[Bucket, R]): R =
     withLocalS3Bucket { bucket =>
@@ -41,7 +45,7 @@ trait S3ListingFixtures[ListingResult]
 
   def createInitialEntries(
     bucket: Bucket,
-    initialEntries: Seq[ObjectLocation]): Seq[PutObjectResult] =
+    initialEntries: Seq[S3ObjectLocation]): Seq[PutObjectResult] =
     initialEntries
       .map { loc =>
         s3Client.putObject(loc.namespace, loc.path, "hello world")
