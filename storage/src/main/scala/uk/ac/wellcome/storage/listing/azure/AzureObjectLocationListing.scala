@@ -1,16 +1,17 @@
 package uk.ac.wellcome.storage.listing.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.azure.AzureBlobLocationPrefix
 
 class AzureObjectLocationListing(implicit itemListing: AzureBlobItemListing)
     extends AzureListing[ObjectLocation] {
-  override def list(prefix: ObjectLocationPrefix): ListingResult =
+  override def list(prefix: AzureBlobLocationPrefix): ListingResult =
     itemListing
       .list(prefix)
       .map { iterator =>
         iterator.map { item =>
-          ObjectLocation(prefix.namespace, item.getName)
+          ObjectLocation(prefix.container, item.getName)
         }
       }
 }

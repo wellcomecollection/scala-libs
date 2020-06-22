@@ -7,8 +7,8 @@ import uk.ac.wellcome.storage.ObjectLocation
 class S3ObjectLocationTest extends AnyFunSpec with Matchers {
   it("creates a location from a prefix") {
     val prefix = S3ObjectLocationPrefix(
-      bucket = "my-test-bucket",
-      keyPrefix = "png-objects"
+      namespace = "my-test-bucket",
+      path = "png-objects"
     )
 
     val location = prefix.asLocation("cats", "cat1.png")

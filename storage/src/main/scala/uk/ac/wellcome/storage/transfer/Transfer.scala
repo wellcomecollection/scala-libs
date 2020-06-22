@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.transfer
 
-trait Transfer[Location] {
-  def transfer(src: Location, dst: Location, checkForExisting: Boolean = true)
+trait Transfer[SrcLocation, DstLocation] {
+  def transfer(src: SrcLocation, dst: DstLocation, checkForExisting: Boolean = true)
     : Either[TransferFailure, TransferSuccess] =
     if (checkForExisting) {
       transferWithCheckForExisting(src, dst)
@@ -10,10 +10,10 @@ trait Transfer[Location] {
     }
 
   protected def transferWithCheckForExisting(
-    src: Location,
-    dst: Location): Either[TransferFailure, TransferSuccess]
+    src: SrcLocation,
+    dst: DstLocation): Either[TransferFailure, TransferSuccess]
 
   protected def transferWithOverwrites(
-    src: Location,
-    dst: Location): Either[TransferFailure, TransferSuccess]
+    src: SrcLocation,
+    dst: DstLocation): Either[TransferFailure, TransferSuccess]
 }

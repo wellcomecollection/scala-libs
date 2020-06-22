@@ -15,13 +15,13 @@ case class S3ObjectLocation(
 ) extends Location
 
 case class S3ObjectLocationPrefix(
-  bucket: String,
-  keyPrefix: String
+  namespace: String,
+  path: String
 ) extends Prefix[S3ObjectLocation] {
 
   override def asLocation(parts: String*): S3ObjectLocation =
     S3ObjectLocation(
-      namespace = bucket,
-      path = Paths.get(keyPrefix, parts: _*).normalize().toString
+      namespace = namespace,
+      path = Paths.get(path, parts: _*).normalize().toString
     )
 }

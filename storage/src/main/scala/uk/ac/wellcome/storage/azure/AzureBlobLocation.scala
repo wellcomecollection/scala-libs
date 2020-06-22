@@ -14,7 +14,7 @@ case class AzureBlobLocationPrefix(
   namePrefix: String
 ) extends Prefix[AzureBlobLocation] {
 
-  override def asLocation(parts: String*): AzureBlobLocationPrefix =
+  override def asLocation(parts: String*): AzureBlobLocation =
     AzureBlobLocationPrefix(
       container = container,
       name = Paths.get(namePrefix, parts: _*).normalize().toString
