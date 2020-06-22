@@ -35,10 +35,12 @@ case class PrefixTransferListingFailure[Prefix](prefix: Prefix,
 
 sealed trait TransferSuccess extends TransferResult
 
-case class TransferNoOp[SrcLocation, DstLocation](source: SrcLocation, destination: DstLocation)
+case class TransferNoOp[SrcLocation, DstLocation](source: SrcLocation,
+                                                  destination: DstLocation)
     extends TransferSuccess
 
-case class TransferPerformed[SrcLocation, DstLocation](source: SrcLocation, destination: DstLocation)
+case class TransferPerformed[SrcLocation, DstLocation](source: SrcLocation,
+                                                       destination: DstLocation)
     extends TransferSuccess
 
 case class PrefixTransferSuccess(successes: Int) extends TransferSuccess

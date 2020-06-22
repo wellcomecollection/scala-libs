@@ -1,7 +1,12 @@
 package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{GetObjectTaggingRequest, ObjectTagging, SetObjectTaggingRequest, Tag}
+import com.amazonaws.services.s3.model.{
+  GetObjectTaggingRequest,
+  ObjectTagging,
+  SetObjectTaggingRequest,
+  Tag
+}
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags

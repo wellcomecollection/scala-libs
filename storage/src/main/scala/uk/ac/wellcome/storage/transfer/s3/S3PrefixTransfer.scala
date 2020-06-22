@@ -8,7 +8,11 @@ import uk.ac.wellcome.storage.transfer.PrefixTransfer
 class S3PrefixTransfer()(
   implicit val transfer: S3Transfer,
   val listing: S3ObjectLocationListing
-) extends PrefixTransfer[S3ObjectLocation, S3ObjectLocationPrefix, S3ObjectLocation, S3ObjectLocationPrefix] {
+) extends PrefixTransfer[
+      S3ObjectLocation,
+      S3ObjectLocationPrefix,
+      S3ObjectLocation,
+      S3ObjectLocationPrefix] {
   override protected def buildDstLocation(
     srcPrefix: S3ObjectLocationPrefix,
     dstPrefix: S3ObjectLocationPrefix,

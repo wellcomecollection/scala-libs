@@ -1,7 +1,9 @@
 package uk.ac.wellcome.storage.transfer
 
 trait Transfer[SrcLocation, DstLocation] {
-  def transfer(src: SrcLocation, dst: DstLocation, checkForExisting: Boolean = true)
+  def transfer(src: SrcLocation,
+               dst: DstLocation,
+               checkForExisting: Boolean = true)
     : Either[TransferFailure, TransferSuccess] =
     if (checkForExisting) {
       transferWithCheckForExisting(src, dst)

@@ -8,7 +8,11 @@ import uk.ac.wellcome.storage.transfer.PrefixTransfer
 class S3toAzurePrefixTransfer()(
   implicit val transfer: S3toAzureTransfer,
   val listing: S3ObjectLocationListing
-) extends PrefixTransfer[S3ObjectLocation, S3ObjectLocationPrefix, AzureBlobLocation, AzureBlobLocationPrefix] {
+) extends PrefixTransfer[
+      S3ObjectLocation,
+      S3ObjectLocationPrefix,
+      AzureBlobLocation,
+      AzureBlobLocationPrefix] {
   override protected def buildDstLocation(
     srcPrefix: S3ObjectLocationPrefix,
     dstPrefix: AzureBlobLocationPrefix,

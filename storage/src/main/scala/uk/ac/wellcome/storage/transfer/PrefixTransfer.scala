@@ -6,11 +6,11 @@ import uk.ac.wellcome.storage.listing.Listing
 
 import scala.collection.parallel.ParIterable
 
-trait PrefixTransfer[
-    SrcLocation <: Location,
-    SrcPrefix <: Prefix[SrcLocation],
-    DstLocation <: Location,
-    DstPrefix <: Prefix[DstLocation]] extends Logging {
+trait PrefixTransfer[SrcLocation <: Location,
+                     SrcPrefix <: Prefix[SrcLocation],
+                     DstLocation <: Location,
+                     DstPrefix <: Prefix[DstLocation]]
+    extends Logging {
   implicit val transfer: Transfer[SrcLocation, DstLocation]
   implicit val listing: Listing[SrcPrefix, SrcLocation]
 
@@ -32,8 +32,8 @@ trait PrefixTransfer[
     iterator
       .grouped(10)
       .foreach { locations =>
-        val results
-          : ParIterable[(SrcLocation, Either[TransferFailure, TransferSuccess])] =
+        val results: ParIterable[(SrcLocation,
+                                  Either[TransferFailure, TransferSuccess])] =
           locations.par.map { srcLocation =>
             (
               srcLocation,

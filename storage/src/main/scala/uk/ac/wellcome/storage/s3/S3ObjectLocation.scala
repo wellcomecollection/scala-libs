@@ -43,8 +43,8 @@ trait S3Decodable {
         } yield constructor(bucket, key)
 
       (oldStyle, newStyle) match {
-        case (Right(location), _) => Right(location)
-        case (_, Right(location)) => Right(location)
+        case (Right(location), _)       => Right(location)
+        case (_, Right(location))       => Right(location)
         case (_, Left(decodingFailure)) => Left(decodingFailure)
       }
     }

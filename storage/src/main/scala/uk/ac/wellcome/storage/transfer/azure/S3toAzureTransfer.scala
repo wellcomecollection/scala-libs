@@ -6,7 +6,11 @@ import com.azure.storage.blob.BlobServiceClient
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.store.azure.{AzureStreamReadable, AzureStreamStore, AzureStreamWritable}
+import uk.ac.wellcome.storage.store.azure.{
+  AzureStreamReadable,
+  AzureStreamStore,
+  AzureStreamWritable
+}
 import uk.ac.wellcome.storage.store.s3.S3StreamReadable
 import uk.ac.wellcome.storage.transfer._
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified}
@@ -79,12 +83,12 @@ class S3toAzureTransfer(implicit
     singleTransfer.retry(maxAttempts = 3)
   }
 
-  private def compare(
-    src: S3ObjectLocation,
-    dst: AzureBlobLocation,
-    srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[S3ObjectLocation, AzureBlobLocation],
-                                    TransferNoOp[S3ObjectLocation, AzureBlobLocation]] =
+  private def compare(src: S3ObjectLocation,
+                      dst: AzureBlobLocation,
+                      srcStream: InputStream,
+                      dstStream: InputStream)
+    : Either[TransferOverwriteFailure[S3ObjectLocation, AzureBlobLocation],
+             TransferNoOp[S3ObjectLocation, AzureBlobLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
