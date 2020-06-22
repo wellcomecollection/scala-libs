@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.s3
 import uk.ac.wellcome.json.JsonUtil._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.storage.JsonDecodingError
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 
 class S3ObjectLocationTest extends AnyFunSpec with Matchers {
   it("creates a location from a prefix") {
@@ -64,7 +64,7 @@ class S3ObjectLocationTest extends AnyFunSpec with Matchers {
       )
     }
 
-    it("decodes from a new-style S3ObjectLocation") {
+    it("decodes from a new-style S3ObjectLocationPrefix") {
       val jsonString = """{"bucket": "my-bucket", "key": "myfile.txt"}"""
 
       val location = fromJson[S3ObjectLocationPrefix](jsonString).get
