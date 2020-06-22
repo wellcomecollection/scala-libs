@@ -15,6 +15,6 @@ class S3toAzurePrefixTransfer()(
     srcLocation: S3ObjectLocation
   ): AzureBlobLocation =
     dstPrefix.asLocation(
-      srcLocation.path.stripPrefix(srcPrefix.path)
+      srcLocation.key.stripPrefix(srcPrefix.keyPrefix)
     )
 }

@@ -5,28 +5,23 @@ import java.nio.file.Paths
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import uk.ac.wellcome.storage.{Location, Prefix}
 
-// Note: we use the old namespace/path naming convention because those are the
-// names we used for the precursor to this class, ObjectLocation.
-//
-// Ideally we'd use bucket/key to match the vocabulary used by S3, but that's
-// too much for right now. :(
 case class S3ObjectLocation(
-  namespace: String,
-  path: String
+  bucket: String,
+  key: String
 ) extends Location {
 
   def join(parts: String*): S3ObjectLocation = this.copy(
-    path = Paths.get(this.path, parts: _*).normalize().toString
+    key = Paths.get(this.key, parts: _*).normalize().toString
   )
 }
 
 case class S3ObjectLocationPrefix(
-  namespace: String,
-  path: String
+  bucket: String,
+  keyPrefix: String
 ) extends Prefix[S3ObjectLocation] {
 
   override def asLocation(parts: String*): S3ObjectLocation =
-    S3ObjectLocation(namespace = namespace, path = path).join(parts: _*)
+    S3ObjectLocation(bucket = bucket, key = keyPrefix).join(parts: _*)
 }
 
 // Note: the precursor to these classes was ObjectLocation, which used the
@@ -60,13 +55,13 @@ trait S3Decodable {
 case object S3ObjectLocation extends S3Decodable {
   implicit val decoder: Decoder[S3ObjectLocation] =
     createDecoder[S3ObjectLocation] { (bucket: String, key: String) =>
-      S3ObjectLocation(namespace = bucket, path = key)
+      S3ObjectLocation(bucket = bucket, key = key)
     }
 }
 
 case object S3ObjectLocationPrefix extends S3Decodable {
   implicit val decoder: Decoder[S3ObjectLocationPrefix] =
     createDecoder[S3ObjectLocationPrefix] { (bucket: String, key: String) =>
-      S3ObjectLocationPrefix(namespace = bucket, path = key)
+      S3ObjectLocationPrefix(bucket = bucket, keyPrefix = key)
     }
 }

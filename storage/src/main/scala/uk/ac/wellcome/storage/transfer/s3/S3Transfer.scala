@@ -94,7 +94,7 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[S3ObjectLocation,
 
   private def getStream(location: S3ObjectLocation): Try[S3ObjectInputStream] =
     Try {
-      s3Client.getObject(location.namespace, location.path)
+      s3Client.getObject(location.bucket, location.key)
     }.map { _.getObjectContent }
 
   private def runTransfer(
@@ -105,7 +105,7 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[S3ObjectLocation,
     // verified an object.  For safety, we drop all the tags every time an object
     // gets rewritten or copied around.
     val copyRequest =
-      new CopyObjectRequest(src.namespace, src.path, dst.namespace, dst.path)
+      new CopyObjectRequest(src.bucket, src.key, dst.bucket, dst.key)
         .withNewObjectTagging(new ObjectTagging(List().asJava))
 
     for {

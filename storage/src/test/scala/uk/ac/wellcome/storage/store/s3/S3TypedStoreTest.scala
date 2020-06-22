@@ -65,7 +65,7 @@ class S3TypedStoreTest
         // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
 
         val tooLongPath = randomStringOfByteLength(1025)()
-        val id = createId.copy(path = tooLongPath)
+        val id = createId.copy(key = tooLongPath)
 
         val entry = createT
 

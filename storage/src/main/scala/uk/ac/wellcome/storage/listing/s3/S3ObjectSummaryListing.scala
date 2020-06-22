@@ -17,8 +17,8 @@ class S3ObjectSummaryListing(batchSize: Int = 1000)(
       val iterator = S3Objects
         .withPrefix(
           s3Client,
-          prefix.namespace,
-          prefix.path
+          prefix.bucket,
+          prefix.keyPrefix
         )
         .withBatchSize(batchSize)
         .asScala

@@ -15,7 +15,7 @@ class S3PrefixTransfer()(
     srcLocation: S3ObjectLocation
   ): S3ObjectLocation =
     dstPrefix.asLocation(
-      srcLocation.path.stripPrefix(srcPrefix.path)
+      srcLocation.key.stripPrefix(srcPrefix.keyPrefix)
     )
 }
 

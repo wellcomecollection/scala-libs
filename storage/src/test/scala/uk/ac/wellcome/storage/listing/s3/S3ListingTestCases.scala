@@ -36,13 +36,13 @@ trait S3ListingTestCases[ListingResult]
     it("ignores entries with a matching key in a different bucket") {
       withLocalS3Bucket { bucket =>
         val location = createObjectLocationWith(bucket)
-        s3Client.putObject(location.namespace, location.path, "hello world")
+        s3Client.putObject(location.bucket, location.key, "hello world")
 
         // Now create the same keys but in a different bucket
         withLocalS3Bucket { queryBucket =>
           val prefix = S3ObjectLocationPrefix(
-            namespace = queryBucket.name,
-            path = location.path
+            bucket = queryBucket.name,
+            keyPrefix = location.key
           )
 
           listing.list(prefix).right.value shouldBe empty
@@ -63,7 +63,7 @@ trait S3ListingTestCases[ListingResult]
     it("ignores objects in the same bucket with a different key") {
       withLocalS3Bucket { bucket =>
         val location = createObjectLocationWith(bucket)
-        s3Client.putObject(location.namespace, location.path, "hello world")
+        s3Client.putObject(location.bucket, location.key, "hello world")
 
         val prefix = createObjectLocationPrefixWith(bucket)
         listing.list(prefix).right.value shouldBe empty
@@ -80,8 +80,8 @@ trait S3ListingTestCases[ListingResult]
         createInitialEntries(bucket, locations)
 
         val prefix = S3ObjectLocationPrefix(
-          namespace = location.namespace,
-          path = location.path
+          bucket = location.bucket,
+          keyPrefix = location.key
         )
 
         val smallBatchListing = createS3Listing(batchSize = 5)

@@ -88,7 +88,7 @@ trait S3Fixtures
     )
 
   def getContentFromS3(location: S3ObjectLocation): String = {
-    val s3Object = s3Client.getObject(location.namespace, location.path)
+    val s3Object = s3Client.getObject(location.bucket, location.key)
 
     val inputStream = new InputStreamWithLength(
       s3Object.getObjectContent,
@@ -135,8 +135,8 @@ trait S3Fixtures
     key: String = randomAlphanumeric
   ): S3ObjectLocation =
     S3ObjectLocation(
-      namespace = bucket.name,
-      path = key
+      bucket = bucket.name,
+      key = key
     )
 
   def createObjectLocation: S3ObjectLocation =
@@ -144,8 +144,8 @@ trait S3Fixtures
 
   def createObjectLocationPrefixWith(bucket: Bucket): S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(
-      namespace = bucket.name,
-      path = randomAlphanumeric
+      bucket = bucket.name,
+      keyPrefix = randomAlphanumeric
     )
 
   def putStream(location: S3ObjectLocation, inputStream: InputStreamWithLength): Unit = {
@@ -153,8 +153,8 @@ trait S3Fixtures
     metadata.setContentLength(inputStream.length)
 
     val putObjectRequest = new PutObjectRequest(
-      location.namespace,
-      location.path,
+      location.bucket,
+      location.key,
       inputStream,
       metadata
     )

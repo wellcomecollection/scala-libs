@@ -31,8 +31,8 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
 
         s3Client.setObjectTagging(
           new SetObjectTaggingRequest(
-            location.namespace,
-            location.path,
+            location.bucket,
+            location.key,
             new ObjectTagging(tagSet)
           )
         )
@@ -133,8 +133,8 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
 
   private def putObject(location: S3ObjectLocation): Unit =
     s3Client.putObject(
-      location.namespace,
-      location.path,
+      location.bucket,
+      location.key,
       s"<Written by ${this.getClass.getName}"
     )
 

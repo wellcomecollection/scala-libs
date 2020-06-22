@@ -37,8 +37,8 @@ trait DynamoHybridStoreTestCases[
   def createPrefix(implicit context: (Bucket, Table)): S3ObjectLocationPrefix = {
     val (bucket, _) = context
     S3ObjectLocationPrefix(
-      namespace = bucket.name,
-      path = randomAlphanumeric
+      bucket = bucket.name,
+      keyPrefix = randomAlphanumeric
     )
   }
 
@@ -48,8 +48,8 @@ trait DynamoHybridStoreTestCases[
 
   override def createTypedStoreId(implicit bucket: Unit): S3ObjectLocation =
     S3ObjectLocation(
-      namespace = createBucketName,
-      path = randomAlphanumeric
+      bucket = createBucketName,
+      key = randomAlphanumeric
     )
 
   override def createMetadata: Map[String, String] = createValidMetadata
@@ -115,7 +115,7 @@ trait DynamoHybridStoreTestCases[
 
                 val s3Location = dynamoValue.identifiedT.typedStoreId
 
-                s3Location.path should endWith(".json")
+                s3Location.key should endWith(".json")
               }
             }
           }
@@ -267,8 +267,8 @@ trait DynamoHybridStoreTestCases[
                       val typeStoreId = indexedEntry.identifiedT.typedStoreId
 
                       s3Client.deleteObject(
-                        typeStoreId.namespace,
-                        typeStoreId.path)
+                        typeStoreId.bucket,
+                        typeStoreId.key)
 
                       val value = hybridStore.get(id).left.value
 
@@ -300,9 +300,9 @@ trait DynamoHybridStoreTestCases[
                       val typeStoreId = indexedEntry.identifiedT.typedStoreId
 
                       s3Client.deleteObject(
-                        typeStoreId.namespace,
-                        typeStoreId.path)
-                      s3Client.deleteBucket(typeStoreId.namespace)
+                        typeStoreId.bucket,
+                        typeStoreId.key)
+                      s3Client.deleteBucket(typeStoreId.bucket)
 
                       val value = hybridStore.get(id).left.value
 

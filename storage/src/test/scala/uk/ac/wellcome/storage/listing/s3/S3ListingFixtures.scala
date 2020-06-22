@@ -25,14 +25,14 @@ trait S3ListingFixtures[ListingResult]
 
   def createPrefix: S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(
-      namespace = createBucketName,
-      path = randomAlphanumeric
+      bucket = createBucketName,
+      keyPrefix = randomAlphanumeric
     )
 
   def createPrefixMatching(location: S3ObjectLocation): S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(
-      namespace = location.namespace,
-      path = location.path
+      bucket = location.bucket,
+      keyPrefix = location.key
     )
 
   def withListingContext[R](testWith: TestWith[Bucket, R]): R =
@@ -48,6 +48,6 @@ trait S3ListingFixtures[ListingResult]
     initialEntries: Seq[S3ObjectLocation]): Seq[PutObjectResult] =
     initialEntries
       .map { loc =>
-        s3Client.putObject(loc.namespace, loc.path, "hello world")
+        s3Client.putObject(loc.bucket, loc.key, "hello world")
       }
 }

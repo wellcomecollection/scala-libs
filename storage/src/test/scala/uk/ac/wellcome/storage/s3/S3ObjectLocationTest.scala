@@ -8,15 +8,15 @@ import uk.ac.wellcome.json.exceptions.JsonDecodingError
 class S3ObjectLocationTest extends AnyFunSpec with Matchers {
   it("creates a location from a prefix") {
     val prefix = S3ObjectLocationPrefix(
-      namespace = "my-test-bucket",
-      path = "png-objects"
+      bucket = "my-test-bucket",
+      keyPrefix = "png-objects"
     )
 
     val location = prefix.asLocation("cats", "cat1.png")
 
     location shouldBe S3ObjectLocation(
-      namespace = "my-test-bucket",
-      path = "png-objects/cats/cat1.png"
+      bucket = "my-test-bucket",
+      key = "png-objects/cats/cat1.png"
     )
   }
 
@@ -27,8 +27,8 @@ class S3ObjectLocationTest extends AnyFunSpec with Matchers {
       val location = fromJson[S3ObjectLocation](jsonString).get
 
       location shouldBe S3ObjectLocation(
-        namespace = "my-bucket",
-        path = "myfile.txt"
+        bucket = "my-bucket",
+        key = "myfile.txt"
       )
     }
 
@@ -38,8 +38,8 @@ class S3ObjectLocationTest extends AnyFunSpec with Matchers {
       val location = fromJson[S3ObjectLocation](jsonString).get
 
       location shouldBe S3ObjectLocation(
-        namespace = "my-bucket",
-        path = "myfile.txt"
+        bucket = "my-bucket",
+        key = "myfile.txt"
       )
     }
 
@@ -59,8 +59,8 @@ class S3ObjectLocationTest extends AnyFunSpec with Matchers {
       val location = fromJson[S3ObjectLocationPrefix](jsonString).get
 
       location shouldBe S3ObjectLocationPrefix(
-        namespace = "my-bucket",
-        path = "myfile.txt"
+        bucket = "my-bucket",
+        keyPrefix = "myfile.txt"
       )
     }
 
@@ -70,8 +70,8 @@ class S3ObjectLocationTest extends AnyFunSpec with Matchers {
       val location = fromJson[S3ObjectLocationPrefix](jsonString).get
 
       location shouldBe S3ObjectLocationPrefix(
-        namespace = "my-bucket",
-        path = "myfile.txt"
+        bucket = "my-bucket",
+        keyPrefix = "myfile.txt"
       )
     }
 

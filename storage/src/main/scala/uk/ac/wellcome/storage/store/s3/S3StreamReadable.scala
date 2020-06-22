@@ -11,7 +11,7 @@ trait S3StreamReadable extends RetryableReadable[S3ObjectLocation, InputStreamWi
   val maxRetries: Int
 
   def retryableGetFunction(location: S3ObjectLocation): InputStreamWithLength = {
-    val retrievedObject = s3Client.getObject(location.namespace, location.path)
+    val retrievedObject = s3Client.getObject(location.bucket, location.key)
 
     new InputStreamWithLength(
       retrievedObject.getObjectContent,
