@@ -1,3 +1,5 @@
+RELEASE_TYPE: major
+
 ### Libraries affected
 
 `storage`
