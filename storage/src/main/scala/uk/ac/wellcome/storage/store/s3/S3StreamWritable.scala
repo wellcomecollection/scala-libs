@@ -49,15 +49,15 @@ trait S3StreamWritable extends Writable[S3ObjectLocation, InputStreamWithLength]
     location: S3ObjectLocation,
     stream: InputStreamWithLength,
   ): Either[WriteError, PutObjectRequest] = {
-    val keyByteLength = location.key.getBytes.length
+    val keyByteLength = location.path.getBytes.length
 
     val metadata = new ObjectMetadata()
 
     metadata.setContentLength(stream.length)
 
     val request = new PutObjectRequest(
-      location.bucket,
-      location.key,
+      location.namespace,
+      location.path,
       stream,
       metadata
     )

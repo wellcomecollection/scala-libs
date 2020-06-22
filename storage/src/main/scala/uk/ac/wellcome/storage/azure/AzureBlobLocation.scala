@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.azure
 
+import java.nio.file.Paths
+
 import uk.ac.wellcome.storage.{Location, Prefix}
 
 case class AzureBlobLocation(
@@ -10,4 +12,11 @@ case class AzureBlobLocation(
 case class AzureBlobLocationPrefix(
   container: String,
   namePrefix: String
-) extends Prefix[AzureBlobLocation]
+) extends Prefix[AzureBlobLocation] {
+
+  override def asLocation(parts: String*): AzureBlobLocationPrefix =
+    AzureBlobLocationPrefix(
+      container = container,
+      name = Paths.get(namePrefix, parts: _*).normalize().toString
+    )
+}
