@@ -21,7 +21,7 @@ class TagsBuilderTest extends AnyFunSpec with Matchers {
     it("creates S3Tags") {
       val awsConfig = ConfigFactory.parseString(awsConfigString)
       val targetConfig = awsConfig.getConfig("somepath")
-      val tags = TagsBuilder.buildClient(targetConfig)
+      val tags = TagsBuilder.build(targetConfig)
 
       tags shouldBe a[S3Tags]
     }
@@ -40,7 +40,7 @@ class TagsBuilderTest extends AnyFunSpec with Matchers {
     it("creates AzureBlobMetadata") {
       val azureConfig = ConfigFactory.parseString(azureConfigString)
       val targetConfig = azureConfig.getConfig("somepath")
-      val tags = TagsBuilder.buildClient(targetConfig)
+      val tags = TagsBuilder.build(targetConfig)
 
       tags shouldBe a[AzureBlobMetadata]
     }
@@ -58,7 +58,7 @@ class TagsBuilderTest extends AnyFunSpec with Matchers {
     it("creates S3Tags") {
       val awsConfig = ConfigFactory.parseString(awsConfigString)
       val targetConfig = awsConfig.getConfig("somepath")
-      val tags = TagsBuilder.buildClient(targetConfig)
+      val tags = TagsBuilder.build(targetConfig)
 
       tags shouldBe a[S3Tags]
     }
