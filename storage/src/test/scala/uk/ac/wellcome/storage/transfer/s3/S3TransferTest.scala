@@ -1,15 +1,16 @@
 package uk.ac.wellcome.storage.transfer.s3
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.tags.s3.S3Tags
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFailure, TransferTestCases}
-import uk.ac.wellcome.storage.{Identified, ObjectLocation}
 
 class S3TransferTest
-    extends TransferTestCases[ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
+    extends TransferTestCases[S3ObjectLocation, S3ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
     with S3TransferFixtures[Record]
     with RecordGenerators {
   override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
@@ -22,25 +23,25 @@ class S3TransferTest
       testWith(bucket)
     }
 
-  override def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
+  override def withSrcStore[R](initialEntries: Map[S3ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
     withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) { store =>
       testWith(store)
     }
 
-  override def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
+  override def withDstStore[R](initialEntries: Map[S3ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
     withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) { store =>
       testWith(store)
     }
 
-  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation], R]): R =
+  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R]): R =
     testWith(
       new S3Transfer()
     )
 
-  override def createSrcLocation(bucket: Bucket): ObjectLocation =
+  override def createSrcLocation(bucket: Bucket): S3ObjectLocation =
     createObjectLocationWith(bucket)
 
-  override def createDstLocation(bucket: Bucket): ObjectLocation =
+  override def createDstLocation(bucket: Bucket): S3ObjectLocation =
     createObjectLocationWith(bucket)
 
   override def createT: Record = createRecord
@@ -62,7 +63,7 @@ class S3TransferTest
           transfer
             .transfer(src, dst)
             .left
-            .value shouldBe a[TransferSourceFailure[_]]
+            .value shouldBe a[TransferSourceFailure[_, _]]
         }
       }
     }

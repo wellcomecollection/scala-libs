@@ -6,9 +6,10 @@ import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
 import uk.ac.wellcome.storage.store.fixtures.BucketNamespaceFixtures
 import uk.ac.wellcome.storage._
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 
 class S3StreamStoreTest
-    extends StreamStoreTestCases[ObjectLocation, Bucket, S3StreamStore, Unit]
+    extends StreamStoreTestCases[S3ObjectLocation, Bucket, S3StreamStore, Unit]
     with S3StreamStoreFixtures
     with BucketNamespaceFixtures {
   describe("handles errors from S3") {
@@ -26,7 +27,7 @@ class S3StreamStoreTest
 
       it("errors if the key doesn't exist") {
         withLocalS3Bucket { bucket =>
-          val location = createObjectLocationWith(bucket.name)
+          val location = createObjectLocationWith(bucket)
           withStoreImpl(initialEntries = Map.empty) { store =>
             val err = store.get(location).left.value
             err shouldBe a[DoesNotExistError]
@@ -41,7 +42,7 @@ class S3StreamStoreTest
       it("errors if the bucket doesn't exist") {
         withStoreImpl(initialEntries = Map.empty) { store =>
           val err =
-            store.get(createObjectLocationWith(createBucketName)).left.value
+            store.get(createObjectLocation).left.value
           err shouldBe a[DoesNotExistError]
 
           err.e shouldBe a[AmazonS3Exception]
@@ -53,7 +54,7 @@ class S3StreamStoreTest
       it("errors if asked to get from an invalid bucket") {
         withStoreImpl(initialEntries = Map.empty) { store =>
           val invalidLocation =
-            createObjectLocationWith(namespace = createInvalidBucketName)
+            createObjectLocationWith(bucket = createInvalidBucket)
           val err = store.get(invalidLocation).left.value
           err shouldBe a[StoreReadError]
 
@@ -78,7 +79,7 @@ class S3StreamStoreTest
 
       it("errors if the bucket doesn't exist") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val result = store.put(createObjectLocationWith(createBucketName))(createT).left.value
+          val result = store.put(createObjectLocation)(createT).left.value
 
           result shouldBe a[StoreWriteError]
 
@@ -90,7 +91,8 @@ class S3StreamStoreTest
 
       it("errors if the bucket name is invalid") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val result = store.put(createObjectLocationWith(createInvalidBucketName))(createT).left.value
+          val badLocation = createObjectLocationWith(bucket = createInvalidBucket)
+          val result = store.put(badLocation)(createT).left.value
 
           result shouldBe a[StoreWriteError]
 
@@ -106,7 +108,7 @@ class S3StreamStoreTest
           // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
 
           val tooLongPath = randomStringOfByteLength(1025)()
-          val id = createId.copy(path = tooLongPath)
+          val id = createId.copy(key = tooLongPath)
 
           val entry = ReplayableStream(randomBytes())
 

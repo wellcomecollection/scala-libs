@@ -1,26 +1,36 @@
 package uk.ac.wellcome.storage.listing.azure
 
+import java.nio.file.Paths
+
 import org.scalatest.Assertion
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
 import uk.ac.wellcome.storage.listing.ListingTestCases
 
-class AzureObjectLocationListingTest extends ListingTestCases[ObjectLocation, ObjectLocationPrefix, ObjectLocation, AzureObjectLocationListing, Container] with AzureFixtures {
-  override def createIdent(implicit container: Container): ObjectLocation =
-    createObjectLocationWith(namespace = container.name)
+class AzureObjectLocationListingTest extends ListingTestCases[AzureBlobLocation, AzureBlobLocationPrefix, AzureBlobLocation, AzureObjectLocationListing, Container] with AzureFixtures {
+  override def createIdent(implicit container: Container): AzureBlobLocation =
+    createBlobLocationWith(container)
 
-  override def extendIdent(location: ObjectLocation, extension: String): ObjectLocation =
-    location.join(extension)
+  override def extendIdent(location: AzureBlobLocation, extension: String): AzureBlobLocation =
+    location.copy(
+      name = Paths.get(location.name, extension).normalize().toString
+    )
 
-  override def createPrefix: ObjectLocationPrefix =
-    createObjectLocationPrefixWith(namespace = createContainerName)
+  override def createPrefix: AzureBlobLocationPrefix =
+    AzureBlobLocationPrefix(
+      container = createContainerName,
+      namePrefix = randomAlphanumeric
+    )
 
-  override def createPrefixMatching(location: ObjectLocation): ObjectLocationPrefix =
-    location.asPrefix
+  override def createPrefixMatching(location: AzureBlobLocation): AzureBlobLocationPrefix =
+    AzureBlobLocationPrefix(
+      container = location.container,
+      namePrefix = location.name
+    )
 
-  override def assertResultCorrect(result: Iterable[ObjectLocation], entries: Seq[ObjectLocation]): Assertion =
+  override def assertResultCorrect(result: Iterable[AzureBlobLocation], entries: Seq[AzureBlobLocation]): Assertion =
     result.toSeq should contain theSameElementsAs entries
 
   override def withListingContext[R](testWith: TestWith[Container, R]): R =
@@ -28,11 +38,11 @@ class AzureObjectLocationListingTest extends ListingTestCases[ObjectLocation, Ob
       testWith(container)
     }
 
-  override def withListing[R](container: Container, initialEntries: Seq[ObjectLocation])(testWith: TestWith[AzureObjectLocationListing, R]): R = {
+  override def withListing[R](container: Container, initialEntries: Seq[AzureBlobLocation])(testWith: TestWith[AzureObjectLocationListing, R]): R = {
     initialEntries.foreach { location =>
       azureClient
-        .getBlobContainerClient(location.namespace)
-        .getBlobClient(location.path)
+        .getBlobContainerClient(location.container)
+        .getBlobClient(location.name)
         .upload(randomInputStream(length = 20), 20)
     }
 

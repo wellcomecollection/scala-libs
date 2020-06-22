@@ -2,7 +2,6 @@ package uk.ac.wellcome.storage.typesafe
 
 import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import com.typesafe.config.Config
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
 import uk.ac.wellcome.storage.tags.azure.AzureBlobMetadata
@@ -24,8 +23,8 @@ object TagsBuilder {
   //  }
   //
 
-  def buildClient(config: Config)
-    : Tags[ObjectLocation] with RetryableReadable[Map[String, String]] = {
+  def buildClient(
+    config: Config): Tags[_] with RetryableReadable[_, Map[String, String]] = {
 
     val cloudProvider = config
       .getStringOption("cloudProvider")

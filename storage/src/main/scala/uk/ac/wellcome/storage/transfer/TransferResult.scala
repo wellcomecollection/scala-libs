@@ -6,19 +6,22 @@ sealed trait TransferFailure extends TransferResult {
   val e: Throwable
 }
 
-case class TransferSourceFailure[Location](source: Location,
-                                           destination: Location,
-                                           e: Throwable = new Error())
+case class TransferSourceFailure[SrcLocation, DstLocation](
+  source: SrcLocation,
+  destination: DstLocation,
+  e: Throwable = new Error())
     extends TransferFailure
 
-case class TransferDestinationFailure[Location](source: Location,
-                                                destination: Location,
-                                                e: Throwable = new Error())
+case class TransferDestinationFailure[SrcLocation, DstLocation](
+  source: SrcLocation,
+  destination: DstLocation,
+  e: Throwable = new Error())
     extends TransferFailure
 
-case class TransferOverwriteFailure[Location](source: Location,
-                                              destination: Location,
-                                              e: Throwable = new Error())
+case class TransferOverwriteFailure[SrcLocation, DstLocation](
+  source: SrcLocation,
+  destination: DstLocation,
+  e: Throwable = new Error())
     extends TransferFailure
 
 case class PrefixTransferFailure(failures: Int,
@@ -32,10 +35,12 @@ case class PrefixTransferListingFailure[Prefix](prefix: Prefix,
 
 sealed trait TransferSuccess extends TransferResult
 
-case class TransferNoOp[Location](source: Location, destination: Location)
+case class TransferNoOp[SrcLocation, DstLocation](source: SrcLocation,
+                                                  destination: DstLocation)
     extends TransferSuccess
 
-case class TransferPerformed[Location](source: Location, destination: Location)
+case class TransferPerformed[SrcLocation, DstLocation](source: SrcLocation,
+                                                       destination: DstLocation)
     extends TransferSuccess
 
 case class PrefixTransferSuccess(successes: Int) extends TransferSuccess

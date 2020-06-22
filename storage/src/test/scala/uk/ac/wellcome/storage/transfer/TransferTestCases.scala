@@ -8,10 +8,12 @@ import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait TransferTestCases[
-  Location, T,
+  SrcLocation,
+  DstLocation,
+  T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[Location, T],
-  DstStore <: Store[Location, T],
+  SrcStore <: Store[SrcLocation, T],
+  DstStore <: Store[DstLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers
@@ -31,13 +33,13 @@ trait TransferTestCases[
       }
     }
 
-  def createSrcLocation(namespace: SrcNamespace): Location
-  def createDstLocation(namespace: DstNamespace): Location
+  def createSrcLocation(namespace: SrcNamespace): SrcLocation
+  def createDstLocation(namespace: DstNamespace): DstLocation
 
-  def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
-  def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
+  def withSrcStore[R](initialEntries: Map[SrcLocation, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
+  def withDstStore[R](initialEntries: Map[DstLocation, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
 
-  def withTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[Transfer[Location], R]): R
+  def withTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[Transfer[SrcLocation, DstLocation], R]): R
 
   describe("behaves as a Transfer") {
     it("copies an object from a source to a destination") {
@@ -78,9 +80,9 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.left.value shouldBe a[TransferSourceFailure[_]]
+              result.left.value shouldBe a[TransferSourceFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location]]
+              val failure = result.left.value.asInstanceOf[TransferSourceFailure[SrcLocation, DstLocation]]
               failure.source shouldBe src
               failure.destination shouldBe dst
             }
@@ -105,9 +107,9 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.left.value shouldBe a[TransferOverwriteFailure[_]]
+              result.left.value shouldBe a[TransferOverwriteFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferOverwriteFailure[Location]]
+              val failure = result.left.value.asInstanceOf[TransferOverwriteFailure[SrcLocation, DstLocation]]
               failure.source shouldBe src
               failure.destination shouldBe dst
 
@@ -157,9 +159,9 @@ trait TransferTestCases[
                   _.transfer(src, dst, checkForExisting = false)
                 }
 
-              result.left.value shouldBe a[TransferSourceFailure[_]]
+              result.left.value shouldBe a[TransferSourceFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location]]
+              val failure = result.left.value.asInstanceOf[TransferSourceFailure[SrcLocation, DstLocation]]
               failure.source shouldBe src
               failure.destination shouldBe dst
             }

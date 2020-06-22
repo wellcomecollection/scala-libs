@@ -1,36 +1,36 @@
 package uk.ac.wellcome.storage.store
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.{Identified, ObjectLocation, ReadError, RetryOps}
+import uk.ac.wellcome.storage.{Identified, ReadError, RetryOps}
 
 import scala.util.{Failure, Success, Try}
 
-trait RetryableReadable[T] extends Readable[ObjectLocation, T] with Logging {
+trait RetryableReadable[Ident, T] extends Readable[Ident, T] with Logging {
   import RetryOps._
 
   val maxRetries: Int
 
-  def retryableGetFunction(location: ObjectLocation): T
+  def retryableGetFunction(ident: Ident): T
 
   def buildGetError(throwable: Throwable): ReadError
 
-  def get(location: ObjectLocation): ReadEither =
-    retryableGet(location) map { t =>
-      Identified(location, t)
+  def get(ident: Ident): ReadEither =
+    retryableGet(ident) map { t =>
+      Identified(ident, t)
     }
 
-  def retryableGet(location: ObjectLocation): Either[ReadError, T] =
-    getOnce().retry(maxRetries)(location)
+  def retryableGet(ident: Ident): Either[ReadError, T] =
+    getOnce.retry(maxRetries)(ident)
 
-  private def getOnce(): ObjectLocation => Either[ReadError, T] =
-    (location: ObjectLocation) =>
+  private def getOnce: Ident => Either[ReadError, T] =
+    (ident: Ident) =>
       Try {
-        retryableGetFunction(location)
+        retryableGetFunction(ident)
       } match {
         case Success(t) => Right(t)
         case Failure(err) =>
           val error = buildGetError(err)
-          warn(s"Error when trying to get $location: $error")
+          warn(s"Error when trying to get $ident: $error")
           Left(error)
     }
 }

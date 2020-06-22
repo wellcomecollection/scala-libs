@@ -5,24 +5,11 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.{DynamoFixtures, S3Fixtures}
-import uk.ac.wellcome.storage.generators.{
-  MetadataGenerators,
-  ObjectLocationGenerators,
-  Record,
-  RecordGenerators
-}
+import uk.ac.wellcome.storage.generators.{MetadataGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
-import uk.ac.wellcome.storage.store.{
-  HybridIndexedStoreEntry,
-  HybridStoreEntry,
-  VersionedStoreWithOverwriteTestCases
-}
-import uk.ac.wellcome.storage.{
-  ObjectLocation,
-  StoreReadError,
-  StoreWriteError,
-  Version
-}
+import uk.ac.wellcome.storage.store.{HybridIndexedStoreEntry, HybridStoreEntry, VersionedStoreWithOverwriteTestCases}
+import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 
 class DynamoVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[
@@ -30,7 +17,6 @@ class DynamoVersionedHybridStoreTest
       HybridStoreEntry[Record, Map[String, String]],
       DynamoHybridStoreWithMaxima[String, Int, Record, Map[String, String]]]
     with RecordGenerators
-    with ObjectLocationGenerators
     with S3Fixtures
     with MetadataGenerators
     with DynamoFixtures {
@@ -38,7 +24,7 @@ class DynamoVersionedHybridStoreTest
   type DynamoVersionedStoreImpl =
     DynamoVersionedHybridStore[String, Int, Record, Map[String, String]]
   type IndexedStoreEntry =
-    HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]
+    HybridIndexedStoreEntry[S3ObjectLocation, Map[String, String]]
 
   override def createTable(table: Table): Table =
     createTableWithHashRangeKey(table)
@@ -114,7 +100,7 @@ class DynamoVersionedHybridStoreTest
           new DynamoHashRangeStore[String, Int, IndexedStoreEntry](
             dynamoConfig)
 
-        val prefix = createObjectLocationPrefixWith(bucket.name)
+        val prefix = createObjectLocationPrefixWith(bucket)
 
         testWith(
           new DynamoHybridStoreWithMaxima[
