@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## v11.5.0 - 2020-06-22
+
+### Libraries affected
+
+`storage_typesafe`
+
+### Description
+
+Adds a `TagsBuilder` object to create the appropriate `Tags` class for the specified `CloudProvider`.
+
+For config:
+
+```hocon
+somepath {
+  cloudProvider = "azure"
+  azure.blobStore.connectionString = "UseDevelopmentStorage=true;"
+}
+``` 
+
+In code:
+
+```scala
+import uk.ac.wellcome.storage.typesafe.TagsBuilder
+
+val tags = TagsBuilder.buildClient(config)
+
+assert(tags.isInstanceOf(AzureBlobMetadata))
+```
+
 ## v11.4.0 - 2020-06-19
 
 ### Libraries affected
