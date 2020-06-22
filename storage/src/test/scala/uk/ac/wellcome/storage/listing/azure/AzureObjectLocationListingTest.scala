@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.listing.azure
 
+import java.nio.file.Paths
+
 import org.scalatest.Assertion
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
@@ -12,7 +14,9 @@ class AzureObjectLocationListingTest extends ListingTestCases[AzureBlobLocation,
     createBlobLocationWith(container)
 
   override def extendIdent(location: AzureBlobLocation, extension: String): AzureBlobLocation =
-    location.join(extension)
+    location.copy(
+      name = Paths.get(location.name, extension).normalize().toString
+    )
 
   override def createPrefix: AzureBlobLocationPrefix =
     AzureBlobLocationPrefix(

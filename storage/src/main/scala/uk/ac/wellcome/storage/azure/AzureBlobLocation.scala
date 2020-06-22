@@ -7,12 +7,7 @@ import uk.ac.wellcome.storage.{Location, Prefix}
 case class AzureBlobLocation(
   container: String,
   name: String
-) extends Location {
-
-  def join(parts: String*): AzureBlobLocation = this.copy(
-    name = Paths.get(this.name, parts: _*).normalize().toString
-  )
-}
+) extends Location
 
 case class AzureBlobLocationPrefix(
   container: String,
@@ -20,5 +15,8 @@ case class AzureBlobLocationPrefix(
 ) extends Prefix[AzureBlobLocation] {
 
   override def asLocation(parts: String*): AzureBlobLocation =
-    AzureBlobLocation(container = container, name = namePrefix).join(parts: _*)
+    AzureBlobLocation(
+      container = container,
+      name = Paths.get(namePrefix, parts: _*).normalize().toString
+    )
 }

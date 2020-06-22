@@ -8,12 +8,7 @@ import uk.ac.wellcome.storage.{Location, Prefix}
 case class S3ObjectLocation(
   bucket: String,
   key: String
-) extends Location {
-
-  def join(parts: String*): S3ObjectLocation = this.copy(
-    key = Paths.get(this.key, parts: _*).normalize().toString
-  )
-}
+) extends Location
 
 case class S3ObjectLocationPrefix(
   bucket: String,
@@ -21,7 +16,10 @@ case class S3ObjectLocationPrefix(
 ) extends Prefix[S3ObjectLocation] {
 
   override def asLocation(parts: String*): S3ObjectLocation =
-    S3ObjectLocation(bucket = bucket, key = keyPrefix).join(parts: _*)
+    S3ObjectLocation(
+      bucket = bucket,
+      key = Paths.get(keyPrefix, parts: _*).normalize().toString
+    )
 }
 
 // Note: the precursor to these classes was ObjectLocation, which used the

@@ -75,7 +75,9 @@ trait S3ListingTestCases[ListingResult]
         val location = createObjectLocationWith(bucket)
 
         val locations = (1 to 10).map { i =>
-          location.join(s"file_$i.txt")
+          location.copy(
+            key = s"${location.key}/file_$i.txt"
+          )
         }
         createInitialEntries(bucket, locations)
 

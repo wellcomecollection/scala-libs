@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.listing.s3
 
+import java.nio.file.Paths
+
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import uk.ac.wellcome.fixtures.TestWith
@@ -21,7 +23,9 @@ trait S3ListingFixtures[ListingResult]
 
   def extendIdent(location: S3ObjectLocation,
                   extension: String): S3ObjectLocation =
-    location.join(extension)
+    location.copy(
+      key = Paths.get(location.key, extension).normalize().toString
+    )
 
   def createPrefix: S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(
