@@ -5,12 +5,13 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
 import com.amazonaws.services.s3.transfer.{TransferManagerBuilder, Upload}
 import uk.ac.wellcome.storage._
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.Writable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
 import scala.util.{Failure, Success, Try}
 
-trait S3StreamWritable extends Writable[ObjectLocation, InputStreamWithLength] {
+trait S3StreamWritable extends Writable[S3ObjectLocation, InputStreamWithLength] {
   implicit val s3Client: AmazonS3
 
   private val transferManager = TransferManagerBuilder.standard
@@ -45,18 +46,18 @@ trait S3StreamWritable extends Writable[ObjectLocation, InputStreamWithLength] {
   private val MAX_KEY_BYTE_LENGTH = 1024
 
   private def createPutObjectRequest(
-    location: ObjectLocation,
+    location: S3ObjectLocation,
     stream: InputStreamWithLength,
   ): Either[WriteError, PutObjectRequest] = {
-    val keyByteLength = location.path.getBytes.length
+    val keyByteLength = location.key.getBytes.length
 
     val metadata = new ObjectMetadata()
 
     metadata.setContentLength(stream.length)
 
     val request = new PutObjectRequest(
-      location.namespace,
-      location.path,
+      location.bucket,
+      location.key,
       stream,
       metadata
     )
@@ -75,9 +76,9 @@ trait S3StreamWritable extends Writable[ObjectLocation, InputStreamWithLength] {
 
   private def uploadWithTransferManager(
     putObjectRequest: PutObjectRequest,
-    location: ObjectLocation,
+    location: S3ObjectLocation,
     inputStream: InputStreamWithLength
-  ): Either[WriteError, Identified[ObjectLocation, InputStreamWithLength]] =
+  ): Either[WriteError, Identified[S3ObjectLocation, InputStreamWithLength]] =
     Try {
       val upload: Upload = transferManager
         .upload(putObjectRequest)
@@ -88,7 +89,7 @@ trait S3StreamWritable extends Writable[ObjectLocation, InputStreamWithLength] {
       case Failure(err) => Left(buildPutError(err))
     }
 
-  override def put(location: ObjectLocation)(
+  override def put(location: S3ObjectLocation)(
     inputStream: InputStreamWithLength): WriteEither =
     for {
       putObjectRequest <- createPutObjectRequest(location, inputStream)
