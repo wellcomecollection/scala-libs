@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.generators.{MetadataGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store.TypedStoreTestCases
 import uk.ac.wellcome.storage.store.fixtures.StringNamespaceFixtures
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
@@ -18,7 +18,6 @@ class MemoryTypedStoreTest
       MemoryTypedStore[String, Record],
       MemoryStore[String, Array[Byte]]]
     with MemoryTypedStoreFixtures[String, Record]
-    with MetadataGenerators
     with RecordGenerators
     with StringNamespaceFixtures {
   override def createT: Record = createRecord

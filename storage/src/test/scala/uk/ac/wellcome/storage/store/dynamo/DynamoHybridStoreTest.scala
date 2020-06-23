@@ -10,7 +10,6 @@ import uk.ac.wellcome.storage.{
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.Record
-import uk.ac.wellcome.storage.store.HybridIndexedStoreEntry
 import org.scanamo.auto._
 
 class DynamoHybridStoreTest
@@ -18,7 +17,7 @@ class DynamoHybridStoreTest
       DynamoHashStore[
         String,
         Int,
-        HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]]
+        ObjectLocation]
     ] {
   override def createTable(table: Table): Table =
     createTableWithHashKey(table)
@@ -30,8 +29,7 @@ class DynamoHybridStoreTest
     implicit val underlyingTypedStore: S3TypedStoreImpl = typedStore
     implicit val underlyingIndexedStore: DynamoIndexedStoreImpl = indexedStore
 
-    val hybridStore =
-      new DynamoHybridStore[Record, Map[String, String]](createPrefix)
+    val hybridStore = new DynamoHybridStore[Record](createPrefix)
 
     testWith(hybridStore)
   }
@@ -55,8 +53,7 @@ class DynamoHybridStoreTest
 
     testWith(
       new DynamoIndexedStoreImpl(config = createDynamoConfigWith(table)) {
-        override def put(id: Version[String, Int])(
-          t: HybridIndexedStoreEntry[ObjectLocation, Map[String, String]])
+        override def put(id: Version[String, Int])(t: ObjectLocation)
           : WriteEither =
           Left(StoreWriteError(new Error("BOOM!")))
       }

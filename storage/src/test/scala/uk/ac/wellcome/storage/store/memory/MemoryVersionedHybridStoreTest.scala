@@ -4,20 +4,14 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.maxima.memory.MemoryMaxima
-import uk.ac.wellcome.storage.store.{
-  HybridIndexedStoreEntry,
-  HybridStoreEntry,
-  VersionedStoreWithOverwriteTestCases
-}
+import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
 
 class MemoryVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[
       String,
-      HybridStoreEntry[Record, Record],
-      MemoryHybridStoreWithMaxima[String, Record, Record]]
+      Record,
+      MemoryHybridStoreWithMaxima[String, Record]]
     with RecordGenerators {
-
-  type IndexedStoreEntry = HybridIndexedStoreEntry[String, Record]
 
   override def withFailingGetVersionedStore[R](initialEntries: Entries)(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
@@ -27,7 +21,7 @@ class MemoryVersionedHybridStoreTest
       }
 
       val versionedHybridStore =
-        new MemoryVersionedHybridStore[String, Record, Record](storeContext) {
+        new MemoryVersionedHybridStore[String, Record](storeContext) {
           override def get(id: Version[String, Int]): ReadEither = {
             Left(StoreReadError(new Error("BOOM!")))
           }
@@ -45,11 +39,9 @@ class MemoryVersionedHybridStoreTest
       }
 
       val versionedHybridStore =
-        new MemoryVersionedHybridStore[String, Record, Record](storeContext) {
-          override def put(id: Version[String, Int])(
-            t: HybridStoreEntry[Record, Record]): WriteEither = {
+        new MemoryVersionedHybridStore[String, Record](storeContext) {
+          override def put(id: Version[String, Int])(t: Record): WriteEither =
             Left(StoreWriteError(new Error("BOOM!")))
-          }
         }
 
       testWith(versionedHybridStore)
@@ -60,7 +52,7 @@ class MemoryVersionedHybridStoreTest
 
   override def withVersionedStoreImpl[R](
     initialEntries: Entries,
-    storeContext: MemoryHybridStoreWithMaxima[String, Record, Record])(
+    storeContext: MemoryHybridStoreWithMaxima[String, Record])(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
 
     initialEntries.map {
@@ -68,18 +60,16 @@ class MemoryVersionedHybridStoreTest
     }
 
     val versionedHybridStore =
-      new MemoryVersionedHybridStore[String, Record, Record](storeContext)
+      new MemoryVersionedHybridStore[String, Record](storeContext)
 
     testWith(versionedHybridStore)
   }
 
   override def withVersionedStoreContext[R](
-    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record, Record], R])
+    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R])
     : R = {
-    val indexedStore = new MemoryStore[
-      Version[String, Int],
-      HybridIndexedStoreEntry[String, Record]](Map.empty)
-    with MemoryMaxima[String, HybridIndexedStoreEntry[String, Record]]
+    val indexedStore = new MemoryStore[Version[String, Int], String](Map.empty)
+    with MemoryMaxima[String, String]
 
     val memoryStoreForStreamStore =
       new MemoryStore[String, Array[Byte]](Map.empty)
@@ -88,24 +78,22 @@ class MemoryVersionedHybridStoreTest
       new MemoryTypedStore[String, Record](Map.empty)(streamStore, codec)
 
     testWith(
-      new MemoryHybridStoreWithMaxima[String, Record, Record]()(
+      new MemoryHybridStoreWithMaxima[String, Record]()(
         typedStore,
         indexedStore,
         codec))
   }
 
-  override def createT: HybridStoreEntry[Record, Record] =
-    HybridStoreEntry(createRecord, createRecord)
+  override def createT: Record = createRecord
 
   override def withStoreImpl[R](
-    initialEntries: Map[Version[String, Int],
-                        HybridStoreEntry[Record, Record]],
-    storeContext: MemoryHybridStoreWithMaxima[String, Record, Record])(
+    initialEntries: Map[Version[String, Int], Record],
+    storeContext: MemoryHybridStoreWithMaxima[String, Record])(
     testWith: TestWith[StoreImpl, R]): R =
     withVersionedStoreImpl(initialEntries, storeContext)(testWith)
 
   override def withStoreContext[R](
-    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record, Record], R])
+    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R])
     : R =
     withVersionedStoreContext(testWith)
 

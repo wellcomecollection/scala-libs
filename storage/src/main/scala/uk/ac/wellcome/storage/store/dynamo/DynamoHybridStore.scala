@@ -6,13 +6,10 @@ import uk.ac.wellcome.storage.store._
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage._
 
-class DynamoHybridStore[T, Metadata](prefix: ObjectLocationPrefix)(
-  implicit val indexedStore: DynamoHashStore[
-    String,
-    Int,
-    HybridIndexedStoreEntry[ObjectLocation, Metadata]],
+class DynamoHybridStore[T](prefix: ObjectLocationPrefix)(
+  implicit val indexedStore: DynamoHashStore[String, Int, ObjectLocation],
   val typedStore: S3TypedStore[T]
-) extends HybridStore[Version[String, Int], ObjectLocation, T, Metadata] {
+) extends HybridStore[Version[String, Int], ObjectLocation, T] {
 
   override protected def createTypeStoreId(
     id: Version[String, Int]): ObjectLocation =

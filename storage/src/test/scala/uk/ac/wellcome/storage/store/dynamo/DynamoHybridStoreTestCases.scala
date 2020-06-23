@@ -7,7 +7,6 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.fixtures.{DynamoFixtures, S3Fixtures}
 import uk.ac.wellcome.storage.generators.{
-  MetadataGenerators,
   Record,
   RecordGenerators
 }
@@ -15,14 +14,11 @@ import uk.ac.wellcome.storage.store._
 import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
 
 trait DynamoHybridStoreTestCases[
-  DynamoStoreImpl <: Store[
-    Version[String, Int],
-    HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]]]
+  DynamoStoreImpl <: Store[Version[String, Int], ObjectLocation]]
     extends HybridStoreWithoutOverwritesTestCases[
       Version[String, Int],
       ObjectLocation,
       Record,
-      Map[String, String],
       Unit,
       S3TypedStore[Record],
       DynamoStoreImpl,
@@ -30,12 +26,9 @@ trait DynamoHybridStoreTestCases[
     ]
     with RecordGenerators
     with S3Fixtures
-    with DynamoFixtures
-    with MetadataGenerators {
+    with DynamoFixtures {
   type S3TypedStoreImpl = S3TypedStore[Record]
   type DynamoIndexedStoreImpl = DynamoStoreImpl
-  type IndexedStoreEntry =
-    HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]
 
   def createPrefix(implicit context: (Bucket, Table)): ObjectLocationPrefix = {
     val (bucket, _) = context
@@ -51,8 +44,6 @@ trait DynamoHybridStoreTestCases[
 
   override def createTypedStoreId(implicit bucket: Unit): ObjectLocation =
     createObjectLocation
-
-  override def createMetadata: Map[String, String] = createValidMetadata
 
   override def withBrokenPutTypedStoreImpl[R](
     testWith: TestWith[S3TypedStoreImpl, R])(
@@ -88,8 +79,7 @@ trait DynamoHybridStoreTestCases[
       }
     }
 
-  override def createT: HybridStoreEntry[Record, Map[String, String]] =
-    HybridStoreEntry(createRecord, createValidMetadata)
+  override def createT: Record = createRecord
 
   override def withNamespace[R](testWith: TestWith[Unit, R]): R =
     testWith(())
@@ -113,7 +103,7 @@ trait DynamoHybridStoreTestCases[
                 val dynamoResult = indexedStore.get(putValue.id)
                 val dynamoValue = dynamoResult.right.value
 
-                val s3Location = dynamoValue.identifiedT.typedStoreId
+                val s3Location = dynamoValue.identifiedT
 
                 s3Location.path should endWith(".json")
               }
@@ -264,7 +254,7 @@ trait DynamoHybridStoreTestCases[
                         Right[_, _]]
 
                       val indexedEntry = indexedStore.get(id).right.value
-                      val typeStoreId = indexedEntry.identifiedT.typedStoreId
+                      val typeStoreId = indexedEntry.identifiedT
 
                       s3Client.deleteObject(
                         typeStoreId.namespace,
@@ -297,7 +287,7 @@ trait DynamoHybridStoreTestCases[
                         Right[_, _]]
 
                       val indexedEntry = indexedStore.get(id).right.value
-                      val typeStoreId = indexedEntry.identifiedT.typedStoreId
+                      val typeStoreId = indexedEntry.identifiedT
 
                       s3Client.deleteObject(
                         typeStoreId.namespace,
