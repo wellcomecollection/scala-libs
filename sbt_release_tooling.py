@@ -46,13 +46,6 @@ def git(*args):
     subprocess.check_call(('git',) + args)
 
 
-def sbt(*args):
-    """
-    Run an sbt command and check it completes successfully.
-    """
-    subprocess.check_call(('sbt',) + args)
-
-
 def tags():
     """
     Returns a list of all tags in the repo.
@@ -331,7 +324,6 @@ def release():
         sys.exit(0)
 
     print('Attempting a release.')
-    sbt('publish')
 
     git('push', 'ssh-origin', 'HEAD:master')
     git('push', 'ssh-origin', '--tag')
@@ -394,12 +386,6 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 'release':
         release()
-    elif sys.argv[1] == 'test':
-        if os.path.exists('docker-compose.yml'):
-            sbt('dockerComposeUp')
-            sbt('test')
-        else:
-            sbt('test')
     elif sys.argv[1] == 'format':
         autoformat()
     else:

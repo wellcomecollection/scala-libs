@@ -34,9 +34,11 @@ services:
 
 jobs:
   include:
+    # Format
     - stage: format
       name: format
       script: ./sbt_release_tooling.py format
+    # Test
     - stage: test
       name: fixtures
       script: sbt "project fixtures" test
@@ -54,11 +56,33 @@ jobs:
       script: sbt "project storage" dockerComposeUp test dockerComposeStop
     - name: storage_typesafe
       script: sbt "project storage_typesafe" test
+    # Release
     - stage: release
+      name: release
       script: ./sbt_release_tooling.py release
+    # Publish
+    - stage: publish
+      name: fixtures
+      script: sbt "project fixtures" publish
+    - name: json
+      script: sbt "project json" publish
+    - name: messaging
+      script: sbt "project messaging" publish
+    - name: messaging_typesafe
+      script: sbt "project messaging_typesafe" publish
+    - name: monitoring
+      script: sbt "project monitoring" publish
+    - name: monitoring_typesafe
+      script: sbt "project monitoring_typesafe" publish
+    - name: storage
+      script: sbt "project storage" publish
+    - name: storage_typesafe
+      script: sbt "project storage_typesafe" publish
 
 stages:
   - format
-  - test
+  - name: test
   - name: release
+    if: type = push
+  - name: publish
     if: type = push
