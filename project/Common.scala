@@ -4,8 +4,8 @@ import com.tapad.docker.DockerComposePlugin
 import sbt.Keys._
 import sbt._
 
-class Common(projectVersion: String) {
-  val settings: Seq[Def.Setting[_]] = Seq(
+object Common {
+  def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.6",
     organization := "uk.ac.wellcome",
     scalacOptions ++= Seq(
@@ -32,6 +32,7 @@ class Common(projectVersion: String) {
   def setupProject(
                     project: Project,
                     folder: String,
+                    projectVersion: String,
                     localDependencies: Seq[Project] = Seq(),
                     externalDependencies: Seq[ModuleID] = Seq()
                   ): Project = {
@@ -43,6 +44,8 @@ class Common(projectVersion: String) {
           configuration = Some("compile->compile;test->test")
         )
       }
+
+    val settings = createSettings(projectVersion)
 
     project
       .in(new File(folder))
