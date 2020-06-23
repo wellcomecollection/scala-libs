@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.fixtures
 import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.fixtures.{Fixture, fixture}
-import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.generators.RandomThings
 
 object AzureFixtures {
@@ -36,16 +36,10 @@ trait AzureFixtures extends RandomThings with Eventually with IntegrationPatienc
   def createContainerName: String =
     randomAlphanumeric.toLowerCase
 
-  def createBlobLocationWith(container: Container): AzureBlobLocation =
-    AzureBlobLocation(
-      container = container.name,
-      name = randomAlphanumeric
-    )
-
-  def createBlobLocationPrefixWith(container: Container): AzureBlobLocationPrefix =
-    AzureBlobLocationPrefix(
-      container = container.name,
-      namePrefix = randomAlphanumeric
+  def createAzureObjectLocationWith(container: Container): ObjectLocation =
+    ObjectLocation(
+      namespace = container.name,
+      path = randomAlphanumeric
     )
 
   def withAzureContainer[R]: Fixture[Container, R] =

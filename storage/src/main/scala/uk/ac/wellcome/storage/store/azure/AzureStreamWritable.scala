@@ -4,25 +4,29 @@ import java.io.BufferedInputStream
 
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobErrorCode, BlobStorageException}
-import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.store.Writable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
-import uk.ac.wellcome.storage.{Identified, OverwriteError, StoreWriteError}
+import uk.ac.wellcome.storage.{
+  Identified,
+  ObjectLocation,
+  OverwriteError,
+  StoreWriteError
+}
 
 import scala.util.{Failure, Success, Try}
 
 trait AzureStreamWritable
-    extends Writable[AzureBlobLocation, InputStreamWithLength] {
+    extends Writable[ObjectLocation, InputStreamWithLength] {
   implicit val blobClient: BlobServiceClient
   val allowOverwrites: Boolean
 
-  override def put(location: AzureBlobLocation)(
+  override def put(location: ObjectLocation)(
     inputStream: InputStreamWithLength): WriteEither =
     Try {
       val individualBlobClient =
         blobClient
-          .getBlobContainerClient(location.container)
-          .getBlobClient(location.name)
+          .getBlobContainerClient(location.namespace)
+          .getBlobClient(location.path)
 
       // We need to buffer the input stream, or we get errors from the Azure SDK:
       //

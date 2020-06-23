@@ -1,29 +1,24 @@
 package uk.ac.wellcome.storage.transfer
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.{Location, Prefix}
 import uk.ac.wellcome.storage.listing.Listing
 
 import scala.collection.parallel.ParIterable
 
-trait PrefixTransfer[SrcLocation <: Location,
-                     SrcPrefix <: Prefix[SrcLocation],
-                     DstLocation <: Location,
-                     DstPrefix <: Prefix[DstLocation]]
-    extends Logging {
-  implicit val transfer: Transfer[SrcLocation, DstLocation]
-  implicit val listing: Listing[SrcPrefix, SrcLocation]
+trait PrefixTransfer[Prefix, Location] extends Logging {
+  implicit val transfer: Transfer[Location]
+  implicit val listing: Listing[Prefix, Location]
 
   protected def buildDstLocation(
-    srcPrefix: SrcPrefix,
-    dstPrefix: DstPrefix,
-    srcLocation: SrcLocation
-  ): DstLocation
+    srcPrefix: Prefix,
+    dstPrefix: Prefix,
+    srcLocation: Location
+  ): Location
 
   private def copyPrefix(
-    iterator: Iterable[SrcLocation],
-    srcPrefix: SrcPrefix,
-    dstPrefix: DstPrefix,
+    iterator: Iterable[Location],
+    srcPrefix: Prefix,
+    dstPrefix: Prefix,
     checkForExisting: Boolean
   ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
     var successes = 0
@@ -32,8 +27,8 @@ trait PrefixTransfer[SrcLocation <: Location,
     iterator
       .grouped(10)
       .foreach { locations =>
-        val results: ParIterable[(SrcLocation,
-                                  Either[TransferFailure, TransferSuccess])] =
+        val results
+          : ParIterable[(Location, Either[TransferFailure, TransferSuccess])] =
           locations.par.map { srcLocation =>
             (
               srcLocation,
@@ -67,8 +62,8 @@ trait PrefixTransfer[SrcLocation <: Location,
   }
 
   def transferPrefix(
-    srcPrefix: SrcPrefix,
-    dstPrefix: DstPrefix,
+    srcPrefix: Prefix,
+    dstPrefix: Prefix,
     checkForExisting: Boolean = true
   ): Either[TransferFailure, PrefixTransferSuccess] = {
     listing.list(srcPrefix) match {

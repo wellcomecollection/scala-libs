@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.store.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.OverwriteError
-import uk.ac.wellcome.storage.azure.AzureBlobLocation
+import uk.ac.wellcome.storage.{ObjectLocation, OverwriteError}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
+import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
@@ -14,11 +14,12 @@ case class AzureStreamStoreContext(
 
 class AzureStreamStoreTest
     extends StreamStoreTestCases[
-      AzureBlobLocation,
+      ObjectLocation,
       Container,
       AzureStreamStore,
       AzureStreamStoreContext]
-    with AzureFixtures {
+    with AzureFixtures
+    with ObjectLocationGenerators {
 
   // Azurite test container does not error when handed incorrect stream lengths
   override lazy val skipStreamLengthTests = true
@@ -28,17 +29,17 @@ class AzureStreamStoreTest
       testWith(container)
     }
 
-  override def createId(implicit container: Container): AzureBlobLocation =
-    createBlobLocationWith(container)
+  override def createId(implicit container: Container): ObjectLocation =
+    createAzureObjectLocationWith(container)
 
   override def withStreamStoreImpl[R](
     context: AzureStreamStoreContext,
-    initialEntries: Map[AzureBlobLocation, InputStreamWithLength])(
+    initialEntries: Map[ObjectLocation, InputStreamWithLength])(
     testWith: TestWith[AzureStreamStore, R]): R = {
     initialEntries.foreach { case (location, data) =>
         azureClient
-          .getBlobContainerClient(location.container)
-          .getBlobClient(location.name)
+          .getBlobContainerClient(location.namespace)
+          .getBlobClient(location.path)
           .upload(data, data.length)
     }
 

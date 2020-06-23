@@ -6,18 +6,21 @@ import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.fixtures.{DynamoFixtures, S3Fixtures}
-import uk.ac.wellcome.storage.generators.{MetadataGenerators, Record, RecordGenerators}
-import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import uk.ac.wellcome.storage.generators.{
+  MetadataGenerators,
+  Record,
+  RecordGenerators
+}
 import uk.ac.wellcome.storage.store._
 import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
 
 trait DynamoHybridStoreTestCases[
   DynamoStoreImpl <: Store[
     Version[String, Int],
-    HybridIndexedStoreEntry[S3ObjectLocation, Map[String, String]]]]
+    HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]]]
     extends HybridStoreWithoutOverwritesTestCases[
       Version[String, Int],
-      S3ObjectLocation,
+      ObjectLocation,
       Record,
       Map[String, String],
       Unit,
@@ -32,13 +35,13 @@ trait DynamoHybridStoreTestCases[
   type S3TypedStoreImpl = S3TypedStore[Record]
   type DynamoIndexedStoreImpl = DynamoStoreImpl
   type IndexedStoreEntry =
-    HybridIndexedStoreEntry[S3ObjectLocation, Map[String, String]]
+    HybridIndexedStoreEntry[ObjectLocation, Map[String, String]]
 
-  def createPrefix(implicit context: (Bucket, Table)): S3ObjectLocationPrefix = {
+  def createPrefix(implicit context: (Bucket, Table)): ObjectLocationPrefix = {
     val (bucket, _) = context
-    S3ObjectLocationPrefix(
-      bucket = bucket.name,
-      keyPrefix = randomAlphanumeric
+    ObjectLocationPrefix(
+      namespace = bucket.name,
+      path = randomAlphanumeric
     )
   }
 
@@ -46,11 +49,8 @@ trait DynamoHybridStoreTestCases[
     implicit context: (Bucket, Table)): R =
     testWith(S3TypedStore[Record])
 
-  override def createTypedStoreId(implicit bucket: Unit): S3ObjectLocation =
-    S3ObjectLocation(
-      bucket = createBucketName,
-      key = randomAlphanumeric
-    )
+  override def createTypedStoreId(implicit bucket: Unit): ObjectLocation =
+    createObjectLocation
 
   override def createMetadata: Map[String, String] = createValidMetadata
 
@@ -61,7 +61,7 @@ trait DynamoHybridStoreTestCases[
 
     testWith(
       new S3TypedStore[Record]()(codec, s3StreamStore) {
-        override def put(location: S3ObjectLocation)(
+        override def put(id: ObjectLocation)(
           entry: Record): WriteEither =
           Left(StoreWriteError(new Error("BOOM!")))
       }
@@ -75,7 +75,7 @@ trait DynamoHybridStoreTestCases[
 
     testWith(
       new S3TypedStore[Record]()(codec, s3StreamStore) {
-        override def get(location: S3ObjectLocation): ReadEither =
+        override def get(id: ObjectLocation): ReadEither =
           Left(StoreReadError(new Error("BOOM!")))
       }
     )
@@ -115,7 +115,7 @@ trait DynamoHybridStoreTestCases[
 
                 val s3Location = dynamoValue.identifiedT.typedStoreId
 
-                s3Location.key should endWith(".json")
+                s3Location.path should endWith(".json")
               }
             }
           }
@@ -267,8 +267,8 @@ trait DynamoHybridStoreTestCases[
                       val typeStoreId = indexedEntry.identifiedT.typedStoreId
 
                       s3Client.deleteObject(
-                        typeStoreId.bucket,
-                        typeStoreId.key)
+                        typeStoreId.namespace,
+                        typeStoreId.path)
 
                       val value = hybridStore.get(id).left.value
 
@@ -300,9 +300,9 @@ trait DynamoHybridStoreTestCases[
                       val typeStoreId = indexedEntry.identifiedT.typedStoreId
 
                       s3Client.deleteObject(
-                        typeStoreId.bucket,
-                        typeStoreId.key)
-                      s3Client.deleteBucket(typeStoreId.bucket)
+                        typeStoreId.namespace,
+                        typeStoreId.path)
+                      s3Client.deleteBucket(typeStoreId.namespace)
 
                       val value = hybridStore.get(id).left.value
 

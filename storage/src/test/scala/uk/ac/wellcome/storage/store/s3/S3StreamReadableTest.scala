@@ -29,7 +29,7 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
 
       readable.get(location).left.value shouldBe a[DoesNotExistError]
 
-      verify(spyClient, times(1)).getObject(location.bucket, location.key)
+      verify(spyClient, times(1)).getObject(location.namespace, location.path)
     }
   }
 
@@ -39,19 +39,19 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
     withLocalS3Bucket { bucket =>
       val location = createObjectLocationWith(bucket)
       s3Client.putObject(
-        location.bucket,
-        location.key,
+        location.namespace,
+        location.path,
         "hello world"
       )
 
       when(mockClient.getObject(any[String], any[String]))
         .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-        .thenReturn(s3Client.getObject(location.bucket, location.key))
+        .thenReturn(s3Client.getObject(location.namespace, location.path))
 
       val readable = createS3ReadableWith(mockClient, retries = 3)
       readable.get(location) shouldBe a[Right[_, _]]
 
-      verify(mockClient, times(2)).getObject(location.bucket, location.key)
+      verify(mockClient, times(2)).getObject(location.namespace, location.path)
     }
   }
 
@@ -71,6 +71,6 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
     val readable = createS3ReadableWith(mockClient, retries = retries)
     readable.get(location).left.value shouldBe a[StoreReadError]
 
-    verify(mockClient, times(retries)).getObject(location.bucket, location.key)
+    verify(mockClient, times(retries)).getObject(location.namespace, location.path)
   }
 }

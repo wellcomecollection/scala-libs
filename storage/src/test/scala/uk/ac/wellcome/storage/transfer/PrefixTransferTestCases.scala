@@ -4,15 +4,14 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{Identified, Location, Prefix}
+import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait PrefixTransferTestCases[
-  SrcLocation <: Location, SrcPrefix <: Prefix[SrcLocation],
-  DstLocation <: Location, DstPrefix <: Prefix[DstLocation], T,
+  Location, Prefix, T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[SrcLocation, T],
-  DstStore <: Store[DstLocation, T],
+  SrcStore <: Store[Location, T],
+  DstStore <: Store[Location, T],
   Context]
     extends AnyFunSpec
     with Matchers
@@ -27,26 +26,23 @@ trait PrefixTransferTestCases[
       }
     }
 
-  def createSrcLocation(srcNamespace: SrcNamespace): SrcLocation
-  def createDstLocation(dstNamespace: DstNamespace): DstLocation
+  def createSrcLocation(srcNamespace: SrcNamespace): Location
+  def createDstLocation(dstNamespace: DstNamespace): Location
 
-  def createSrcPrefix(srcNamespace: SrcNamespace): SrcPrefix
-  def createDstPrefix(dstNamespace: DstNamespace): DstPrefix
+  def createSrcPrefix(srcNamespace: SrcNamespace): Prefix
+  def createDstPrefix(dstNamespace: DstNamespace): Prefix
 
-  def createSrcLocationFrom(srcPrefix: SrcPrefix, suffix: String): SrcLocation =
-    srcPrefix.asLocation(suffix)
+  def createSrcLocationFrom(srcPrefix: Prefix, suffix: String): Location
+  def createDstLocationFrom(dstPrefix: Prefix, suffix: String): Location
 
-  def createDstLocationFrom(dstPrefix: DstPrefix, suffix: String): DstLocation =
-    dstPrefix.asLocation(suffix)
+  def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
+  def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
 
-  def withSrcStore[R](initialEntries: Map[SrcLocation, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
-  def withDstStore[R](initialEntries: Map[DstLocation, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
+  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
 
-  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[SrcLocation, SrcPrefix, DstLocation, DstPrefix], R]): R
-
-  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[SrcLocation, SrcPrefix, DstLocation, DstPrefix], R]): R
-  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[SrcLocation, SrcPrefix, DstLocation, DstPrefix], R]): R
-  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[SrcLocation, SrcPrefix, DstLocation, DstPrefix], R]): R
+  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
 
   def createT: T
 

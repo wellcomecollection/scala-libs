@@ -7,8 +7,7 @@ import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.UpdateWriteError
-import uk.ac.wellcome.storage.azure.AzureBlobLocation
+import uk.ac.wellcome.storage.{ObjectLocation, UpdateWriteError}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.tags.{Tags, TagsTestCases}
@@ -19,18 +18,18 @@ import scala.collection.JavaConverters._
 class AzureBlobMetadataTest
   extends AnyFunSpec
     with Matchers
-    with TagsTestCases[AzureBlobLocation, Container]
+    with TagsTestCases[ObjectLocation, Container]
     with AzureFixtures {
 
-  def putObject(location: AzureBlobLocation, metadata: Map[String, String] = Map.empty): Unit = {
+  def putObject(location: ObjectLocation, metadata: Map[String, String] = Map.empty) = {
     val streamLength = 256
     val allowOverwrites = true
     val inputStream = randomInputStream(length = streamLength)
 
     val individualBlobClient =
       azureClient
-        .getBlobContainerClient(location.container)
-        .getBlobClient(location.name)
+        .getBlobContainerClient(location.namespace)
+        .getBlobClient(location.path)
 
     individualBlobClient.upload(
       inputStream,
@@ -44,7 +43,7 @@ class AzureBlobMetadataTest
 
   }
 
-  override def withTags[R](initialTags: Map[AzureBlobLocation, Map[String, String]])(testWith: TestWith[Tags[AzureBlobLocation], R]): R = {
+  override def withTags[R](initialTags: Map[ObjectLocation, Map[String, String]])(testWith: TestWith[Tags[ObjectLocation], R]): R = {
     initialTags
       .foreach { case (location, tags) =>
         putObject(
@@ -58,8 +57,8 @@ class AzureBlobMetadataTest
 
   val azureBlobMetadata = new AzureBlobMetadata()
 
-  override def createIdent(context: Container): AzureBlobLocation =
-    createBlobLocationWith(context)
+  override def createIdent(context: Container): ObjectLocation =
+    createAzureObjectLocationWith(context)
 
   override def withContext[R](testWith: TestWith[Container, R]): R =
     withAzureContainer { container =>
@@ -68,7 +67,7 @@ class AzureBlobMetadataTest
 
   it("throws an error if the tags are larger than 8KB in total") {
     withAzureContainer { container =>
-      val location = createBlobLocationWith(container)
+      val location = createAzureObjectLocationWith(container)
       putObject(location)
 
       val tooManyBytes =

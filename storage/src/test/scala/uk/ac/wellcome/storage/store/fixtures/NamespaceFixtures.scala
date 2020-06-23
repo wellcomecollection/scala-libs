@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.store.fixtures
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.RandomThings
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
 
 trait NamespaceFixtures[Ident, Namespace] {
   def withNamespace[R](testWith: TestWith[Namespace, R]): R
@@ -23,13 +23,16 @@ trait StringNamespaceFixtures
 }
 
 trait BucketNamespaceFixtures
-    extends NamespaceFixtures[S3ObjectLocation, Bucket]
+    extends NamespaceFixtures[ObjectLocation, Bucket]
     with S3Fixtures {
   override def withNamespace[R](testWith: TestWith[Bucket, R]): R =
     withLocalS3Bucket { bucket =>
       testWith(bucket)
     }
 
-  override def createId(implicit bucket: Bucket): S3ObjectLocation =
-    createObjectLocationWith(bucket)
+  override def createId(implicit namespace: Bucket): ObjectLocation =
+    ObjectLocation(
+      namespace = namespace.name,
+      path = randomAlphanumeric
+    )
 }

@@ -4,7 +4,7 @@ import uk.ac.wellcome.storage.store.memory.MemoryStoreBase
 import uk.ac.wellcome.storage.transfer._
 
 trait MemoryTransfer[Ident, T]
-    extends Transfer[Ident, Ident]
+    extends Transfer[Ident]
     with MemoryStoreBase[Ident, T] {
   override def transferWithCheckForExisting(
     src: Ident,
