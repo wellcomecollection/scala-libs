@@ -5,7 +5,6 @@ import java.util.UUID
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.generators.{
-  MetadataGenerators,
   Record,
   RecordGenerators
 }
@@ -16,19 +15,14 @@ class MemoryHybridStoreTest
       UUID,
       String,
       Record,
-      Map[String, String],
       String,
       MemoryTypedStore[String, Record],
-      MemoryStore[UUID, HybridIndexedStoreEntry[String, Map[String, String]]],
-      (MemoryTypedStore[String, Record],
-       MemoryStore[UUID,
-                   HybridIndexedStoreEntry[String, Map[String, String]]])]
-    with MetadataGenerators
+      MemoryStore[UUID, String],
+      (MemoryTypedStore[String, Record], MemoryStore[UUID, String])]
     with RecordGenerators
     with MemoryTypedStoreFixtures[String, Record] {
 
-  type MemoryIndexedStoreImpl =
-    MemoryStore[UUID, HybridIndexedStoreEntry[String, Map[String, String]]]
+  type MemoryIndexedStoreImpl = MemoryStore[UUID, String]
   type MemoryTypedStoreImpl = MemoryTypedStore[String, Record]
 
   type Context = (MemoryTypedStoreImpl, MemoryIndexedStoreImpl)
@@ -37,7 +31,7 @@ class MemoryHybridStoreTest
                                       indexedStore: MemoryIndexedStoreImpl)(
     testWith: TestWith[HybridStoreImpl, R])(implicit context: Context): R =
     testWith(
-      new MemoryHybridStore[UUID, Record, Map[String, String]]()(
+      new MemoryHybridStore[UUID, Record]()(
         typedStore,
         indexedStore,
         codec)
@@ -62,8 +56,6 @@ class MemoryHybridStoreTest
   override def createTypedStoreId(implicit namespace: String): String =
     s"$namespace/$randomAlphanumeric"
 
-  override def createMetadata: Map[String, String] = createValidMetadata
-
   override def withStoreContext[R](testWith: TestWith[Context, R]): R = {
     implicit val underlyingStreamStore: MemoryStreamStore[String] =
       MemoryStreamStore[String]()
@@ -75,9 +67,8 @@ class MemoryHybridStoreTest
     }
   }
 
-  override def createT: HybridStoreEntry[Record, Map[String, String]] =
-    HybridStoreEntry(createRecord, createValidMetadata)
-
+  override def createT: Record = createRecord
+    
   override def withNamespace[R](testWith: TestWith[String, R]): R =
     testWith(randomAlphanumeric)
 
@@ -116,11 +107,9 @@ class MemoryHybridStoreTest
     implicit context: Context): R = {
     testWith(
       new MemoryIndexedStoreImpl(initialEntries = Map.empty) {
-        override def put(id: UUID)(
-          t: HybridIndexedStoreEntry[String, Map[String, String]]): Either[
+        override def put(id: UUID)(t: String): Either[
           WriteError,
-          Identified[UUID,
-                     HybridIndexedStoreEntry[String, Map[String, String]]]] =
+          Identified[UUID, String]] =
           Left(StoreWriteError(new Error("BOOM!")))
       }
     )
@@ -133,8 +122,7 @@ class MemoryHybridStoreTest
       new MemoryIndexedStoreImpl(initialEntries = Map.empty) {
         override def get(id: UUID): Either[
           ReadError,
-          Identified[UUID,
-                     HybridIndexedStoreEntry[String, Map[String, String]]]] =
+          Identified[UUID, String]] =
           Left(StoreReadError(new Error("BOOM!")))
       }
     )

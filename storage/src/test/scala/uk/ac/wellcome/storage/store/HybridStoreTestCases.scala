@@ -11,24 +11,21 @@ import uk.ac.wellcome.storage._
 trait HybridStoreTestCases[IndexedStoreId,
                            TypedStoreId,
                            T,
-                           Metadata,
                            Namespace,
                            TypedStoreImpl <: TypedStore[TypedStoreId, T],
-                           IndexedStoreImpl <: Store[
-                             IndexedStoreId,
-                             HybridIndexedStoreEntry[TypedStoreId, Metadata]],
+                           IndexedStoreImpl <: Store[IndexedStoreId, TypedStoreId],
                            HybridStoreContext]
     extends AnyFunSpec
     with StoreTestCases[
       IndexedStoreId,
-      HybridStoreEntry[T, Metadata],
+      T,
       Namespace,
       HybridStoreContext]
     with Matchers
     with RandomThings
     with EitherValues {
 
-  type HybridStoreImpl = HybridStore[IndexedStoreId, TypedStoreId, T, Metadata]
+  type HybridStoreImpl = HybridStore[IndexedStoreId, TypedStoreId, T]
 
   def withHybridStoreImpl[R](
     typedStore: TypedStoreImpl,
@@ -46,8 +43,6 @@ trait HybridStoreTestCases[IndexedStoreId,
   def createIndexedStoreId(implicit namespace: Namespace): IndexedStoreId =
     createId
 
-  def createMetadata: Metadata
-
   def withBrokenPutTypedStoreImpl[R](testWith: TestWith[TypedStoreImpl, R])(
     implicit context: HybridStoreContext): R
 
@@ -63,7 +58,7 @@ trait HybridStoreTestCases[IndexedStoreId,
     implicit context: HybridStoreContext): R
 
   override def withStoreImpl[R](
-    initialEntries: Map[IndexedStoreId, HybridStoreEntry[T, Metadata]],
+    initialEntries: Map[IndexedStoreId, T],
     storeContext: HybridStoreContext)(testWith: TestWith[StoreImpl, R]): R = {
     implicit val context: HybridStoreContext = storeContext
 
@@ -98,35 +93,11 @@ trait HybridStoreTestCases[IndexedStoreId,
                   val indexedResult = indexedStore.get(putValue.id)
                   val indexedValue = indexedResult.right.value
 
-                  val typedStoreId = indexedValue.identifiedT.typedStoreId
+                  val typedStoreId = indexedValue.identifiedT
 
                   val typedResult = typedStore.get(typedStoreId)
                   val typedValue = typedResult.right.value
-                  typedValue.identifiedT shouldBe hybridStoreEntry.t
-                }
-              }
-            }
-          }
-        }
-      }
-
-      it("stores the metadata in the indexed store") {
-        withStoreContext { implicit context =>
-          withNamespace { implicit namespace =>
-            withTypedStoreImpl { typedStore =>
-              withIndexedStoreImpl { indexedStore =>
-                withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
-                  val id = createId
-                  val hybridStoreEntry = createT
-
-                  val putResult = hybridStore.put(id)(hybridStoreEntry)
-                  val putValue = putResult.right.value
-
-                  val indexedResult = indexedStore.get(putValue.id)
-                  val indexedValue = indexedResult.right.value
-
-                  indexedValue.id shouldBe id
-                  indexedValue.identifiedT.metadata shouldBe hybridStoreEntry.metadata
+                  typedValue.identifiedT shouldBe hybridStoreEntry
                 }
               }
             }
@@ -171,14 +142,8 @@ trait HybridStoreTestCases[IndexedStoreId,
               withIndexedStoreImpl { indexedStore =>
                 val indexedStoreId = createIndexedStoreId
                 val typedStoreId = createTypedStoreId
-                val metadata = createMetadata
 
-                val hybridIndexedStoreEntry = HybridIndexedStoreEntry(
-                  typedStoreId = typedStoreId,
-                  metadata = metadata
-                )
-
-                indexedStore.put(indexedStoreId)(hybridIndexedStoreEntry) shouldBe a[
+                indexedStore.put(indexedStoreId)(typedStoreId) shouldBe a[
                   Right[_, _]]
 
                 withHybridStoreImpl(typedStore, indexedStore) {
@@ -198,14 +163,8 @@ trait HybridStoreTestCases[IndexedStoreId,
               withIndexedStoreImpl { indexedStore =>
                 val indexedStoreId = createIndexedStoreId
                 val typedStoreId = createTypedStoreId
-                val metadata = createMetadata
 
-                val hybridIndexedStoreEntry = HybridIndexedStoreEntry(
-                  typedStoreId = typedStoreId,
-                  metadata = metadata
-                )
-
-                indexedStore.put(indexedStoreId)(hybridIndexedStoreEntry) shouldBe a[
+                indexedStore.put(indexedStoreId)(typedStoreId) shouldBe a[
                   Right[_, _]]
 
                 withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
@@ -245,7 +204,7 @@ trait HybridStoreTestCases[IndexedStoreId,
                     hybridStoreImpl.put(id)(createT) shouldBe a[Right[_, _]]
 
                     val typeStoreId =
-                      indexedStore.get(id).right.value.identifiedT.typedStoreId
+                      indexedStore.get(id).right.value.identifiedT
 
                     val byteLength = 256
                     val inputStream = new InputStreamWithLength(
@@ -273,24 +232,21 @@ trait HybridStoreWithOverwritesTestCases[
   IndexedStoreId,
   TypedStoreId,
   T,
-  Metadata,
   Namespace,
   TypedStoreImpl <: TypedStore[TypedStoreId, T],
-  IndexedStoreImpl <: Store[IndexedStoreId,
-                            HybridIndexedStoreEntry[TypedStoreId, Metadata]],
+  IndexedStoreImpl <: Store[IndexedStoreId, TypedStoreId],
   HybridStoreContext]
     extends HybridStoreTestCases[
       IndexedStoreId,
       TypedStoreId,
       T,
-      Metadata,
       Namespace,
       TypedStoreImpl,
       IndexedStoreImpl,
       HybridStoreContext]
     with StoreWithOverwritesTestCases[
       IndexedStoreId,
-      HybridStoreEntry[T, Metadata],
+      T,
       Namespace,
       HybridStoreContext]
 
@@ -298,23 +254,20 @@ trait HybridStoreWithoutOverwritesTestCases[
   IndexedStoreId,
   TypedStoreId,
   T,
-  Metadata,
   Namespace,
   TypedStoreImpl <: TypedStore[TypedStoreId, T],
-  IndexedStoreImpl <: Store[IndexedStoreId,
-                            HybridIndexedStoreEntry[TypedStoreId, Metadata]],
+  IndexedStoreImpl <: Store[IndexedStoreId, TypedStoreId],
   HybridStoreContext]
     extends HybridStoreTestCases[
       IndexedStoreId,
       TypedStoreId,
       T,
-      Metadata,
       Namespace,
       TypedStoreImpl,
       IndexedStoreImpl,
       HybridStoreContext]
     with StoreWithoutOverwritesTestCases[
       IndexedStoreId,
-      HybridStoreEntry[T, Metadata],
+      T,
       Namespace,
       HybridStoreContext]

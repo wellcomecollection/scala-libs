@@ -3,39 +3,20 @@ package uk.ac.wellcome.storage.store
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage._
 
-case class HybridStoreEntry[T, Metadata](t: T, metadata: Metadata)
-case class HybridIndexedStoreEntry[TypeStoreId, Metadata](
-  typedStoreId: TypeStoreId,
-  metadata: Metadata
-)
-
-trait HybridStore[IndexedStoreId, TypedStoreId, T, Metadata]
-    extends Store[IndexedStoreId, HybridStoreEntry[T, Metadata]]
+trait HybridStore[IndexedStoreId, TypedStoreId, T]
+    extends Store[IndexedStoreId, T]
     with Logging {
 
-  type IndexEntry =
-    HybridIndexedStoreEntry[TypedStoreId, Metadata]
-
-  implicit protected val indexedStore: Store[IndexedStoreId, IndexEntry]
+  implicit protected val indexedStore: Store[IndexedStoreId, TypedStoreId]
   implicit protected val typedStore: TypedStore[TypedStoreId, T]
 
   protected def createTypeStoreId(id: IndexedStoreId): TypedStoreId
 
   override def get(id: IndexedStoreId): ReadEither =
     for {
-      indexResult <- indexedStore.get(id)
-
-      indexedStoreEntry = indexResult.identifiedT
-
-      typeStoreEntry <- getTypedStoreEntry(indexedStoreEntry.typedStoreId)
-
-      metadata = indexedStoreEntry.metadata
-      hybridEntry: HybridStoreEntry[T, Metadata] = HybridStoreEntry(
-        t = typeStoreEntry.identifiedT,
-        metadata = metadata
-      )
-
-    } yield Identified(id, hybridEntry)
+      typedStoreId <- indexedStore.get(id)
+      item <- getTypedStoreEntry(typedStoreId.identifiedT)
+    } yield Identified(id, item.identifiedT)
 
   // If the indexed store points to a typed store entry that doesn't exist, that
   // suggests an internal error in the store, so we don't want to bubble up
@@ -49,29 +30,16 @@ trait HybridStore[IndexedStoreId, TypedStoreId, T, Metadata]
       case Left(err) => Left(err)
     }
 
-  override def put(id: IndexedStoreId)(
-    t: HybridStoreEntry[T, Metadata]): WriteEither = {
+  override def put(id: IndexedStoreId)(item: T): WriteEither = {
     val typeStoreId = createTypeStoreId(id)
 
     for {
-      putTypeResult <- typedStore.put(typeStoreId)(t.t)
-
-      locationEntry = HybridIndexedStoreEntry(
-        typedStoreId = putTypeResult.id,
-        metadata = t.metadata
-      )
-
-      putVersionedResult <- indexedStore
-        .put(id)(locationEntry) match {
-        case Left(error)   => Left(StoreWriteError(error.e))
-        case Right(result) => Right(result)
+      item <- typedStore.put(typeStoreId)(item).map(_.identifiedT)
+      id <- indexedStore.put(id)(typeStoreId) match {
+        case Left(error)              => Left(StoreWriteError(error.e))
+        case Right(Identified(id, _)) => Right(id)
       }
 
-      hybridEntry = HybridStoreEntry(
-        t = putTypeResult.identifiedT,
-        metadata = putVersionedResult.identifiedT.metadata
-      )
-
-    } yield Identified(putVersionedResult.id, hybridEntry)
+    } yield Identified(id, item)
   }
 }
