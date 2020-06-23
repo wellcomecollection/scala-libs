@@ -1,4 +1,6 @@
 language: scala
+scala:
+  - 2.12.6
 
 before_script:
   - openssl aes-256-cbc -K $encrypted_12c8071d2874_key -iv $encrypted_12c8071d2874_iv -in secrets.zip.enc -out secrets.zip -d
@@ -18,9 +20,6 @@ cache:
 
 sudo: false
 
-scala:
-- 2.12.6
-
 branches:
   only:
     - master
@@ -30,22 +29,48 @@ env:
     # This forces Python to print everything to stdout/stderr immediately.
     - PYTHONUNBUFFERED=x
 
+services:
+  - docker
+
 jobs:
   include:
+    # Format
     - stage: format
-      env: TASK=format
+      name: format
+      script: ./sbt_release_tooling.py format
+    # Test
     - stage: test
-      env: TASK=test
-      services:
-        - docker
+      name: fixtures
+      script: sbt "project fixtures" test
+    - name: json
+      script: sbt "project json" test
+    - name: messaging
+      script: sbt "project messaging" dockerComposeUp test dockerComposeStop && sbt "project messaging_typesafe" test
+    - name: monitoring
+      script: sbt "project monitoring" test && sbt "project monitoring_typesafe" test
+    - name: storage
+      script: sbt "project storage" dockerComposeUp test dockerComposeStop && sbt "project storage_typesafe" test
+    # Release
     - stage: release
-      env: TASK=release
-
-script:
-  - ./sbt_release_tooling.py "$TASK"
+      name: release
+      script: ./sbt_release_tooling.py release
+    # Publish
+    - stage: publish
+      name: fixtures
+      script: sbt "project fixtures" publish
+    - name: json
+      script: sbt "project json" publish
+    - name: messaging
+      script: sbt "project messaging" publish && sbt "project messaging_typesafe" publish
+    - name: monitoring
+      script: sbt "project monitoring" publish && sbt "project monitoring_typesafe" publish
+    - name: storage
+      script: sbt "project storage" publish && sbt "project storage_typesafe" publish
 
 stages:
   - format
-  - test
+  - name: test
   - name: release
+    if: type = push
+  - name: publish
     if: type = push

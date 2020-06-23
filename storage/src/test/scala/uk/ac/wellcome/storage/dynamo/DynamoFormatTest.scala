@@ -2,6 +2,7 @@ package uk.ac.wellcome.storage.dynamo
 
 import java.net.URI
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 import org.scanamo.syntax._
@@ -62,7 +63,9 @@ trait DynamoFormatTestCases[T]
 }
 
 class DynamoInstantFormatTest extends DynamoFormatTestCases[Instant] {
-  def createT: Instant = Instant.now()
+  def createT: Instant =
+    Instant.now()
+      .truncatedTo( ChronoUnit.MILLIS )
 
   def createBadT: String = "not a valid datetime"
 

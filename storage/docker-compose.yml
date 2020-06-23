@@ -19,15 +19,6 @@ services:
       interval: 2s
       timeout: 10s
       retries: 5
-  sns:
-    image: "wellcome/fake-sns"
-    ports:
-      - "9292:9292"
-  sqs:
-    image: "s12v/elasticmq"
-    ports:
-      - "9324:9324"
-      - "4789:9324"
   azurite:
     image: "mcr.microsoft.com/azure-storage/azurite"
     ports:
