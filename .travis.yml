@@ -45,17 +45,11 @@ jobs:
     - name: json
       script: sbt "project json" test
     - name: messaging
-      script: >-
-      sbt "project messaging" dockerComposeUp test dockerComposeStop &&
-      sbt "project messaging_typesafe" test
+      script: sbt "project messaging" dockerComposeUp test dockerComposeStop && sbt "project messaging_typesafe" test
     - name: monitoring
-      script: >-
-      sbt "project monitoring" test &&
-      sbt "project monitoring_typesafe" test
+      script: sbt "project monitoring" test && sbt "project monitoring_typesafe" test
     - name: storage
-      script: >-
-      sbt "project storage" dockerComposeUp test dockerComposeStop &&
-      sbt "project storage_typesafe" test
+      script: sbt "project storage" dockerComposeUp test dockerComposeStop && sbt "project storage_typesafe" test
     # Release
     - stage: release
       name: release
@@ -67,17 +61,11 @@ jobs:
     - name: json
       script: sbt "project json" publish
     - name: messaging
-      script: >-
-      sbt "project messaging" publish &&
-      sbt "project messaging_typesafe" publish
+      script: sbt "project messaging" publish && sbt "project messaging_typesafe" publish
     - name: monitoring
-      script: >-
-      sbt "project monitoring" publish &&
-      sbt "project monitoring_typesafe" publish
+      script: sbt "project monitoring" publish && sbt "project monitoring_typesafe" publish
     - name: storage
-      script: >-
-      sbt "project storage" publish &&
-      sbt "project storage_typesafe" publish
+      script: sbt "project storage" publish && sbt "project storage_typesafe" publish
 
 stages:
   - format
