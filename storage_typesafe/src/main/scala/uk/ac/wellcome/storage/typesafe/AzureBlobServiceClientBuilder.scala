@@ -9,8 +9,8 @@ object AzureBlobServiceClientBuilder {
     val connectionString = config
       .requireString("azure.blobStore.connectionString")
 
-      new BlobServiceClientBuilder()
-        .connectionString(connectionString)
-        .buildClient()
+    new BlobServiceClientBuilder()
+      .connectionString(connectionString)
+      .buildClient()
   }
 }
