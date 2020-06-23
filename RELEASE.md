@@ -1,3 +1,3 @@
 RELEASE_TYPE: patch
 
-Split build steps for performance.
+No user-facing changes. Splits the build steps in CI for the scala-libs repo to increase potential parallelism in builds, and to make it clearer where failures occur.
