@@ -53,7 +53,7 @@ jobs:
     - name: storage
       script: sbt "project storage" dockerComposeUp test dockerComposeStop
     - name: storage_typesafe
-    - script: sbt "project storage_typesafe" test
+      script: sbt "project storage_typesafe" test
     - stage: release
       script: ./sbt_release_tooling.py release
 
