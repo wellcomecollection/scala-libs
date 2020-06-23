@@ -1,56 +1,60 @@
-lazy val fixtures = Common.setupProject(
+val projectVersion = "14.0.0"
+
+lazy val common = new Common(projectVersion)
+
+lazy val fixtures = common.setupProject(
   project,
   "fixtures",
   externalDependencies = Dependencies.fixturesDependencies
 )
 
-lazy val json = Common.setupProject(
+lazy val json = common.setupProject(
   project,
   "json",
   externalDependencies = Dependencies.jsonDependencies
 )
 
-lazy val typesafe_app = Common.setupProject(
+lazy val typesafe_app = common.setupProject(
   project,
   "typesafe_app",
   localDependencies = Seq(fixtures),
   externalDependencies = Dependencies.typesafeAppDependencies
 )
 
-lazy val monitoring = Common.setupProject(
+lazy val monitoring = common.setupProject(
   project,
   "monitoring",
   localDependencies = Seq(typesafe_app, fixtures),
   externalDependencies = Dependencies.monitoringDependencies
 )
 
-lazy val monitoring_typesafe = Common.setupProject(
+lazy val monitoring_typesafe = common.setupProject(
   project,
   "monitoring_typesafe",
   localDependencies = Seq(monitoring)
 )
 
-lazy val storage = Common.setupProject(
+lazy val storage = common.setupProject(
   project,
   "storage",
   localDependencies = Seq(typesafe_app, fixtures, json),
   externalDependencies = Dependencies.storageDependencies
 )
 
-lazy val storage_typesafe = Common.setupProject(
+lazy val storage_typesafe = common.setupProject(
   project,
   "storage_typesafe",
   localDependencies = Seq(storage)
 )
 
-lazy val messaging = Common.setupProject(
+lazy val messaging = common.setupProject(
   project,
   "messaging",
   localDependencies = Seq(typesafe_app, fixtures, json, monitoring),
   externalDependencies = Dependencies.messagingDependencies
 )
 
-lazy val messaging_typesafe = Common.setupProject(
+lazy val messaging_typesafe = common.setupProject(
   project,
   "messaging_typesafe",
   localDependencies = Seq(messaging, monitoring_typesafe)

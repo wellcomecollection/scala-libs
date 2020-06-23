@@ -4,9 +4,7 @@ import com.tapad.docker.DockerComposePlugin
 import sbt.Keys._
 import sbt._
 
-object Common {
-  val projectVersion = "13.0.0"
-
+class Common(projectVersion: String) {
   val settings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.6",
     organization := "uk.ac.wellcome",
@@ -48,7 +46,7 @@ object Common {
 
     project
       .in(new File(folder))
-      .settings(Common.settings: _*)
+      .settings(settings: _*)
       .settings(DockerCompose.settings: _*)
       .enablePlugins(DockerComposePlugin)
       .dependsOn(dependsOn: _*)
