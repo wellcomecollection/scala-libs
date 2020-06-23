@@ -46,6 +46,13 @@ def git(*args):
     subprocess.check_call(('git',) + args)
 
 
+def sbt(*args):
+    """
+    Run an sbt command and check it completes successfully.
+    """
+    subprocess.check_call(('sbt',) + args)
+
+
 def tags():
     """
     Returns a list of all tags in the repo.
