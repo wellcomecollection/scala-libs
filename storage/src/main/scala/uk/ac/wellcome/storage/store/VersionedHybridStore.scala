@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store
 
-class VersionedHybridStore[Id, V, TypedStoreId, T, Metadata](
-  hybridStore: HybridStoreWithMaxima[Id, V, TypedStoreId, T, Metadata]
+class VersionedHybridStore[Id, V, TypedStoreId, T](
+  hybridStore: HybridStoreWithMaxima[Id, V, TypedStoreId, T]
 )(implicit N: Numeric[V])
-    extends VersionedStore[Id, V, HybridStoreEntry[T, Metadata]](hybridStore)
+    extends VersionedStore[Id, V, T](hybridStore)
