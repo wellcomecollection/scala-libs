@@ -35,11 +35,11 @@ services:
 jobs:
   include:
     - stage: format
-      name: format
-    - script: ./sbt_release_tooling.py format
+    - name: format
+      script: ./sbt_release_tooling.py format
     - stage: test
-      name: fixtures
-    - script: sbt "project fixtures" test
+    - name: fixtures
+      script: sbt "project fixtures" test
     - name: json
       script: sbt "project json" test
     - name: messaging
