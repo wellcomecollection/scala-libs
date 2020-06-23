@@ -1,4 +1,6 @@
 language: scala
+scala:
+  - 2.12.6
 
 before_script:
   - openssl aes-256-cbc -K $encrypted_12c8071d2874_key -iv $encrypted_12c8071d2874_iv -in secrets.zip.enc -out secrets.zip -d
@@ -18,9 +20,6 @@ cache:
 
 sudo: false
 
-scala:
-- 2.12.6
-
 branches:
   only:
     - master
@@ -30,14 +29,23 @@ env:
     # This forces Python to print everything to stdout/stderr immediately.
     - PYTHONUNBUFFERED=x
 
+services:
+  - docker
+
 jobs:
   include:
     - stage: format
       env: TASK=format
     - stage: test
-      env: TASK=test
-      services:
-        - docker
+      script: sbt dockerComposeUp
+    - script: sbt "project fixtures" test
+    - script: sbt "project json" test
+    - script: sbt "project messaging" test
+    - script: sbt "project messaging_typesafe" test
+    - script: sbt "project monitoring" test
+    - script: sbt "project monitoring_typesafe" test
+    - script: sbt "project storage" test
+    - script: sbt "project storage_typesafe" test
     - stage: release
       env: TASK=release
 
