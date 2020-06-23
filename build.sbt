@@ -4,7 +4,7 @@ import java.util.UUID
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
 
 val projectName = "libs"
-val projectVersion = "13.0.0"
+val projectVersion = "13.1.0"
 
 enablePlugins(DockerComposePlugin)
 
