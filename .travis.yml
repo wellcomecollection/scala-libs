@@ -57,15 +57,15 @@ jobs:
     # Publish
     - stage: publish
       name: fixtures
-      script: ./sbt_release_tooling.py configure && sbt "project fixtures" publish
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project fixtures" publish
     - name: json
-      script: ./sbt_release_tooling.py configure && sbt "project json" publish
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project json" publish
     - name: messaging
-      script: ./sbt_release_tooling.py configure && sbt "project messaging" publish && sbt "project messaging_typesafe" publish
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project messaging" publish && sbt "project messaging_typesafe" publish
     - name: monitoring
-      script: ./sbt_release_tooling.py configure && sbt "project monitoring" publish && sbt "project monitoring_typesafe" publish
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project monitoring" publish && sbt "project monitoring_typesafe" publish
     - name: storage
-      script: ./sbt_release_tooling.py configure && sbt "project storage" publish && sbt "project storage_typesafe" publish
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project storage" publish && sbt "project storage_typesafe" publish
 
 stages:
   - format
