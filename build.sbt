@@ -74,7 +74,7 @@ lazy val messaging_typesafe = Common.setupProject(
 //import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
 //s3CredentialsProvider := { _ =>
 //  val builder = new STSAssumeRoleSessionCredentialsProvider.Builder(
-//    "arn:aws:iam::760097843905:role/platform-dev",
+//    "arn:aws:iam::760097843905:role/platform-developer",
 //    UUID.randomUUID().toString
 //  )
 //  builder.build()
