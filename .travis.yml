@@ -44,6 +44,8 @@ jobs:
       script: sbt "project fixtures" test
     - name: json
       script: sbt "project json" test
+    - name: typesafe_app
+      script: sbt "project typesafe_app" test
     - name: messaging
       script: sbt "project messaging" dockerComposeUp test dockerComposeStop && sbt "project messaging_typesafe" test
     - name: monitoring
@@ -60,6 +62,8 @@ jobs:
       script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project fixtures" publish
     - name: json
       script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project json" publish
+    - name: typesafe_app
+      script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project typesafe_app" publish
     - name: messaging
       script: git pull origin master && ./sbt_release_tooling.py configure && sbt "project messaging" publish && sbt "project messaging_typesafe" publish
     - name: monitoring
