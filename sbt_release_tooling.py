@@ -384,7 +384,7 @@ if __name__ == '__main__':
         len(sys.argv) != 2 or
         sys.argv[1] in ('-h', '--help') or
         sys.argv[1] not in (
-            'format', 'check_release_file', 'release', 'test')
+            'format', 'check_release_file', 'release', 'test','configure')
     ):
         print(__doc__.strip())
         sys.exit(1)
