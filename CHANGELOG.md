@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v14.0.4 - 2020-06-24
+
+No changes, updates the fmt-sbt-s3-resolver plugin to avoid the dependency error described here: https://github.com/frugalmechanic/fm-sbt-s3-resolver/pull/56
+
 ## v14.0.3 - 2020-06-24
 
 No changes - updates build system.
