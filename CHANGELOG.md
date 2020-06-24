@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v14.0.2 - 2020-06-24
+
+No changes - updates build system.
+
 ## v14.0.1 - 2020-06-23
 
 No user-facing changes. Splits the build steps in CI for the scala-libs repo to increase potential parallelism in builds, and to make it clearer where failures occur.
