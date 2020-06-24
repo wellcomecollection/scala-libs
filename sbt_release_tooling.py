@@ -395,5 +395,8 @@ if __name__ == '__main__':
         release()
     elif sys.argv[1] == 'format':
         autoformat()
+    elif sys.argv[1] == 'configure':
+        # Nothing to do, secrets already configured
+        assert True
     else:
         assert False, sys.argv
