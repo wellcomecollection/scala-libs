@@ -90,7 +90,7 @@ object Dependencies {
     "software.amazon.awssdk" % "sns" % versions.aws2,
     "software.amazon.awssdk" % "sqs" % versions.aws2,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
-    // This needs to be excluded bacuse it conflicts with aws http client "netty-nio-client"
+    // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
       exclude ("com.github.matsluni", "aws-spi-akka-http_2.12"),
     "io.circe" %% "circe-yaml" % versions.circe
