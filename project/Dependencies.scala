@@ -68,7 +68,8 @@ object Dependencies {
   )
 
   val scanamoDependencies = Seq(
-    "org.scanamo" %% "scanamo" % versions.scanamo
+    "org.scanamo" %% "scanamo" % versions.scanamo,
+    "org.scanamo" %% "scanamo-time" % versions.scanamo
   )
 
   val openTracingDependencies = Seq(
