@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v14.1.0 - 2020-07-14
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Store Instants in Dynamo as *seconds* since the epoch, not *milliseconds*.
+
 ## v14.0.6 - 2020-06-24
 
 No changes, trying to fix build.
