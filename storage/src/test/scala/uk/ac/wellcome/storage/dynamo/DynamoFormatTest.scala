@@ -15,7 +15,8 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import org.scanamo.auto._
 import org.scanamo.error.InvalidPropertiesError
 import org.scanamo.{Table => ScanamoTable}
-import org.scanamo.time.JavaTimeFormats._
+
+import DynamoTimeFormat._
 
 trait DynamoFormatTestCases[T]
     extends AnyFunSpec
@@ -64,12 +65,13 @@ trait DynamoFormatTestCases[T]
 
 class DynamoInstantFormatTest extends DynamoFormatTestCases[Instant] {
   def createT: Instant =
-    Instant.now()
-      .truncatedTo( ChronoUnit.MILLIS )
+    Instant
+      .now()
+      .truncatedTo(ChronoUnit.SECONDS)
 
   def createBadT: String = "not a valid datetime"
 
-  implicit val dynamoFormat: DynamoFormat[Instant] = instantAsLongFormat
+  implicit val dynamoFormat: DynamoFormat[Instant] = instantAsLongSecondsFormat
 }
 
 class DynamoURIFormatTest extends DynamoFormatTestCases[URI] {

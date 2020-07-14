@@ -29,9 +29,9 @@ object Dependencies {
 
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circe,
-    "io.circe" %% "circe-generic"% versions.circe,
-    "io.circe" %% "circe-generic-extras"% versions.circe,
-    "io.circe" %% "circe-parser"% versions.circe
+    "io.circe" %% "circe-generic" % versions.circe,
+    "io.circe" %% "circe-generic-extras" % versions.circe,
+    "io.circe" %% "circe-parser" % versions.circe
   )
 
   val testDependencies = Seq(
@@ -77,7 +77,7 @@ object Dependencies {
     "io.opentracing" % "opentracing-mock" % "0.33.0" % Test
   )
 
-  val elasticApmBridgeDependencies = Seq (
+  val elasticApmBridgeDependencies = Seq(
     "co.elastic.apm" % "apm-opentracing" % versions.elasticApm,
     "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm
   )
@@ -91,9 +91,9 @@ object Dependencies {
     "software.amazon.awssdk" % "sns" % versions.aws2,
     "software.amazon.awssdk" % "sqs" % versions.aws2,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
-      // This needs to be excluded bacuse it conflicts with aws http client "netty-nio-client"
-      // and it also causes weird leaks between tests
-      exclude("com.github.matsluni", "aws-spi-akka-http_2.12"),
+    // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
+    // and it also causes weird leaks between tests
+      exclude ("com.github.matsluni", "aws-spi-akka-http_2.12"),
     "io.circe" %% "circe-yaml" % versions.circe
   ) ++
     openTracingDependencies ++
@@ -102,8 +102,8 @@ object Dependencies {
 
   val jsonDependencies =
     circeDependencies ++
-    sl4jDependencies ++
-    testDependencies
+      sl4jDependencies ++
+      testDependencies
 
   val fixturesDependencies =
     sl4jDependencies

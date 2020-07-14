@@ -4,7 +4,7 @@ import java.util.UUID
 
 import org.scalatest.EitherValues
 import org.scanamo.auto._
-import org.scanamo.time.JavaTimeFormats._
+import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.locking.LockingServiceTestCases
 

@@ -9,9 +9,9 @@ import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
 import org.scanamo.syntax._
-import org.scanamo.time.JavaTimeFormats._
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import uk.ac.wellcome.storage.locking.{LockDao, LockFailure, UnlockFailure}
+import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext
 import scala.util.Try

@@ -8,12 +8,12 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.Assertion
 import org.scanamo.auto._
-import org.scanamo.time.JavaTimeFormats._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.RandomThings
 import uk.ac.wellcome.storage.locking.{LockDao, LockDaoFixtures}
+import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

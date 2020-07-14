@@ -4,7 +4,7 @@ import java.time.Duration
 
 import com.typesafe.config.Config
 import org.scanamo.auto._
-import org.scanamo.time.JavaTimeFormats._
+import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 import uk.ac.wellcome.storage.locking.dynamo.{
   DynamoLockDao,
   DynamoLockDaoConfig,
