@@ -16,7 +16,8 @@ import uk.ac.wellcome.storage.transfer._
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation, ObjectLocation] {
+class S3Transfer(implicit s3Client: AmazonS3)
+    extends Transfer[ObjectLocation, ObjectLocation] {
 
   import uk.ac.wellcome.storage.RetryOps._
 
@@ -24,9 +25,8 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation, O
     .withS3Client(s3Client)
     .build
 
-  override def transferWithOverwrites(
-    src: ObjectLocation,
-    dst: ObjectLocation): TransferEither = {
+  override def transferWithOverwrites(src: ObjectLocation,
+                                      dst: ObjectLocation): TransferEither = {
     def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
@@ -84,12 +84,12 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation, O
         }
     }
 
-  private def compare(
-    src: ObjectLocation,
-    dst: ObjectLocation,
-    srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
-                                    TransferNoOp[ObjectLocation, ObjectLocation]] =
+  private def compare(src: ObjectLocation,
+                      dst: ObjectLocation,
+                      srcStream: InputStream,
+                      dstStream: InputStream)
+    : Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
+             TransferNoOp[ObjectLocation, ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
@@ -101,9 +101,8 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation, O
       s3Client.getObject(location.namespace, location.path)
     }.map { _.getObjectContent }
 
-  private def runTransfer(
-    src: ObjectLocation,
-    dst: ObjectLocation): TransferEither = {
+  private def runTransfer(src: ObjectLocation,
+                          dst: ObjectLocation): TransferEither = {
 
     // We use tags in the verifier in the storage service to check if we've already
     // verified an object.  For safety, we drop all the tags every time an object

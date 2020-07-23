@@ -81,19 +81,20 @@ class S3toAzureTransfer(implicit
     singleTransfer.retry(maxAttempts = 3)
   }
 
-  private def compare(
-    src: ObjectLocation,
-    dst: ObjectLocation,
-    srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
-                                    TransferNoOp[ObjectLocation, ObjectLocation]] =
+  private def compare(src: ObjectLocation,
+                      dst: ObjectLocation,
+                      srcStream: InputStream,
+                      dstStream: InputStream)
+    : Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
+             TransferNoOp[ObjectLocation, ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
       Left(TransferOverwriteFailure(src, dst))
     }
 
-  private def runTransfer(src: ObjectLocation, dst: ObjectLocation): TransferEither =
+  private def runTransfer(src: ObjectLocation,
+                          dst: ObjectLocation): TransferEither =
     s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
         azureWritable.put(dst)(srcStream) match {
