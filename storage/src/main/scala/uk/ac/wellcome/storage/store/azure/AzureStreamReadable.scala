@@ -6,7 +6,7 @@ import uk.ac.wellcome.storage.azure.AzureStorageErrors
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
-trait AzureStreamReadable extends RetryableReadable[InputStreamWithLength] {
+trait AzureStreamReadable extends RetryableReadable[ObjectLocation, InputStreamWithLength] {
   implicit val blobClient: BlobServiceClient
   val maxRetries: Int
 

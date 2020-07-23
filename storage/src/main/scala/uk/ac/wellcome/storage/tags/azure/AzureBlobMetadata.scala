@@ -17,7 +17,7 @@ import scala.util.{Failure, Success, Try}
 class AzureBlobMetadata(val maxRetries: Int = 2)(
   implicit blobClient: BlobServiceClient)
     extends Tags[ObjectLocation]
-    with RetryableReadable[Map[String, String]] {
+    with RetryableReadable[ObjectLocation, Map[String, String]] {
 
   override protected def writeTags(
     id: ObjectLocation,
