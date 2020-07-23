@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.transfer.s3
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.tags.s3.S3Tags
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFailure, TransferTestCases}
@@ -79,7 +80,7 @@ class S3TransferTest
 
       withTransferStore(initialEntries) { implicit store =>
         s3Tags
-          .update(src) { _ =>
+          .update(S3ObjectLocation(src)) { _ =>
             Right(Map("srcTag" -> "srcValue"))
           } shouldBe a[Right[_, _]]
 
@@ -87,8 +88,8 @@ class S3TransferTest
           transfer.transfer(src, dst) shouldBe a[Right[_, _]]
         }
 
-        s3Tags.get(src).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
-        s3Tags.get(dst).right.value shouldBe Identified(dst, Map.empty)
+        s3Tags.get(S3ObjectLocation(src)).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
+        s3Tags.get(S3ObjectLocation(dst)).right.value shouldBe Identified(dst, Map.empty)
       }
     }
   }

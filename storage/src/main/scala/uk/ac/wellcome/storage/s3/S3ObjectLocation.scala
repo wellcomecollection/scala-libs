@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.s3
 
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
-import uk.ac.wellcome.storage.{Location, Prefix}
+import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
 
 import scala.util.{Failure, Success, Try}
 
@@ -75,6 +75,12 @@ trait S3Decodable {
 }
 
 case object S3ObjectLocation extends S3Decodable {
+  def apply(objectLocation: ObjectLocation): S3ObjectLocation =
+    S3ObjectLocation(
+      bucket = objectLocation.namespace,
+      key = objectLocation.path
+    )
+
   implicit val decoder: Decoder[S3ObjectLocation] =
     createDecoder[S3ObjectLocation](keyField = "key") {
       (bucket: String, key: String) =>
