@@ -13,22 +13,16 @@ class S3TransferTest
     extends TransferTestCases[S3ObjectLocation, S3ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
     with S3TransferFixtures[Record]
     with RecordGenerators {
-  override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { bucket =>
-      testWith(bucket)
-    }
-
-  override def withDstNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { bucket =>
-      testWith(bucket)
-    }
 
   override def withSrcStore[R](
     initialEntries: Map[S3ObjectLocation, Record]
   )(
     testWith: TestWith[S3TypedStore[Record], R]
   )(implicit context: Unit): R =
-    withTypedStore(storeContext = (), initialEntries = initialEntries) { store =>
+    withTypedStoreImpl(
+      storeContext = (),
+      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+    ) { store =>
       testWith(store)
     }
 
@@ -37,7 +31,10 @@ class S3TransferTest
   )(
     testWith: TestWith[S3TypedStore[Record], R]
   )(implicit context: Unit): R =
-    withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) { store =>
+    withTypedStoreImpl(
+      storeContext = (),
+      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+    ) { store =>
       testWith(store)
     }
 
@@ -46,12 +43,6 @@ class S3TransferTest
     dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R]
   ): R =
     testWith(new S3Transfer())
-
-  override def createSrcLocation(bucket: Bucket): S3ObjectLocation =
-    createS3ObjectLocationWith(bucket)
-
-  override def createDstLocation(bucket: Bucket): S3ObjectLocation =
-    createS3ObjectLocationWith(bucket)
 
   override def createT: Record = createRecord
 
@@ -62,8 +53,8 @@ class S3TransferTest
   // the dst inputStream correctly.
   it("errors if the destination exists but the source does not") {
     withLocalS3Bucket { bucket =>
-      val src = createObjectLocationWith(bucket)
-      val dst = createObjectLocationWith(bucket)
+      val src = createS3ObjectLocationWith(bucket)
+      val dst = createS3ObjectLocationWith(bucket)
 
       val initialEntries = Map(dst -> createRecord)
 
@@ -80,8 +71,8 @@ class S3TransferTest
 
   it("doesn't replicate tags") {
     withLocalS3Bucket { bucket =>
-      val src = createObjectLocationWith(bucket)
-      val dst = createObjectLocationWith(bucket)
+      val src = createS3ObjectLocationWith(bucket)
+      val dst = createS3ObjectLocationWith(bucket)
 
       val initialEntries = Map(src -> createRecord)
 
@@ -89,7 +80,7 @@ class S3TransferTest
 
       withTransferStore(initialEntries) { implicit store =>
         s3Tags
-          .update(src) { _ =>
+          .update(src.toObjectLocation) { _ =>
             Right(Map("srcTag" -> "srcValue"))
           } shouldBe a[Right[_, _]]
 
@@ -97,15 +88,15 @@ class S3TransferTest
           transfer.transfer(src, dst) shouldBe a[Right[_, _]]
         }
 
-        s3Tags.get(src).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
-        s3Tags.get(dst).right.value shouldBe Identified(dst, Map.empty)
+        s3Tags.get(src.toObjectLocation).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
+        s3Tags.get(dst.toObjectLocation).right.value shouldBe Identified(dst, Map.empty)
       }
     }
   }
 
   it("allows a no-op copy if the source and destination are the same") {
     withLocalS3Bucket { bucket =>
-      val src = createObjectLocationWith(bucket)
+      val src = createS3ObjectLocationWith(bucket)
       val t = createT
 
       withTransferStore(initialEntries = Map(src -> t)) { implicit store =>
@@ -116,7 +107,7 @@ class S3TransferTest
 
         result.right.value shouldBe TransferNoOp(src, src)
 
-        store.get(src) shouldBe Right(Identified(src, t))
+        store.get(src.toObjectLocation) shouldBe Right(Identified(src, t))
       }
     }
   }

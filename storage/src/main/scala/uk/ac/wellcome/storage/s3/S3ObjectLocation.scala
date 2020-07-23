@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
-import uk.ac.wellcome.storage.{Location, Prefix}
+import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
 
 import scala.util.{Failure, Success, Try}
 
@@ -22,6 +22,10 @@ case class S3ObjectLocation(
 
   def asPrefix: S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(bucket = bucket, keyPrefix = key)
+
+  // TODO: Bridging code while we split the locations; remove eventually
+  def toObjectLocation: ObjectLocation =
+    ObjectLocation(bucket, key)
 }
 
 case class S3ObjectLocationPrefix(

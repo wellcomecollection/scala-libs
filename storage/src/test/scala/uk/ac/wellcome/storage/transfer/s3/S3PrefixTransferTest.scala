@@ -1,17 +1,18 @@
 package uk.ac.wellcome.storage.transfer.s3
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSummaryListing}
-import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.transfer._
-import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPrefix}
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
-      ObjectLocation, ObjectLocationPrefix,
-      ObjectLocation, ObjectLocationPrefix,
+      S3ObjectLocation, S3ObjectLocationPrefix,
+      S3ObjectLocation, S3ObjectLocationPrefix,
       Record,
       Bucket,
       Bucket,
@@ -19,43 +20,39 @@ class S3PrefixTransferTest
       S3TypedStore[Record],
       Unit]
     with RecordGenerators
-    with S3TypedStoreFixtures[Record] {
+    with S3TransferFixtures[Record] {
 
-  def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { srcBucket =>
-      testWith(srcBucket)
-    }
+  def createSrcPrefix(srcBucket: Bucket): S3ObjectLocationPrefix =
+    createS3ObjectLocationPrefixWith(srcBucket)
 
-  def withDstNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { dstBucket =>
-      testWith(dstBucket)
-    }
+  def createDstPrefix(dstBucket: Bucket): S3ObjectLocationPrefix =
+    createS3ObjectLocationPrefixWith(dstBucket)
 
-  def createSrcLocation(srcBucket: Bucket): ObjectLocation =
-    createObjectLocationWith(srcBucket)
-
-  def createDstLocation(dstBucket: Bucket): ObjectLocation =
-    createObjectLocationWith(dstBucket)
-
-  def createSrcPrefix(srcBucket: Bucket): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(srcBucket.name)
-
-  def createDstPrefix(dstBucket: Bucket): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(dstBucket.name)
-
-  def createSrcLocationFrom(srcPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  def createSrcLocationFrom(srcPrefix: S3ObjectLocationPrefix, suffix: String): S3ObjectLocation =
     srcPrefix.asLocation(suffix)
 
-  def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  def createDstLocationFrom(dstPrefix: S3ObjectLocationPrefix, suffix: String): S3ObjectLocation =
     dstPrefix.asLocation(suffix)
 
-  def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
+  def withSrcStore[R](
+    initialEntries: Map[S3ObjectLocation, Record])(
+    testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit
+  ): R =
+    withTypedStoreImpl(
+      context,
+      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+    ) { typedStore =>
       testWith(typedStore)
     }
 
-  def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
+  def withDstStore[R](
+    initialEntries: Map[S3ObjectLocation, Record])(
+    testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit
+  ): R =
+    withTypedStoreImpl(
+      context,
+      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+    ) { typedStore =>
       testWith(typedStore)
     }
 
@@ -76,8 +73,8 @@ class S3PrefixTransferTest
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
-        override def list(prefix: ObjectLocationPrefix): ListingResult =
-          super.list(prefix).map { _ ++ Seq(createObjectLocation) }
+        override def list(prefix: S3ObjectLocationPrefix): ListingResult =
+          super.list(prefix).map { _ ++ Seq(createS3ObjectLocation) }
       }
 
     implicit val transfer: S3Transfer = new S3Transfer()
@@ -95,7 +92,7 @@ class S3PrefixTransferTest
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
-        override def list(prefix: ObjectLocationPrefix): ListingResult =
+        override def list(prefix: S3ObjectLocationPrefix): ListingResult =
           Left(ListingFailure(prefix))
       }
 
@@ -114,9 +111,10 @@ class S3PrefixTransferTest
 
     implicit val transfer: S3Transfer = new S3Transfer() {
       override def transfer(
-                             src: ObjectLocation,
-                             dst: ObjectLocation,
-                             checkForExisting: Boolean = true): TransferEither =
+        src: S3ObjectLocation,
+        dst: S3ObjectLocation,
+        checkForExisting: Boolean = true
+      ): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 
