@@ -10,6 +10,17 @@ case class AzureBlobLocation(
 ) extends Location {
   override def toString: String =
     s"azure://$container/$name"
+
+  def join(parts: String*): AzureBlobLocation =
+    this.copy(
+      name = Paths.get(name, parts: _*).toString
+    )
+
+  def asPrefix: AzureBlobLocationPrefix =
+    AzureBlobLocationPrefix(
+      container = container,
+      namePrefix = name
+    )
 }
 
 case class AzureBlobLocationPrefix(
@@ -20,8 +31,5 @@ case class AzureBlobLocationPrefix(
     s"azure://$container/$namePrefix"
 
   def asLocation(parts: String*): AzureBlobLocation =
-    AzureBlobLocation(
-      container = container,
-      name = Paths.get(namePrefix, parts: _*).toString
-    )
+    AzureBlobLocation(container = container, name = namePrefix).join(parts: _*)
 }
