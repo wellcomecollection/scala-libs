@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v15.0.0 - 2020-07-23
+
+Changes to the `TransferResult` type hierarchy; refactoring in the Transfer and PrefixTransfer classes to make it easier to switch to new-style locations in the next patch.
+
 ## v14.2.0 - 2020-07-23
 
 This release introduces four new classes in the **storage** library:
