@@ -65,7 +65,7 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
     srcPrefix: Prefix,
     dstPrefix: Prefix,
     checkForExisting: Boolean = true
-  ): Either[TransferFailure, PrefixTransferSuccess] = {
+  ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
     listing.list(srcPrefix) match {
       case Left(error) =>
         Left(PrefixTransferListingFailure(srcPrefix, error.e))

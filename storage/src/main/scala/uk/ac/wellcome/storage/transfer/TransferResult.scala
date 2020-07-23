@@ -21,15 +21,6 @@ case class TransferOverwriteFailure[Location](source: Location,
                                               e: Throwable = new Error())
     extends TransferFailure
 
-case class PrefixTransferIncomplete(failures: Int,
-                                    successes: Int,
-                                    e: Throwable = new Error())
-    extends TransferFailure
-
-case class PrefixTransferListingFailure[Prefix](prefix: Prefix,
-                                                e: Throwable = new Error())
-    extends TransferFailure
-
 sealed trait TransferSuccess extends TransferResult
 
 case class TransferNoOp[Location](source: Location, destination: Location)
@@ -37,5 +28,3 @@ case class TransferNoOp[Location](source: Location, destination: Location)
 
 case class TransferPerformed[Location](source: Location, destination: Location)
     extends TransferSuccess
-
-case class PrefixTransferSuccess(successes: Int) extends TransferSuccess
