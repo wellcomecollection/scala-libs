@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v16.0.0 - 2020-07-23
+
+Change all the Azure-related storage classes to use the new-style locations.
+
+Replace all uses of `ObjectLocation` with `AzureBlobLocation` to get the new behaviour; the two classes are compatible.
+
 ## v15.0.0 - 2020-07-23
 
 Changes to the `TransferResult` type hierarchy; refactoring in the Transfer and PrefixTransfer classes to make it easier to switch to new-style locations in the next patch.
