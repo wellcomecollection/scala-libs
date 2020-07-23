@@ -6,11 +6,13 @@ import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.streaming._
 
-trait S3StreamReadable extends RetryableReadable[S3ObjectLocation, InputStreamWithLength] {
+trait S3StreamReadable
+    extends RetryableReadable[S3ObjectLocation, InputStreamWithLength] {
   implicit val s3Client: AmazonS3
   val maxRetries: Int
 
-  def retryableGetFunction(location: S3ObjectLocation): InputStreamWithLength = {
+  def retryableGetFunction(
+    location: S3ObjectLocation): InputStreamWithLength = {
     val retrievedObject = s3Client.getObject(location.bucket, location.key)
 
     new InputStreamWithLength(

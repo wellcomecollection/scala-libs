@@ -3,7 +3,11 @@ package uk.ac.wellcome.storage.transfer.s3
 import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging, S3ObjectInputStream}
+import com.amazonaws.services.s3.model.{
+  CopyObjectRequest,
+  ObjectTagging,
+  S3ObjectInputStream
+}
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
@@ -13,7 +17,7 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Transfer(implicit s3Client: AmazonS3)
-  extends Transfer[S3ObjectLocation, S3ObjectLocation] {
+    extends Transfer[S3ObjectLocation, S3ObjectLocation] {
 
   import uk.ac.wellcome.storage.RetryOps._
 
@@ -21,9 +25,8 @@ class S3Transfer(implicit s3Client: AmazonS3)
     .withS3Client(s3Client)
     .build
 
-  override def transferWithOverwrites(
-    src: S3ObjectLocation,
-    dst: S3ObjectLocation): TransferEither = {
+  override def transferWithOverwrites(src: S3ObjectLocation,
+                                      dst: S3ObjectLocation): TransferEither = {
     def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
@@ -81,12 +84,12 @@ class S3Transfer(implicit s3Client: AmazonS3)
         }
     }
 
-  private def compare(
-    src: S3ObjectLocation,
-    dst: S3ObjectLocation,
-    srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[S3ObjectLocation, S3ObjectLocation],
-                                    TransferNoOp[S3ObjectLocation, S3ObjectLocation]] =
+  private def compare(src: S3ObjectLocation,
+                      dst: S3ObjectLocation,
+                      srcStream: InputStream,
+                      dstStream: InputStream)
+    : Either[TransferOverwriteFailure[S3ObjectLocation, S3ObjectLocation],
+             TransferNoOp[S3ObjectLocation, S3ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
@@ -98,9 +101,8 @@ class S3Transfer(implicit s3Client: AmazonS3)
       s3Client.getObject(location.bucket, location.key)
     }.map { _.getObjectContent }
 
-  private def runTransfer(
-    src: S3ObjectLocation,
-    dst: S3ObjectLocation): TransferEither = {
+  private def runTransfer(src: S3ObjectLocation,
+                          dst: S3ObjectLocation): TransferEither = {
 
     // We use tags in the verifier in the storage service to check if we've already
     // verified an object.  For safety, we drop all the tags every time an object
