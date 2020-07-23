@@ -16,6 +16,9 @@ trait AzureBlobLocationGenerators extends RandomThings {
   def createContainerName: String =
     randomAlphanumeric.toLowerCase
 
+  def createContainer: Container =
+    Container(createContainerName)
+
   def createAzureBlobLocationWith(container: Container): AzureBlobLocation =
     AzureBlobLocation(
       container = container.name,

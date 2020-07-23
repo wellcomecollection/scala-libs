@@ -6,7 +6,7 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
-import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store.TypedStoreTestCases
 import uk.ac.wellcome.storage.streaming.{Codec, InputStreamWithLength}
 import uk.ac.wellcome.storage.{Identified, StoreReadError, StoreWriteError}
@@ -18,7 +18,7 @@ class AzureTypedStoreTest
     Container,
     AzureStreamStore,
     AzureTypedStore[Record],
-    Unit] with RecordGenerators with AzureFixtures with ObjectLocationGenerators {
+    Unit] with RecordGenerators with AzureFixtures {
   override def withBrokenStreamStore[R](testWith: TestWith[AzureStreamStore, R]): R = {
     val brokenStore = new AzureStreamStore() {
       override def get(location: AzureBlobLocation): ReadEither =

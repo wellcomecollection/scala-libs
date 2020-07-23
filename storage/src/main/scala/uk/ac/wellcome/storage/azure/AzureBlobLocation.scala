@@ -15,6 +15,12 @@ case class AzureBlobLocation(
     this.copy(
       name = Paths.get(name, parts: _*).toString
     )
+
+  def asPrefix: AzureBlobLocationPrefix =
+    AzureBlobLocationPrefix(
+      container = container,
+      namePrefix = name
+    )
 }
 
 case class AzureBlobLocationPrefix(
