@@ -37,7 +37,7 @@ trait TransferTestCases[
   def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
   def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
 
-  def withTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[Transfer[Location], R]): R
+  def withTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[Transfer[Location, Location], R]): R
 
   describe("behaves as a Transfer") {
     it("copies an object from a source to a destination") {

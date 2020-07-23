@@ -55,7 +55,7 @@ class S3toAzureTransferTest extends TransferTestCases[ObjectLocation, Record, Bu
     testWith(azureTypedStore)
   }
 
-  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation], R]): R = {
+  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R]): R = {
     implicit val s3StreamReadable: S3StreamReadable = srcStore.streamStore
 
     testWith(new S3toAzureTransfer())

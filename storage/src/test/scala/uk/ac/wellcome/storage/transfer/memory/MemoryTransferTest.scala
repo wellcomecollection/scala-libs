@@ -51,7 +51,7 @@ class MemoryTransferTest
     testWith(context)
   }
 
-  override def withTransfer[R](srcStore: MemoryStoreContext, dstStore: MemoryStoreContext)(testWith: TestWith[Transfer[String], R]): R =
+  override def withTransfer[R](srcStore: MemoryStoreContext, dstStore: MemoryStoreContext)(testWith: TestWith[Transfer[String, String], R]): R =
     testWith(
       srcStore
     )

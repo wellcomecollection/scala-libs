@@ -32,7 +32,7 @@ class S3TransferTest
       testWith(store)
     }
 
-  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation], R]): R =
+  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R]): R =
     testWith(
       new S3Transfer()
     )

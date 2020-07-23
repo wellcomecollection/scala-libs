@@ -6,7 +6,7 @@ import uk.ac.wellcome.storage.listing.Listing
 import scala.collection.parallel.ParIterable
 
 trait PrefixTransfer[Prefix, Location] extends Logging {
-  implicit val transfer: Transfer[Location]
+  implicit val transfer: Transfer[Location, Location]
   implicit val listing: Listing[Prefix, Location]
 
   protected def buildDstLocation(

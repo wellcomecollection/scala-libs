@@ -12,7 +12,7 @@ trait MemoryTransferFixtures[Ident, T]
       MemoryStore[Ident, T] with MemoryTransfer[Ident, T]] {
   type MemoryStoreImpl = MemoryStore[Ident, T] with MemoryTransfer[Ident, T]
 
-  override def withTransfer[R](testWith: TestWith[Transfer[Ident], R])(
+  override def withTransfer[R](testWith: TestWith[Transfer[Ident, Ident], R])(
     implicit store: MemoryStoreImpl): R =
     testWith(store)
 

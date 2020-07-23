@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.transfer._
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation] {
+class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation, ObjectLocation] {
 
   import uk.ac.wellcome.storage.RetryOps._
 

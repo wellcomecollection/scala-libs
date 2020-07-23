@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.{DoesNotExistError, Identified, ObjectLocation}
 class S3toAzureTransfer(implicit
                         s3Readable: S3StreamReadable,
                         blobClient: BlobServiceClient)
-    extends Transfer[ObjectLocation] {
+    extends Transfer[ObjectLocation, ObjectLocation] {
   import uk.ac.wellcome.storage.RetryOps._
 
   private val azureStreamStore: AzureStreamStore = new AzureStreamStore(
