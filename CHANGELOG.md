@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v14.2.0 - 2020-07-23
+
+This release introduces four new classes in the **storage** library:
+
+-   `S3ObjectLocation`
+-   `S3ObjectLocationPrefix`
+-   `AzureBlobLocation`
+-   `AzureBlobLocationPrefix`
+
+which extend new traits `Location` and `Prefix`, respectively.
+
+These will eventually replace the existing `ObjectLocation` class, but `S3ObjectLocation` should be a drop-in replacement in all existing code.
+
 ## v14.1.0 - 2020-07-14
 
 ### Libraries affected
