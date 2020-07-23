@@ -3,7 +3,6 @@ package uk.ac.wellcome.storage.fixtures
 import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.fixtures.{Fixture, fixture}
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.generators.AzureBlobLocationGenerators
 
 object AzureFixtures {
@@ -23,12 +22,6 @@ trait AzureFixtures extends Eventually with IntegrationPatience with AzureBlobLo
     new BlobServiceClientBuilder()
       .connectionString("UseDevelopmentStorage=true;")
       .buildClient()
-
-  def createAzureObjectLocationWith(container: Container): ObjectLocation =
-    ObjectLocation(
-      namespace = container.name,
-      path = randomAlphanumeric
-    )
 
   def withAzureContainer[R]: Fixture[Container, R] =
     fixture[Container, R](
