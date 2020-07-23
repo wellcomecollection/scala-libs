@@ -9,7 +9,7 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFa
 import uk.ac.wellcome.storage.{Identified, ObjectLocation}
 
 class S3TransferTest
-    extends TransferTestCases[ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
+    extends TransferTestCases[ObjectLocation, ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
     with S3TransferFixtures[Record]
     with RecordGenerators {
   override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =

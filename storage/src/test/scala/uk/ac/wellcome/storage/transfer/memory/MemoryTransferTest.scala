@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
 class MemoryTransferTest
     extends TransferTestCases[
-      String, Array[Byte],
+      String, String, Array[Byte],
       String, String,
       MemoryStore[String, Array[Byte]] with MemoryTransfer[String, Array[Byte]],
       MemoryStore[String, Array[Byte]] with MemoryTransfer[String, Array[Byte]],
