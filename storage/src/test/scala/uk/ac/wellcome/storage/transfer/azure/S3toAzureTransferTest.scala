@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.store.azure.{AzureStreamStore, AzureTypedStore}
 import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore, S3TypedStore}
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
-class S3toAzureTransferTest extends TransferTestCases[ObjectLocation, Record, Bucket, Container, S3TypedStore[Record], AzureTypedStore[Record], Unit] with RecordGenerators with AzureFixtures with S3Fixtures with ObjectLocationGenerators {
+class S3toAzureTransferTest extends TransferTestCases[ObjectLocation, ObjectLocation, Record, Bucket, Container, S3TypedStore[Record], AzureTypedStore[Record], Unit] with RecordGenerators with AzureFixtures with S3Fixtures with ObjectLocationGenerators {
   override def createT: Record = createRecord
 
   override def withContext[R](testWith: TestWith[Unit, R]): R = testWith(())
@@ -55,7 +55,7 @@ class S3toAzureTransferTest extends TransferTestCases[ObjectLocation, Record, Bu
     testWith(azureTypedStore)
   }
 
-  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation], R]): R = {
+  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R]): R = {
     implicit val s3StreamReadable: S3StreamReadable = srcStore.streamStore
 
     testWith(new S3toAzureTransfer())

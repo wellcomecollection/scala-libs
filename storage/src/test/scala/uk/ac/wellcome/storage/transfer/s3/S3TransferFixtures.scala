@@ -21,7 +21,7 @@ trait S3TransferFixtures[T]
     }
 
   override def withTransfer[R](
-    testWith: TestWith[Transfer[ObjectLocation], R])(
+    testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R])(
     implicit store: S3TypedStore[T]): R =
     testWith(new S3Transfer())
 }

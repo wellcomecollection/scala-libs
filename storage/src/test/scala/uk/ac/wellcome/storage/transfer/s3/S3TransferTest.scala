@@ -9,7 +9,7 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFa
 import uk.ac.wellcome.storage.{Identified, ObjectLocation}
 
 class S3TransferTest
-    extends TransferTestCases[ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
+    extends TransferTestCases[ObjectLocation, ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
     with S3TransferFixtures[Record]
     with RecordGenerators {
   override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
@@ -32,7 +32,7 @@ class S3TransferTest
       testWith(store)
     }
 
-  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation], R]): R =
+  override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R]): R =
     testWith(
       new S3Transfer()
     )
@@ -62,7 +62,7 @@ class S3TransferTest
           transfer
             .transfer(src, dst)
             .left
-            .value shouldBe a[TransferSourceFailure[_]]
+            .value shouldBe a[TransferSourceFailure[_, _]]
         }
       }
     }

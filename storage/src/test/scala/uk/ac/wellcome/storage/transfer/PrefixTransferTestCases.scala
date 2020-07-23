@@ -8,10 +8,12 @@ import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait PrefixTransferTestCases[
-  Location, Prefix, T,
+  SrcLocation, SrcPrefix,
+  DstLocation, DstPrefix,
+  T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[Location, T],
-  DstStore <: Store[Location, T],
+  SrcStore <: Store[SrcLocation, T],
+  DstStore <: Store[DstLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers
@@ -26,23 +28,25 @@ trait PrefixTransferTestCases[
       }
     }
 
-  def createSrcLocation(srcNamespace: SrcNamespace): Location
-  def createDstLocation(dstNamespace: DstNamespace): Location
+  type PrefixTransferImpl = PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
 
-  def createSrcPrefix(srcNamespace: SrcNamespace): Prefix
-  def createDstPrefix(dstNamespace: DstNamespace): Prefix
+  def createSrcLocation(srcNamespace: SrcNamespace): SrcLocation
+  def createDstLocation(dstNamespace: DstNamespace): DstLocation
 
-  def createSrcLocationFrom(srcPrefix: Prefix, suffix: String): Location
-  def createDstLocationFrom(dstPrefix: Prefix, suffix: String): Location
+  def createSrcPrefix(srcNamespace: SrcNamespace): SrcPrefix
+  def createDstPrefix(dstNamespace: DstNamespace): DstPrefix
 
-  def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
-  def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
+  def createSrcLocationFrom(srcPrefix: SrcPrefix, suffix: String): SrcLocation
+  def createDstLocationFrom(dstPrefix: DstPrefix, suffix: String): DstLocation
 
-  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withSrcStore[R](initialEntries: Map[SrcLocation, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
+  def withDstStore[R](initialEntries: Map[DstLocation, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
 
-  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
-  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
-  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransferImpl, R]): R
+
+  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransferImpl, R]): R
+  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransferImpl, R]): R
+  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransferImpl, R]): R
 
   def createT: T
 
@@ -190,7 +194,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
+              val failure = result.left.value.asInstanceOf[PrefixTransferIncomplete]
 
               failure.successes shouldBe actualLocationCount
               failure.failures shouldBe 1
@@ -215,7 +219,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              result.left.value shouldBe a[PrefixTransferFailure]
+              result.left.value shouldBe a[PrefixTransferIncomplete]
             }
           }
         }
@@ -263,7 +267,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
+              val failure = result.left.value.asInstanceOf[PrefixTransferIncomplete]
 
               failure.successes shouldBe 0
               failure.failures shouldBe 1

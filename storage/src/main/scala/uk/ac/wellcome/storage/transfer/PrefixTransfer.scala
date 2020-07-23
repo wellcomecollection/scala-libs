@@ -5,30 +5,30 @@ import uk.ac.wellcome.storage.listing.Listing
 
 import scala.collection.parallel.ParIterable
 
-trait PrefixTransfer[Prefix, Location] extends Logging {
-  implicit val transfer: Transfer[Location]
-  implicit val listing: Listing[Prefix, Location]
+trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
+    extends Logging {
+  implicit val transfer: Transfer[SrcLocation, DstLocation]
+  implicit val listing: Listing[SrcPrefix, SrcLocation]
 
   protected def buildDstLocation(
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
-    srcLocation: Location
-  ): Location
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
+    srcLocation: SrcLocation
+  ): DstLocation
 
   private def copyPrefix(
-    iterator: Iterable[Location],
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
+    iterator: Iterable[SrcLocation],
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
     checkForExisting: Boolean
-  ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
+  ): Either[PrefixTransferIncomplete, PrefixTransferSuccess] = {
     var successes = 0
     var failures = 0
 
     iterator
       .grouped(10)
       .foreach { locations =>
-        val results
-          : ParIterable[(Location, Either[TransferFailure, TransferSuccess])] =
+        val results: ParIterable[(SrcLocation, transfer.TransferEither)] =
           locations.par.map { srcLocation =>
             (
               srcLocation,
@@ -57,18 +57,18 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
     Either.cond(
       test = failures == 0,
       right = PrefixTransferSuccess(successes),
-      left = PrefixTransferFailure(failures, successes)
+      left = PrefixTransferIncomplete(failures, successes)
     )
   }
 
   def transferPrefix(
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
     checkForExisting: Boolean = true
-  ): Either[TransferFailure, PrefixTransferSuccess] = {
+  ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
     listing.list(srcPrefix) match {
       case Left(error) =>
-        Left(PrefixTransferListingFailure(srcPrefix, error.e))
+        Left(PrefixTransferListingFailure(srcPrefix, error))
 
       case Right(iterable) =>
         copyPrefix(

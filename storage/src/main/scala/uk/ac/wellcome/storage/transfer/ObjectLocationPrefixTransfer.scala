@@ -3,7 +3,11 @@ package uk.ac.wellcome.storage.transfer
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
 
 trait ObjectLocationPrefixTransfer
-    extends PrefixTransfer[ObjectLocationPrefix, ObjectLocation] {
+    extends PrefixTransfer[
+      ObjectLocationPrefix,
+      ObjectLocation,
+      ObjectLocationPrefix,
+      ObjectLocation] {
   override protected def buildDstLocation(
     srcPrefix: ObjectLocationPrefix,
     dstPrefix: ObjectLocationPrefix,

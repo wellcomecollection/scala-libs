@@ -1,41 +1,40 @@
 package uk.ac.wellcome.storage.transfer
 
-sealed trait TransferResult
+sealed trait TransferResult[SrcLocation, DstLocation] {
+  val src: SrcLocation
+  val dst: DstLocation
+}
 
-sealed trait TransferFailure extends TransferResult {
+sealed trait TransferFailure[SrcLocation, DstLocation]
+    extends TransferResult[SrcLocation, DstLocation] {
   val e: Throwable
 }
 
-case class TransferSourceFailure[Location](source: Location,
-                                           destination: Location,
-                                           e: Throwable = new Error())
-    extends TransferFailure
+case class TransferSourceFailure[SrcLocation, DstLocation](src: SrcLocation,
+                                                           dst: DstLocation,
+                                                           e: Throwable =
+                                                             new Error())
+    extends TransferFailure[SrcLocation, DstLocation]
 
-case class TransferDestinationFailure[Location](source: Location,
-                                                destination: Location,
-                                                e: Throwable = new Error())
-    extends TransferFailure
+case class TransferDestinationFailure[SrcLocation, DstLocation](
+  src: SrcLocation,
+  dst: DstLocation,
+  e: Throwable = new Error())
+    extends TransferFailure[SrcLocation, DstLocation]
 
-case class TransferOverwriteFailure[Location](source: Location,
-                                              destination: Location,
-                                              e: Throwable = new Error())
-    extends TransferFailure
+case class TransferOverwriteFailure[SrcLocation, DstLocation](src: SrcLocation,
+                                                              dst: DstLocation,
+                                                              e: Throwable =
+                                                                new Error())
+    extends TransferFailure[SrcLocation, DstLocation]
 
-case class PrefixTransferFailure(failures: Int,
-                                 successes: Int,
-                                 e: Throwable = new Error())
-    extends TransferFailure
+sealed trait TransferSuccess[SrcLocation, DstLocation]
+    extends TransferResult[SrcLocation, DstLocation]
 
-case class PrefixTransferListingFailure[Prefix](prefix: Prefix,
-                                                e: Throwable = new Error())
-    extends TransferFailure
+case class TransferNoOp[SrcLocation, DstLocation](src: SrcLocation,
+                                                  dst: DstLocation)
+    extends TransferSuccess[SrcLocation, DstLocation]
 
-sealed trait TransferSuccess extends TransferResult
-
-case class TransferNoOp[Location](source: Location, destination: Location)
-    extends TransferSuccess
-
-case class TransferPerformed[Location](source: Location, destination: Location)
-    extends TransferSuccess
-
-case class PrefixTransferSuccess(successes: Int) extends TransferSuccess
+case class TransferPerformed[SrcLocation, DstLocation](src: SrcLocation,
+                                                       dst: DstLocation)
+    extends TransferSuccess[SrcLocation, DstLocation]

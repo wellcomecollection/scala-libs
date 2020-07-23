@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.{DoesNotExistError, Identified, ObjectLocation}
 class S3toAzureTransfer(implicit
                         s3Readable: S3StreamReadable,
                         blobClient: BlobServiceClient)
-    extends Transfer[ObjectLocation] {
+    extends Transfer[ObjectLocation, ObjectLocation] {
   import uk.ac.wellcome.storage.RetryOps._
 
   private val azureStreamStore: AzureStreamStore = new AzureStreamStore(
@@ -27,7 +27,7 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithCheckForExisting(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither =
     azureReadable.get(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and start the
@@ -74,29 +74,27 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithOverwrites(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-    def singleTransfer: Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither = {
+    def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
     singleTransfer.retry(maxAttempts = 3)
   }
 
-  private def compare(
-    src: ObjectLocation,
-    dst: ObjectLocation,
-    srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation],
-                                    TransferNoOp[ObjectLocation]] =
+  private def compare(src: ObjectLocation,
+                      dst: ObjectLocation,
+                      srcStream: InputStream,
+                      dstStream: InputStream)
+    : Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
+             TransferNoOp[ObjectLocation, ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
       Left(TransferOverwriteFailure(src, dst))
     }
 
-  private def runTransfer(
-    src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-
+  private def runTransfer(src: ObjectLocation,
+                          dst: ObjectLocation): TransferEither =
     s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
         azureWritable.put(dst)(srcStream) match {
@@ -106,5 +104,4 @@ class S3toAzureTransfer(implicit
 
       case Left(err) => Left(TransferSourceFailure(src, dst, err.e))
     }
-  }
 }
