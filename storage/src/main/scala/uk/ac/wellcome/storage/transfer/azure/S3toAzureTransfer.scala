@@ -5,7 +5,11 @@ import java.io.InputStream
 import com.azure.storage.blob.BlobServiceClient
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
-import uk.ac.wellcome.storage.store.azure.{AzureStreamReadable, AzureStreamStore, AzureStreamWritable}
+import uk.ac.wellcome.storage.store.azure.{
+  AzureStreamReadable,
+  AzureStreamStore,
+  AzureStreamWritable
+}
 import uk.ac.wellcome.storage.store.s3.S3StreamReadable
 import uk.ac.wellcome.storage.transfer._
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, ObjectLocation}

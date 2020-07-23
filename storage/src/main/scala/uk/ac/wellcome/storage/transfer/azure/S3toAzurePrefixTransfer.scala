@@ -9,9 +9,11 @@ class S3toAzurePrefixTransfer()(
   implicit val transfer: S3toAzureTransfer,
   val listing: S3ObjectLocationListing
 ) extends PrefixTransfer[
-    ObjectLocationPrefix, ObjectLocation,
-    AzureBlobLocationPrefix, AzureBlobLocation
-  ] {
+      ObjectLocationPrefix,
+      ObjectLocation,
+      AzureBlobLocationPrefix,
+      AzureBlobLocation
+    ] {
 
   override protected def buildDstLocation(
     srcPrefix: ObjectLocationPrefix,
