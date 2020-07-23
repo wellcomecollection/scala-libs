@@ -22,10 +22,6 @@ case class S3ObjectLocation(
 
   def asPrefix: S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(bucket = bucket, keyPrefix = key)
-
-  // TODO: Bridging code while we split the locations; remove eventually
-  def toObjectLocation: ObjectLocation =
-    ObjectLocation(bucket, key)
 }
 
 case class S3ObjectLocationPrefix(

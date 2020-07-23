@@ -1,13 +1,8 @@
 package uk.ac.wellcome.storage.tags.azure
 
-import com.azure.storage.blob.BlobServiceClient
-import uk.ac.wellcome.storage.azure.AzureStorageErrors
-import uk.ac.wellcome.storage.{
-  ObjectLocation,
-  ReadError,
-  StoreWriteError,
-  WriteError
-}
+import com.azure.storage.blob.{BlobClient, BlobServiceClient}
+import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureStorageErrors}
+import uk.ac.wellcome.storage.{ObjectLocation, ReadError, StoreWriteError, WriteError}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
 
@@ -16,17 +11,17 @@ import scala.util.{Failure, Success, Try}
 
 class AzureBlobMetadata(val maxRetries: Int = 2)(
   implicit blobClient: BlobServiceClient)
-    extends Tags[ObjectLocation]
-    with RetryableReadable[Map[String, String]] {
+    extends Tags[AzureBlobLocation]
+    with RetryableReadable[AzureBlobLocation, Map[String, String]] {
 
   override protected def writeTags(
-    id: ObjectLocation,
+    location: AzureBlobLocation,
     tags: Map[String, String]): Either[WriteError, Map[String, String]] = {
     Try {
-      val individualBlobClient =
+      val individualBlobClient: BlobClient =
         blobClient
-          .getBlobContainerClient(id.namespace)
-          .getBlobClient(id.path)
+          .getBlobContainerClient(location.container)
+          .getBlobClient(location.name)
 
       individualBlobClient.setMetadata(tags.asJava)
     } match {
@@ -36,11 +31,11 @@ class AzureBlobMetadata(val maxRetries: Int = 2)(
   }
 
   override def retryableGetFunction(
-    location: ObjectLocation): Map[String, String] = {
+    location: AzureBlobLocation): Map[String, String] = {
     val individualBlobClient =
       blobClient
-        .getBlobContainerClient(location.namespace)
-        .getBlobClient(location.path)
+        .getBlobContainerClient(location.container)
+        .getBlobClient(location.name)
 
     individualBlobClient.getProperties.getMetadata.asScala.toMap
   }

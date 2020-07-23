@@ -138,6 +138,9 @@ trait S3Fixtures
       path = key
     )
 
+  def deleteObject(location: S3ObjectLocation): Unit =
+    s3Client.deleteObject(location.bucket, location.key)
+
   def putString(location: S3ObjectLocation, contents: String = randomAlphanumeric): PutObjectResult =
     s3Client.putObject(location.bucket, location.key, contents)
 

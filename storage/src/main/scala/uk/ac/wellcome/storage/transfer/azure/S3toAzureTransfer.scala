@@ -26,7 +26,7 @@ class S3toAzureTransfer(implicit
   override protected def transferWithCheckForExisting(
     src: S3ObjectLocation,
     dst: AzureBlobLocation): TransferEither =
-    azureReadable.get(dst.toObjectLocation) match {
+    azureReadable.get(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and start the
       // transfer.
@@ -39,7 +39,7 @@ class S3toAzureTransfer(implicit
         Left(TransferDestinationFailure(src, dst, err.e))
 
       case Right(Identified(_, dstStream)) =>
-        s3Readable.get(src.toObjectLocation) match {
+        s3Readable.get(src) match {
           case Right(Identified(_, srcStream)) =>
             val result = compare(
               src = src,
@@ -92,9 +92,9 @@ class S3toAzureTransfer(implicit
     }
 
   private def runTransfer(src: S3ObjectLocation, dst: AzureBlobLocation): TransferEither =
-    s3Readable.get(src.toObjectLocation) match {
+    s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
-        azureWritable.put(dst.toObjectLocation)(srcStream) match {
+        azureWritable.put(dst)(srcStream) match {
           case Right(_)  => Right(TransferPerformed(src, dst))
           case Left(err) => Left(TransferDestinationFailure(src, dst, err.e))
         }

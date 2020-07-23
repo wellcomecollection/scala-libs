@@ -99,7 +99,7 @@ class DynamoVersionedHybridStoreTest
           new DynamoHashRangeStore[String, Int, ObjectLocation](
             dynamoConfig)
 
-        val prefix = createObjectLocationPrefixWith(bucket.name)
+        val prefix = createS3ObjectLocationPrefixWith(bucket)
 
         testWith(
           new DynamoHybridStoreWithMaxima[

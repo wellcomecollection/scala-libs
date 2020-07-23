@@ -2,6 +2,7 @@ package uk.ac.wellcome.storage.azure
 
 import java.nio.file.Paths
 
+import com.azure.storage.blob.{BlobClient, BlobServiceClient}
 import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
 
 case class AzureBlobLocation(
@@ -15,11 +16,6 @@ case class AzureBlobLocation(
     this.copy(
       name = Paths.get(name, parts: _*).toString
     )
-
-  // TODO: Bridging code while we split the locations; remove eventually
-  def toObjectLocation: ObjectLocation =
-    ObjectLocation(container, name)
-
 }
 
 case class AzureBlobLocationPrefix(

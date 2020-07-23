@@ -106,8 +106,8 @@ class S3StreamStoreTest
           // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
           // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
 
-          val tooLongPath = randomStringOfByteLength(1025)()
-          val id = createId.copy(path = tooLongPath)
+          val tooLongKey = randomStringOfByteLength(1025)()
+          val id = createId.copy(key = tooLongKey)
 
           val entry = ReplayableStream(randomBytes())
 

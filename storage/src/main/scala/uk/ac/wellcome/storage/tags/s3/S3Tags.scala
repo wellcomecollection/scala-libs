@@ -22,7 +22,7 @@ import scala.util.{Failure, Success, Try}
 
 class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     extends Tags[ObjectLocation]
-    with RetryableReadable[Map[String, String]] {
+    with RetryableReadable[ObjectLocation, Map[String, String]] {
 
   override def retryableGetFunction(
     location: ObjectLocation): Map[String, String] = {
