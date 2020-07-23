@@ -5,7 +5,6 @@ import uk.ac.wellcome.storage.OverwriteError
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
-import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
@@ -19,8 +18,7 @@ class AzureStreamStoreTest
       Container,
       AzureStreamStore,
       AzureStreamStoreContext]
-    with AzureFixtures
-    with ObjectLocationGenerators {
+    with AzureFixtures {
 
   // Azurite test container does not error when handed incorrect stream lengths
   override lazy val skipStreamLengthTests = true
