@@ -16,8 +16,6 @@ trait S3ListingFixtures[ListingResult]
       ListingResult,
       S3Listing[ListingResult],
       Bucket] {
-  import uk.ac.wellcome.storage.s3.S3LocationOps._
-
   def createIdent(implicit bucket: Bucket): S3ObjectLocation =
     createS3ObjectLocationWith(bucket)
 
