@@ -12,7 +12,7 @@ import org.scalatest.{Assertion, EitherValues}
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
+import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, S3ObjectLocationGenerators}
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config}
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
@@ -36,7 +36,8 @@ trait S3Fixtures
     with IntegrationPatience
     with Matchers
     with EitherValues
-    with ObjectLocationGenerators {
+    with ObjectLocationGenerators
+    with S3ObjectLocationGenerators {
 
   import S3Fixtures._
 
@@ -105,14 +106,6 @@ trait S3Fixtures
     implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(location)).get
 
-  def createBucketName: String =
-    // Bucket names
-    //  - start with a lowercase letter or number,
-    //  - do not contain uppercase characters or underscores,
-    //  - between 3 and 63 characters in length.
-    // [https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html#bucketnamingrules]
-    randomAlphanumeric.toLowerCase
-
   def createInvalidBucketName: String =
     // Create a variety of invalid patterns, and choose one at random.
     Random
@@ -124,9 +117,6 @@ trait S3Fixtures
           Random.alphanumeric.take(100) mkString
         ))
       .head
-
-  def createBucket: Bucket =
-    Bucket(createBucketName)
 
   def createObjectLocationWith(
     bucket: Bucket
