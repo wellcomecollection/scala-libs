@@ -1,7 +1,8 @@
 package uk.ac.wellcome.storage.store.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{ObjectLocation, OverwriteError}
+import uk.ac.wellcome.storage.OverwriteError
+import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.generators.ObjectLocationGenerators
@@ -14,7 +15,7 @@ case class AzureStreamStoreContext(
 
 class AzureStreamStoreTest
     extends StreamStoreTestCases[
-      ObjectLocation,
+      AzureBlobLocation,
       Container,
       AzureStreamStore,
       AzureStreamStoreContext]
@@ -29,17 +30,17 @@ class AzureStreamStoreTest
       testWith(container)
     }
 
-  override def createId(implicit container: Container): ObjectLocation =
-    createAzureObjectLocationWith(container)
+  override def createId(implicit container: Container): AzureBlobLocation =
+    createAzureBlobLocationWith(container)
 
   override def withStreamStoreImpl[R](
     context: AzureStreamStoreContext,
-    initialEntries: Map[ObjectLocation, InputStreamWithLength])(
+    initialEntries: Map[AzureBlobLocation, InputStreamWithLength])(
     testWith: TestWith[AzureStreamStore, R]): R = {
     initialEntries.foreach { case (location, data) =>
         azureClient
-          .getBlobContainerClient(location.namespace)
-          .getBlobClient(location.path)
+          .getBlobContainerClient(location.container)
+          .getBlobClient(location.name)
           .upload(data, data.length)
     }
 
