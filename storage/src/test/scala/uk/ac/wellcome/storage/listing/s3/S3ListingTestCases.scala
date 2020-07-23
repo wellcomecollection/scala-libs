@@ -6,7 +6,6 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.listing.ListingTestCases
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
-import uk.ac.wellcome.storage.s3.S3LocationOps._
 
 trait S3ListingTestCases[ListingResult]
     extends ListingTestCases[
