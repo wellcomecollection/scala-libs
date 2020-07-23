@@ -13,36 +13,11 @@ class S3TransferTest
     extends TransferTestCases[ObjectLocation, ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
     with S3TransferFixtures[Record]
     with RecordGenerators {
-  override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { bucket =>
-      testWith(bucket)
-    }
-
-  override def withDstNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { bucket =>
-      testWith(bucket)
-    }
-
-  override def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) { store =>
-      testWith(store)
-    }
-
-  override def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) { store =>
-      testWith(store)
-    }
 
   override def withTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[ObjectLocation, ObjectLocation], R]): R =
     testWith(
       new S3Transfer()
     )
-
-  override def createSrcLocation(bucket: Bucket): ObjectLocation =
-    createObjectLocationWith(bucket)
-
-  override def createDstLocation(bucket: Bucket): ObjectLocation =
-    createObjectLocationWith(bucket)
 
   override def createT: Record = createRecord
 
@@ -88,8 +63,8 @@ class S3TransferTest
           transfer.transfer(src, dst) shouldBe a[Right[_, _]]
         }
 
-        s3Tags.get(S3ObjectLocation(src)).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
-        s3Tags.get(S3ObjectLocation(dst)).right.value shouldBe Identified(dst, Map.empty)
+        s3Tags.get(S3ObjectLocation(src)).right.value.identifiedT shouldBe Map("srcTag" -> "srcValue")
+        s3Tags.get(S3ObjectLocation(dst)).right.value.identifiedT shouldBe empty
       }
     }
   }

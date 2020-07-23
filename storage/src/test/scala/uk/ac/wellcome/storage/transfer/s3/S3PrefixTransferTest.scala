@@ -19,23 +19,8 @@ class S3PrefixTransferTest
       S3TypedStore[Record],
       Unit]
     with RecordGenerators
-    with S3TypedStoreFixtures[Record] {
-
-  def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { srcBucket =>
-      testWith(srcBucket)
-    }
-
-  def withDstNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { dstBucket =>
-      testWith(dstBucket)
-    }
-
-  def createSrcLocation(srcBucket: Bucket): ObjectLocation =
-    createObjectLocationWith(srcBucket)
-
-  def createDstLocation(dstBucket: Bucket): ObjectLocation =
-    createObjectLocationWith(dstBucket)
+    with S3TypedStoreFixtures[Record]
+    with S3TransferFixtures[Record] {
 
   def createSrcPrefix(srcBucket: Bucket): ObjectLocationPrefix =
     createObjectLocationPrefixWith(srcBucket.name)
@@ -48,16 +33,6 @@ class S3PrefixTransferTest
 
   def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
     dstPrefix.asLocation(suffix)
-
-  def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
-      testWith(typedStore)
-    }
-
-  def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R =
-    withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
-      testWith(typedStore)
-    }
 
   def withPrefixTransfer[R](
     srcStore: S3TypedStore[Record],
