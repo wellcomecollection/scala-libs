@@ -40,7 +40,7 @@ class S3PrefixTransferTest
   ): R =
     withTypedStoreImpl(
       context,
-      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+      initialEntries = initialEntries.map { case (loc, t) => (loc, t) }
     ) { typedStore =>
       testWith(typedStore)
     }
@@ -51,7 +51,7 @@ class S3PrefixTransferTest
   ): R =
     withTypedStoreImpl(
       context,
-      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+      initialEntries = initialEntries.map { case (loc, t) => (loc, t) }
     ) { typedStore =>
       testWith(typedStore)
     }

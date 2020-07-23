@@ -21,7 +21,7 @@ class S3TransferTest
   )(implicit context: Unit): R =
     withTypedStoreImpl(
       storeContext = (),
-      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+      initialEntries = initialEntries.map { case (loc, t) => (loc, t) }
     ) { store =>
       testWith(store)
     }
@@ -33,7 +33,7 @@ class S3TransferTest
   )(implicit context: Unit): R =
     withTypedStoreImpl(
       storeContext = (),
-      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+      initialEntries = initialEntries.map { case (loc, t) => (loc, t) }
     ) { store =>
       testWith(store)
     }
@@ -80,7 +80,7 @@ class S3TransferTest
 
       withTransferStore(initialEntries) { implicit store =>
         s3Tags
-          .update(src.toObjectLocation) { _ =>
+          .update(src) { _ =>
             Right(Map("srcTag" -> "srcValue"))
           } shouldBe a[Right[_, _]]
 
@@ -88,8 +88,8 @@ class S3TransferTest
           transfer.transfer(src, dst) shouldBe a[Right[_, _]]
         }
 
-        s3Tags.get(src.toObjectLocation).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
-        s3Tags.get(dst.toObjectLocation).right.value shouldBe Identified(dst, Map.empty)
+        s3Tags.get(src).right.value shouldBe Identified(src, Map("srcTag" -> "srcValue"))
+        s3Tags.get(dst).right.value shouldBe Identified(dst, Map.empty)
       }
     }
   }
@@ -107,7 +107,7 @@ class S3TransferTest
 
         result.right.value shouldBe TransferNoOp(src, src)
 
-        store.get(src.toObjectLocation) shouldBe Right(Identified(src, t))
+        store.get(src) shouldBe Right(Identified(src, t))
       }
     }
   }

@@ -40,7 +40,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     val s3TypedStore = S3TypedStore[Record]
 
     initialEntries.foreach { case (location, record) =>
-      s3TypedStore.put(location.toObjectLocation)(record) shouldBe a[Right[_, _]]
+      s3TypedStore.put(location)(record) shouldBe a[Right[_, _]]
     }
 
     testWith(s3TypedStore)
@@ -53,7 +53,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     val azureTypedStore = new AzureTypedStore[Record]()
 
     initialEntries.foreach { case (location, record) =>
-      azureTypedStore.put(location.toObjectLocation)(record) shouldBe a[Right[_, _]]
+      azureTypedStore.put(location)(record) shouldBe a[Right[_, _]]
     }
 
     testWith(azureTypedStore)

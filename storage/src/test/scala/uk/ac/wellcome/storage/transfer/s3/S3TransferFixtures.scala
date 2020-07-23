@@ -18,7 +18,7 @@ trait S3TransferFixtures[T]
     testWith: TestWith[S3TypedStore[T], R]): R =
     withTypedStoreImpl(
       storeContext = (),
-      initialEntries = initialEntries.map { case (loc, t) => (loc.toObjectLocation, t) }
+      initialEntries = initialEntries.map { case (loc, t) => (loc, t) }
     ) {
       typedStore =>
         testWith(typedStore)

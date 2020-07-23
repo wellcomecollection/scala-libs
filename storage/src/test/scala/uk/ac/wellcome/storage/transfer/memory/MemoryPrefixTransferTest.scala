@@ -1,26 +1,27 @@
 package uk.ac.wellcome.storage.transfer.memory
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, Record, RecordGenerators}
-import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.generators.{MemoryLocationGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.ListingFailure
+import uk.ac.wellcome.storage.providers.memory.{MemoryLocation, MemoryLocationPrefix}
 import uk.ac.wellcome.storage.store.memory.MemoryStore
 import uk.ac.wellcome.storage.transfer._
 
 class MemoryPrefixTransferTest
     extends PrefixTransferTestCases[
-      ObjectLocation, ObjectLocationPrefix,
-      ObjectLocation, ObjectLocationPrefix,
+      MemoryLocation, MemoryLocationPrefix,
+      MemoryLocation, MemoryLocationPrefix,
       Record,
       String,
       String,
-      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record],
-      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record],
-      MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]]
+      MemoryStore[MemoryLocation, Record] with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record],
+      MemoryStore[MemoryLocation, Record] with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record],
+      MemoryStore[MemoryLocation, Record] with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record]]
   with RecordGenerators
-  with ObjectLocationGenerators {
+  with MemoryLocationGenerators {
 
   type MemoryRecordStore =
-    MemoryStore[ObjectLocation, Record] with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]
+    MemoryStore[MemoryLocation, Record] with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record]
 
   override def withSrcNamespace[R](testWith: TestWith[String, R]): R =
     testWith(randomAlphanumeric)
@@ -28,25 +29,25 @@ class MemoryPrefixTransferTest
   override def withDstNamespace[R](testWith: TestWith[String, R]): R =
     testWith(randomAlphanumeric)
 
-  override def createSrcLocation(srcNamespace: String): ObjectLocation =
-    createObjectLocationWith(srcNamespace)
+  override def createSrcLocation(srcNamespace: String): MemoryLocation =
+    createMemoryLocationWith(srcNamespace)
 
-  override def createDstLocation(dstNamespace: String): ObjectLocation =
-    createObjectLocationWith(dstNamespace)
+  override def createDstLocation(dstNamespace: String): MemoryLocation =
+    createMemoryLocationWith(dstNamespace)
 
-  override def createSrcPrefix(srcNamespace: String): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(srcNamespace)
+  override def createSrcPrefix(srcNamespace: String): MemoryLocationPrefix =
+    createMemoryLocationPrefixWith(srcNamespace)
 
-  override def createDstPrefix(dstNamespace: String): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(dstNamespace)
+  override def createDstPrefix(dstNamespace: String): MemoryLocationPrefix =
+    createMemoryLocationPrefixWith(dstNamespace)
 
-  override def createSrcLocationFrom(srcPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  override def createSrcLocationFrom(srcPrefix: MemoryLocationPrefix, suffix: String): MemoryLocation =
     srcPrefix.asLocation(suffix)
 
-  override def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  override def createDstLocationFrom(dstPrefix: MemoryLocationPrefix, suffix: String): MemoryLocation =
     dstPrefix.asLocation(suffix)
 
-  override def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
+  override def withSrcStore[R](initialEntries: Map[MemoryLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
     initialEntries.foreach { case (location, record) =>
       underlying.put(location)(record) shouldBe a[Right[_, _]]
     }
@@ -54,7 +55,7 @@ class MemoryPrefixTransferTest
     testWith(underlying)
   }
 
-  override def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
+  override def withDstStore[R](initialEntries: Map[MemoryLocation, Record])(testWith: TestWith[MemoryRecordStore, R])(implicit underlying: MemoryRecordStore): R = {
     initialEntries.foreach { case (location, record) =>
       underlying.put(location)(record) shouldBe a[Right[_, _]]
     }
@@ -62,23 +63,23 @@ class MemoryPrefixTransferTest
     testWith(underlying)
   }
 
-  class MemoryObjectLocationPrefixTransfer(initialEntries: Map[ObjectLocation, Record])
-    extends MemoryStore[ObjectLocation, Record](initialEntries = initialEntries)
-      with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record] {
+  class MemoryMemoryLocationPrefixTransfer(initialEntries: Map[MemoryLocation, Record])
+    extends MemoryStore[MemoryLocation, Record](initialEntries = initialEntries)
+      with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record] {
     override protected def buildDstLocation(
-      srcPrefix: ObjectLocationPrefix,
-      dstPrefix: ObjectLocationPrefix,
-      srcLocation: ObjectLocation): ObjectLocation =
+      srcPrefix: MemoryLocationPrefix,
+      dstPrefix: MemoryLocationPrefix,
+      srcLocation: MemoryLocation): MemoryLocation =
       dstPrefix.asLocation(
         srcLocation.path.stripPrefix(srcPrefix.path)
       )
 
-    override protected def startsWith(location: ObjectLocation, prefix: ObjectLocationPrefix): Boolean = {
+    override protected def startsWith(location: MemoryLocation, prefix: MemoryLocationPrefix): Boolean = {
       location.namespace == prefix.namespace && location.path.startsWith(prefix.path)
     }
   }
 
-  override def withPrefixTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R =
+  override def withPrefixTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[MemoryLocationPrefix, MemoryLocation, MemoryLocationPrefix, MemoryLocation], R]): R =
     testWith(srcStore)
 
   override def withExtraListingTransfer[R](
@@ -87,13 +88,13 @@ class MemoryPrefixTransferTest
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R = {
-    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
-      override def list(prefix: ObjectLocationPrefix): ListingResult = {
+    val prefixTransfer = new MemoryMemoryLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def list(prefix: MemoryLocationPrefix): ListingResult = {
         val matchingLocations = entries
           .filter { case (location, _) => startsWith(location, prefix) }
           .map { case (location, _) => location }
 
-        Right(matchingLocations ++ Seq(createObjectLocation))
+        Right(matchingLocations ++ Seq(createMemoryLocation))
       }
     }
 
@@ -106,8 +107,8 @@ class MemoryPrefixTransferTest
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R = {
-    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
-      override def list(prefix: ObjectLocationPrefix): ListingResult =
+    val prefixTransfer = new MemoryMemoryLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def list(prefix: MemoryLocationPrefix): ListingResult =
         Left(ListingFailure(prefix))
     }
 
@@ -120,8 +121,8 @@ class MemoryPrefixTransferTest
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R =  {
-    val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
-      override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): TransferEither =
+    val prefixTransfer = new MemoryMemoryLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
+      override def transfer(src: MemoryLocation, dst: MemoryLocation, checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 
@@ -130,7 +131,7 @@ class MemoryPrefixTransferTest
 
   override def withContext[R](testWith: TestWith[MemoryRecordStore, R]): R =
     testWith(
-      new MemoryObjectLocationPrefixTransfer(initialEntries = Map.empty)
+      new MemoryMemoryLocationPrefixTransfer(initialEntries = Map.empty)
     )
 
   override def createT: Record = createRecord
