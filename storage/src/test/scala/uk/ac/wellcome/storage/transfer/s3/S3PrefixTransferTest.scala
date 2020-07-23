@@ -99,7 +99,7 @@ class S3PrefixTransferTest
       override def transfer(
                              src: ObjectLocation,
                              dst: ObjectLocation,
-                             checkForExisting: Boolean = true): Either[TransferFailure, TransferSuccess] =
+                             checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 

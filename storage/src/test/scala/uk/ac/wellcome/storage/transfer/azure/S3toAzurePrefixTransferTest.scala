@@ -104,7 +104,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
 
   override def withBrokenTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation], R]): R = {
     implicit val brokenTransfer: S3toAzureTransfer = new S3toAzureTransfer() {
-      override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): Either[TransferFailure, TransferSuccess] =
+      override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 

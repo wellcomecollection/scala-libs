@@ -27,7 +27,7 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithCheckForExisting(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither =
     azureReadable.get(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and start the
@@ -74,8 +74,8 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithOverwrites(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-    def singleTransfer: Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither = {
+    def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
     singleTransfer.retry(maxAttempts = 3)
@@ -85,18 +85,15 @@ class S3toAzureTransfer(implicit
     src: ObjectLocation,
     dst: ObjectLocation,
     srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation],
-                                    TransferNoOp[ObjectLocation]] =
+    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
+                                    TransferNoOp[ObjectLocation, ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
       Left(TransferOverwriteFailure(src, dst))
     }
 
-  private def runTransfer(
-    src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-
+  private def runTransfer(src: ObjectLocation, dst: ObjectLocation): TransferEither =
     s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
         azureWritable.put(dst)(srcStream) match {
@@ -106,5 +103,4 @@ class S3toAzureTransfer(implicit
 
       case Left(err) => Left(TransferSourceFailure(src, dst, err.e))
     }
-  }
 }

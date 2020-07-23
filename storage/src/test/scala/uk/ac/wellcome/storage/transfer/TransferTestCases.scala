@@ -78,11 +78,11 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.left.value shouldBe a[TransferSourceFailure[_]]
+              result.left.value shouldBe a[TransferSourceFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location]]
-              failure.source shouldBe src
-              failure.destination shouldBe dst
+              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location, Location]]
+              failure.src shouldBe src
+              failure.dst shouldBe dst
             }
           }
         }
@@ -105,11 +105,11 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.left.value shouldBe a[TransferOverwriteFailure[_]]
+              result.left.value shouldBe a[TransferOverwriteFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferOverwriteFailure[Location]]
-              failure.source shouldBe src
-              failure.destination shouldBe dst
+              val failure = result.left.value.asInstanceOf[TransferOverwriteFailure[Location, Location]]
+              failure.src shouldBe src
+              failure.dst shouldBe dst
 
               srcStore.get(src) shouldBe Right(Identified(src, srcT))
               dstStore.get(dst) shouldBe Right(Identified(dst, dstT))
@@ -157,11 +157,11 @@ trait TransferTestCases[
                   _.transfer(src, dst, checkForExisting = false)
                 }
 
-              result.left.value shouldBe a[TransferSourceFailure[_]]
+              result.left.value shouldBe a[TransferSourceFailure[_, _]]
 
-              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location]]
-              failure.source shouldBe src
-              failure.destination shouldBe dst
+              val failure = result.left.value.asInstanceOf[TransferSourceFailure[Location, Location]]
+              failure.src shouldBe src
+              failure.dst shouldBe dst
             }
           }
         }

@@ -26,8 +26,8 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation] {
 
   override def transferWithOverwrites(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
-    def singleTransfer: Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither = {
+    def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
     singleTransfer.retry(maxAttempts = 3)
@@ -35,7 +35,7 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation] {
 
   override def transferWithCheckForExisting(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] =
+    dst: ObjectLocation): TransferEither =
     getStream(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and
@@ -88,8 +88,8 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation] {
     src: ObjectLocation,
     dst: ObjectLocation,
     srcStream: InputStream,
-    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation],
-                                    TransferNoOp[ObjectLocation]] =
+    dstStream: InputStream): Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
+                                    TransferNoOp[ObjectLocation, ObjectLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
@@ -103,7 +103,7 @@ class S3Transfer(implicit s3Client: AmazonS3) extends Transfer[ObjectLocation] {
 
   private def runTransfer(
     src: ObjectLocation,
-    dst: ObjectLocation): Either[TransferFailure, TransferSuccess] = {
+    dst: ObjectLocation): TransferEither = {
 
     // We use tags in the verifier in the storage service to check if we've already
     // verified an object.  For safety, we drop all the tags every time an object

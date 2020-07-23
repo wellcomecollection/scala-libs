@@ -62,7 +62,7 @@ class S3TransferTest
           transfer
             .transfer(src, dst)
             .left
-            .value shouldBe a[TransferSourceFailure[_]]
+            .value shouldBe a[TransferSourceFailure[_, _]]
         }
       }
     }

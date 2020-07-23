@@ -28,7 +28,7 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
       .grouped(10)
       .foreach { locations =>
         val results
-          : ParIterable[(Location, Either[TransferFailure, TransferSuccess])] =
+          : ParIterable[(Location, transfer.TransferEither)] =
           locations.par.map { srcLocation =>
             (
               srcLocation,

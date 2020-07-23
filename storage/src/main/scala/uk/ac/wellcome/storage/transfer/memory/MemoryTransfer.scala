@@ -8,7 +8,7 @@ trait MemoryTransfer[Ident, T]
     with MemoryStoreBase[Ident, T] {
   override def transferWithCheckForExisting(
     src: Ident,
-    dst: Ident): Either[TransferFailure, TransferSuccess] =
+    dst: Ident): TransferEither =
     (entries.get(src), entries.get(dst)) match {
       case (Some(srcT), Some(dstT)) if srcT == dstT =>
         Right(TransferNoOp(src, dst))
@@ -23,7 +23,7 @@ trait MemoryTransfer[Ident, T]
 
   override def transferWithOverwrites(
     src: Ident,
-    dst: Ident): Either[TransferFailure, TransferSuccess] =
+    dst: Ident): TransferEither =
     entries.get(src) match {
       case Some(srcT) =>
         entries = entries ++ Map(dst -> srcT)
