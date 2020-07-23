@@ -5,20 +5,20 @@ import uk.ac.wellcome.storage.listing.Listing
 
 import scala.collection.parallel.ParIterable
 
-trait PrefixTransfer[Prefix, Location] extends Logging {
-  implicit val transfer: Transfer[Location, Location]
-  implicit val listing: Listing[Prefix, Location]
+trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation] extends Logging {
+  implicit val transfer: Transfer[SrcLocation, DstLocation]
+  implicit val listing: Listing[SrcPrefix, SrcLocation]
 
   protected def buildDstLocation(
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
-    srcLocation: Location
-  ): Location
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
+    srcLocation: SrcLocation
+  ): DstLocation
 
   private def copyPrefix(
-    iterator: Iterable[Location],
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
+    iterator: Iterable[SrcLocation],
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
     checkForExisting: Boolean
   ): Either[PrefixTransferIncomplete, PrefixTransferSuccess] = {
     var successes = 0
@@ -28,7 +28,7 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
       .grouped(10)
       .foreach { locations =>
         val results
-          : ParIterable[(Location, transfer.TransferEither)] =
+          : ParIterable[(SrcLocation, transfer.TransferEither)] =
           locations.par.map { srcLocation =>
             (
               srcLocation,
@@ -62,8 +62,8 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
   }
 
   def transferPrefix(
-    srcPrefix: Prefix,
-    dstPrefix: Prefix,
+    srcPrefix: SrcPrefix,
+    dstPrefix: DstPrefix,
     checkForExisting: Boolean = true
   ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
     listing.list(srcPrefix) match {

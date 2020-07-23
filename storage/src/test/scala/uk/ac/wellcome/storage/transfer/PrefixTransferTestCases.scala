@@ -38,11 +38,11 @@ trait PrefixTransferTestCases[
   def withSrcStore[R](initialEntries: Map[Location, T])(testWith: TestWith[SrcStore, R])(implicit context: Context): R
   def withDstStore[R](initialEntries: Map[Location, T])(testWith: TestWith[DstStore, R])(implicit context: Context): R
 
-  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withPrefixTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location, Prefix, Location], R]): R
 
-  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
-  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
-  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location], R]): R
+  def withExtraListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location, Prefix, Location], R]): R
+  def withBrokenListingTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location, Prefix, Location], R]): R
+  def withBrokenTransfer[R](srcStore: SrcStore, dstStore: DstStore)(testWith: TestWith[PrefixTransfer[Prefix, Location, Prefix, Location], R]): R
 
   def createT: T
 
