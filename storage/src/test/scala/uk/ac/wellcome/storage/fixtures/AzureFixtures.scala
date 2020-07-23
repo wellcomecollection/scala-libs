@@ -4,7 +4,7 @@ import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import uk.ac.wellcome.fixtures.{Fixture, fixture}
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.storage.generators.AzureBlobLocationGenerators
 
 object AzureFixtures {
   class Container(val name: String) extends AnyVal {
@@ -16,7 +16,7 @@ object AzureFixtures {
   }
 }
 
-trait AzureFixtures extends RandomThings with Eventually with IntegrationPatience {
+trait AzureFixtures extends Eventually with IntegrationPatience with AzureBlobLocationGenerators {
   import AzureFixtures._
 
   implicit val azureClient: BlobServiceClient =
