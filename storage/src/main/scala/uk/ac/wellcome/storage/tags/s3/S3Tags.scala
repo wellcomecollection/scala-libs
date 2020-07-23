@@ -10,11 +10,7 @@ import com.amazonaws.services.s3.model.{
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
-import uk.ac.wellcome.storage.{
-  ReadError,
-  StoreWriteError,
-  WriteError
-}
+import uk.ac.wellcome.storage.{ReadError, StoreWriteError, WriteError}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
