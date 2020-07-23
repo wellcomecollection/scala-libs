@@ -3,20 +3,24 @@ package uk.ac.wellcome.storage.store.azure
 import java.io.InputStream
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{Identified, ObjectLocation, StoreReadError, StoreWriteError}
+import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
-import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, Record, RecordGenerators}
+import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store.TypedStoreTestCases
 import uk.ac.wellcome.storage.streaming.{Codec, InputStreamWithLength}
+import uk.ac.wellcome.storage.{Identified, StoreReadError, StoreWriteError}
 
-class AzureTypedStoreTest extends TypedStoreTestCases[ObjectLocation, Record, Container, AzureStreamStore, AzureTypedStore[Record], Unit] with RecordGenerators with AzureFixtures with ObjectLocationGenerators {
+class AzureTypedStoreTest
+    extends TypedStoreTestCases[AzureBlobLocation, Record, Container, AzureStreamStore, AzureTypedStore[Record], Unit]
+      with RecordGenerators
+      with AzureFixtures {
   override def withBrokenStreamStore[R](testWith: TestWith[AzureStreamStore, R]): R = {
     val brokenStore = new AzureStreamStore() {
-      override def get(location: ObjectLocation): ReadEither =
+      override def get(location: AzureBlobLocation): ReadEither =
         Left(StoreReadError(new Throwable("get: BOOM!")))
 
-      override def put(location: ObjectLocation)(is: InputStreamWithLength): WriteEither =
+      override def put(location: AzureBlobLocation)(is: InputStreamWithLength): WriteEither =
         Left(StoreWriteError(new Throwable("put: BOOM!")))
     }
 
@@ -27,14 +31,17 @@ class AzureTypedStoreTest extends TypedStoreTestCases[ObjectLocation, Record, Co
 
   override def withSingleValueStreamStore[R](rawStream: InputStream)(testWith: TestWith[AzureStreamStore, R]): R = {
     val store = new AzureStreamStore() {
-      override def get(location: ObjectLocation): ReadEither =
+      override def get(location: AzureBlobLocation): ReadEither =
         Right(Identified(location, new InputStreamWithLength(rawStream, length = 0)))
     }
 
     testWith(store)
   }
 
-  override def withTypedStore[R](streamStore: AzureStreamStore, initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[AzureTypedStore[Record], R])(implicit codec: Codec[Record]): R = {
+  override def withTypedStore[R](
+    streamStore: AzureStreamStore, initialEntries: Map[AzureBlobLocation, Record])(
+    testWith: TestWith[AzureTypedStore[Record], R])(implicit codec: Codec[Record]
+  ): R = {
     implicit val s: AzureStreamStore = streamStore
     val typedStore = new AzureTypedStore[Record]()
 
@@ -45,7 +52,9 @@ class AzureTypedStoreTest extends TypedStoreTestCases[ObjectLocation, Record, Co
     testWith(typedStore)
   }
 
-  override def withStreamStoreImpl[R](context: Unit, initialEntries: Map[ObjectLocation, InputStreamWithLength])(testWith: TestWith[AzureStreamStore, R]): R = {
+  override def withStreamStoreImpl[R](
+    context: Unit, initialEntries: Map[AzureBlobLocation, InputStreamWithLength])(testWith: TestWith[AzureStreamStore, R]
+  ): R = {
     val streamStore = new AzureStreamStore()
 
     initialEntries.foreach { case (location, inputStream) =>
@@ -62,6 +71,6 @@ class AzureTypedStoreTest extends TypedStoreTestCases[ObjectLocation, Record, Co
       testWith(container)
     }
 
-  override def createId(implicit container: Container): ObjectLocation =
-    createAzureObjectLocationWith(container)
+  override def createId(implicit container: Container): AzureBlobLocation =
+    createAzureBlobLocationWith(container)
 }

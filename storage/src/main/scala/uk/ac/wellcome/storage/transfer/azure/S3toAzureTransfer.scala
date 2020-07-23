@@ -4,6 +4,7 @@ import java.io.InputStream
 
 import com.azure.storage.blob.BlobServiceClient
 import org.apache.commons.io.IOUtils
+import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.store.azure.{
   AzureStreamReadable,
   AzureStreamStore,
@@ -16,7 +17,7 @@ import uk.ac.wellcome.storage.{DoesNotExistError, Identified, ObjectLocation}
 class S3toAzureTransfer(implicit
                         s3Readable: S3StreamReadable,
                         blobClient: BlobServiceClient)
-    extends Transfer[ObjectLocation, ObjectLocation] {
+    extends Transfer[ObjectLocation, AzureBlobLocation] {
   import uk.ac.wellcome.storage.RetryOps._
 
   private val azureStreamStore: AzureStreamStore = new AzureStreamStore(
@@ -27,7 +28,7 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithCheckForExisting(
     src: ObjectLocation,
-    dst: ObjectLocation): TransferEither =
+    dst: AzureBlobLocation): TransferEither =
     azureReadable.get(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and start the
@@ -74,7 +75,7 @@ class S3toAzureTransfer(implicit
 
   override protected def transferWithOverwrites(
     src: ObjectLocation,
-    dst: ObjectLocation): TransferEither = {
+    dst: AzureBlobLocation): TransferEither = {
     def singleTransfer: TransferEither =
       runTransfer(src, dst)
 
@@ -82,11 +83,11 @@ class S3toAzureTransfer(implicit
   }
 
   private def compare(src: ObjectLocation,
-                      dst: ObjectLocation,
+                      dst: AzureBlobLocation,
                       srcStream: InputStream,
                       dstStream: InputStream)
-    : Either[TransferOverwriteFailure[ObjectLocation, ObjectLocation],
-             TransferNoOp[ObjectLocation, ObjectLocation]] =
+    : Either[TransferOverwriteFailure[ObjectLocation, AzureBlobLocation],
+             TransferNoOp[ObjectLocation, AzureBlobLocation]] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
     } else {
@@ -94,7 +95,7 @@ class S3toAzureTransfer(implicit
     }
 
   private def runTransfer(src: ObjectLocation,
-                          dst: ObjectLocation): TransferEither =
+                          dst: AzureBlobLocation): TransferEither =
     s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
         azureWritable.put(dst)(srcStream) match {

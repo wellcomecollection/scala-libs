@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.transfer.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.fixtures.{AzureFixtures, S3Fixtures}
+import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
@@ -13,40 +13,24 @@ import uk.ac.wellcome.storage.transfer._
 
 class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
   ObjectLocation, ObjectLocationPrefix,
-  ObjectLocation, ObjectLocationPrefix,
+  AzureBlobLocation, AzureBlobLocationPrefix,
   Record,
   Bucket, Container,
   S3TypedStore[Record], AzureTypedStore[Record],
   Unit]
     with RecordGenerators
-    with AzureFixtures
-    with S3Fixtures {
-  override def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { srcBucket =>
-      testWith(srcBucket)
-    }
-
-  override def withDstNamespace[R](testWith: TestWith[Container, R]): R =
-    withAzureContainer { dstContainer =>
-      testWith(dstContainer)
-    }
-
-  override def createSrcLocation(srcBucket: Bucket): ObjectLocation =
-    createObjectLocationWith(srcBucket)
-
-  override def createDstLocation(dstContainer: Container): ObjectLocation =
-    createObjectLocationWith(dstContainer.name)
+    with AzureTransferFixtures {
 
   override def createSrcPrefix(srcBucket: Bucket): ObjectLocationPrefix =
     createObjectLocationPrefixWith(srcBucket.name)
 
-  override def createDstPrefix(dstContainer: Container): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(dstContainer.name)
+  override def createDstPrefix(dstContainer: Container): AzureBlobLocationPrefix =
+    createAzureBlobLocationPrefixWith(dstContainer)
 
   override def createSrcLocationFrom(srcPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
     srcPrefix.asLocation(suffix)
 
-  override def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  override def createDstLocationFrom(dstPrefix: AzureBlobLocationPrefix, suffix: String): AzureBlobLocation =
     dstPrefix.asLocation(suffix)
 
   override def withSrcStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[S3TypedStore[Record], R])(implicit context: Unit): R = {
@@ -59,7 +43,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     testWith(s3TypedStore)
   }
 
-  override def withDstStore[R](initialEntries: Map[ObjectLocation, Record])(testWith: TestWith[AzureTypedStore[Record], R])(implicit context: Unit): R = {
+  override def withDstStore[R](initialEntries: Map[AzureBlobLocation, Record])(testWith: TestWith[AzureTypedStore[Record], R])(implicit context: Unit): R = {
     implicit val azureStreamStore: AzureStreamStore = new AzureStreamStore()
     val azureTypedStore = new AzureTypedStore[Record]()
 
@@ -123,7 +107,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     testWith: TestWith[PrefixTransferImpl, R]
   ): R = {
     implicit val brokenTransfer: S3toAzureTransfer = new S3toAzureTransfer() {
-      override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): TransferEither =
+      override def transfer(src: ObjectLocation, dst: AzureBlobLocation, checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 
