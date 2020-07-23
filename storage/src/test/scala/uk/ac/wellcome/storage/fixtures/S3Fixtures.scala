@@ -118,6 +118,9 @@ trait S3Fixtures
         ))
       .head
 
+  def createInvalidBucket: Bucket =
+    Bucket(createInvalidBucketName)
+
   def createObjectLocationWith(
     bucket: Bucket
   ): ObjectLocation =
@@ -138,13 +141,13 @@ trait S3Fixtures
   def putString(location: S3ObjectLocation, contents: String = randomAlphanumeric): PutObjectResult =
     s3Client.putObject(location.bucket, location.key, contents)
 
-  def putStream(location: ObjectLocation, inputStream: InputStreamWithLength): Unit = {
+  def putStream(location: S3ObjectLocation, inputStream: InputStreamWithLength): Unit = {
     val metadata = new ObjectMetadata()
     metadata.setContentLength(inputStream.length)
 
     val putObjectRequest = new PutObjectRequest(
-      location.namespace,
-      location.path,
+      location.bucket,
+      location.key,
       inputStream,
       metadata
     )

@@ -6,13 +6,14 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.TypedStoreTestCases
 import uk.ac.wellcome.storage.store.fixtures.BucketNamespaceFixtures
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
 class S3TypedStoreTest
     extends TypedStoreTestCases[
-      ObjectLocation,
+      S3ObjectLocation,
       Record,
       Bucket,
       S3StreamStore,
@@ -24,11 +25,11 @@ class S3TypedStoreTest
   override def withBrokenStreamStore[R](
     testWith: TestWith[S3StreamStore, R]): R = {
     val brokenS3StreamStore = new S3StreamStore {
-      override def get(location: ObjectLocation): ReadEither = Left(
+      override def get(location: S3ObjectLocation): ReadEither = Left(
         StoreReadError(new Throwable("get: BOOM!"))
       )
 
-      override def put(location: ObjectLocation)(
+      override def put(location: S3ObjectLocation)(
         inputStream: InputStreamWithLength): WriteEither = Left(
         StoreWriteError(
           new Throwable("put: BOOM!")
@@ -42,7 +43,7 @@ class S3TypedStoreTest
   override def withSingleValueStreamStore[R](rawStream: InputStream)(
     testWith: TestWith[S3StreamStore, R]): R = {
     val s3StreamStore: S3StreamStore = new S3StreamStore() {
-      override def get(location: ObjectLocation): ReadEither =
+      override def get(location: S3ObjectLocation): ReadEither =
         Right(
           Identified(
             location,
@@ -63,8 +64,8 @@ class S3TypedStoreTest
         // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
         // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
 
-        val tooLongPath = randomStringOfByteLength(1025)()
-        val id = createId.copy(path = tooLongPath)
+        val tooLongKey = randomStringOfByteLength(1025)()
+        val id = createId.copy(key = tooLongKey)
 
         val entry = createT
 
