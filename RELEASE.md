@@ -1,10 +1,38 @@
 RELEASE_TYPE: major
 
-*   The `TransferResult` type hierarchy has been rearranged:
+New-style locations, take two!
 
-    -   Results for a single Transfer and a PrefixTransfer are now two separate traits.
-        This means that you don't have to deal with Transfer failures from the result of a PrefixTransfer, or vice versa.
-    -   `PrefixTransferFailure` is now a base trait for all PrefixTransfer errors, and the previous case class has been renamed to `PrefixTransferIncomplete`.
-        This result means that the prefix transfer was not completed successfully, but it may not have failed entirely.
-    -   `PrefixTransferIncomplete` no longer holds an error (which was always empty).
-    -   `PrefixTransferListingFailure` now includes the full ListingFailure, rather than the underlying exception.
+The storage service already has a lot of the new-style classes vendored, so the upgrade should be (fairly) seamless.
+For the catalogue, replace `ObjectLocation` with `S3ObjectLocation` and everything should work correctly.
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+`ObjectLocation` has been removed, and replaced with provider-specific classes `S3ObjectLocation` and `AzureBlobLocation`.
+Similar classes exist for `LocationPrefix`.
+
+These two classes have the same semantics as ObjectLocation, but now encode and enforce the associated provider -- so you can't, for example, ask Azure for an object that's stored in S3.
+
+*Note:* Because the field names are now provider-specific, encoding these classes as JSON will give different output.
+The library includes decoders so this distinction will be hidden when using the library, but may cause issues for anything else that reads the JSON.
+
+Previously:
+
+```json
+{"namespace": "my-great-bucket", "path": "myfile.txt"}
+```
+
+Now (S3):
+
+```json
+{"bucket": "my-great-bucket", "key": "myfile.txt"}
+```
+
+Now (Azure):
+
+```json
+{"container": "my-great-container", "name": "myfile.txt"}
+```
