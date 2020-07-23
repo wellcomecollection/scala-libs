@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.fixtures
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.iterable.S3Objects
-import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, S3ObjectSummary}
+import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, PutObjectResult, S3ObjectSummary}
 import grizzled.slf4j.Logging
 import io.circe.parser.parse
 import io.circe.{Decoder, Json}
@@ -13,7 +13,7 @@ import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.generators.{ObjectLocationGenerators, S3ObjectLocationGenerators}
-import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config}
+import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
@@ -134,6 +134,9 @@ trait S3Fixtures
       namespace = bucket.name,
       path = key
     )
+
+  def putString(location: S3ObjectLocation, contents: String = randomAlphanumeric): PutObjectResult =
+    s3Client.putObject(location.bucket, location.key, contents)
 
   def putStream(location: ObjectLocation, inputStream: InputStreamWithLength): Unit = {
     val metadata = new ObjectMetadata()
