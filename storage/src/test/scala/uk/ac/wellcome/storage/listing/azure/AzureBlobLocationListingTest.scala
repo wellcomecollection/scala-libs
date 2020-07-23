@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
 import uk.ac.wellcome.storage.listing.ListingTestCases
 
-class AzureObjectLocationListingTest extends ListingTestCases[ObjectLocation, ObjectLocationPrefix, ObjectLocation, AzureObjectLocationListing, Container] with AzureFixtures {
+class AzureBlobLocationListingTest extends ListingTestCases[ObjectLocation, ObjectLocationPrefix, ObjectLocation, AzureBlobLocationListing, Container] with AzureFixtures {
   override def createIdent(implicit container: Container): ObjectLocation =
     createObjectLocationWith(namespace = container.name)
 
@@ -28,7 +28,7 @@ class AzureObjectLocationListingTest extends ListingTestCases[ObjectLocation, Ob
       testWith(container)
     }
 
-  override def withListing[R](container: Container, initialEntries: Seq[ObjectLocation])(testWith: TestWith[AzureObjectLocationListing, R]): R = {
+  override def withListing[R](container: Container, initialEntries: Seq[ObjectLocation])(testWith: TestWith[AzureBlobLocationListing, R]): R = {
     initialEntries.foreach { location =>
       azureClient
         .getBlobContainerClient(location.namespace)
@@ -37,7 +37,7 @@ class AzureObjectLocationListingTest extends ListingTestCases[ObjectLocation, Ob
     }
 
     testWith(
-      AzureObjectLocationListing()
+      AzureBlobLocationListing()
     )
   }
 }

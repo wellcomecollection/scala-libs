@@ -2,8 +2,7 @@ package uk.ac.wellcome.storage.azure
 
 import java.nio.file.Paths
 
-import com.azure.storage.blob.{BlobClient, BlobServiceClient}
-import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
+import uk.ac.wellcome.storage.{Location, Prefix}
 
 case class AzureBlobLocation(
   container: String,

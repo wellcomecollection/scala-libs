@@ -2,9 +2,9 @@ package uk.ac.wellcome.storage.tags.azure
 
 import com.azure.storage.blob.{BlobClient, BlobServiceClient}
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureStorageErrors}
-import uk.ac.wellcome.storage.{ObjectLocation, ReadError, StoreWriteError, WriteError}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
+import uk.ac.wellcome.storage.{ReadError, StoreWriteError, WriteError}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}

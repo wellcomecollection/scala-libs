@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
-import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
+import uk.ac.wellcome.storage.{Location, Prefix}
 
 import scala.util.{Failure, Success, Try}
 
