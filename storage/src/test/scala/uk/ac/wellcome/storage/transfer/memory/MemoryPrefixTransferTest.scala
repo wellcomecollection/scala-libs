@@ -8,8 +8,8 @@ import uk.ac.wellcome.storage.transfer._
 
 class MemoryPrefixTransferTest
     extends PrefixTransferTestCases[
-      ObjectLocation,
-      ObjectLocationPrefix,
+      ObjectLocation, ObjectLocationPrefix,
+      ObjectLocation, ObjectLocationPrefix,
       Record,
       String,
       String,
@@ -74,7 +74,12 @@ class MemoryPrefixTransferTest
   override def withPrefixTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R =
     testWith(srcStore)
 
-  override def withExtraListingTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withExtraListingTransfer[R](
+    srcStore: MemoryRecordStore,
+    dstStore: MemoryRecordStore
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
       override def list(prefix: ObjectLocationPrefix): ListingResult = {
         val matchingLocations = entries
@@ -88,7 +93,12 @@ class MemoryPrefixTransferTest
     testWith(prefixTransfer)
   }
 
-  override def withBrokenListingTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withBrokenListingTransfer[R](
+    srcStore: MemoryRecordStore,
+    dstStore: MemoryRecordStore
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
       override def list(prefix: ObjectLocationPrefix): ListingResult =
         Left(ListingFailure(prefix))
@@ -97,7 +107,12 @@ class MemoryPrefixTransferTest
     testWith(prefixTransfer)
   }
 
-  override def withBrokenTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R =  {
+  override def withBrokenTransfer[R](
+    srcStore: MemoryRecordStore,
+    dstStore: MemoryRecordStore
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R =  {
     val prefixTransfer = new MemoryObjectLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
       override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))

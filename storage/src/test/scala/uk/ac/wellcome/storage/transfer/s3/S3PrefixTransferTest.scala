@@ -10,8 +10,8 @@ import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPre
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
-      ObjectLocation,
-      ObjectLocationPrefix,
+      ObjectLocation, ObjectLocationPrefix,
+      ObjectLocation, ObjectLocationPrefix,
       Record,
       Bucket,
       Bucket,
@@ -59,12 +59,19 @@ class S3PrefixTransferTest
       testWith(typedStore)
     }
 
-  def withPrefixTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R =
-    testWith(
-      S3PrefixTransfer()
-    )
+  def withPrefixTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: S3TypedStore[Record])(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R =
+    testWith(S3PrefixTransfer())
 
-  def withExtraListingTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  def withExtraListingTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: S3TypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val summaryListing: S3ObjectSummaryListing =
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
@@ -78,7 +85,12 @@ class S3PrefixTransferTest
     testWith(new S3PrefixTransfer())
   }
 
-  def withBrokenListingTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  def withBrokenListingTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: S3TypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val summaryListing: S3ObjectSummaryListing =
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
@@ -92,7 +104,12 @@ class S3PrefixTransferTest
     testWith(new S3PrefixTransfer())
   }
 
-  def withBrokenTransfer[R](srcStore: S3TypedStore[Record], dstStore: S3TypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  def withBrokenTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: S3TypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
 
     implicit val transfer: S3Transfer = new S3Transfer() {

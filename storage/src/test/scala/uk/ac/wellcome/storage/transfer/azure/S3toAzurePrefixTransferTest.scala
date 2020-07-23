@@ -12,8 +12,8 @@ import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPre
 import uk.ac.wellcome.storage.transfer._
 
 class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
-  ObjectLocation,
-  ObjectLocationPrefix,
+  ObjectLocation, ObjectLocationPrefix,
+  ObjectLocation, ObjectLocationPrefix,
   Record,
   Bucket, Container,
   S3TypedStore[Record], AzureTypedStore[Record],
@@ -74,11 +74,20 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
   implicit val s3Listing: S3ObjectLocationListing = S3ObjectLocationListing()
   implicit val transfer: S3toAzureTransfer = new S3toAzureTransfer()
 
-  override def withPrefixTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withPrefixTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: AzureTypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R =
     testWith(new S3toAzurePrefixTransfer())
-  }
 
-  override def withExtraListingTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withExtraListingTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: AzureTypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val summaryListing: S3ObjectSummaryListing =
       new S3ObjectSummaryListing()
     implicit val extraListing: S3ObjectLocationListing =
@@ -90,7 +99,12 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     testWith(new S3toAzurePrefixTransfer()(transfer, extraListing))
   }
 
-  override def withBrokenListingTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withBrokenListingTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: AzureTypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val summaryListing: S3ObjectSummaryListing =
       new S3ObjectSummaryListing()
     implicit val brokenListing: S3ObjectLocationListing =
@@ -102,7 +116,12 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     testWith(new S3toAzurePrefixTransfer()(transfer, brokenListing))
   }
 
-  override def withBrokenTransfer[R](srcStore: S3TypedStore[Record], dstStore: AzureTypedStore[Record])(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R = {
+  override def withBrokenTransfer[R](
+    srcStore: S3TypedStore[Record],
+    dstStore: AzureTypedStore[Record]
+  )(
+    testWith: TestWith[PrefixTransferImpl, R]
+  ): R = {
     implicit val brokenTransfer: S3toAzureTransfer = new S3toAzureTransfer() {
       override def transfer(src: ObjectLocation, dst: ObjectLocation, checkForExisting: Boolean = true): TransferEither =
         Left(TransferSourceFailure(src, dst))
