@@ -190,7 +190,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
+              val failure = result.left.value.asInstanceOf[PrefixTransferIncomplete]
 
               failure.successes shouldBe actualLocationCount
               failure.failures shouldBe 1
@@ -215,7 +215,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              result.left.value shouldBe a[PrefixTransferFailure]
+              result.left.value shouldBe a[PrefixTransferIncomplete]
             }
           }
         }
@@ -263,7 +263,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              val failure = result.left.value.asInstanceOf[PrefixTransferFailure]
+              val failure = result.left.value.asInstanceOf[PrefixTransferIncomplete]
 
               failure.successes shouldBe 0
               failure.failures shouldBe 1

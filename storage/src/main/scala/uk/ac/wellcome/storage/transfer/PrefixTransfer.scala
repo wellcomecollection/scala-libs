@@ -20,7 +20,7 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
     srcPrefix: Prefix,
     dstPrefix: Prefix,
     checkForExisting: Boolean
-  ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
+  ): Either[PrefixTransferIncomplete, PrefixTransferSuccess] = {
     var successes = 0
     var failures = 0
 
@@ -57,7 +57,7 @@ trait PrefixTransfer[Prefix, Location] extends Logging {
     Either.cond(
       test = failures == 0,
       right = PrefixTransferSuccess(successes),
-      left = PrefixTransferFailure(failures, successes)
+      left = PrefixTransferIncomplete(failures, successes)
     )
   }
 

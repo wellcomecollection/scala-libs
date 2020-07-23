@@ -21,9 +21,9 @@ case class TransferOverwriteFailure[Location](source: Location,
                                               e: Throwable = new Error())
     extends TransferFailure
 
-case class PrefixTransferFailure(failures: Int,
-                                 successes: Int,
-                                 e: Throwable = new Error())
+case class PrefixTransferIncomplete(failures: Int,
+                                    successes: Int,
+                                    e: Throwable = new Error())
     extends TransferFailure
 
 case class PrefixTransferListingFailure[Prefix](prefix: Prefix,
