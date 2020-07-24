@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.generators
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.ByteArrayInputStream
 
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
