@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v19.0.0 - 2020-07-24
+
+Replace the remaining uses of `ObjectLocation` with `S3ObjectLocation` or `MemoryLocation` throughout the storage library.
+
 ## v18.0.0 - 2020-07-24
 
 Change the `S3Listing` and `S3Transfer` classes to use the new-style locations.
