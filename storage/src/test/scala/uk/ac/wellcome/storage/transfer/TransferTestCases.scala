@@ -8,10 +8,12 @@ import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait TransferTestCases[
-  SrcLocation, DstLocation, T,
+  SrcLocation, DstLocation,
+  SrcStoreLocation, DstStoreLocation,
+  T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[SrcLocation, T],
-  DstStore <: Store[DstLocation, T],
+  SrcStore <: Store[SrcStoreLocation, T],
+  DstStore <: Store[DstStoreLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers

@@ -10,6 +10,7 @@ class MemoryPrefixTransferTest
     extends PrefixTransferTestCases[
       ObjectLocation, ObjectLocationPrefix,
       ObjectLocation, ObjectLocationPrefix,
+      ObjectLocation, ObjectLocation,
       Record,
       String,
       String,
@@ -135,4 +136,7 @@ class MemoryPrefixTransferTest
     )
 
   override def createT: Record = createRecord
+
+  override def srcToObjectLocation(srcLocation: ObjectLocation): ObjectLocation = srcLocation
+  override def dstToObjectLocation(dstLocation: ObjectLocation): ObjectLocation = dstLocation
 }

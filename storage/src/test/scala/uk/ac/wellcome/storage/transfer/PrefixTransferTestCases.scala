@@ -10,16 +10,20 @@ import uk.ac.wellcome.storage.store.Store
 trait PrefixTransferTestCases[
   SrcLocation, SrcPrefix,
   DstLocation, DstPrefix,
+  SrcStoreLocation, DstStoreLocation,
   T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[SrcLocation, T],
-  DstStore <: Store[DstLocation, T],
+  SrcStore <: Store[SrcStoreLocation, T],
+  DstStore <: Store[DstStoreLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers
     with EitherValues {
   def withSrcNamespace[R](testWith: TestWith[SrcNamespace, R]): R
   def withDstNamespace[R](testWith: TestWith[DstNamespace, R]): R
+
+  def srcToObjectLocation(srcLocation: SrcLocation): SrcStoreLocation
+  def dstToObjectLocation(dstLocation: DstLocation): DstStoreLocation
 
   def withNamespacePair[R](testWith: TestWith[(SrcNamespace, DstNamespace), R]): R =
     withSrcNamespace { srcNamespace =>
@@ -99,8 +103,8 @@ trait PrefixTransferTestCases[
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(srcLocation) shouldBe Right(Identified(srcLocation, t))
-              dstStore.get(dstLocation) shouldBe Right(Identified(dstLocation, t))
+              srcStore.get(srcToObjectLocation(srcLocation)) shouldBe Right(Identified(srcLocation, t))
+              dstStore.get(dstToObjectLocation(dstLocation)) shouldBe Right(Identified(dstLocation, t))
             }
           }
         }
@@ -272,8 +276,8 @@ trait PrefixTransferTestCases[
               failure.successes shouldBe 0
               failure.failures shouldBe 1
 
-              srcStore.get(src).right.value shouldBe Identified(src, srcT)
-              dstStore.get(dst).right.value shouldBe Identified(dst, dstT)
+              srcStore.get(srcToObjectLocation(src)).right.value shouldBe Identified(src, srcT)
+              dstStore.get(dstToObjectLocation(dst)).right.value shouldBe Identified(dst, dstT)
             }
           }
         }
@@ -301,8 +305,8 @@ trait PrefixTransferTestCases[
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(src).right.value shouldBe Identified(src, srcT)
-              dstStore.get(dst).right.value shouldBe Identified(dst, srcT)
+              srcStore.get(srcToObjectLocation(src)).right.value shouldBe Identified(src, srcT)
+              dstStore.get(dstToObjectLocation(dst)).right.value shouldBe Identified(dst, srcT)
             }
           }
         }
