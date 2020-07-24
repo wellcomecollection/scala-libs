@@ -2,7 +2,9 @@ package uk.ac.wellcome.storage.providers.memory
 
 import java.nio.file.Paths
 
-case class MemoryLocation(namespace: String, path: String) {
+import uk.ac.wellcome.storage.{Location, Prefix}
+
+case class MemoryLocation(namespace: String, path: String) extends Location {
   override def toString = s"$namespace/$path"
 
   def join(parts: String*): MemoryLocation = this.copy(
@@ -16,7 +18,7 @@ case class MemoryLocation(namespace: String, path: String) {
     )
 }
 
-case class MemoryLocationPrefix(namespace: String, path: String) {
+case class MemoryLocationPrefix(namespace: String, path: String) extends Prefix[MemoryLocation] {
   override def toString = s"$namespace/$path"
 
   def asLocation(parts: String*): MemoryLocation =
