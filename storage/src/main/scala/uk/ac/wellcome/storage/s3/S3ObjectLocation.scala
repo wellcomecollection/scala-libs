@@ -1,7 +1,10 @@
 package uk.ac.wellcome.storage.s3
 
+import java.nio.file.Paths
+
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
+import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.{Location, ObjectLocation, Prefix}
 
 import scala.util.{Failure, Success, Try}
@@ -12,6 +15,14 @@ case class S3ObjectLocation(
 ) extends Location {
   override def toString: String =
     s"s3://$bucket/$key"
+
+  def join(parts: String*): S3ObjectLocation =
+    this.copy(
+      key = Paths.get(key, parts: _*).toString
+    )
+
+  def toObjectLocation: ObjectLocation =
+    ObjectLocation(bucket, key)
 }
 
 case class S3ObjectLocationPrefix(
@@ -20,6 +31,10 @@ case class S3ObjectLocationPrefix(
 ) extends Prefix[S3ObjectLocation] {
   override def toString: String =
     s"s3://$bucket/$keyPrefix"
+
+  def asLocation(parts: String*): S3ObjectLocation =
+    S3ObjectLocation(bucket = bucket, key = keyPrefix).join(parts: _*)
+
 }
 
 // Note: the precursor to these classes was ObjectLocation, which used the
