@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.generators
 import java.io.{ByteArrayInputStream, InputStream}
 
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
 import scala.util.Random
 
@@ -53,9 +54,9 @@ trait RandomThings extends Matchers {
     byteArray
   }
 
-  def randomInputStream(length: Int = 256): InputStream = {
+  def randomInputStream(length: Int = 256): InputStreamWithLength = {
     val bytes = randomBytes(length)
 
-    new ByteArrayInputStream(bytes)
+    new InputStreamWithLength(new ByteArrayInputStream(bytes), length = length)
   }
 }

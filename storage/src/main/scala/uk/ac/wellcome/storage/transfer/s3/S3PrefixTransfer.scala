@@ -23,6 +23,7 @@ class S3PrefixTransfer()(
     dstPrefix.asLocation(
       srcLocation.key.stripPrefix(srcPrefix.keyPrefix)
     )
+}
 
 object S3PrefixTransfer {
   def apply()(implicit s3Client: AmazonS3): S3PrefixTransfer = {

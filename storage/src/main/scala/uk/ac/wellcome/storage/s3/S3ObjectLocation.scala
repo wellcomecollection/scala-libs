@@ -21,6 +21,9 @@ case class S3ObjectLocation(
       key = Paths.get(key, parts: _*).toString
     )
 
+  def asPrefix: S3ObjectLocationPrefix =
+    S3ObjectLocationPrefix(bucket, key)
+
   def toObjectLocation: ObjectLocation =
     ObjectLocation(bucket, key)
 }
