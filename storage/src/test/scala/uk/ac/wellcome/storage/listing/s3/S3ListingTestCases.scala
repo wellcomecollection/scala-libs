@@ -17,7 +17,8 @@ trait S3ListingTestCases[ListingResult]
     with S3ListingFixtures[ListingResult] {
   def withListing[R](bucket: Bucket, initialEntries: Seq[S3ObjectLocation])(
     testWith: TestWith[S3Listing[ListingResult], R]): R = {
-    createInitialEntries(bucket, initialEntries)
+    initialEntries
+      .foreach { loc => putStream(loc) }
 
     testWith(createS3Listing())
   }
@@ -36,7 +37,7 @@ trait S3ListingTestCases[ListingResult]
     it("ignores entries with a matching key in a different bucket") {
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putStream(location.toObjectLocation)
+        putStream(location)
 
         // Now create the same keys but in a different bucket
         withLocalS3Bucket { queryBucket =>
@@ -61,7 +62,7 @@ trait S3ListingTestCases[ListingResult]
     it("ignores objects in the same bucket with a different key") {
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putStream(location.toObjectLocation)
+        putStream(location)
 
         val prefix = location.join("subdir").asPrefix
         listing.list(prefix).right.value shouldBe empty
@@ -75,7 +76,7 @@ trait S3ListingTestCases[ListingResult]
         val locations = (1 to 10).map { i =>
           location.join(s"file_$i.txt")
         }
-        createInitialEntries(bucket, locations)
+        locations.foreach { loc => putStream(loc) }
 
         val smallBatchListing = createS3Listing(batchSize = 5)
         assertResultCorrect(

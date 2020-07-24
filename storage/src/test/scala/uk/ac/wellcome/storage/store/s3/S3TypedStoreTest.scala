@@ -8,7 +8,7 @@ import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.TypedStoreTestCases
-import uk.ac.wellcome.storage.store.fixtures.BucketNamespaceFixtures
+import uk.ac.wellcome.storage.store.fixtures.S3NamespaceFixtures
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
 class S3TypedStoreTest
@@ -21,7 +21,7 @@ class S3TypedStoreTest
       Unit]
     with S3TypedStoreFixtures[Record]
     with RecordGenerators
-    with BucketNamespaceFixtures {
+    with S3NamespaceFixtures {
   override def withBrokenStreamStore[R](
     testWith: TestWith[S3StreamStore, R]): R = {
     val brokenS3StreamStore = new S3StreamStore {

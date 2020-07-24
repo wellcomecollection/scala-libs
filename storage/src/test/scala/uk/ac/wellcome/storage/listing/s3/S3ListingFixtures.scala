@@ -35,12 +35,4 @@ trait S3ListingFixtures[ListingResult]
 
   def createS3Listing(batchSize: Int = 1000)(
     implicit s3Client: AmazonS3 = s3Client): S3Listing[ListingResult]
-
-  def createInitialEntries(
-    bucket: Bucket,
-    initialEntries: Seq[S3ObjectLocation]): Unit =
-    initialEntries
-      .foreach { loc =>
-        putStream(loc.toObjectLocation)
-      }
 }

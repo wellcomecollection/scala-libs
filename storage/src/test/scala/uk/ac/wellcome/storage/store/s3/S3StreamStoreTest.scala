@@ -4,14 +4,14 @@ import com.amazonaws.SdkClientException
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
-import uk.ac.wellcome.storage.store.fixtures.BucketNamespaceFixtures
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.store.fixtures.S3NamespaceFixtures
 
 class S3StreamStoreTest
     extends StreamStoreTestCases[S3ObjectLocation, Bucket, S3StreamStore, Unit]
     with S3StreamStoreFixtures
-    with BucketNamespaceFixtures {
+    with S3NamespaceFixtures {
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
