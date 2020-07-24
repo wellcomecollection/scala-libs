@@ -18,7 +18,8 @@ case class MemoryLocation(namespace: String, path: String) extends Location {
     )
 }
 
-case class MemoryLocationPrefix(namespace: String, path: String) extends Prefix[MemoryLocation] {
+case class MemoryLocationPrefix(namespace: String, path: String)
+    extends Prefix[MemoryLocation] {
   override def toString = s"$namespace/$path"
 
   def asLocation(parts: String*): MemoryLocation =

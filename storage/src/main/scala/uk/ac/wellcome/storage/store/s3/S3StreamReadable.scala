@@ -11,7 +11,8 @@ trait S3StreamReadable
   implicit val s3Client: AmazonS3
   val maxRetries: Int
 
-  def retryableGetFunction(location: S3ObjectLocation): InputStreamWithLength = {
+  def retryableGetFunction(
+    location: S3ObjectLocation): InputStreamWithLength = {
     val retrievedObject = s3Client.getObject(location.bucket, location.key)
 
     new InputStreamWithLength(
