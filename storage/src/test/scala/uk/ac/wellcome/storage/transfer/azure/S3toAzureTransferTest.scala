@@ -1,7 +1,6 @@
 package uk.ac.wellcome.storage.transfer.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
@@ -14,7 +13,6 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 class S3toAzureTransferTest
     extends TransferTestCases[
         S3ObjectLocation, AzureBlobLocation,
-        ObjectLocation, AzureBlobLocation,
         Record,
         Bucket, Container,
         S3TypedStore[Record], AzureTypedStore[Record],
@@ -32,7 +30,7 @@ class S3toAzureTransferTest
     val s3TypedStore = new S3TypedStore[Record]()
 
     initialEntries.foreach { case (location, record) =>
-      s3TypedStore.put(location.toObjectLocation)(record) shouldBe a[Right[_, _]]
+      s3TypedStore.put(location)(record) shouldBe a[Right[_, _]]
     }
 
     testWith(s3TypedStore)

@@ -1,7 +1,6 @@
 package uk.ac.wellcome.storage.transfer.azure
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
@@ -24,8 +23,4 @@ trait AzureTransferFixtures extends AzureFixtures with S3Fixtures {
 
   def createDstLocation(dstContainer: Container): AzureBlobLocation =
     createAzureBlobLocationWith(dstContainer)
-
-  def srcToObjectLocation(srcLocation: S3ObjectLocation): ObjectLocation = srcLocation.toObjectLocation
-
-  def dstToObjectLocation(dstLocation: AzureBlobLocation): AzureBlobLocation = dstLocation
 }

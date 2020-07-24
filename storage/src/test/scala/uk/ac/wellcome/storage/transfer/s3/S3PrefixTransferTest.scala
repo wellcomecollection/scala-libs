@@ -7,13 +7,12 @@ import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSumma
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
 import uk.ac.wellcome.storage.transfer._
-import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation}
+import uk.ac.wellcome.storage.ListingFailure
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
       S3ObjectLocation, S3ObjectLocationPrefix,
       S3ObjectLocation, S3ObjectLocationPrefix,
-      ObjectLocation, ObjectLocation,
       Record,
       Bucket,
       Bucket,

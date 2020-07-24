@@ -8,18 +8,14 @@ import uk.ac.wellcome.storage.store.Store
 
 trait TransferTestCases[
   SrcLocation, DstLocation,
-  SrcStoreLocation, DstStoreLocation,
   T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[SrcStoreLocation, T],
-  DstStore <: Store[DstStoreLocation, T],
+  SrcStore <: Store[SrcLocation, T],
+  DstStore <: Store[DstLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers
     with EitherValues {
-
-  def srcToObjectLocation(srcLocation: SrcLocation): SrcStoreLocation
-  def dstToObjectLocation(dstLocation: DstLocation): DstStoreLocation
 
   def createT: T
 
@@ -61,8 +57,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
-              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
+              srcStore.get(src).right.value.identifiedT shouldBe t
+              dstStore.get(dst).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -117,8 +113,8 @@ trait TransferTestCases[
               result.left.value.src shouldBe src
               result.left.value.dst shouldBe dst
 
-              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
-              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
+              srcStore.get(src).right.value.identifiedT shouldBe srcT
+              dstStore.get(dst).right.value.identifiedT shouldBe dstT
             }
           }
         }
@@ -142,8 +138,8 @@ trait TransferTestCases[
                 }
 
               result.right.value shouldBe TransferNoOp(src, dst)
-              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
-              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
+              srcStore.get(src).right.value.identifiedT shouldBe t
+              dstStore.get(dst).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -191,8 +187,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
-              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe srcT
+              srcStore.get(src).right.value.identifiedT shouldBe srcT
+              dstStore.get(dst).right.value.identifiedT shouldBe srcT
             }
           }
         }
