@@ -106,18 +106,6 @@ trait S3Fixtures
     implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(location)).get
 
-  def createInvalidBucketName: String =
-    // Create a variety of invalid patterns, and choose one at random.
-    Random
-      .shuffle(
-        Seq(
-          "_" + createBucket,
-          randomAlphanumeric.toUpperCase() + createBucket,
-          createBucket + randomAlphanumeric.toUpperCase(),
-          Random.alphanumeric.take(100) mkString
-        ))
-      .head
-
   def createObjectLocationWith(
     bucket: Bucket
   ): ObjectLocation =

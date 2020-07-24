@@ -5,19 +5,11 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.{DynamoFixtures, S3Fixtures}
-import uk.ac.wellcome.storage.generators.{
-  ObjectLocationGenerators,
-  Record,
-  RecordGenerators
-}
+import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
 import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
-import uk.ac.wellcome.storage.{
-  ObjectLocation,
-  StoreReadError,
-  StoreWriteError,
-  Version
-}
+import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 
 class DynamoVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[
@@ -25,7 +17,6 @@ class DynamoVersionedHybridStoreTest
       Record,
       DynamoHybridStoreWithMaxima[String, Int, Record]]
     with RecordGenerators
-    with ObjectLocationGenerators
     with S3Fixtures
     with DynamoFixtures {
 
@@ -96,10 +87,10 @@ class DynamoVersionedHybridStoreTest
         val dynamoConfig = DynamoConfig(table.name, table.index)
 
         val indexedStore =
-          new DynamoHashRangeStore[String, Int, ObjectLocation](
+          new DynamoHashRangeStore[String, Int, S3ObjectLocation](
             dynamoConfig)
 
-        val prefix = createObjectLocationPrefixWith(bucket.name)
+        val prefix = createS3ObjectLocationPrefixWith(bucket)
 
         testWith(
           new DynamoHybridStoreWithMaxima[

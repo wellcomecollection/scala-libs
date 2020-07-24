@@ -3,6 +3,8 @@ package uk.ac.wellcome.storage.generators
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
+import scala.util.Random
+
 trait S3ObjectLocationGenerators extends RandomThings {
   def createBucketName: String =
     // Bucket names
@@ -13,6 +15,20 @@ trait S3ObjectLocationGenerators extends RandomThings {
     randomAlphanumeric.toLowerCase
 
   def createBucket: Bucket = Bucket(createBucketName)
+
+  def createInvalidBucketName: String =
+    // Create a variety of invalid patterns, and choose one at random.
+    Random
+      .shuffle(
+        Seq(
+          "_" + createBucket,
+          randomAlphanumeric.toUpperCase() + createBucket,
+          createBucket + randomAlphanumeric.toUpperCase(),
+          Random.alphanumeric.take(100) mkString
+        ))
+      .head
+
+  def createInvalidBucket: Bucket = Bucket(createInvalidBucketName)
 
   def createS3ObjectLocationWith(bucket: Bucket): S3ObjectLocation =
     S3ObjectLocation(

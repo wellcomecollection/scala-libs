@@ -85,7 +85,7 @@ class DynamoHashWritableTest
       // Maximum length of an partition key is 2048 bytes as of 25/06/2019
       // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html#limits-partition-sort-keys
 
-      val hashKey = randomStringOfByteLength(2049)()
+      val hashKey = randomStringOfByteLength(2049)
 
       val record = createRecord
 

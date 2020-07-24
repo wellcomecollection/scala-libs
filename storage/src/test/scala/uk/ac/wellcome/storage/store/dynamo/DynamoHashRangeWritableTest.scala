@@ -93,7 +93,7 @@ class DynamoHashRangeWritableTest
       // impossible to reach as Int.MaxValue can be represented
       // in < 32 bits!
 
-      val hashKey = randomStringOfByteLength(2049)()
+      val hashKey = randomStringOfByteLength(2049)
 
       val record = createRecord
 
