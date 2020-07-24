@@ -38,11 +38,7 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
 
     withLocalS3Bucket { bucket =>
       val location = createObjectLocationWith(bucket)
-      s3Client.putObject(
-        location.namespace,
-        location.path,
-        "hello world"
-      )
+      putStream(location)
 
       when(mockClient.getObject(any[String], any[String]))
         .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))

@@ -135,7 +135,9 @@ trait S3Fixtures
       path = key
     )
 
-  def putStream(location: ObjectLocation, inputStream: InputStreamWithLength): Unit = {
+  def putStream(
+    location: ObjectLocation,
+    inputStream: InputStreamWithLength = randomInputStream()): Unit = {
     val metadata = new ObjectMetadata()
     metadata.setContentLength(inputStream.length)
 

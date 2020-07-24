@@ -4,14 +4,16 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSummaryListing}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
 import uk.ac.wellcome.storage.transfer._
-import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation}
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
-      ObjectLocation, ObjectLocationPrefix,
-      ObjectLocation, ObjectLocationPrefix,
+      S3ObjectLocation, S3ObjectLocationPrefix,
+      S3ObjectLocation, S3ObjectLocationPrefix,
+      ObjectLocation, ObjectLocation,
       Record,
       Bucket,
       Bucket,
@@ -22,16 +24,16 @@ class S3PrefixTransferTest
     with S3TypedStoreFixtures[Record]
     with S3TransferFixtures[Record] {
 
-  def createSrcPrefix(srcBucket: Bucket): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(srcBucket.name)
+  def createSrcPrefix(srcBucket: Bucket): S3ObjectLocationPrefix =
+    createS3ObjectLocationPrefixWith(srcBucket)
 
-  def createDstPrefix(dstBucket: Bucket): ObjectLocationPrefix =
-    createObjectLocationPrefixWith(dstBucket.name)
+  def createDstPrefix(dstBucket: Bucket): S3ObjectLocationPrefix =
+    createS3ObjectLocationPrefixWith(dstBucket)
 
-  def createSrcLocationFrom(srcPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  def createSrcLocationFrom(srcPrefix: S3ObjectLocationPrefix, suffix: String): S3ObjectLocation =
     srcPrefix.asLocation(suffix)
 
-  def createDstLocationFrom(dstPrefix: ObjectLocationPrefix, suffix: String): ObjectLocation =
+  def createDstLocationFrom(dstPrefix: S3ObjectLocationPrefix, suffix: String): S3ObjectLocation =
     dstPrefix.asLocation(suffix)
 
   def withPrefixTransfer[R](
@@ -51,8 +53,8 @@ class S3PrefixTransferTest
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
-        override def list(prefix: ObjectLocationPrefix): ListingResult =
-          super.list(prefix).map { _ ++ Seq(createObjectLocation) }
+        override def list(prefix: S3ObjectLocationPrefix): ListingResult =
+          super.list(prefix).map { _ ++ Seq(createS3ObjectLocation) }
       }
 
     implicit val transfer: S3Transfer = new S3Transfer()
@@ -70,7 +72,7 @@ class S3PrefixTransferTest
       new S3ObjectSummaryListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
-        override def list(prefix: ObjectLocationPrefix): ListingResult =
+        override def list(prefix: S3ObjectLocationPrefix): ListingResult =
           Left(ListingFailure(prefix))
       }
 
@@ -89,9 +91,10 @@ class S3PrefixTransferTest
 
     implicit val transfer: S3Transfer = new S3Transfer() {
       override def transfer(
-                             src: ObjectLocation,
-                             dst: ObjectLocation,
-                             checkForExisting: Boolean = true): TransferEither =
+        src: S3ObjectLocation,
+        dst: S3ObjectLocation,
+        checkForExisting: Boolean = true
+      ): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 

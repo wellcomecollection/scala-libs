@@ -4,18 +4,22 @@ import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait TransferTestCases[
-  SrcLocation, DstLocation, T,
+  SrcLocation, DstLocation,
+  SrcStoreLocation, DstStoreLocation,
+  T,
   SrcNamespace, DstNamespace,
-  SrcStore <: Store[SrcLocation, T],
-  DstStore <: Store[DstLocation, T],
+  SrcStore <: Store[SrcStoreLocation, T],
+  DstStore <: Store[DstStoreLocation, T],
   Context]
     extends AnyFunSpec
     with Matchers
     with EitherValues {
+
+  def srcToObjectLocation(srcLocation: SrcLocation): SrcStoreLocation
+  def dstToObjectLocation(dstLocation: DstLocation): DstStoreLocation
 
   def createT: T
 
@@ -57,8 +61,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src) shouldBe Right(Identified(src, t))
-              dstStore.get(dst) shouldBe Right(Identified(dst, t))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -113,8 +117,8 @@ trait TransferTestCases[
               result.left.value.src shouldBe src
               result.left.value.dst shouldBe dst
 
-              srcStore.get(src) shouldBe Right(Identified(src, srcT))
-              dstStore.get(dst) shouldBe Right(Identified(dst, dstT))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
             }
           }
         }
@@ -138,8 +142,8 @@ trait TransferTestCases[
                 }
 
               result.right.value shouldBe TransferNoOp(src, dst)
-              srcStore.get(src) shouldBe Right(Identified(src, t))
-              dstStore.get(dst) shouldBe Right(Identified(dst, t))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -187,8 +191,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src) shouldBe Right(Identified(src, srcT))
-              dstStore.get(dst) shouldBe Right(Identified(dst, srcT))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe srcT
             }
           }
         }

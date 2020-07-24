@@ -5,17 +5,17 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.listing.ListingTestCases
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectLocationPrefix}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 trait S3ListingTestCases[ListingResult]
     extends ListingTestCases[
-      ObjectLocation,
-      ObjectLocationPrefix,
+      S3ObjectLocation,
+      S3ObjectLocationPrefix,
       ListingResult,
       S3Listing[ListingResult],
       Bucket]
     with S3ListingFixtures[ListingResult] {
-  def withListing[R](bucket: Bucket, initialEntries: Seq[ObjectLocation])(
+  def withListing[R](bucket: Bucket, initialEntries: Seq[S3ObjectLocation])(
     testWith: TestWith[S3Listing[ListingResult], R]): R = {
     createInitialEntries(bucket, initialEntries)
 
@@ -35,12 +35,12 @@ trait S3ListingTestCases[ListingResult]
 
     it("ignores entries with a matching key in a different bucket") {
       withLocalS3Bucket { bucket =>
-        val location = createObjectLocationWith(bucket)
-        s3Client.putObject(location.namespace, location.path, "hello world")
+        val location = createS3ObjectLocationWith(bucket)
+        putStream(location.toObjectLocation)
 
         // Now create the same keys but in a different bucket
         withLocalS3Bucket { queryBucket =>
-          val queryLocation = location.copy(namespace = queryBucket.name)
+          val queryLocation = location.copy(bucket = queryBucket.name)
           val prefix = queryLocation.asPrefix
 
           listing.list(prefix).right.value shouldBe empty
@@ -60,17 +60,17 @@ trait S3ListingTestCases[ListingResult]
 
     it("ignores objects in the same bucket with a different key") {
       withLocalS3Bucket { bucket =>
-        val location = createObjectLocationWith(bucket)
-        s3Client.putObject(location.namespace, location.path, "hello world")
+        val location = createS3ObjectLocationWith(bucket)
+        putStream(location.toObjectLocation)
 
-        val prefix = createObjectLocationWith(bucket).asPrefix
+        val prefix = location.join("subdir").asPrefix
         listing.list(prefix).right.value shouldBe empty
       }
     }
 
     it("fetches all the objects, not just the batch size") {
       withLocalS3Bucket { bucket =>
-        val location = createObjectLocationWith(bucket)
+        val location = createS3ObjectLocationWith(bucket)
 
         val locations = (1 to 10).map { i =>
           location.join(s"file_$i.txt")

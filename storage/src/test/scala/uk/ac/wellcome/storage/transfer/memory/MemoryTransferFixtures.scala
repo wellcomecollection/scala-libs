@@ -8,6 +8,7 @@ import uk.ac.wellcome.storage.transfer.fixtures.TransferFixtures
 trait MemoryTransferFixtures[Ident, T]
     extends TransferFixtures[
       Ident,
+      Ident,
       T,
       MemoryStore[Ident, T] with MemoryTransfer[Ident, T]] {
   type MemoryStoreImpl = MemoryStore[Ident, T] with MemoryTransfer[Ident, T]

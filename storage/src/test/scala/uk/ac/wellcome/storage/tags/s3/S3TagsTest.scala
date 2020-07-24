@@ -24,7 +24,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     testWith: TestWith[Tags[S3ObjectLocation], R]): R = {
     initialTags
       .foreach { case (location, tags) =>
-        putObject(location)
+        putStream(location.toObjectLocation)
 
         val tagSet = tags
           .map { case (k, v) => new Tag(k, v) }
@@ -63,7 +63,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
 
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putObject(location)
+        putStream(location.toObjectLocation)
 
         val result =
           s3Tags
@@ -80,7 +80,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     it("if the tag name is empty") {
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putObject(location)
+        putStream(location.toObjectLocation)
 
         val result =
           s3Tags
@@ -99,7 +99,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
       // https://docs.aws.amazon.com/AmazonS3/latest/dev/object-tagging.html
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putObject(location)
+        putStream(location.toObjectLocation)
 
         val result =
           s3Tags
@@ -118,7 +118,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
       // https://docs.aws.amazon.com/AmazonS3/latest/dev/object-tagging.html
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
-        putObject(location)
+        putStream(location.toObjectLocation)
 
         val result: s3Tags.UpdateEither =
           s3Tags
@@ -132,9 +132,6 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
       }
     }
   }
-
-  private def putObject(location: S3ObjectLocation): Unit =
-    s3Client.putObject(location.bucket, location.key, s"<Written by ${this.getClass.getName}")
 
   private def assertIsS3Exception(result: s3Tags.UpdateEither)(assert: String => Assertion): Assertion = {
     val err = result.left.value

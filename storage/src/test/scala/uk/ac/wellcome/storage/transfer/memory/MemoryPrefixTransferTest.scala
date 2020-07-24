@@ -10,6 +10,7 @@ class MemoryPrefixTransferTest
     extends PrefixTransferTestCases[
       ObjectLocation, ObjectLocationPrefix,
       ObjectLocation, ObjectLocationPrefix,
+      ObjectLocation, ObjectLocation,
       Record,
       String,
       String,
@@ -64,11 +65,19 @@ class MemoryPrefixTransferTest
 
   class MemoryObjectLocationPrefixTransfer(initialEntries: Map[ObjectLocation, Record])
     extends MemoryStore[ObjectLocation, Record](initialEntries = initialEntries)
-      with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record]
-      with ObjectLocationPrefixTransfer {
+      with MemoryPrefixTransfer[ObjectLocation, ObjectLocationPrefix, Record] {
     override protected def startsWith(location: ObjectLocation, prefix: ObjectLocationPrefix): Boolean = {
       location.namespace == prefix.namespace && location.path.startsWith(prefix.path)
     }
+
+    override protected def buildDstLocation(
+      srcPrefix: ObjectLocationPrefix,
+      dstPrefix: ObjectLocationPrefix,
+      srcLocation: ObjectLocation
+    ): ObjectLocation =
+      dstPrefix.asLocation(
+        srcLocation.path.stripPrefix(srcPrefix.path)
+      )
   }
 
   override def withPrefixTransfer[R](srcStore: MemoryRecordStore, dstStore: MemoryRecordStore)(testWith: TestWith[PrefixTransfer[ObjectLocationPrefix, ObjectLocation, ObjectLocationPrefix, ObjectLocation], R]): R =
@@ -127,4 +136,7 @@ class MemoryPrefixTransferTest
     )
 
   override def createT: Record = createRecord
+
+  override def srcToObjectLocation(srcLocation: ObjectLocation): ObjectLocation = srcLocation
+  override def dstToObjectLocation(dstLocation: ObjectLocation): ObjectLocation = dstLocation
 }
