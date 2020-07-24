@@ -119,8 +119,4 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
   override def createT: Record = createRecord
 
   override def withContext[R](testWith: TestWith[Unit, R]): R = testWith(())
-
-  override def srcToObjectLocation(srcLocation: S3ObjectLocation): ObjectLocation = srcLocation.toObjectLocation
-
-  override def dstToObjectLocation(dstLocation: AzureBlobLocation): AzureBlobLocation = dstLocation
 }

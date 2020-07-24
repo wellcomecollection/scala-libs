@@ -1,6 +1,7 @@
 package uk.ac.wellcome.storage.transfer.s3
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
@@ -10,9 +11,14 @@ import uk.ac.wellcome.storage.transfer.fixtures.TransferFixtures
 trait S3TransferFixtures[T]
     extends TransferFixtures[
       S3ObjectLocation,
+      ObjectLocation,
       T,
       S3TypedStore[T]]
     with S3TypedStoreFixtures[T] {
+  def srcToObjectLocation(srcLocation: S3ObjectLocation): ObjectLocation = srcLocation.toObjectLocation
+
+  def dstToObjectLocation(dstLocation: S3ObjectLocation): ObjectLocation = dstLocation.toObjectLocation
+
   override def withTransferStore[R](
     initialEntries: Map[S3ObjectLocation, T])(
     testWith: TestWith[S3TypedStore[T], R]): R =

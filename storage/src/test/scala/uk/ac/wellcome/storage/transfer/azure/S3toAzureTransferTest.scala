@@ -1,6 +1,7 @@
 package uk.ac.wellcome.storage.transfer.azure
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
@@ -11,7 +12,14 @@ import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore, S3Typed
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
 class S3toAzureTransferTest
-    extends TransferTestCases[S3ObjectLocation, AzureBlobLocation, Record, Bucket, Container, S3TypedStore[Record], AzureTypedStore[Record], Unit]
+    extends TransferTestCases[
+        S3ObjectLocation, AzureBlobLocation,
+        ObjectLocation, AzureBlobLocation,
+        Record,
+        Bucket, Container,
+        S3TypedStore[Record], AzureTypedStore[Record],
+        Unit
+      ]
       with RecordGenerators
       with AzureTransferFixtures {
   override def createT: Record = createRecord

@@ -1,6 +1,7 @@
 package uk.ac.wellcome.storage.transfer.s3
 
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
@@ -9,7 +10,14 @@ import uk.ac.wellcome.storage.tags.s3.S3Tags
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFailure, TransferTestCases}
 
 class S3TransferTest
-    extends TransferTestCases[S3ObjectLocation, S3ObjectLocation, Record, Bucket, Bucket, S3TypedStore[Record], S3TypedStore[Record], Unit]
+    extends TransferTestCases[
+      S3ObjectLocation, S3ObjectLocation,
+      ObjectLocation, ObjectLocation,
+      Record, Bucket,
+      Bucket,
+      S3TypedStore[Record], S3TypedStore[Record],
+      Unit
+      ]
     with S3TransferFixtures[Record]
     with RecordGenerators {
 

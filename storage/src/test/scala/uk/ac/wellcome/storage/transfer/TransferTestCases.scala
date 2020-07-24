@@ -19,6 +19,9 @@ trait TransferTestCases[
     with Matchers
     with EitherValues {
 
+  def srcToObjectLocation(srcLocation: SrcLocation): SrcStoreLocation
+  def dstToObjectLocation(dstLocation: DstLocation): DstStoreLocation
+
   def createT: T
 
   def withContext[R](testWith: TestWith[Context, R]): R
@@ -59,8 +62,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src) shouldBe Right(Identified(src, t))
-              dstStore.get(dst) shouldBe Right(Identified(dst, t))
+              srcStore.get(srcToObjectLocation(src)) shouldBe Right(Identified(src, t))
+              dstStore.get(dstToObjectLocation(dst)) shouldBe Right(Identified(dst, t))
             }
           }
         }
@@ -115,8 +118,8 @@ trait TransferTestCases[
               result.left.value.src shouldBe src
               result.left.value.dst shouldBe dst
 
-              srcStore.get(src) shouldBe Right(Identified(src, srcT))
-              dstStore.get(dst) shouldBe Right(Identified(dst, dstT))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
             }
           }
         }
@@ -140,8 +143,8 @@ trait TransferTestCases[
                 }
 
               result.right.value shouldBe TransferNoOp(src, dst)
-              srcStore.get(src) shouldBe Right(Identified(src, t))
-              dstStore.get(dst) shouldBe Right(Identified(dst, t))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -189,8 +192,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src) shouldBe Right(Identified(src, srcT))
-              dstStore.get(dst) shouldBe Right(Identified(dst, srcT))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
             }
           }
         }

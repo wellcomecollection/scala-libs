@@ -7,7 +7,9 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
 class MemoryTransferTest
     extends TransferTestCases[
-      String, String, Array[Byte],
+      String, String,
+      String, String,
+      Array[Byte],
       String, String,
       MemoryStore[String, Array[Byte]] with MemoryTransfer[String, Array[Byte]],
       MemoryStore[String, Array[Byte]] with MemoryTransfer[String, Array[Byte]],
@@ -55,4 +57,8 @@ class MemoryTransferTest
     testWith(
       srcStore
     )
+
+  override def srcToObjectLocation(srcLocation: String): String = srcLocation
+
+  override def dstToObjectLocation(dstLocation: String): String = dstLocation
 }

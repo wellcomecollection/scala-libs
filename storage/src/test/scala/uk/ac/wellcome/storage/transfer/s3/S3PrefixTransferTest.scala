@@ -104,8 +104,4 @@ class S3PrefixTransferTest
   def createT: Record = createRecord
 
   def withContext[R](testWith: TestWith[Unit, R]): R = testWith(())
-
-  override def srcToObjectLocation(srcLocation: S3ObjectLocation): ObjectLocation = srcLocation.toObjectLocation
-
-  override def dstToObjectLocation(dstLocation: S3ObjectLocation): ObjectLocation = dstLocation.toObjectLocation
 }
