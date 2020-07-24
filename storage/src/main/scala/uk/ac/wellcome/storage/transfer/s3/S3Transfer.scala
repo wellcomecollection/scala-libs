@@ -3,7 +3,11 @@ package uk.ac.wellcome.storage.transfer.s3
 import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging, S3ObjectInputStream}
+import com.amazonaws.services.s3.model.{
+  CopyObjectRequest,
+  ObjectTagging,
+  S3ObjectInputStream
+}
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
