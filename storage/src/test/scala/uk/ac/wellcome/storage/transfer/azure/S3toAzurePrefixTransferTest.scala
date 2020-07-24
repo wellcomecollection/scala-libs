@@ -9,13 +9,12 @@ import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSumma
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.azure.{AzureStreamStore, AzureTypedStore}
 import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore, S3TypedStore}
-import uk.ac.wellcome.storage.{ListingFailure, ObjectLocation}
+import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.transfer._
 
 class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
   S3ObjectLocation, S3ObjectLocationPrefix,
   AzureBlobLocation, AzureBlobLocationPrefix,
-  ObjectLocation, AzureBlobLocation,
   Record,
   Bucket, Container,
   S3TypedStore[Record], AzureTypedStore[Record],
@@ -39,7 +38,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
     val s3TypedStore = S3TypedStore[Record]
 
     initialEntries.foreach { case (location, record) =>
-      s3TypedStore.put(location.toObjectLocation)(record) shouldBe a[Right[_, _]]
+      s3TypedStore.put(location)(record) shouldBe a[Right[_, _]]
     }
 
     testWith(s3TypedStore)

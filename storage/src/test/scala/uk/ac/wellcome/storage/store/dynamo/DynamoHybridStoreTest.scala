@@ -1,23 +1,19 @@
 package uk.ac.wellcome.storage.store.dynamo
 
+import org.scanamo.auto._
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{
-  ObjectLocation,
-  StoreReadError,
-  StoreWriteError,
-  Version
-}
+import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.Record
-import org.scanamo.auto._
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 
 class DynamoHybridStoreTest
     extends DynamoHybridStoreTestCases[
       DynamoHashStore[
         String,
         Int,
-        ObjectLocation]
+        S3ObjectLocation]
     ] {
   override def createTable(table: Table): Table =
     createTableWithHashKey(table)
@@ -53,7 +49,7 @@ class DynamoHybridStoreTest
 
     testWith(
       new DynamoIndexedStoreImpl(config = createDynamoConfigWith(table)) {
-        override def put(id: Version[String, Int])(t: ObjectLocation)
+        override def put(id: Version[String, Int])(loc: S3ObjectLocation)
           : WriteEither =
           Left(StoreWriteError(new Error("BOOM!")))
       }

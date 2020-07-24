@@ -4,19 +4,20 @@ import com.amazonaws.SdkClientException
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.store.StreamStoreTestCases
-import uk.ac.wellcome.storage.store.fixtures.BucketNamespaceFixtures
 import uk.ac.wellcome.storage._
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.store.fixtures.S3NamespaceFixtures
 
 class S3StreamStoreTest
-    extends StreamStoreTestCases[ObjectLocation, Bucket, S3StreamStore, Unit]
+    extends StreamStoreTestCases[S3ObjectLocation, Bucket, S3StreamStore, Unit]
     with S3StreamStoreFixtures
-    with BucketNamespaceFixtures {
+    with S3NamespaceFixtures {
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
         val store = new S3StreamStore()(brokenS3Client)
 
-        val result = store.get(createObjectLocation).left.value
+        val result = store.get(createS3ObjectLocation).left.value
         result shouldBe a[StoreReadError]
 
         val err = result.e
@@ -26,7 +27,7 @@ class S3StreamStoreTest
 
       it("errors if the key doesn't exist") {
         withLocalS3Bucket { bucket =>
-          val location = createObjectLocationWith(bucket.name)
+          val location = createS3ObjectLocationWith(bucket)
           withStoreImpl(initialEntries = Map.empty) { store =>
             val err = store.get(location).left.value
             err shouldBe a[DoesNotExistError]
@@ -41,7 +42,7 @@ class S3StreamStoreTest
       it("errors if the bucket doesn't exist") {
         withStoreImpl(initialEntries = Map.empty) { store =>
           val err =
-            store.get(createObjectLocationWith(createBucketName)).left.value
+            store.get(createS3ObjectLocationWith(createBucket)).left.value
           err shouldBe a[DoesNotExistError]
 
           err.e shouldBe a[AmazonS3Exception]
@@ -52,8 +53,7 @@ class S3StreamStoreTest
 
       it("errors if asked to get from an invalid bucket") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val invalidLocation =
-            createObjectLocationWith(namespace = createInvalidBucketName)
+          val invalidLocation = createS3ObjectLocationWith(createInvalidBucket)
           val err = store.get(invalidLocation).left.value
           err shouldBe a[StoreReadError]
 
@@ -68,7 +68,7 @@ class S3StreamStoreTest
       it("errors if S3 fails to respond") {
         val store = new S3StreamStore()(brokenS3Client)
 
-        val result = store.put(createObjectLocation)(createT).left.value
+        val result = store.put(createS3ObjectLocation)(createT).left.value
         result shouldBe a[StoreWriteError]
 
         val err = result.e
@@ -78,7 +78,7 @@ class S3StreamStoreTest
 
       it("errors if the bucket doesn't exist") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val result = store.put(createObjectLocationWith(createBucketName))(createT).left.value
+          val result = store.put(createS3ObjectLocation)(createT).left.value
 
           result shouldBe a[StoreWriteError]
 
@@ -90,7 +90,7 @@ class S3StreamStoreTest
 
       it("errors if the bucket name is invalid") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val result = store.put(createObjectLocationWith(createInvalidBucketName))(createT).left.value
+          val result = store.put(createS3ObjectLocationWith(createInvalidBucket))(createT).left.value
 
           result shouldBe a[StoreWriteError]
 
@@ -101,12 +101,13 @@ class S3StreamStoreTest
       }
 
       it("errors if the object key is too long") {
-        withNamespace { implicit namespace =>
+        withLocalS3Bucket { bucket =>
           // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
           // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
-
-          val tooLongPath = randomStringOfByteLength(1025)()
-          val id = createId.copy(path = tooLongPath)
+          val id = S3ObjectLocation(
+            bucket = bucket.name,
+            key = randomStringOfByteLength(1025)
+          )
 
           val entry = ReplayableStream(randomBytes())
 

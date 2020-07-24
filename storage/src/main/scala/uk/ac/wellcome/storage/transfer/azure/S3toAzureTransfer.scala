@@ -43,7 +43,7 @@ class S3toAzureTransfer(implicit
         Left(TransferDestinationFailure(src, dst, err.e))
 
       case Right(Identified(_, dstStream)) =>
-        s3Readable.get(src.toObjectLocation) match {
+        s3Readable.get(src) match {
           case Right(Identified(_, srcStream)) =>
             val result = compare(
               src = src,
@@ -97,7 +97,7 @@ class S3toAzureTransfer(implicit
 
   private def runTransfer(src: S3ObjectLocation,
                           dst: AzureBlobLocation): TransferEither =
-    s3Readable.get(src.toObjectLocation) match {
+    s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
         azureWritable.put(dst)(srcStream) match {
           case Right(_)  => Right(TransferPerformed(src, dst))

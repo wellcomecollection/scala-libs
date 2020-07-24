@@ -1,7 +1,6 @@
 package uk.ac.wellcome.storage.transfer.s3
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
@@ -12,7 +11,6 @@ import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferSourceFa
 class S3TransferTest
     extends TransferTestCases[
       S3ObjectLocation, S3ObjectLocation,
-      ObjectLocation, ObjectLocation,
       Record, Bucket,
       Bucket,
       S3TypedStore[Record], S3TypedStore[Record],
@@ -90,7 +88,7 @@ class S3TransferTest
 
         result.right.value shouldBe TransferNoOp(src, src)
 
-        store.get(src.toObjectLocation).right.value.identifiedT shouldBe t
+        store.get(src).right.value.identifiedT shouldBe t
       }
     }
   }
