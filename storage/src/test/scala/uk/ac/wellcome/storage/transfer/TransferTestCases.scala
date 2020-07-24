@@ -4,7 +4,6 @@ import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait TransferTestCases[
@@ -62,8 +61,8 @@ trait TransferTestCases[
 
               result.right.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(srcToObjectLocation(src)) shouldBe Right(Identified(src, t))
-              dstStore.get(dstToObjectLocation(dst)) shouldBe Right(Identified(dst, t))
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe t
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -193,7 +192,7 @@ trait TransferTestCases[
               result.right.value shouldBe TransferPerformed(src, dst)
 
               srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
-              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe srcT
             }
           }
         }

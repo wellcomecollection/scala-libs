@@ -4,7 +4,6 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.Identified
 import uk.ac.wellcome.storage.store.Store
 
 trait PrefixTransferTestCases[
@@ -103,8 +102,8 @@ trait PrefixTransferTestCases[
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(srcToObjectLocation(srcLocation)) shouldBe Right(Identified(srcLocation, t))
-              dstStore.get(dstToObjectLocation(dstLocation)) shouldBe Right(Identified(dstLocation, t))
+              srcStore.get(srcToObjectLocation(srcLocation)).right.value.identifiedT shouldBe t
+              dstStore.get(dstToObjectLocation(dstLocation)).right.value.identifiedT shouldBe t
             }
           }
         }
@@ -276,8 +275,8 @@ trait PrefixTransferTestCases[
               failure.successes shouldBe 0
               failure.failures shouldBe 1
 
-              srcStore.get(srcToObjectLocation(src)).right.value shouldBe Identified(src, srcT)
-              dstStore.get(dstToObjectLocation(dst)).right.value shouldBe Identified(dst, dstT)
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe dstT
             }
           }
         }
@@ -305,8 +304,8 @@ trait PrefixTransferTestCases[
 
               result.right.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(srcToObjectLocation(src)).right.value shouldBe Identified(src, srcT)
-              dstStore.get(dstToObjectLocation(dst)).right.value shouldBe Identified(dst, srcT)
+              srcStore.get(srcToObjectLocation(src)).right.value.identifiedT shouldBe srcT
+              dstStore.get(dstToObjectLocation(dst)).right.value.identifiedT shouldBe srcT
             }
           }
         }
