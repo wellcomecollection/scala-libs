@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.1.0 - 2020-07-27
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+This adds `basename`, `parent` and `asLocation` methods to `Prefix[_ <: Location]`.
+
 ## v19.0.0 - 2020-07-24
 
 Replace the remaining uses of `ObjectLocation` with `S3ObjectLocation` or `MemoryLocation` throughout the storage library.
