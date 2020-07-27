@@ -32,4 +32,10 @@ case class AzureBlobLocationPrefix(
 
   def asLocation(parts: String*): AzureBlobLocation =
     AzureBlobLocation(container = container, name = namePrefix).join(parts: _*)
+
+  override def namespace: String = container
+  override def pathPrefix: String = namePrefix
+
+  override def parent: Prefix[AzureBlobLocation] =
+    this.copy(namePrefix = parentOf(namePrefix))
 }

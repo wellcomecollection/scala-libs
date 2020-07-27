@@ -73,6 +73,28 @@ class S3ObjectLocationTest
         }
       }
     }
+
+    describe("behaves as a Location") {
+      val loc = S3ObjectLocation(bucket = "my-s3-bucket", key = "path/to/pictures")
+
+      it("joins paths") {
+        loc.join("cats", "devon-rex.jpg") shouldBe S3ObjectLocation(
+          bucket = "my-s3-bucket",
+          key = "path/to/pictures/cats/devon-rex.jpg"
+        )
+      }
+
+      it("creates a prefix") {
+        loc.asPrefix shouldBe S3ObjectLocationPrefix(
+          bucket = "my-s3-bucket",
+          keyPrefix = "path/to/pictures"
+        )
+      }
+
+      it("casts to a string") {
+        loc.toString shouldBe "s3://my-s3-bucket/path/to/pictures"
+      }
+    }
   }
 
   describe("S3ObjectLocationPrefix") {
@@ -128,6 +150,35 @@ class S3ObjectLocationTest
 
           getTableItem[IdentifiedLocation](id = item.id, table = table).get.right.value shouldBe item
         }
+      }
+    }
+
+    describe("behaves as a Prefix") {
+      val prefix = S3ObjectLocationPrefix(
+        bucket = "my-s3-bucket",
+        keyPrefix = "path/to/different/pictures"
+      )
+
+      it("creates a location") {
+        prefix.asLocation("dogs", "corgi.png") shouldBe S3ObjectLocation(
+          bucket = "my-s3-bucket",
+          key = "path/to/different/pictures/dogs/corgi.png"
+        )
+      }
+
+      it("gets the basename") {
+        prefix.basename shouldBe "pictures"
+      }
+
+      it("gets the parent") {
+        prefix.parent shouldBe S3ObjectLocationPrefix(
+          bucket = "my-s3-bucket",
+          keyPrefix = "path/to/different"
+        )
+      }
+
+      it("casts to a string") {
+        prefix.toString shouldBe "s3://my-s3-bucket/path/to/different/pictures"
       }
     }
   }
