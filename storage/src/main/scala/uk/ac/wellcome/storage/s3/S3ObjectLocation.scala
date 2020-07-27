@@ -34,6 +34,10 @@ case class S3ObjectLocationPrefix(
   def asLocation(parts: String*): S3ObjectLocation =
     S3ObjectLocation(bucket = bucket, key = keyPrefix).join(parts: _*)
 
+  override def pathPrefix: String = keyPrefix
+
+  override def parent: Prefix[S3ObjectLocation] =
+    this.copy(keyPrefix = parentOf(keyPrefix))
 }
 
 // Note: the precursor to these classes was ObjectLocation, which used the

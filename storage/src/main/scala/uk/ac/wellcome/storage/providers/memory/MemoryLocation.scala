@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import uk.ac.wellcome.storage.{Location, Prefix}
 
 case class MemoryLocation(namespace: String, path: String) extends Location {
-  override def toString = s"$namespace/$path"
+  override def toString: String = s"$namespace/$path"
 
   def join(parts: String*): MemoryLocation = this.copy(
     path = Paths.get(this.path, parts: _*).normalize().toString
@@ -20,8 +20,13 @@ case class MemoryLocation(namespace: String, path: String) extends Location {
 
 case class MemoryLocationPrefix(namespace: String, path: String)
     extends Prefix[MemoryLocation] {
-  override def toString = s"$namespace/$path"
+  override def toString: String = s"$namespace/$path"
 
   def asLocation(parts: String*): MemoryLocation =
     MemoryLocation(namespace, path).join(parts: _*)
+
+  override def pathPrefix: String = path
+
+  override def parent: Prefix[MemoryLocation] =
+    this.copy(path = parentOf(path))
 }
