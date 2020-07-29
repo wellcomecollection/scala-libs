@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.3.0 - 2020-07-29
+
+### Libraries affected
+
+`messaging`
+
+### Description
+
+Remove the `NotificationStream` class and the associated fixture and builders, which aren't used anywhere in the platform.
+
 ## v19.2.0 - 2020-07-29
 
 Remove some unneeded Materializer instances:
