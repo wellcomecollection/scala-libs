@@ -5,7 +5,7 @@ import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.MessageAction.Delete
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorAttributes, Materializer, Supervision}
+import akka.stream.{ActorAttributes, Supervision}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
@@ -64,8 +64,6 @@ class SQSStream[T](sqsClient: SqsAsyncClient,
     modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
     implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
-
-    implicit val materializer = Materializer(actorSystem)
 
     val src = modifySource(source.map { message =>
       (message, fromJson[T](message.body).get)

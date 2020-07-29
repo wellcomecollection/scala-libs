@@ -1,7 +1,6 @@
 package uk.ac.wellcome.messaging.worker
 
 import akka.actor.ActorSystem
-import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.{Done, NotUsed}
 import uk.ac.wellcome.messaging.worker.steps.MonitoringProcessor
@@ -26,7 +25,6 @@ trait AkkaWorker[Message,
       Action] {
 
   implicit val as: ActorSystem
-  implicit val am: Materializer = Materializer(as)
   private val ec = as.dispatcher
   protected val monitoringProcessorBuilder: (
     ExecutionContext) => MonitoringProcessor[Work,
