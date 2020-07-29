@@ -139,18 +139,16 @@ class CloudWatchMetricsTest
   private def withMetricsSender[R](
     cloudWatchClient: CloudWatchClient)(
     testWith: TestWith[CloudWatchMetrics, R]): R =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { implicit materializer =>
-        val metricsSender = new CloudWatchMetrics(
-          cloudWatchClient = cloudWatchClient,
-          metricsConfig = MetricsConfig(
-            namespace = "test",
-            flushInterval = 1 second
-          )
+    withMaterializer { implicit materializer =>
+      val metricsSender = new CloudWatchMetrics(
+        cloudWatchClient = cloudWatchClient,
+        metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 1 second
         )
+      )
 
-        testWith(metricsSender)
-      }
+      testWith(metricsSender)
     }
 
   private def assertSingleDataPoint(amazonCloudWatch: CloudWatchClient,

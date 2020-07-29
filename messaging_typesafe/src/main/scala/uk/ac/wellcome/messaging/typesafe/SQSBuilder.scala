@@ -1,7 +1,6 @@
 package uk.ac.wellcome.messaging.typesafe
 
 import akka.actor.ActorSystem
-import akka.stream.Materializer
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.sqs.{SqsAsyncClient, SqsClient}
 import uk.ac.wellcome.config.models.AWSClientConfig
@@ -53,7 +52,6 @@ object SQSBuilder extends AWSClientConfigBuilder {
     )
 
   def buildSQSStream[T](config: Config)(implicit actorSystem: ActorSystem,
-                                        materializer: Materializer,
                                         ec: ExecutionContext): SQSStream[T] =
     new SQSStream[T](
       sqsClient = buildSQSAsyncClient(config),
