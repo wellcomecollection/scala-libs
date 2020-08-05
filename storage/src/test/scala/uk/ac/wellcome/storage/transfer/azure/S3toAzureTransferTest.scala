@@ -6,7 +6,7 @@ import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.store.azure.{AzureStreamStore, AzureTypedStore}
+import uk.ac.wellcome.storage.store.azure.AzureTypedStore
 import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore, S3TypedStore}
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
@@ -40,9 +40,7 @@ class S3toAzureTransferTest
     initialEntries: Map[AzureBlobLocation, Record])(
     testWith: TestWith[AzureTypedStore[Record], R])(implicit context: Unit
   ): R = {
-    implicit val azureStreamStore: AzureStreamStore = new AzureStreamStore()
-
-    val azureTypedStore = new AzureTypedStore[Record]()
+    val azureTypedStore = AzureTypedStore[Record]
 
     initialEntries.foreach { case (location, record) =>
       azureTypedStore.put(location)(record) shouldBe a[Right[_, _]]
