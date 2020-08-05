@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.transfer.azure
 
+import com.amazonaws.services.s3.AmazonS3
+import com.azure.storage.blob.BlobServiceClient
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import uk.ac.wellcome.storage.listing.s3.S3ObjectLocationListing
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
@@ -22,4 +24,15 @@ class S3toAzurePrefixTransfer()(
     dstPrefix.asLocation(
       srcLocation.key.stripPrefix(srcPrefix.keyPrefix)
     )
+}
+
+object S3toAzurePrefixTransfer {
+  def apply()(implicit
+              s3Client: AmazonS3,
+              blobClient: BlobServiceClient): S3toAzurePrefixTransfer = {
+    implicit val transfer: S3toAzureTransfer = S3toAzureTransfer()
+    implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
+
+    new S3toAzurePrefixTransfer()
+  }
 }

@@ -64,7 +64,7 @@ class S3toAzurePrefixTransferTest extends PrefixTransferTestCases[
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R =
-    testWith(new S3toAzurePrefixTransfer())
+    testWith(S3toAzurePrefixTransfer())
 
   override def withExtraListingTransfer[R](
     srcStore: S3TypedStore[Record],
