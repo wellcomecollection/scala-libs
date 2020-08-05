@@ -1,12 +1,10 @@
 package uk.ac.wellcome.storage.typesafe
 
-import com.amazonaws.services.s3.AmazonS3
 import com.typesafe.config.Config
 import uk.ac.wellcome.storage.listing.s3.{
   S3ObjectLocationListing,
   S3ObjectSummaryListing
 }
-import uk.ac.wellcome.storage.store.s3.S3StreamReadable
 import uk.ac.wellcome.storage.transfer.azure.{
   S3toAzurePrefixTransfer,
   S3toAzureTransfer
@@ -30,10 +28,6 @@ object PrefixTransferBuilder {
   //
 
   def build(config: Config) = {
-
-    class S3Reader(val maxRetries: Int = 3)(implicit val s3Client: AmazonS3)
-        extends S3StreamReadable
-
     val srcCloudProvider = config
       .getStringOption("source.cloudProvider")
       .flatMap(CloudProvider.create)
@@ -62,8 +56,7 @@ object PrefixTransferBuilder {
         implicit val azureClient =
           AzureBlobServiceClientBuilder.build(dstConfig)
 
-        implicit val s3Reader = new S3Reader()
-        implicit val s3toAzureTransfer = new S3toAzureTransfer()
+        implicit val s3toAzureTransfer: S3toAzureTransfer = S3toAzureTransfer()
 
         implicit val summary = new S3ObjectSummaryListing()
         implicit val listing = new S3ObjectLocationListing()

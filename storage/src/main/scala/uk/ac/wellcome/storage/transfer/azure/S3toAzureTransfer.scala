@@ -2,6 +2,7 @@ package uk.ac.wellcome.storage.transfer.azure
 
 import java.io.InputStream
 
+import com.amazonaws.services.s3.AmazonS3
 import com.azure.storage.blob.BlobServiceClient
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
@@ -11,7 +12,7 @@ import uk.ac.wellcome.storage.store.azure.{
   AzureStreamStore,
   AzureStreamWritable
 }
-import uk.ac.wellcome.storage.store.s3.S3StreamReadable
+import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore}
 import uk.ac.wellcome.storage.transfer._
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified}
 
@@ -106,4 +107,14 @@ class S3toAzureTransfer(implicit
 
       case Left(err) => Left(TransferSourceFailure(src, dst, err.e))
     }
+}
+
+object S3toAzureTransfer {
+  def apply()(implicit
+              s3Client: AmazonS3,
+              blobClient: BlobServiceClient): S3toAzureTransfer = {
+    implicit val s3Readable: S3StreamReadable = new S3StreamStore()
+
+    new S3toAzureTransfer()
+  }
 }

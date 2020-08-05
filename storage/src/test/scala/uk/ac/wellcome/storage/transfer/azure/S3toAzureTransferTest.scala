@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.azure.AzureTypedStore
-import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore, S3TypedStore}
+import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
 import uk.ac.wellcome.storage.transfer.{Transfer, TransferTestCases}
 
 class S3toAzureTransferTest
@@ -53,9 +53,6 @@ class S3toAzureTransferTest
     srcStore: S3TypedStore[Record],
     dstStore: AzureTypedStore[Record])(
     testWith: TestWith[Transfer[S3ObjectLocation, AzureBlobLocation], R]
-  ): R = {
-    implicit val s3StreamReadable: S3StreamReadable = srcStore.streamStore
-
-    testWith(new S3toAzureTransfer())
-  }
+  ): R =
+    testWith(S3toAzureTransfer())
 }
