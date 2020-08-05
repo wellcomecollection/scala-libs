@@ -17,7 +17,9 @@ class MemoryIndividualMessageSender extends IndividualMessageSender[String] {
 
   override def send(body: String)(subject: String,
                                   destination: String): Try[Unit] = Try {
-    messages = messages :+ MemoryMessage(body, subject, destination)
+    this.synchronized {
+      messages = messages :+ MemoryMessage(body, subject, destination)
+    }
   }
 
   def getMessages[T]()(implicit decoder: Decoder[T]): Seq[T] =

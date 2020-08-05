@@ -11,42 +11,53 @@ import uk.ac.wellcome.messaging.memory.{MemoryIndividualMessageSender, MemoryMes
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
-import scala.util.{Success}
+import scala.util.{Success, Try}
 
 class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions with ScalaFutures with RandomGenerators {
-  def send(sender: MemoryIndividualMessageSender)(body: String, subject: String, destination: String): Future[Unit] =
-    Future.fromTry(sender.send(body)(subject, destination))
-
   it("sends individual messages") {
     val sender = new MemoryIndividualMessageSender()
-    val toSend = Function.tupled(send(sender) _)
 
-    val messages = (1 to 1000).map( _ => (randomAlphanumeric(), randomAlphanumeric(), randomAlphanumeric()))
+    sender.send("hello world")(
+      subject = "my first message",
+      destination = "greetings") shouldBe Success(())
+    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Success(
+      ())
+    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Success(
+      ())
+    sender.send("chinese")(
+      subject = "a non-alphabet language",
+      destination = "languages") shouldBe Success(())
+
+    sender.messages shouldBe List(
+      sender.MemoryMessage("hello world", "my first message", "greetings"),
+      sender.MemoryMessage("guten tag", "auf deutsch", "greetings"),
+      sender.MemoryMessage("你好", "中文", "greetings"),
+      sender.MemoryMessage("chinese", "a non-alphabet language", "languages")
+    )
+  }
+
+  it("can send many messages in parallel") {
+    val sender = new MemoryIndividualMessageSender()
+
+    def send(body: String, subject: String, destination: String): Future[Try[Unit]] =
+      Future(sender.send(body)(subject, destination))
+
+    val toSend = Function.tupled(send _)
+    val messageCount = randomInt(from = 50, to = 150)
+
+    val messages = (1 to messageCount).map(i =>
+      (f"$i-${randomAlphanumeric()}", randomAlphanumeric(), randomAlphanumeric()))
 
     val eventuallyResults = Future.sequence(messages.map(toSend))
-    val expectedResults = messages.map(Function.tupled(sender.MemoryMessage.apply))
+    val expectedResults = messages.map(
+      Function.tupled(sender.MemoryMessage.apply)
+    ).toSet
 
-    whenReady(eventuallyResults) { _ =>
-
-      sender.messages shouldBe expectedResults
+    whenReady(eventuallyResults) { results =>
+      sender.messages.size shouldBe messageCount
+      results.foreach(_ shouldBe Success(()))
+      sender.messages.toSet shouldBe expectedResults
     }
-//    sender.send("hello world")(
-//      subject = "my first message",
-//      destination = "greetings") shouldBe Success(())
-//    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Success(
-//      ())
-//    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Success(
-//      ())
-//    sender.send("chinese")(
-//      subject = "a non-alphabet language",
-//      destination = "languages") shouldBe Success(())
-//
-//    sender.messages shouldBe List(
-//      sender.MemoryMessage("hello world", "my first message", "greetings"),
-//      sender.MemoryMessage("guten tag", "auf deutsch", "greetings"),
-//      sender.MemoryMessage("你好", "中文", "greetings"),
-//      sender.MemoryMessage("chinese", "a non-alphabet language", "languages")
-//    )
   }
 
   it("encodes case classes as JSON") {
