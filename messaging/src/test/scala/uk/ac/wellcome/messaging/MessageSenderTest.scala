@@ -1,37 +1,52 @@
 package uk.ac.wellcome.messaging
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.messaging.memory.{
-  MemoryIndividualMessageSender,
-  MemoryMessageSender
-}
+import uk.ac.wellcome.messaging.memory.{MemoryIndividualMessageSender, MemoryMessageSender}
 
-import scala.util.Success
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions {
+import scala.concurrent.Future
+import scala.util.{Success}
+
+class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions with ScalaFutures with RandomGenerators {
+  def send(sender: MemoryIndividualMessageSender)(body: String, subject: String, destination: String): Future[Unit] =
+    Future.fromTry(sender.send(body)(subject, destination))
+
   it("sends individual messages") {
     val sender = new MemoryIndividualMessageSender()
+    val toSend = Function.tupled(send(sender) _)
 
-    sender.send("hello world")(
-      subject = "my first message",
-      destination = "greetings") shouldBe Success(())
-    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Success(
-      ())
-    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Success(
-      ())
-    sender.send("chinese")(
-      subject = "a non-alphabet language",
-      destination = "languages") shouldBe Success(())
+    val messages = (1 to 1000).map( _ => (randomAlphanumeric(), randomAlphanumeric(), randomAlphanumeric()))
 
-    sender.messages shouldBe List(
-      sender.MemoryMessage("hello world", "my first message", "greetings"),
-      sender.MemoryMessage("guten tag", "auf deutsch", "greetings"),
-      sender.MemoryMessage("你好", "中文", "greetings"),
-      sender.MemoryMessage("chinese", "a non-alphabet language", "languages")
-    )
+    val eventuallyResults = Future.sequence(messages.map(toSend))
+    val expectedResults = messages.map(Function.tupled(sender.MemoryMessage.apply))
+
+    whenReady(eventuallyResults) { _ =>
+
+      sender.messages shouldBe expectedResults
+    }
+//    sender.send("hello world")(
+//      subject = "my first message",
+//      destination = "greetings") shouldBe Success(())
+//    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Success(
+//      ())
+//    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Success(
+//      ())
+//    sender.send("chinese")(
+//      subject = "a non-alphabet language",
+//      destination = "languages") shouldBe Success(())
+//
+//    sender.messages shouldBe List(
+//      sender.MemoryMessage("hello world", "my first message", "greetings"),
+//      sender.MemoryMessage("guten tag", "auf deutsch", "greetings"),
+//      sender.MemoryMessage("你好", "中文", "greetings"),
+//      sender.MemoryMessage("chinese", "a non-alphabet language", "languages")
+//    )
   }
 
   it("encodes case classes as JSON") {
