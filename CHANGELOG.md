@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v19.3.1 - 2020-08-05
+
+`send` on `MemoryIndividualMessageSender` now updates its internal message list using `synchronized` to prevent dropping entries with concurrent writes.
+
 ## v19.3.0 - 2020-07-29
 
 ### Libraries affected
