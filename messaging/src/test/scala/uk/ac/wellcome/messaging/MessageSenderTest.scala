@@ -1,17 +1,19 @@
 package uk.ac.wellcome.messaging
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.messaging.memory.{
-  MemoryIndividualMessageSender,
-  MemoryMessageSender
-}
+import uk.ac.wellcome.messaging.memory.{MemoryIndividualMessageSender, MemoryMessageSender}
 
-import scala.util.Success
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions {
+import scala.concurrent.Future
+import scala.util.{Success, Try}
+
+class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions with ScalaFutures with RandomGenerators {
   it("sends individual messages") {
     val sender = new MemoryIndividualMessageSender()
 
@@ -32,6 +34,30 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions {
       sender.MemoryMessage("你好", "中文", "greetings"),
       sender.MemoryMessage("chinese", "a non-alphabet language", "languages")
     )
+  }
+
+  it("can send many messages in parallel") {
+    val sender = new MemoryIndividualMessageSender()
+
+    def send(body: String, subject: String, destination: String): Future[Try[Unit]] =
+      Future(sender.send(body)(subject, destination))
+
+    val toSend = Function.tupled(send _)
+    val messageCount = randomInt(from = 50, to = 150)
+
+    val messages = (1 to messageCount).map(i =>
+      (f"$i-${randomAlphanumeric()}", randomAlphanumeric(), randomAlphanumeric()))
+
+    val eventuallyResults = Future.sequence(messages.map(toSend))
+    val expectedResults = messages.map(
+      Function.tupled(sender.MemoryMessage.apply)
+    ).toSet
+
+    whenReady(eventuallyResults) { results =>
+      sender.messages.size shouldBe messageCount
+      results.foreach(_ shouldBe Success(()))
+      sender.messages.toSet shouldBe expectedResults
+    }
   }
 
   it("encodes case classes as JSON") {
