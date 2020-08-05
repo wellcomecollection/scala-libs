@@ -3,15 +3,8 @@ package uk.ac.wellcome.storage.typesafe
 import com.amazonaws.services.s3.AmazonS3
 import com.azure.storage.blob.BlobServiceClient
 import com.typesafe.config.Config
-import uk.ac.wellcome.storage.listing.s3.{
-  S3ObjectLocationListing,
-  S3ObjectSummaryListing
-}
 import uk.ac.wellcome.storage.transfer.azure.S3toAzurePrefixTransfer
-import uk.ac.wellcome.storage.transfer.s3.{
-  S3PrefixTransfer,
-  S3Transfer
-}
+import uk.ac.wellcome.storage.transfer.s3.S3PrefixTransfer
 import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 object PrefixTransferBuilder {
@@ -42,13 +35,9 @@ object PrefixTransferBuilder {
 
     (srcCloudProvider, dstCloudProvider) match {
       case (AWS, AWS) => {
-        implicit val s3Client = S3Builder.buildS3Client(config)
-        implicit val summary = new S3ObjectSummaryListing()
+        implicit val s3Client: AmazonS3 = S3Builder.buildS3Client(config)
 
-        implicit val transfer = new S3Transfer()
-        implicit val listing = new S3ObjectLocationListing()
-
-        new S3PrefixTransfer()
+        S3PrefixTransfer()
       }
       case (AWS, Azure) => {
         val srcConfig = config.getConfig("source")
