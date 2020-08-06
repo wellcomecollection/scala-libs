@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v19.4.1 - 2020-08-06
+
+Add some tests that we remove double slashes when joining paths.
+
+This isn't a change in behaviour, just a new test to avoid regressing this behaviour in future.
+
 ## v19.4.0 - 2020-08-06
 
 ### Libraries affected
