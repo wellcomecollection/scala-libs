@@ -12,6 +12,15 @@ case class S3ObjectLocation(
   bucket: String,
   key: String
 ) extends Location {
+
+  // Having a '.' or '..' in a filesystem path usually indicates "current directory"
+  // or "parent directory".  Having either of these in an S3 key causes issues in
+  // the S3 console, so prevent our code from creating objects with such keys.
+  require(
+    Paths.get(key).normalize().toString == key,
+    s"S3 object key cannot contain '.' or '..' entries: $key"
+  )
+
   override def toString: String =
     s"s3://$bucket/$key"
 
@@ -28,6 +37,15 @@ case class S3ObjectLocationPrefix(
   bucket: String,
   keyPrefix: String
 ) extends Prefix[S3ObjectLocation] {
+
+  // Having a '.' or '..' in the path usually indicates "current directory" or
+  // "parent directory".  Having either of these in an S3 key causes issues in
+  // the S3 console, so prevent our code from creating objects with such keys.
+  require(
+    Paths.get(keyPrefix).normalize().toString == keyPrefix,
+    s"S3 object key cannot contain '.' or '..' entries: $keyPrefix"
+  )
+
   override def toString: String =
     s"s3://$bucket/$keyPrefix"
 

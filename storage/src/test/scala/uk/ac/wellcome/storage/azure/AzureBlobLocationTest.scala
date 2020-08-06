@@ -31,6 +31,20 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
     it("casts to a string") {
       loc.toString shouldBe "azure://my-azure-container/path/to/pictures"
     }
+
+    it("blocks the . and .. characters in the blob name") {
+      val err1 = intercept[IllegalArgumentException] {
+        AzureBlobLocation(container = "my-azure-container", name = "path/./to/pictures")
+      }
+
+      err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/./to/pictures"
+
+      val err2 = intercept[IllegalArgumentException] {
+        AzureBlobLocation(container = "my-azure-container", name = "path/../to/pictures")
+      }
+
+      err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/../to/pictures"
+    }
   }
 
   describe("AzureBlobLocationPrefix") {
@@ -59,6 +73,20 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("casts to a string") {
       prefix.toString shouldBe "azure://my-azure-container/path/to/different/pictures"
+    }
+
+    it("blocks the . and .. characters in the blob name") {
+      val err1 = intercept[IllegalArgumentException] {
+        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/./to/pictures")
+      }
+
+      err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/./to/pictures"
+
+      val err2 = intercept[IllegalArgumentException] {
+        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/../to/pictures")
+      }
+
+      err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/../to/pictures"
     }
   }
 }

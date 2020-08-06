@@ -101,6 +101,20 @@ class S3ObjectLocationTest
       it("casts to a string") {
         loc.toString shouldBe "s3://my-s3-bucket/path/to/pictures"
       }
+
+      it("blocks the . and .. characters in the object key") {
+        val err1 = intercept[IllegalArgumentException] {
+          S3ObjectLocation(bucket = "my-s3-bucket", key = "path/./to/pictures")
+        }
+
+        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+
+        val err2 = intercept[IllegalArgumentException] {
+          S3ObjectLocation(bucket = "my-s3-bucket", key = "path/../to/pictures")
+        }
+
+        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
+      }
     }
   }
 
@@ -186,6 +200,20 @@ class S3ObjectLocationTest
 
       it("casts to a string") {
         prefix.toString shouldBe "s3://my-s3-bucket/path/to/different/pictures"
+      }
+
+      it("blocks the . and .. characters in the key prefix") {
+        val err1 = intercept[IllegalArgumentException] {
+          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/./to/pictures")
+        }
+
+        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+
+        val err2 = intercept[IllegalArgumentException] {
+          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/../to/pictures")
+        }
+
+        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
       }
     }
   }

@@ -11,6 +11,14 @@ case class AzureBlobLocation(
   override def toString: String =
     s"azure://$container/$name"
 
+  // Having a '.' or '..' in a filesystem path usually indicates "current directory"
+  // or "parent directory".  An object store isn't the same as a filesystem,
+  // so prevent our code from creating objects with such names.
+  require(
+    Paths.get(name).normalize().toString == name,
+    s"Azure blob name cannot contain '.' or '..' entries: $name"
+  )
+
   def join(parts: String*): AzureBlobLocation =
     this.copy(
       name = Paths.get(name, parts: _*).toString
@@ -29,6 +37,14 @@ case class AzureBlobLocationPrefix(
 ) extends Prefix[AzureBlobLocation] {
   override def toString: String =
     s"azure://$container/$namePrefix"
+
+  // Having a '.' or '..' in a filesystem path usually indicates "current directory"
+  // or "parent directory".  An object store isn't the same as a filesystem,
+  // so prevent our code from creating objects with such names.
+  require(
+    Paths.get(namePrefix).normalize().toString == namePrefix,
+    s"Azure blob name cannot contain '.' or '..' entries: $namePrefix"
+  )
 
   def asLocation(parts: String*): AzureBlobLocation =
     AzureBlobLocation(container = container, name = namePrefix).join(parts: _*)
