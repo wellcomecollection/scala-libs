@@ -14,6 +14,13 @@ class MemoryLocationTest extends AnyFunSpec with Matchers {
       )
     }
 
+    it("removes double slashes when joining paths") {
+      loc.join("trailing-slash/", "cornish-rex.jpg") shouldBe MemoryLocation(
+        namespace = "my-memory-bukkit",
+        path = "path/to/pictures/trailing-slash/cornish-rex.jpg"
+      )
+    }
+
     it("creates a prefix") {
       loc.asPrefix shouldBe MemoryLocationPrefix(
         namespace = "my-memory-bukkit",

@@ -84,6 +84,13 @@ class S3ObjectLocationTest
         )
       }
 
+      it("removes double slashes when joining paths") {
+        loc.join("trailing-slash/", "cornish-rex.jpg") shouldBe S3ObjectLocation(
+          bucket = "my-s3-bucket",
+          key = "path/to/pictures/trailing-slash/cornish-rex.jpg"
+        )
+      }
+
       it("creates a prefix") {
         loc.asPrefix shouldBe S3ObjectLocationPrefix(
           bucket = "my-s3-bucket",
