@@ -18,7 +18,7 @@ case class S3ObjectLocation(
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
     Paths.get(key).normalize().toString == key,
-    "S3 object key cannot contain '.' or '..' entries"
+    s"S3 object key cannot contain '.' or '..' entries: $key"
   )
 
   override def toString: String =
@@ -43,7 +43,7 @@ case class S3ObjectLocationPrefix(
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
     Paths.get(keyPrefix).normalize().toString == keyPrefix,
-    "S3 object key cannot contain '.' or '..' entries"
+    s"S3 object key cannot contain '.' or '..' entries: $keyPrefix"
   )
 
   override def toString: String =

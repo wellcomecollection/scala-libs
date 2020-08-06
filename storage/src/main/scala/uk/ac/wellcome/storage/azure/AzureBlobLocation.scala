@@ -16,7 +16,7 @@ case class AzureBlobLocation(
   // so prevent our code from creating objects with such names.
   require(
     Paths.get(name).normalize().toString == name,
-    "Azure blob name cannot contain '.' or '..' entries"
+    s"Azure blob name cannot contain '.' or '..' entries: $name"
   )
 
   def join(parts: String*): AzureBlobLocation =
@@ -43,7 +43,7 @@ case class AzureBlobLocationPrefix(
   // so prevent our code from creating objects with such names.
   require(
     Paths.get(namePrefix).normalize().toString == namePrefix,
-    "Azure blob name cannot contain '.' or '..' entries"
+    s"Azure blob name cannot contain '.' or '..' entries: $namePrefix"
   )
 
   def asLocation(parts: String*): AzureBlobLocation =
