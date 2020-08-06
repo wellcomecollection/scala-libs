@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.4.0 - 2020-08-06
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Add a constructor for `AzureTypedStore`, `S3toAzureTransfer` and `S3toAzurePrefixTransfer` that take implicit S3 and Azure clients, saving callers from constructing the intermediate classes.
+
 ## v19.3.1 - 2020-08-05
 
 `send` on `MemoryIndividualMessageSender` now updates its internal message list using `synchronized` to prevent dropping entries with concurrent writes.
