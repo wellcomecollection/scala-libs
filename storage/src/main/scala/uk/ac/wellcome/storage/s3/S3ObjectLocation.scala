@@ -13,12 +13,24 @@ case class S3ObjectLocation(
   key: String
 ) extends Location {
 
+  // More than one consecutive slash is going to be weird in the console, and
+  // is probably indicative of a bug.  Disallow it.
+  require(
+    !key.contains("//"),
+    s"S3 object key cannot include multiple consecutive slashes: $key"
+  )
+
+  require(
+    !key.endsWith("/"),
+    s"S3 object key cannot end with a slash: $key"
+  )
+
   // Having a '.' or '..' in a filesystem path usually indicates "current directory"
   // or "parent directory".  Having either of these in an S3 key causes issues in
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
     Paths.get(key).normalize().toString == key,
-    s"S3 object key cannot contain '.' or '..' entries: $key"
+    s"S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: $key"
   )
 
   override def toString: String =
@@ -38,12 +50,20 @@ case class S3ObjectLocationPrefix(
   keyPrefix: String
 ) extends Prefix[S3ObjectLocation] {
 
+  // More than one consecutive slash is going to be weird in the console, and
+  // is probably indicative of a bug.  Disallow it.
+  require(
+    !keyPrefix.contains("//"),
+    s"S3 key prefix cannot include multiple consecutive slashes: $keyPrefix"
+  )
+
   // Having a '.' or '..' in the path usually indicates "current directory" or
   // "parent directory".  Having either of these in an S3 key causes issues in
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
-    Paths.get(keyPrefix).normalize().toString == keyPrefix,
-    s"S3 object key cannot contain '.' or '..' entries: $keyPrefix"
+    Paths.get(keyPrefix.stripSuffix("/")).normalize().toString == keyPrefix
+      .stripSuffix("/"),
+    s"S3 key prefix cannot contain '.' or '..' entries: $keyPrefix"
   )
 
   override def toString: String =

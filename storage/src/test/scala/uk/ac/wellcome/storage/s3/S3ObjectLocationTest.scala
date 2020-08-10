@@ -107,13 +107,29 @@ class S3ObjectLocationTest
           S3ObjectLocation(bucket = "my-s3-bucket", key = "path/./to/pictures")
         }
 
-        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
           S3ObjectLocation(bucket = "my-s3-bucket", key = "path/../to/pictures")
         }
 
-        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
+        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: path/../to/pictures"
+      }
+
+      it("blocks multiple consecutive slashes") {
+        val err = intercept[IllegalArgumentException] {
+          S3ObjectLocation(bucket = "my-s3-bucket", key = "path//to/cat.jpg")
+        }
+
+        err.getMessage shouldBe "requirement failed: S3 object key cannot include multiple consecutive slashes: path//to/cat.jpg"
+      }
+
+      it("blocks a trailing slash") {
+        val err = intercept[IllegalArgumentException] {
+          S3ObjectLocation(bucket = "my-s3-bucket", key = "path/to/cat.jpg/")
+        }
+
+        err.getMessage shouldBe "requirement failed: S3 object key cannot end with a slash: path/to/cat.jpg/"
       }
     }
   }
@@ -207,13 +223,31 @@ class S3ObjectLocationTest
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/./to/pictures")
         }
 
-        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+        err1.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/../to/pictures")
         }
 
-        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
+        err2.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/../to/pictures"
+      }
+
+      it("blocks multiple consecutive slashes") {
+        val err1 = intercept[IllegalArgumentException] {
+          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures//")
+        }
+
+        err1.getMessage shouldBe "requirement failed: S3 key prefix cannot include multiple consecutive slashes: path/to/pictures//"
+
+        val err2 = intercept[IllegalArgumentException] {
+          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path//to/pictures")
+        }
+
+        err2.getMessage shouldBe "requirement failed: S3 key prefix cannot include multiple consecutive slashes: path//to/pictures"
+      }
+
+      it("allows a trailing slash") {
+        S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures/")
       }
     }
   }
