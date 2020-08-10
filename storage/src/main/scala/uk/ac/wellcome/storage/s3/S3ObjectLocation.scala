@@ -18,7 +18,7 @@ case class S3ObjectLocation(
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
     Paths.get(key).normalize().toString == key,
-    s"S3 object key cannot contain '.' or '..' entries: $key"
+    s"S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: $key"
   )
 
   override def toString: String =
@@ -42,8 +42,8 @@ case class S3ObjectLocationPrefix(
   // "parent directory".  Having either of these in an S3 key causes issues in
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
-    Paths.get(keyPrefix).normalize().toString == keyPrefix,
-    s"S3 object key cannot contain '.' or '..' entries: $keyPrefix"
+    Paths.get(keyPrefix.stripSuffix("/")).normalize().toString == keyPrefix.stripSuffix("/"),
+    s"S3 key prefix cannot contain '.' or '..' entries: $keyPrefix"
   )
 
   override def toString: String =

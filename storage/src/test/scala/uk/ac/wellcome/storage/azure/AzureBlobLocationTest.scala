@@ -37,13 +37,13 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
         AzureBlobLocation(container = "my-azure-container", name = "path/./to/pictures")
       }
 
-      err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/./to/pictures"
+      err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries, or end in a trailing slash: path/./to/pictures"
 
       val err2 = intercept[IllegalArgumentException] {
         AzureBlobLocation(container = "my-azure-container", name = "path/../to/pictures")
       }
 
-      err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/../to/pictures"
+      err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries, or end in a trailing slash: path/../to/pictures"
     }
   }
 
@@ -80,13 +80,17 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
         AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/./to/pictures")
       }
 
-      err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/./to/pictures"
+      err1.getMessage shouldBe "requirement failed: Azure blob name prefix cannot contain '.' or '..' entries: path/./to/pictures"
 
       val err2 = intercept[IllegalArgumentException] {
         AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/../to/pictures")
       }
 
-      err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/../to/pictures"
+      err2.getMessage shouldBe "requirement failed: Azure blob name prefix cannot contain '.' or '..' entries: path/../to/pictures"
+    }
+
+    it("allows a trailing slash") {
+      AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/to/pictures/")
     }
   }
 }

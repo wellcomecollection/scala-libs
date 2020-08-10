@@ -16,7 +16,7 @@ case class AzureBlobLocation(
   // so prevent our code from creating objects with such names.
   require(
     Paths.get(name).normalize().toString == name,
-    s"Azure blob name cannot contain '.' or '..' entries: $name"
+    s"Azure blob name cannot contain '.' or '..' entries, or end in a trailing slash: $name"
   )
 
   def join(parts: String*): AzureBlobLocation =
@@ -42,8 +42,8 @@ case class AzureBlobLocationPrefix(
   // or "parent directory".  An object store isn't the same as a filesystem,
   // so prevent our code from creating objects with such names.
   require(
-    Paths.get(namePrefix).normalize().toString == namePrefix,
-    s"Azure blob name cannot contain '.' or '..' entries: $namePrefix"
+    Paths.get(namePrefix.stripSuffix("/")).normalize().toString == namePrefix.stripSuffix("/"),
+    s"Azure blob name prefix cannot contain '.' or '..' entries: $namePrefix"
   )
 
   def asLocation(parts: String*): AzureBlobLocation =

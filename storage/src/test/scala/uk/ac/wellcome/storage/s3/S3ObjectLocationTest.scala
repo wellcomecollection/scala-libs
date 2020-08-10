@@ -107,13 +107,13 @@ class S3ObjectLocationTest
           S3ObjectLocation(bucket = "my-s3-bucket", key = "path/./to/pictures")
         }
 
-        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
           S3ObjectLocation(bucket = "my-s3-bucket", key = "path/../to/pictures")
         }
 
-        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
+        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries, or end in a trailing slash: path/../to/pictures"
       }
     }
   }
@@ -207,13 +207,17 @@ class S3ObjectLocationTest
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/./to/pictures")
         }
 
-        err1.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/./to/pictures"
+        err1.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/../to/pictures")
         }
 
-        err2.getMessage shouldBe "requirement failed: S3 object key cannot contain '.' or '..' entries: path/../to/pictures"
+        err2.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/../to/pictures"
+      }
+
+      it("allows a trailing slash") {
+        S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures/")
       }
     }
   }
