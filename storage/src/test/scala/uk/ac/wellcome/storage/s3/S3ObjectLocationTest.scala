@@ -207,17 +207,25 @@ class S3ObjectLocationTest
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/./to/pictures")
         }
 
-        err1.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/./to/pictures"
+        err1.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries, or have more than one trailing slash: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
           S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/../to/pictures")
         }
 
-        err2.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/../to/pictures"
+        err2.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries, or have more than one trailing slash: path/../to/pictures"
       }
 
       it("allows a trailing slash") {
         S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures/")
+      }
+
+      it("blocks more than one trailing slash") {
+        val err = intercept[IllegalArgumentException] {
+          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures//")
+        }
+
+        err.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries, or have more than one trailing slash: path/to/pictures//"
       }
     }
   }

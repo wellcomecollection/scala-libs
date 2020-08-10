@@ -43,7 +43,7 @@ case class S3ObjectLocationPrefix(
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
     Paths.get(keyPrefix.stripSuffix("/")).normalize().toString == keyPrefix.stripSuffix("/"),
-    s"S3 key prefix cannot contain '.' or '..' entries: $keyPrefix"
+    s"S3 key prefix cannot contain '.' or '..' entries, or have more than one trailing slash: $keyPrefix"
   )
 
   override def toString: String =

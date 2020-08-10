@@ -43,7 +43,7 @@ case class AzureBlobLocationPrefix(
   // so prevent our code from creating objects with such names.
   require(
     Paths.get(namePrefix.stripSuffix("/")).normalize().toString == namePrefix.stripSuffix("/"),
-    s"Azure blob name prefix cannot contain '.' or '..' entries: $namePrefix"
+    s"Azure blob name prefix cannot contain '.' or '..' entries, or have more than one trailing slash: $namePrefix"
   )
 
   def asLocation(parts: String*): AzureBlobLocation =
