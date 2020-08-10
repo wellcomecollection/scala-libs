@@ -61,7 +61,8 @@ case class AzureBlobLocationPrefix(
   // or "parent directory".  An object store isn't the same as a filesystem,
   // so prevent our code from creating objects with such names.
   require(
-    Paths.get(namePrefix.stripSuffix("/")).normalize().toString == namePrefix.stripSuffix("/"),
+    Paths.get(namePrefix.stripSuffix("/")).normalize().toString == namePrefix
+      .stripSuffix("/"),
     s"Azure blob name prefix cannot contain '.' or '..' entries: $namePrefix"
   )
 

@@ -61,7 +61,8 @@ case class S3ObjectLocationPrefix(
   // "parent directory".  Having either of these in an S3 key causes issues in
   // the S3 console, so prevent our code from creating objects with such keys.
   require(
-    Paths.get(keyPrefix.stripSuffix("/")).normalize().toString == keyPrefix.stripSuffix("/"),
+    Paths.get(keyPrefix.stripSuffix("/")).normalize().toString == keyPrefix
+      .stripSuffix("/"),
     s"S3 key prefix cannot contain '.' or '..' entries: $keyPrefix"
   )
 
