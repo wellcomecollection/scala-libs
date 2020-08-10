@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v19.4.3 - 2020-08-10
+
+Allow a trailing slash in an S3ObjectLocationPrefix and an AzureBlobLocationPrefix.
+
+This also improves the error handling of illegal keys.
+
 ## v19.4.2 - 2020-08-06
 
 Disallow using `.` and `..` in an S3ObjectLocation key and an AzureBlobLocation name.
