@@ -100,10 +100,16 @@ class S3toAzureTransfer(implicit
                           dst: AzureBlobLocation): TransferEither =
     s3Readable.get(src) match {
       case Right(Identified(_, srcStream)) =>
-        azureWritable.put(dst)(srcStream) match {
+        val result = azureWritable.put(dst)(srcStream) match {
           case Right(_)  => Right(TransferPerformed(src, dst))
           case Left(err) => Left(TransferDestinationFailure(src, dst, err.e))
         }
+
+        // Remember to close the S3 stream that we opened -- see
+        // discussion above.
+        srcStream.close()
+
+        result
 
       case Left(err) => Left(TransferSourceFailure(src, dst, err.e))
     }
