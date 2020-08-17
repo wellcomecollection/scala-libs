@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v19.4.4 - 2020-08-17
+
+Remember to close streams that get opened in S3toAzureTransfer, otherwise you get the error:
+
+> Unable to execute HTTP request: Timeout waiting for connection from pool
+
 ## v19.4.3 - 2020-08-10
 
 Allow a trailing slash in an S3ObjectLocationPrefix and an AzureBlobLocationPrefix.
