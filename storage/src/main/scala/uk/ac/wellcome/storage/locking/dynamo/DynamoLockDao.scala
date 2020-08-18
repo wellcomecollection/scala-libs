@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
+import org.scanamo.semiauto._
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import uk.ac.wellcome.storage.locking.{LockDao, LockFailure, UnlockFailure}
@@ -19,10 +20,13 @@ import scala.util.Try
 class DynamoLockDao(
   val client: AmazonDynamoDB,
   config: DynamoLockDaoConfig
-)(implicit val ec: ExecutionContext, val df: DynamoFormat[ExpiringLock])
+)(implicit val ec: ExecutionContext)
     extends LockDao[String, UUID]
     with Logging
     with ScanamoHelpers[ExpiringLock] {
+
+  implicit val df: DynamoFormat[ExpiringLock] =
+    deriveDynamoFormat[ExpiringLock]
 
   override val table: ScanamoTable[ExpiringLock] =
     ScanamoTable[ExpiringLock](config.dynamoConfig.tableName)
