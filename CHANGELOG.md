@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v19.5.0 - 2020-08-18
+
+Remove the implicit DynamoFormat[ExpiringLock] parameter from the lock dao and instead provide it internally, therefore preventing inconsistent formatting.
+
 ## v19.4.4 - 2020-08-17
 
 Remember to close streams that get opened in S3toAzureTransfer, otherwise you get the error:
