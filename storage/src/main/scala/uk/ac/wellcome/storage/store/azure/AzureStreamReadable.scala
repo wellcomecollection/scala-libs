@@ -9,9 +9,8 @@ import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 trait AzureStreamReadable
     extends RetryableReadable[AzureBlobLocation, InputStreamWithLength] {
   implicit val blobClient: BlobServiceClient
-  val maxRetries: Int
 
-  def retryableGetFunction(
+  override protected def retryableGetFunction(
     location: AzureBlobLocation): InputStreamWithLength = {
     val blobInputStream = blobClient
       .getBlobContainerClient(location.container)
@@ -24,6 +23,6 @@ trait AzureStreamReadable
     )
   }
 
-  def buildGetError(throwable: Throwable): ReadError =
+  override protected def buildGetError(throwable: Throwable): ReadError =
     AzureStorageErrors.readErrors(throwable)
 }

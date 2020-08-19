@@ -30,7 +30,7 @@ class AzureBlobMetadata(val maxRetries: Int = 2)(
     }
   }
 
-  override def retryableGetFunction(
+  override protected def retryableGetFunction(
     location: AzureBlobLocation): Map[String, String] = {
     val individualBlobClient =
       blobClient
@@ -40,6 +40,6 @@ class AzureBlobMetadata(val maxRetries: Int = 2)(
     individualBlobClient.getProperties.getMetadata.asScala.toMap
   }
 
-  override def buildGetError(throwable: Throwable): ReadError =
+  override protected def buildGetError(throwable: Throwable): ReadError =
     AzureStorageErrors.readErrors(throwable)
 }
