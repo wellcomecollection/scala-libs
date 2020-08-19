@@ -19,7 +19,7 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     extends Tags[S3ObjectLocation]
     with RetryableReadable[S3ObjectLocation, Map[String, String]] {
 
-  override def retryableGetFunction(
+  override protected def retryableGetFunction(
     location: S3ObjectLocation): Map[String, String] = {
     val response = s3Client.getObjectTagging(
       new GetObjectTaggingRequest(location.bucket, location.key)
@@ -30,7 +30,7 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     }.toMap
   }
 
-  override def buildGetError(throwable: Throwable): ReadError =
+  override protected def buildGetError(throwable: Throwable): ReadError =
     S3Errors.readErrors(throwable)
 
   override protected def writeTags(

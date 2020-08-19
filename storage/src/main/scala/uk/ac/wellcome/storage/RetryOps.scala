@@ -39,6 +39,7 @@ object RetryOps extends Logging {
             debug(s"Retryable error: marking operation as failed with $err")
             Left(err)
           } else {
+            assert(remainingAttempts > 0)
             debug(s"Retryable error: retrying operation with $err")
             retryInternal(remainingAttempts - 1)(in)
           }

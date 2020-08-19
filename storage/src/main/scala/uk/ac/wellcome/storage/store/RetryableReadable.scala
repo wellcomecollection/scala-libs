@@ -10,17 +10,14 @@ trait RetryableReadable[Ident, T] extends Readable[Ident, T] with Logging {
 
   val maxRetries: Int
 
-  def retryableGetFunction(id: Ident): T
+  protected def retryableGetFunction(id: Ident): T
 
-  def buildGetError(throwable: Throwable): ReadError
+  protected def buildGetError(throwable: Throwable): ReadError
 
   def get(id: Ident): ReadEither =
-    retryableGet(id) map { t =>
+    getOnce.retry(maxRetries)(id) map { t =>
       Identified(id, t)
     }
-
-  def retryableGet(id: Ident): Either[ReadError, T] =
-    getOnce.retry(maxRetries)(id)
 
   private def getOnce: Ident => Either[ReadError, T] =
     (id: Ident) =>
