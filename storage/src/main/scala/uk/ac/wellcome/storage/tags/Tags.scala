@@ -14,7 +14,7 @@ trait Tags[Ident]
     tags: Map[String, String]): Either[WriteError, Map[String, String]]
 
   def update(id: Ident)(updateFunction: UpdateFunction): UpdateEither = {
-    info(s"Tags on $id: updating tags")
+    debug(s"Tags on $id: updating tags")
 
     for {
       existingTags <- get(id) match {
