@@ -19,6 +19,9 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
       override val maxRetries: Int = retries
     }
 
+  val s3ServerException = new AmazonS3Exception("We encountered an internal error. Please try again.")
+  s3ServerException.setStatusCode(500)
+
   it("does not retry a deterministic error") {
     val spyClient = spy(s3Client)
 
@@ -41,7 +44,7 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
       putStream(location)
 
       when(mockClient.getObject(any[String], any[String]))
-        .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
+        .thenThrow(s3ServerException)
         .thenReturn(s3Client.getObject(location.bucket, location.key))
 
       val readable = createS3ReadableWith(mockClient, retries = 3)
@@ -59,10 +62,10 @@ class S3StreamReadableTest extends AnyFunSpec with Matchers with S3Fixtures with
     val retries = 4
 
     when(mockClient.getObject(any[String], any[String]))
-      .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-      .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-      .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-      .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
+      .thenThrow(s3ServerException)
+      .thenThrow(s3ServerException)
+      .thenThrow(s3ServerException)
+      .thenThrow(s3ServerException)
 
     val readable = createS3ReadableWith(mockClient, retries = retries)
     readable.get(location).left.value shouldBe a[StoreReadError]
