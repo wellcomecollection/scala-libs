@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.5.2 - 2020-08-19
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+The `S3Tags` class will now retry writing tags to S3 if it receives a transient error from the SetObjectTagging API.
+
 ## v19.5.1 - 2020-08-19
 
 ### Libraries affected
