@@ -10,7 +10,12 @@ import com.amazonaws.services.s3.model.{
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
-import uk.ac.wellcome.storage.{ReadError, StoreWriteError, WriteError}
+import uk.ac.wellcome.storage.{
+  ReadError,
+  RetryableError,
+  StoreWriteError,
+  WriteError
+}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
@@ -35,6 +40,18 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
 
   override protected def writeTags(
     location: S3ObjectLocation,
+    tags: Map[String, String]
+  ): Either[WriteError, Map[String, String]] = {
+    import uk.ac.wellcome.storage.RetryOps._
+
+    def inner: Either[WriteError, Map[String, String]] =
+      writeTagsOnce(location, tags)
+
+    inner.retry(maxRetries)
+  }
+
+  private def writeTagsOnce(
+    location: S3ObjectLocation,
     tags: Map[String, String]): Either[WriteError, Map[String, String]] = {
     val tagSet = tags
       .map { case (k, v) => new Tag(k, v) }
@@ -51,7 +68,7 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
       )
     } match {
       case Success(_)   => Right(tags)
-      case Failure(err) => Left(StoreWriteError(err))
+      case Failure(err) => Left(new StoreWriteError(err) with RetryableError)
     }
   }
 }
