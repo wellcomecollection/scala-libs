@@ -138,6 +138,9 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     }
   }
 
+  val s3ServerException = new AmazonS3Exception("We encountered an internal error. Please try again.")
+  s3ServerException.setStatusCode(500)
+
   describe("retries flaky errors from the SetObjectTagging API") {
     it("doesn't retry a persistent error") {
       val mockClient = mock[AmazonS3]
@@ -171,7 +174,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         createGetObjectTaggingMock(mockClient, location = location)
 
         when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
-          .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
+          .thenThrow(s3ServerException)
           .thenReturn(
             s3Client.setObjectTagging(
               new SetObjectTaggingRequest(
@@ -196,8 +199,6 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     it("gives up if there are too many flaky errors") {
       val mockClient = mock[AmazonS3]
 
-      val retries = 4
-
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
         putStream(location)
@@ -205,15 +206,15 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         createGetObjectTaggingMock(mockClient, location = location)
 
         when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
-          .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-          .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-          .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
-          .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
+          .thenThrow(s3ServerException)
+          .thenThrow(s3ServerException)
+          .thenThrow(s3ServerException)
+          .thenThrow(s3ServerException)
 
-        val tags = new S3Tags(maxRetries = retries - 1)(s3Client = mockClient)
+        val tags = new S3Tags(maxRetries = 4)(s3Client = mockClient)
         tags.update(location) { _ => Right(Map("colour" -> "blue")) } shouldBe a[Left[_, _]]
 
-        verify(mockClient, times(3)).setObjectTagging(any[SetObjectTaggingRequest])
+        verify(mockClient, times(4)).setObjectTagging(any[SetObjectTaggingRequest])
       }
     }
 
