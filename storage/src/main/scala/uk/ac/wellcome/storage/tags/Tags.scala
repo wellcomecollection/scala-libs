@@ -23,7 +23,7 @@ trait Tags[Ident]
         case Left(err)                    => Left(UpdateReadError(err))
       }
 
-      _ = debug(s"Tags on $id: existing tags = $existingTags")
+      _ = debug(s"Tags on $id: existing tags = ${existingTags.identifiedT}")
 
       newTags <- updateFunction(existingTags.identifiedT)
 
