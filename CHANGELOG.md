@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.5.1 - 2020-08-19
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Internal refactoring and cleanups in RetryOps and RetryReadable.
+
 ## v19.5.0 - 2020-08-18
 
 Remove the implicit DynamoFormat[ExpiringLock] parameter from the lock dao and instead provide it internally, therefore preventing inconsistent formatting.
