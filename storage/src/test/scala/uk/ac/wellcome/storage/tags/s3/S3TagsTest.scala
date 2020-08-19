@@ -3,7 +3,8 @@ package uk.ac.wellcome.storage.tags.s3
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model._
 import org.mockito.Matchers._
-import org.mockito.Mockito._
+import org.mockito.Mockito.{when, _}
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -138,6 +139,28 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
   }
 
   describe("retries flaky errors from the SetObjectTagging API") {
+    it("doesn't retry a persistent error") {
+      val mockClient = mock[AmazonS3]
+
+      withLocalS3Bucket { bucket =>
+        val location = createS3ObjectLocationWith(bucket)
+        putStream(location)
+
+        createGetObjectTaggingMock(mockClient, location = location)
+
+        // This simulates the case where the object is deleted between the
+        // GET call to find the current tags, and the SET call to update them.
+        // That would be quite unusual and worth further investigation.
+        when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
+          .thenThrow(new AmazonS3Exception("The specified key does not exist"))
+
+        val tags = new S3Tags()(s3Client = mockClient)
+        tags.update(location) { _ => Right(Map("colour" -> "red")) } shouldBe a[Left[_, _]]
+
+        verify(mockClient, times(1)).setObjectTagging(any[SetObjectTaggingRequest])
+      }
+    }
+
     it("it retries a single error") {
       val mockClient = mock[AmazonS3]
 
@@ -145,13 +168,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val location = createS3ObjectLocationWith(bucket)
         putStream(location)
 
-        when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
-          .thenReturn(
-            s3Client
-              .getObjectTagging(
-                new GetObjectTaggingRequest(location.bucket, location.key)
-              )
-          )
+        createGetObjectTaggingMock(mockClient, location = location)
 
         when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
           .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
@@ -185,13 +202,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val location = createS3ObjectLocationWith(bucket)
         putStream(location)
 
-        when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
-          .thenReturn(
-            s3Client
-              .getObjectTagging(
-                new GetObjectTaggingRequest(location.bucket, location.key)
-              )
-          )
+        createGetObjectTaggingMock(mockClient, location = location)
 
         when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
           .thenThrow(new AmazonS3Exception("We encountered an internal error. Please try again."))
@@ -205,6 +216,15 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         verify(mockClient, times(3)).setObjectTagging(any[SetObjectTaggingRequest])
       }
     }
+
+    def createGetObjectTaggingMock(mockClient: AmazonS3, location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResult] =
+      when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
+        .thenReturn(
+          s3Client
+            .getObjectTagging(
+              new GetObjectTaggingRequest(location.bucket, location.key)
+            )
+        )
   }
 
   private def assertIsS3Exception(result: s3Tags.UpdateEither)(assert: String => Assertion): Assertion = {

@@ -1,21 +1,11 @@
 package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{
-  GetObjectTaggingRequest,
-  ObjectTagging,
-  SetObjectTaggingRequest,
-  Tag
-}
+import com.amazonaws.services.s3.model._
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
-import uk.ac.wellcome.storage.{
-  ReadError,
-  RetryableError,
-  StoreWriteError,
-  WriteError
-}
+import uk.ac.wellcome.storage._
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
@@ -68,7 +58,14 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
       )
     } match {
       case Success(_)   => Right(tags)
-      case Failure(err) => Left(new StoreWriteError(err) with RetryableError)
+
+      case Failure(exc: AmazonS3Exception)
+        if exc.getMessage.startsWith(
+          "We encountered an internal error. Please try again.") ||
+          exc.getMessage.startsWith("Please reduce your request rate.") =>
+        Left(new StoreWriteError(exc) with RetryableError)
+
+      case Failure(err) => Left(StoreWriteError(err))
     }
   }
 }
