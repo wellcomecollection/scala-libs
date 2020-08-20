@@ -12,7 +12,8 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class AzureBlobItemListing(implicit blobClient: BlobServiceClient)
-    extends AzureListing[BlobItem] with Logging {
+    extends AzureListing[BlobItem]
+    with Logging {
   override def list(prefix: AzureBlobLocationPrefix): ListingResult = {
     if (!prefix.namePrefix.endsWith("/")) {
       warn(
