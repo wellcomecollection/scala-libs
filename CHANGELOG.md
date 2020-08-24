@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.5.4 - 2020-08-24
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Make the warning introduced in v19.5.3 a bit less chatty.  In particular, the Listing classes no longer warn if you try to list a prefix with an empty path -- i.e., the complete contents of an S3 bucket or Azure container.
+
 ## v19.5.3 - 2020-08-20
 
 Warn that listing the contents of an S3/Azure prefix that doesn't end in a slash may include unexpected objects.
