@@ -15,7 +15,7 @@ class S3ObjectSummaryListing(batchSize: Int = 1000)(
 ) extends S3Listing[S3ObjectSummary]
     with Logging {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult = {
-    if (!prefix.keyPrefix.endsWith("/")) {
+    if (!prefix.keyPrefix.endsWith("/") && prefix.keyPrefix != "") {
       warn(
         "Listing an S3 prefix that does not end with a slash " +
           s"($prefix) may return unexpected objects. " +

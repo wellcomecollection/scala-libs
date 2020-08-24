@@ -15,7 +15,7 @@ class AzureBlobItemListing(implicit blobClient: BlobServiceClient)
     extends AzureListing[BlobItem]
     with Logging {
   override def list(prefix: AzureBlobLocationPrefix): ListingResult = {
-    if (!prefix.namePrefix.endsWith("/")) {
+    if (!prefix.namePrefix.endsWith("/") && prefix.namePrefix != "") {
       warn(
         "Listing an Azure prefix that does not end with a slash " +
           s"($prefix) may return unexpected blobs. " +
