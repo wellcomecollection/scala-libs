@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 from commands import git, sbt
-from git_utils import get_changed_paths
+from git_utils import get_changed_paths, remote_default_branch
 from provider import current_branch, is_default_branch, repo
 
 ROOT = subprocess.check_output([
@@ -30,8 +30,10 @@ def has_source_changes():
     Returns True if there are source changes since the previous release,
     False if not.
     """
+    range = f"{remote_default_branch()}..{current_branch()}"
+
     changed_files = [
-        f for f in get_changed_paths() if f.strip().endswith(('.sbt', '.scala'))
+        f for f in get_changed_paths(range) if f.strip().endswith(('.sbt', '.scala'))
     ]
     return len(changed_files) != 0
 
@@ -81,6 +83,8 @@ def check_release_file():
                 'one to describe your changes.'
             )
             sys.exit(1)
+
+        print('Source changes detected (RELEASE.md is present).')
         parse_release_file()
     else:
         print('No source changes detected (RELEASE.md not required).')
