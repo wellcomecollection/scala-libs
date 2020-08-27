@@ -150,6 +150,8 @@ def check_release_file():
             )
             sys.exit(1)
         parse_release_file()
+    else:
+        print('No source changes detected. No requirement for RELEASE.md')
 
 
 def configure_secrets():
