@@ -4,8 +4,7 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.Future
 
-trait Runnable
-  extends Logging {
+trait Runnable extends Logging {
   def run(): Future[Any]
 
   val foo = "bar"
