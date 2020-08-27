@@ -9,17 +9,17 @@ from git_utils import (
     remote_default_branch,
     local_current_head,
     get_sha1_for_tag,
-    remote_default_head
+    remote_default_head,
 )
 from provider import current_branch, is_default_branch, repo
-from release import check_release_file, parse_release_file, has_release
+from release import check_release_file, parse_release_file, has_release, latest_version
 
 
 def autoformat():
     local_head = local_current_head()
 
     if is_default_branch():
-        latest_sha = get_sha1_for_tag("latest")
+        latest_sha = get_sha1_for_tag(latest_version())
         commit_range = f"{latest_sha}..{local_head}"
     else:
         remote_head = remote_default_head()
