@@ -22,7 +22,7 @@ def get_all_tags():
     Returns a list of all tags in the repo.
     """
     git('fetch', '--tags')
-    result = subprocess.check_output(['git', 'tag']).decode('ascii').strip()
+    result = git('tag')
     all_tags = result.split('\n')
 
     assert len(set(all_tags)) == len(all_tags)

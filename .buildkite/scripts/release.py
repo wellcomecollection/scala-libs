@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
+import datetime as dt
 import os
 import re
 import sys
@@ -8,6 +9,7 @@ import sys
 from commands import git
 from git_utils import (
     get_changed_paths,
+    get_all_tags,
     remote_default_branch,
     local_current_head,
     get_sha1_for_tag,
@@ -148,7 +150,7 @@ def latest_version():
 
     _, latest = max(versions)
 
-    assert latest in tags()
+    assert latest in get_all_tags()
     return latest
 
 
@@ -201,7 +203,7 @@ def release():
     local_head = local_current_head()
 
     if is_default_branch():
-        latest_sha = get_sha1_for_tag("latest")
+        latest_sha = get_sha1_for_tag(latest_version())
         commit_range = f"{latest_sha}..{local_head}"
     else:
         remote_head = remote_default_head()
@@ -218,14 +220,14 @@ def release():
     if has_release():
         print('Updating changelog and version')
         update_for_pending_release()
+        
+        print('Attempting a release.')
+
+        git('push', 'ssh-origin', 'HEAD:master')
+        git('push', 'ssh-origin', '--tag')
     else:
         print('Not releasing due to no release file')
         sys.exit(0)
-
-    print('Attempting a release.')
-
-    git('push', 'ssh-origin', 'HEAD:master')
-    git('push', 'ssh-origin', '--tag')
 
 
 if __name__ == '__main__':
