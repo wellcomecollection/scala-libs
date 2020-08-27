@@ -7,38 +7,14 @@ import re
 import subprocess
 import sys
 
+from git_utils import get_all_tags
 
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
 BUILD_SBT = os.path.join(ROOT, 'build.sbt')
 
-
-def git(*args):
-    """
-    Run a Git command and check it completes successfully.
-    """
-    subprocess.check_call(('git',) + args)
-
-
-def sbt(*args):
-    """
-    Run an sbt command and check it completes successfully.
-    """
-    subprocess.check_call(('sbt',) + args)
-
-
-def tags():
-    """
-    Returns a list of all tags in the repo.
-    """
-    git('fetch', '--tags')
-    result = subprocess.check_output(['git', 'tag']).decode('ascii').strip()
-    all_tags = result.split('\n')
-
-    assert len(set(all_tags)) == len(all_tags)
-
-    return set(all_tags)
+RELEASE_FILE = os.path.join(ROOT, 'RELEASE.md')
 
 
 def latest_version():
@@ -47,7 +23,7 @@ def latest_version():
     """
     versions = []
 
-    for t in tags():
+    for t in get_all_tags():
         assert t == t.strip()
         parts = t.split('.')
         assert len(parts) == 3, t
@@ -60,9 +36,6 @@ def latest_version():
 
     assert latest in tags()
     return latest
-
-
-RELEASE_FILE = os.path.join(ROOT, 'RELEASE.md')
 
 
 def has_release():
