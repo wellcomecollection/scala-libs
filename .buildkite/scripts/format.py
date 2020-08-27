@@ -3,12 +3,11 @@
 
 import os
 import re
-import shutil
 import subprocess
 import sys
 
 from commands import git, sbt
-from git_utils import get_changed_paths, remote_default_branch
+from git_utils import get_changed_paths, remote_default_branch, local_current_head, get_sha1_for_tag, remote_default_head
 from provider import current_branch, is_default_branch, repo
 
 ROOT = subprocess.check_output([
@@ -25,13 +24,11 @@ PATCH = 'patch'
 VALID_RELEASE_TYPES = (MAJOR, MINOR, PATCH)
 
 
-def has_source_changes():
+def has_source_changes(commit_range):
     """
     Returns True if there are source changes since the previous release,
     False if not.
     """
-    range = f"{remote_default_branch()}..{current_branch()}"
-
     changed_files = [
         f for f in get_changed_paths(range) if f.strip().endswith(('.sbt', '.scala'))
     ]
@@ -75,8 +72,8 @@ def parse_release_file():
     return release_type, release_contents
 
 
-def check_release_file():
-    if has_source_changes():
+def check_release_file(commit_range):
+    if has_source_changes(commit_range):
         if not has_release():
             print(
                 'There are source changes but no RELEASE.md. Please create '
@@ -90,29 +87,23 @@ def check_release_file():
         print('No source changes detected (RELEASE.md not required).')
 
 
-def configure_secrets():
-    subprocess.check_call(['unzip', 'secrets.zip'])
-
-    os.makedirs(os.path.join(os.environ['HOME'], '.aws'))
-    shutil.copyfile(
-        src='awscredentials',
-        dst=os.path.join(os.environ['HOME'], '.aws', 'credentials')
-    )
-
-    subprocess.check_call(['chmod', '600', 'id_rsa'])
-    git('config', 'core.sshCommand', 'ssh -i id_rsa')
-
-    git('config', 'user.name', 'Travis CI on behalf of Wellcome')
-    git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
-
-    print('SSH public key:')
-    subprocess.check_call(['ssh-keygen', '-y', '-f', 'id_rsa'])
-
-
 def autoformat():
+    local_head = local_current_head()
+
+    if is_default_branch():
+        latest_sha = get_sha1_for_tag("latest")
+        commit_range = f"{latest_sha}..{local_head}"
+    else:
+        remote_head = remote_default_head()
+        commit_range = f"{remote_head}..{local_head}"
+
+    print(f"Working in branch: {current_branch()}")
+    print(f"On default branch: {is_default_branch()}")
+    print(f"Commit range: {commit_range}")
+
     sbt('scalafmt')
 
-    check_release_file()
+    check_release_file(commit_range)
 
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
