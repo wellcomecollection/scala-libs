@@ -30,7 +30,7 @@ def has_source_changes(commit_range):
     False if not.
     """
     changed_files = [
-        f for f in get_changed_paths(range) if f.strip().endswith(('.sbt', '.scala'))
+        f for f in get_changed_paths(commit_range) if f.strip().endswith(('.sbt', '.scala'))
     ]
     return len(changed_files) != 0
 
