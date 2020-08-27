@@ -1,50 +1,26 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
-import datetime as dt
 import os
 import re
-import subprocess
 import sys
 
-from git_utils import get_all_tags
+from commands import git
+from git_utils import (
+    get_changed_paths,
+    remote_default_branch,
+    local_current_head,
+    get_sha1_for_tag,
+    remote_default_head
+)
+from provider import current_branch, is_default_branch
 
-ROOT = subprocess.check_output([
-    'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
+
+ROOT = git('rev-parse', '--show-toplevel')
 
 BUILD_SBT = os.path.join(ROOT, 'build.sbt')
 
 RELEASE_FILE = os.path.join(ROOT, 'RELEASE.md')
-
-
-def latest_version():
-    """
-    Returns the latest version, as specified by the Git tags.
-    """
-    versions = []
-
-    for t in get_all_tags():
-        assert t == t.strip()
-        parts = t.split('.')
-        assert len(parts) == 3, t
-        parts[0] = parts[0].lstrip('v')
-        v = tuple(map(int, parts))
-
-        versions.append((v, t))
-
-    _, latest = max(versions)
-
-    assert latest in tags()
-    return latest
-
-
-def has_release():
-    """
-    Returns True if there is a release file, False if not.
-    """
-    return os.path.exists(RELEASE_FILE)
-
-
 RELEASE_TYPE = re.compile(r"^RELEASE_TYPE: +(major|minor|patch)")
 
 MAJOR = 'major'
@@ -52,51 +28,6 @@ MINOR = 'minor'
 PATCH = 'patch'
 
 VALID_RELEASE_TYPES = (MAJOR, MINOR, PATCH)
-
-
-def parse_release_file():
-    """
-    Parses the release file, returning a tuple (release_type, release_contents)
-    """
-    with open(RELEASE_FILE) as i:
-        release_contents = i.read()
-
-    release_lines = release_contents.split('\n')
-
-    m = RELEASE_TYPE.match(release_lines[0])
-    if m is not None:
-        release_type = m.group(1)
-        if release_type not in VALID_RELEASE_TYPES:
-            print('Unrecognised release type %r' % (release_type,))
-            sys.exit(1)
-        del release_lines[0]
-        release_contents = '\n'.join(release_lines).strip()
-    else:
-        print(
-            'RELEASE.md does not start by specifying release type. The first '
-            'line of the file should be RELEASE_TYPE: followed by one of '
-            'major, minor, or patch, to specify the type of release that '
-            'this is (i.e. which version number to increment). Instead the '
-            'first line was %r' % (release_lines[0],)
-        )
-        sys.exit(1)
-
-    return release_type, release_contents
-
-
-def hash_for_name(name):
-    return subprocess.check_output([
-        'git', 'rev-parse', name
-    ]).decode('ascii').strip()
-
-
-def is_ancestor(a, b):
-    check = subprocess.call([
-        'git', 'merge-base', '--is-ancestor', a, b
-    ])
-    assert 0 <= check <= 1
-    return check == 0
-
 
 CHANGELOG_HEADER = re.compile(r"^## v\d+\.\d+\.\d+ - \d\d\d\d-\d\d-\d\d$")
 CHANGELOG_FILE = os.path.join(ROOT, 'CHANGELOG.md')
@@ -193,20 +124,94 @@ def update_for_pending_release():
     git('tag', new_version(release_type))
 
 
+def has_release():
+    """
+    Returns True if there is a release file, False if not.
+    """
+    return os.path.exists(RELEASE_FILE)
+
+
+def latest_version():
+    """
+    Returns the latest version, as specified by the Git tags.
+    """
+    versions = []
+
+    for t in get_all_tags():
+        assert t == t.strip()
+        parts = t.split('.')
+        assert len(parts) == 3, t
+        parts[0] = parts[0].lstrip('v')
+        v = tuple(map(int, parts))
+
+        versions.append((v, t))
+
+    _, latest = max(versions)
+
+    assert latest in tags()
+    return latest
+
+
+def parse_release_file():
+    """
+    Parses the release file, returning a tuple (release_type, release_contents)
+    """
+    with open(RELEASE_FILE) as i:
+        release_contents = i.read()
+
+    release_lines = release_contents.split('\n')
+
+    m = RELEASE_TYPE.match(release_lines[0])
+    if m is not None:
+        release_type = m.group(1)
+        if release_type not in VALID_RELEASE_TYPES:
+            print('Unrecognised release type %r' % (release_type,))
+            sys.exit(1)
+        del release_lines[0]
+        release_contents = '\n'.join(release_lines).strip()
+    else:
+        print(
+            'RELEASE.md does not start by specifying release type. The first '
+            'line of the file should be RELEASE_TYPE: followed by one of '
+            'major, minor, or patch, to specify the type of release that '
+            'this is (i.e. which version number to increment). Instead the '
+            'first line was %r' % (release_lines[0],)
+        )
+        sys.exit(1)
+
+    return release_type, release_contents
+
+
+def check_release_file(commit_range):
+    if has_source_changes(commit_range):
+        if not has_release():
+            print(
+                'There are source changes but no RELEASE.md. Please create '
+                'one to describe your changes.'
+            )
+            sys.exit(1)
+
+        print('Source changes detected (RELEASE.md is present).')
+        parse_release_file()
+    else:
+        print('No source changes detected (RELEASE.md not required).')
+
+
 def release():
-    last_release = latest_version()
+    local_head = local_current_head()
 
-    print('Latest released version: %s' % last_release)
+    if is_default_branch():
+        latest_sha = get_sha1_for_tag("latest")
+        commit_range = f"{latest_sha}..{local_head}"
+    else:
+        remote_head = remote_default_head()
+        commit_range = f"{remote_head}..{local_head}"
 
-    HEAD = hash_for_name('HEAD')
-    MASTER = hash_for_name('origin/master')
+    print(f"Working in branch: {current_branch()}")
+    print(f"On default branch: {is_default_branch()}")
+    print(f"Commit range: {commit_range}")
 
-    print('Current head:   %s' % HEAD)
-    print('Current master: %s' % MASTER)
-
-    on_master = is_ancestor(HEAD, MASTER)
-
-    if not on_master:
+    if not is_default_branch():
         print('Trying to release while not on master?')
         sys.exit(1)
 

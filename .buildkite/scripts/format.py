@@ -4,9 +4,15 @@
 import sys
 
 from commands import git, sbt
-from git_utils import get_changed_paths, remote_default_branch, local_current_head, get_sha1_for_tag, remote_default_head
+from git_utils import (
+    get_changed_paths,
+    remote_default_branch,
+    local_current_head,
+    get_sha1_for_tag,
+    remote_default_head
+)
 from provider import current_branch, is_default_branch, repo
-from release_utils import check_release_file, parse_release_file, has_release
+from release import check_release_file, parse_release_file, has_release
 
 
 def autoformat():
