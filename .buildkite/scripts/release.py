@@ -16,7 +16,7 @@ from git_utils import (
     remote_default_head,
     has_source_changes
 )
-from provider import current_branch, is_default_branch
+from provider import current_branch, is_default_branch, repo
 
 
 ROOT = git('rev-parse', '--show-toplevel')
@@ -224,6 +224,10 @@ def release():
         update_for_pending_release()
         
         print('Attempting a release.')
+
+        git("config", "user.name", "Buildkite on behalf of Wellcome Collection")
+        git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
+        git("remote", "add", "ssh-origin", repo(), exit_on_error=False)
 
         git('push', 'ssh-origin', 'HEAD:master')
         git('push', 'ssh-origin', '--tag')
