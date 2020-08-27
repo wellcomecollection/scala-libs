@@ -1,106 +1,20 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
-import datetime as dt
 import os
 import re
 import shutil
 import subprocess
 import sys
 
+from commands import git, sbt
+from git_utils import get_changed_paths
+from provider import current_branch, is_default_branch, repo
 
 ROOT = subprocess.check_output([
     'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
 
-
-def git(*args):
-    """
-    Run a Git command and check it completes successfully.
-    """
-    subprocess.check_call(('git',) + args)
-
-
-def sbt(*args):
-    """
-    Run an sbt command and check it completes successfully.
-    """
-    subprocess.check_call(('sbt',) + args)
-
-
-def tags():
-    """
-    Returns a list of all tags in the repo.
-    """
-    git('fetch', '--tags')
-    result = subprocess.check_output(['git', 'tag']).decode('ascii').strip()
-    all_tags = result.split('\n')
-
-    assert len(set(all_tags)) == len(all_tags)
-
-    return set(all_tags)
-
-
-def latest_version():
-    """
-    Returns the latest version, as specified by the Git tags.
-    """
-    versions = []
-
-    for t in tags():
-        assert t == t.strip()
-        parts = t.split('.')
-        assert len(parts) == 3, t
-        parts[0] = parts[0].lstrip('v')
-        v = tuple(map(int, parts))
-
-        versions.append((v, t))
-
-    _, latest = max(versions)
-
-    assert latest in tags()
-    return latest
-
-
-def modified_files():
-    """
-    Returns a list of all files which have been modified between now
-    and the latest release.
-    """
-    files = set()
-    for command in [
-        ['git', 'diff', '--name-only', '--diff-filter=d',
-            latest_version(), 'HEAD'],
-        ['git', 'diff', '--name-only']
-    ]:
-        diff_output = subprocess.check_output(command).decode('ascii')
-        for l in diff_output.split('\n'):
-            filepath = l.strip()
-            if filepath:
-                assert os.path.exists(filepath)
-                files.add(filepath)
-    return files
-
-
-def has_source_changes():
-    """
-    Returns True if there are source changes since the previous release,
-    False if not.
-    """
-    changed_files = [
-        f for f in modified_files() if f.strip().endswith(('.sbt', '.scala'))
-    ]
-    return len(changed_files) != 0
-
-
 RELEASE_FILE = os.path.join(ROOT, 'RELEASE.md')
-
-
-def has_release():
-    """
-    Returns True if there is a release file, False if not.
-    """
-    return os.path.exists(RELEASE_FILE)
-
 
 RELEASE_TYPE = re.compile(r"^RELEASE_TYPE: +(major|minor|patch)")
 
@@ -109,6 +23,24 @@ MINOR = 'minor'
 PATCH = 'patch'
 
 VALID_RELEASE_TYPES = (MAJOR, MINOR, PATCH)
+
+
+def has_source_changes():
+    """
+    Returns True if there are source changes since the previous release,
+    False if not.
+    """
+    changed_files = [
+        f for f in get_changed_paths() if f.strip().endswith(('.sbt', '.scala'))
+    ]
+    return len(changed_files) != 0
+
+
+def has_release():
+    """
+    Returns True if there is a release file, False if not.
+    """
+    return os.path.exists(RELEASE_FILE)
 
 
 def parse_release_file():
@@ -151,7 +83,7 @@ def check_release_file():
             sys.exit(1)
         parse_release_file()
     else:
-        print('No source changes detected. No requirement for RELEASE.md')
+        print('No source changes detected (RELEASE.md not required).')
 
 
 def configure_secrets():
@@ -173,15 +105,6 @@ def configure_secrets():
     subprocess.check_call(['ssh-keygen', '-y', '-f', 'id_rsa'])
 
 
-def branch_name():
-    """Return the name of the branch under test."""
-    # See https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
-    if os.environ['TRAVIS_PULL_REQUEST'] == 'false':
-        return os.environ['TRAVIS_BRANCH']
-    else:
-        return os.environ['TRAVIS_PULL_REQUEST_BRANCH']
-
-
 def autoformat():
     sbt('scalafmt')
 
@@ -190,23 +113,27 @@ def autoformat():
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
     # with the reformatted code.
-    if subprocess.call(['git', 'diff', '--exit-code']):
-        print('There were changes from formatting, creating a commit')
+    if get_changed_paths():
+        print("*** There were changes from formatting, creating a commit")
+
+        git("config", "user.name", "Buildkite on behalf of Wellcome Collection")
+        git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
+        git("remote", "add", "ssh-origin", repo(), exit_on_error=False)
 
         # We checkout the branch before we add the commit, so we don't
-        # include the merge commit that Travis makes.
-        git('fetch', 'ssh-origin')
-        git('checkout', branch_name())
+        # include the merge commit that Buildkite makes.
+        git("fetch", "ssh-origin")
+        git("checkout", "--track", f"ssh-origin/{current_branch()}")
 
-        git('add', '--verbose', '--update')
-        git('commit', '-m', 'Apply auto-formatting rules')
-        git('push', 'ssh-origin', 'HEAD:%s' % branch_name())
+        git("add", "--verbose", "--update")
+        git("commit", "-m", "Apply auto-formatting rules")
+        git("push", "ssh-origin", f"HEAD:{current_branch()}")
 
-        # We exit here to fail the build, so Travis will skip to the next
+        # We exit here to fail the build, so Buildkite will skip to the next
         # build, which includes the autoformat commit.
         sys.exit(1)
     else:
-        print('There were no changes from auto-formatting')
+        print("*** There were no changes from auto-formatting")
 
 
 if __name__ == '__main__':
