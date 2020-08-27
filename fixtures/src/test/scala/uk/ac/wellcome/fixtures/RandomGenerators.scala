@@ -30,7 +30,7 @@ trait RandomGenerators {
 
   def randomUUID: UUID = UUID.randomUUID()
 
-  def randomInt(from: Int, to: Int): Int = {
+  def randomInt(from: Int = Int.MinValue, to: Int = Int.MaxValue): Int = {
     val difference = to - from
 
     assert(difference > 0)
