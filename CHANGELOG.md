@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v19.5.5 - 2020-08-27
+
+Testing buildkite
+
 ## v19.5.4 - 2020-08-24
 
 ### Libraries affected
