@@ -220,6 +220,7 @@ def release():
 
     if has_release():
         print('Updating changelog and version')
+
         update_for_pending_release()
         
         print('Attempting a release.')
@@ -228,7 +229,7 @@ def release():
         git('push', 'ssh-origin', '--tag')
     else:
         print('Not releasing due to no release file')
-        sys.exit(0)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
