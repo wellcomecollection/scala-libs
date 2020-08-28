@@ -127,7 +127,6 @@ steps:
           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
           network: "host"
           always-pull: true
-          command: ["project typesafe_app", "publish"]
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
