@@ -75,19 +75,19 @@ steps:
           always-pull: true
           command: ["project storage_typesafe", "test"]
   - wait
-#  - label: cut release
-#    if: build.branch == "master"
-#    plugins:
-#      - docker#v3.5.0:
-#          image: "wellcome/sbt_wrapper"
-#          mount-ssh-agent: true
-#          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#          network: "host"
-#          always-pull: true
-#          propagate-environment: true
-#          entrypoint: "/usr/bin/python3"
-#    command: "/workdir/.buildkite/scripts/release.py"
-#  - wait
+  - label: cut release
+    if: build.branch == "master"
+    plugins:
+      - docker#v3.5.0:
+          image: "wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/release.py"
+  - wait
   - label: publish fixtures
     if: build.branch == "master"
     env:
@@ -173,17 +173,17 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
-#  - label: publish storage_typesafe
-#    if: build.branch == "master"
-#    env:
-#      PROJECT: storage_typesafe
-#    plugins:
-#      - docker#v3.5.0:
-#          image: "wellcome/sbt_wrapper"
-#          mount-ssh-agent: true
-#          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#          network: "host"
-#          always-pull: true
-#          propagate-environment: true
-#          entrypoint: "/usr/bin/python3"
-#    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish storage_typesafe
+    if: build.branch == "master"
+    env:
+      PROJECT: storage_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"

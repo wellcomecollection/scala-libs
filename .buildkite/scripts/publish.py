@@ -4,11 +4,16 @@ import os
 
 from commands import sbt, git
 from git_utils import remote_default_branch
-
+from release import has_release
 
 def publish(project_name):
-    git("pull", "origin", remote_default_branch())
-    sbt(f"project {project_name}", "publish")
+    if has_release():
+        print(f"Release detected, publishing {project_name}.")
+        git("pull", "origin", remote_default_branch())
+        sbt(f"project {project_name}", "publish")
+    else:
+        print("No release detected, exit gracefully.")
+        sys.exit(0)
 
 
 # This script takes environment variables as the "command" step

@@ -232,9 +232,8 @@ def release():
         git('push', 'ssh-origin', 'HEAD:master')
         git('push', 'ssh-origin', '--tag')
     else:
-        print('Not releasing due to no release file')
-        # Exit with failure to prevent release proceeding in CI
-        sys.exit(1)
+        print("No release detected, exit gracefully.")
+        sys.exit(0)
 
 
 if __name__ == '__main__':
