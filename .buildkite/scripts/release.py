@@ -233,6 +233,7 @@ def release():
         git('push', 'ssh-origin', '--tag')
     else:
         print('Not releasing due to no release file')
+        # Exit with failure to prevent release proceeding in CI
         sys.exit(1)
 
 
