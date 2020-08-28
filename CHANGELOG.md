@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.5.6 - 2020-08-28
+
+### Libraries affected
+
+All
+
+### Description
+
+Bumps the AKKA version
+
 ## v19.5.5 - 2020-08-27
 
 Add a defaults to `randomInt` in `fixtures` (also for buildkite testing)

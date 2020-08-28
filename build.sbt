@@ -1,4 +1,4 @@
-val projectVersion = "19.5.5"
+val projectVersion = "19.5.6"
 
 lazy val fixtures = Common.setupProject(
   project,
