@@ -11,6 +11,9 @@ def publish(project_name):
     sbt(f"project {project_name}", "publish")
 
 
+# This script takes environment variables as the "command" step
+# when used with the buildkite docker plugin incorrectly parses
+# spaces as newlines preventing passing args to this script!
 if __name__ == '__main__':
     project = os.environ["PROJECT"]
 
