@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
 import os
+import sys
 
 from commands import sbt, git
 from git_utils import remote_default_branch
