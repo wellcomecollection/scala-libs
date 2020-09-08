@@ -1,5 +1,6 @@
 package uk.ac.wellcome.storage.s3
 
+import com.amazonaws.services.s3.model.S3ObjectSummary
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scanamo.auto._
@@ -131,6 +132,17 @@ class S3ObjectLocationTest
 
         err.getMessage shouldBe "requirement failed: S3 object key cannot end with a slash: path/to/cat.jpg/"
       }
+    }
+
+    it("can be created from an S3ObjectSummary") {
+      val bucket = createBucketName
+      val key = randomAlphanumeric
+
+      val summary = new S3ObjectSummary()
+      summary.setBucketName(bucket)
+      summary.setKey(key)
+      
+      S3ObjectLocation(summary) shouldBe S3ObjectLocation(bucket, key)
     }
   }
 

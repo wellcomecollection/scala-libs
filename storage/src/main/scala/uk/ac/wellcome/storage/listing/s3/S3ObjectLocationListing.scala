@@ -9,9 +9,7 @@ class S3ObjectLocationListing(implicit summaryListing: S3ObjectSummaryListing)
     summaryListing
       .list(prefix)
       .map { iterator =>
-        iterator.map { summary =>
-          S3ObjectLocation(bucket = summary.getBucketName, key = summary.getKey)
-        }
+        iterator.map { summary => S3ObjectLocation(summary) }
       }
 }
 
