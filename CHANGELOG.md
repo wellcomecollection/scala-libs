@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v19.6.0 - 2020-09-08
+
+### Libraries affected
+
+`storage`
+
+### Description
+
+Allow creating an instance of `S3ObjectLocation` from an `S3ObjectSummary`.
+
 ## v19.5.6 - 2020-08-28
 
 ### Libraries affected
