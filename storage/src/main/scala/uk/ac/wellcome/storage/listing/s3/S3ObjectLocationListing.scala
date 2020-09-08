@@ -7,8 +7,11 @@ class S3ObjectLocationListing(implicit summaryListing: S3ObjectSummaryListing)
     extends S3Listing[S3ObjectLocation] {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult =
     summaryListing.list(prefix) match {
-      case Right(result) => Right(result.map { summary => S3ObjectLocation(summary) })
-      case Left(err)     => Left(err)
+      case Right(result) =>
+        Right(result.map { summary =>
+          S3ObjectLocation(summary)
+        })
+      case Left(err) => Left(err)
     }
 }
 
