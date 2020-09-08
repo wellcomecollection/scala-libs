@@ -2,6 +2,7 @@ package uk.ac.wellcome.storage.s3
 
 import java.nio.file.Paths
 
+import com.amazonaws.services.s3.model.S3ObjectSummary
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.{Location, Prefix}
@@ -145,6 +146,12 @@ case object S3ObjectLocation extends S3Decodable {
       keyField = "key",
       encoder = (location: S3ObjectLocation) =>
         Map("bucket" -> location.bucket, "key" -> location.key)
+    )
+
+  def apply(summary: S3ObjectSummary): S3ObjectLocation =
+    S3ObjectLocation(
+      bucket = summary.getBucketName,
+      key = summary.getKey
     )
 }
 

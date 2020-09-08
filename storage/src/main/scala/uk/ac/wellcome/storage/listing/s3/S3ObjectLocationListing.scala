@@ -6,13 +6,13 @@ import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 class S3ObjectLocationListing(implicit summaryListing: S3ObjectSummaryListing)
     extends S3Listing[S3ObjectLocation] {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult =
-    summaryListing
-      .list(prefix)
-      .map { iterator =>
-        iterator.map { summary =>
-          S3ObjectLocation(bucket = summary.getBucketName, key = summary.getKey)
-        }
-      }
+    summaryListing.list(prefix) match {
+      case Right(result) =>
+        Right(result.map { summary =>
+          S3ObjectLocation(summary)
+        })
+      case Left(err) => Left(err)
+    }
 }
 
 object S3ObjectLocationListing {

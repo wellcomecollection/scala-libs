@@ -9,10 +9,7 @@ class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
   override def assertResultCorrect(result: Iterable[S3ObjectSummary],
                                    entries: Seq[S3ObjectLocation]): Assertion = {
     val actualLocations =
-      result.toSeq
-        .map { summary =>
-          S3ObjectLocation(summary.getBucketName, summary.getKey)
-        }
+      result.toSeq.map { summary => S3ObjectLocation(summary) }
 
     actualLocations should contain theSameElementsAs entries
   }
