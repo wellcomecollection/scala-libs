@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v19.6.1 - 2020-09-16
+
+Add retry logic for TimeoutException in AzureStorageErrors
+
 ## v19.6.0 - 2020-09-08
 
 ### Libraries affected
