@@ -1,26 +1,23 @@
 package uk.ac.wellcome.storage.transfer.azure
 
-import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.azure.AzureBlobLocation
-import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
-import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
-import uk.ac.wellcome.storage.fixtures.{AzureFixtures, S3Fixtures}
+import com.amazonaws.services.s3.model.S3ObjectSummary
+import uk.ac.wellcome.storage.generators.RandomThings
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 
-trait AzureTransferFixtures extends AzureFixtures with S3Fixtures {
-  def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
-    withLocalS3Bucket { srcBucket =>
-      testWith(srcBucket)
-    }
+trait AzureTransferFixtures extends RandomThings {
+  def createS3ObjectSummaryFrom(
+    location: S3ObjectLocation,
+    size: Long = randomInt(from = 1, to = 50)
+  ): S3ObjectSummary = {
+    val summary = new S3ObjectSummary()
+    summary.setBucketName(location.bucket)
+    summary.setKey(location.key)
 
-  def withDstNamespace[R](testWith: TestWith[Container, R]): R =
-    withAzureContainer { dstContainer =>
-      testWith(dstContainer)
-    }
+    // By default, the size of an S3ObjectSummary() is zero.  We don't want it to
+    // be zero, because then the underlying S3 SDK will skip trying to read it;
+    // the correct size will be set in the StreamStore[S3ObjectSummary].
+    summary.setSize(size)
 
-  def createSrcLocation(srcBucket: Bucket): S3ObjectLocation =
-    createS3ObjectLocationWith(srcBucket)
-
-  def createDstLocation(dstContainer: Container): AzureBlobLocation =
-    createAzureBlobLocationWith(dstContainer)
+    summary
+  }
 }
