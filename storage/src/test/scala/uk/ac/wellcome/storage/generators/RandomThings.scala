@@ -13,6 +13,9 @@ trait RandomThings extends Matchers {
 
   private val lowercaseLatinAlphabet = ('a' to 'z')
 
+  def randomAlphanumericWithLength(length: Int = 8): String =
+    Random.alphanumeric take length mkString
+
   def randomLowercaseLatinAlphabetChar = lowercaseLatinAlphabet(
     Random.nextInt(lowercaseLatinAlphabet.length - 1)
   )
