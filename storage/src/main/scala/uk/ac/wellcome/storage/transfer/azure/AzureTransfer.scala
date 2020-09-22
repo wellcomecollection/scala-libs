@@ -329,7 +329,7 @@ class AzurePutBlockTransfer(
   }
 }
 
-class AzurePutBlockFromUrlTransfer(
+class AzurePutBlockFromUrlTransfer(signedUrlValidity: FiniteDuration)(
   implicit
   val s3Client: AmazonS3,
   val blobServiceClient: BlobServiceClient
@@ -346,7 +346,7 @@ class AzurePutBlockFromUrlTransfer(
     dst: AzureBlobLocation
   ): Either[TransferSourceFailure[S3ObjectSummary, AzureBlobLocation], URL] =
     s3Uploader
-      .getPresignedGetURL(S3ObjectLocation(src), expiryLength = 1.hour)
+      .getPresignedGetURL(S3ObjectLocation(src), expiryLength = signedUrlValidity)
       .left
       .map { readError =>
         TransferSourceFailure(src, dst, e = readError.e)

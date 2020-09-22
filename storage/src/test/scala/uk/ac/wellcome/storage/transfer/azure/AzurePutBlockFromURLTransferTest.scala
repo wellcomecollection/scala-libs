@@ -9,6 +9,7 @@ import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.azure.AzureTypedStore
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.transfer.{TransferNoOp, TransferOverwriteFailure}
+import scala.concurrent.duration._
 
 class AzurePutBlockFromURLTransferTest
     extends AnyFunSpec
@@ -20,7 +21,7 @@ class AzurePutBlockFromURLTransferTest
   val srcStore: S3TypedStore[String] = S3TypedStore[String]
   val dstStore: AzureTypedStore[String] = AzureTypedStore[String]
 
-  val transfer = new AzurePutBlockFromUrlTransfer()
+  val transfer = new AzurePutBlockFromUrlTransfer(10 minutes)
 
   describe("does a no-op transfer for similar-looking objects") {
     it("identical contents => no-op") {
