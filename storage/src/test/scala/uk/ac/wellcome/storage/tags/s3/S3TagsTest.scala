@@ -17,7 +17,6 @@ import uk.ac.wellcome.storage.tags.{Tags, TagsTestCases}
 import uk.ac.wellcome.storage.UpdateWriteError
 
 import scala.collection.JavaConverters._
-import scala.util.Random
 
 class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLocation, Bucket] with S3Fixtures with MockitoSugar {
   // We can associate with at most 10 tags on an object; see
@@ -235,7 +234,4 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     err.e shouldBe a[AmazonS3Exception]
     assert(err.e.getMessage)
   }
-
-  def randomAlphanumericWithLength(length: Int): String =
-    Random.alphanumeric take length mkString
 }
