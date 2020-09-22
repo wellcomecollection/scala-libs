@@ -2,7 +2,11 @@ package uk.ac.wellcome.storage.services.azure
 
 import com.azure.storage.blob.BlobServiceClient
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
-import uk.ac.wellcome.storage.services.{LargeStreamReader, RangedReader, SizeFinder}
+import uk.ac.wellcome.storage.services.{
+  LargeStreamReader,
+  RangedReader,
+  SizeFinder
+}
 
 class AzureLargeStreamReader(
   val bufferSize: Long,

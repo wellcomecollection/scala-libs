@@ -4,7 +4,11 @@ import java.io.ByteArrayOutputStream
 
 import com.azure.core.util.Context
 import com.azure.storage.blob.BlobServiceClient
-import com.azure.storage.blob.models.{BlobRange, BlobRequestConditions, DownloadRetryOptions}
+import com.azure.storage.blob.models.{
+  BlobRange,
+  BlobRequestConditions,
+  DownloadRetryOptions
+}
 import uk.ac.wellcome.storage.ReadError
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureStorageErrors}
 import uk.ac.wellcome.storage.models.{ByteRange, ClosedByteRange, OpenByteRange}

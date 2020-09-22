@@ -29,11 +29,11 @@ class S3Uploader(implicit val s3Client: AmazonS3) {
   // NOTE: checkExists will allow overwriting of existing content if set to false
   // overwriting existing content will change what previously generated URLs return
   def uploadAndGetURL(
-                       location: S3ObjectLocation,
-                       content: InputStreamWithLength,
-                       expiryLength: Duration,
-                       checkExists: Boolean
-                     ): Either[StorageError, URL] =
+    location: S3ObjectLocation,
+    content: InputStreamWithLength,
+    expiryLength: Duration,
+    checkExists: Boolean
+  ): Either[StorageError, URL] =
     for {
       exists <- location.exists
 
@@ -47,11 +47,11 @@ class S3Uploader(implicit val s3Client: AmazonS3) {
     } yield url
 
   def uploadAndGetURL(
-                       location: S3ObjectLocation,
-                       content: String,
-                       expiryLength: Duration,
-                       checkExists: Boolean = false
-                     ): Either[StorageError, URL] =
+    location: S3ObjectLocation,
+    content: String,
+    expiryLength: Duration,
+    checkExists: Boolean = false
+  ): Either[StorageError, URL] =
     for {
       inputStream <- stringCodec.toStream(content)
       result <- uploadAndGetURL(
@@ -63,9 +63,9 @@ class S3Uploader(implicit val s3Client: AmazonS3) {
     } yield result
 
   def getPresignedGetURL(
-                          location: S3ObjectLocation,
-                          expiryLength: Duration
-                        ): Either[ReadError, URL] = {
+    location: S3ObjectLocation,
+    expiryLength: Duration
+  ): Either[ReadError, URL] = {
 
     // Based on an example from the AWS SDK for Java docs:
     // https://docs.aws.amazon.com/AmazonS3/latest/dev/ShareObjectPreSignedURLJavaSDK.html
