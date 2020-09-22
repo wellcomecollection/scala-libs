@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v20.0.0 - 2020-09-22
+
+Add some generic classes used in the storage-service:
+* ByteRange and ByteRangeUtil
+* SizeFinder
+* RangedReader
+* LargeStreamReader
+* ObjectExists
+* S3Uploader
+* AzurePrefixTransfer and AzureTransfer
+
+Delete classes that are not going to be used:
+* AzureBlobMetadata
+* S3ToAzurePrefixTransfer and S3ToAzureTransfer
+
 ## v19.6.1 - 2020-09-16
 
 Add retry logic for TimeoutException in AzureStorageErrors
