@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v21.0.0 - 2020-09-24
+
+Add a mandatory `signedUrlExpiry` parameter to `AzurePutBlockFromUrlTransfer` contructor that specifies how long the presigned URL from S3 should be valid for.
+
 ## v20.0.0 - 2020-09-22
 
 Add some generic classes used in the storage-service:
