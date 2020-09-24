@@ -1,14 +1,20 @@
 package uk.ac.wellcome.storage.transfer.azure
 
+import org.mockito.Mockito.{spy, verify}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import uk.ac.wellcome.storage.azure.AzureBlobLocation
 import uk.ac.wellcome.storage.fixtures.{AzureFixtures, S3Fixtures}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.services.azure.AzureSizeFinder
+import uk.ac.wellcome.storage.services.s3.S3Uploader
 import uk.ac.wellcome.storage.store.azure.AzureTypedStore
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.transfer.{TransferNoOp, TransferOverwriteFailure}
+
+import scala.concurrent.duration._
 
 class AzurePutBlockFromURLTransferTest
     extends AnyFunSpec
@@ -16,11 +22,11 @@ class AzurePutBlockFromURLTransferTest
     with S3Fixtures
     with AzureFixtures
     with AzureTransferFixtures
-    with TableDrivenPropertyChecks {
+    with TableDrivenPropertyChecks with MockitoSugar {
   val srcStore: S3TypedStore[String] = S3TypedStore[String]
   val dstStore: AzureTypedStore[String] = AzureTypedStore[String]
 
-  val transfer = new AzurePutBlockFromUrlTransfer()
+  val transfer = AzurePutBlockFromUrlTransfer(10 minutes, 100000000L)
 
   describe("does a no-op transfer for similar-looking objects") {
     it("identical contents => no-op") {
@@ -112,5 +118,28 @@ class AzurePutBlockFromURLTransferTest
         }
       }
     }
+  }
+
+  it("passes the expiry flag to the S3Uploader"){
+    val s3Uploader = spy(new S3Uploader())
+    val urlValidity = 1 minute
+    val transfer = new AzurePutBlockFromUrlTransfer(s3Uploader, new AzureSizeFinder(), new AzurePutBlockTransfer())(urlValidity, 10L)
+
+    withLocalS3Bucket { bucket =>
+      withAzureContainer { container =>
+          val src = createS3ObjectLocationWith(bucket)
+        val dst = createAzureBlobLocationWith(container)
+
+          srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
+
+          transfer.transfer(
+            src = createS3ObjectSummaryFrom(src),
+            dst = dst,
+            checkForExisting = true
+          )
+
+        verify(s3Uploader).getPresignedGetURL(src, urlValidity)
+        }
+      }
   }
 }
