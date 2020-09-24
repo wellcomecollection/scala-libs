@@ -329,7 +329,11 @@ class AzurePutBlockTransfer(
   }
 }
 
-class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader, azureSizeFinder: AzureSizeFinder, blockTransfer: AzurePutBlockTransfer)(signedUrlValidity: FiniteDuration, val blockSize: Long)(
+class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
+                                   azureSizeFinder: AzureSizeFinder,
+                                   blockTransfer: AzurePutBlockTransfer)(
+  signedUrlValidity: FiniteDuration,
+  val blockSize: Long)(
   implicit
   val s3Client: AmazonS3,
   val blobServiceClient: BlobServiceClient
@@ -340,7 +344,9 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader, azureSizeFinder: Azur
     dst: AzureBlobLocation
   ): Either[TransferSourceFailure[S3ObjectSummary, AzureBlobLocation], URL] =
     s3Uploader
-      .getPresignedGetURL(S3ObjectLocation(src), expiryLength = signedUrlValidity)
+      .getPresignedGetURL(
+        S3ObjectLocation(src),
+        expiryLength = signedUrlValidity)
       .left
       .map { readError =>
         TransferSourceFailure(src, dst, e = readError.e)
@@ -400,8 +406,10 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader, azureSizeFinder: Azur
     }
 }
 
-object AzurePutBlockFromUrlTransfer{
-  def apply(signedUrlValidity: FiniteDuration, blockSize: Long)(implicit  s3Client: AmazonS3, blobServiceClient: BlobServiceClient) = {
+object AzurePutBlockFromUrlTransfer {
+  def apply(signedUrlValidity: FiniteDuration, blockSize: Long)(
+    implicit s3Client: AmazonS3,
+    blobServiceClient: BlobServiceClient) = {
     val s3Uploader = new S3Uploader()
 
     // In the actual replicator, if there's an object in S3 and an object in Azure,
@@ -424,6 +432,9 @@ object AzurePutBlockFromUrlTransfer{
     // memory pressure on the replicator, but is acceptable if we're only doing
     // it for a handful of keys.
     val blockTransfer = new AzurePutBlockTransfer(blockSize = blockSize)
-    new AzurePutBlockFromUrlTransfer(s3Uploader,azureSizeFinder, blockTransfer)(signedUrlValidity, blockSize)
+    new AzurePutBlockFromUrlTransfer(
+      s3Uploader,
+      azureSizeFinder,
+      blockTransfer)(signedUrlValidity, blockSize)
   }
 }
