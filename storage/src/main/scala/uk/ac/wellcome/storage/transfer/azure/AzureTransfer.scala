@@ -329,17 +329,11 @@ class AzurePutBlockTransfer(
   }
 }
 
-class AzurePutBlockFromUrlTransfer(signedUrlValidity: FiniteDuration)(
+class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader, azureSizeFinder: AzureSizeFinder, blockTransfer: AzurePutBlockTransfer)(signedUrlValidity: FiniteDuration, val blockSize: Long)(
   implicit
   val s3Client: AmazonS3,
   val blobServiceClient: BlobServiceClient
 ) extends AzureTransfer[URL] {
-  // The max length you can put in a single Put Block from URL API call is 100 MiB.
-  // The class will load a block of this size into memory, so setting it too
-  // high may cause issues.
-  val blockSize: Long = 100000000L
-
-  private val s3Uploader = new S3Uploader()
 
   override protected def getContext(
     src: S3ObjectSummary,
@@ -368,14 +362,6 @@ class AzurePutBlockFromUrlTransfer(signedUrlValidity: FiniteDuration)(
     blockClient.stageBlockFromUrl(blockId, presignedUrl.toString, range)
   }
 
-  // In the actual replicator, if there's an object in S3 and an object in Azure,
-  // assume they're both the same.  The verifier will validate the checksum later.
-  //
-  // This means that if the replicator is interrupted, it won't wait (and cost money)
-  // to read the existing blob out of Azure.  If the sizes match, it's good enough
-  // for the replicator to assume they're the same.
-  private val azureSizeFinder = new AzureSizeFinder()
-
   override protected def compare(
     src: S3ObjectSummary,
     dst: AzureBlobLocation,
@@ -399,19 +385,6 @@ class AzurePutBlockFromUrlTransfer(signedUrlValidity: FiniteDuration)(
         )
     }
 
-  // Using PutBlockFromURL requires us to create a pre-signed URL for GETing
-  // the object from S3, but some S3 keys are a bit tricky to use in URLs,
-  // and when Azure tries to read them, it gets an error:
-  //
-  //      com.azure.storage.blob.models.BlobStorageException: Status code 403,
-  //      <?xml version="1.0" encoding="utf-8"?><Error><Code>CannotVerifyCopySource…
-  //
-  // In those cases, fall back to transferring the bytes directly through
-  // the replicator.  We try to avoid this because it's slower and puts more
-  // memory pressure on the replicator, but is acceptable if we're only doing
-  // it for a handful of keys.
-  private val blockTransfer = new AzurePutBlockTransfer(blockSize = blockSize)
-
   private def isWeirdKey(key: String): Boolean =
     key.endsWith(".")
 
@@ -425,4 +398,32 @@ class AzurePutBlockFromUrlTransfer(signedUrlValidity: FiniteDuration)(
     } else {
       super.transfer(src, dst, checkForExisting)
     }
+}
+
+object AzurePutBlockFromUrlTransfer{
+  def apply(signedUrlValidity: FiniteDuration, blockSize: Long)(implicit  s3Client: AmazonS3, blobServiceClient: BlobServiceClient) = {
+    val s3Uploader = new S3Uploader()
+
+    // In the actual replicator, if there's an object in S3 and an object in Azure,
+    // assume they're both the same.  The verifier will validate the checksum later.
+    //
+    // This means that if the replicator is interrupted, it won't wait (and cost money)
+    // to read the existing blob out of Azure.  If the sizes match, it's good enough
+    // for the replicator to assume they're the same.
+    val azureSizeFinder = new AzureSizeFinder()
+
+    // Using PutBlockFromURL requires us to create a pre-signed URL for GETing
+    // the object from S3, but some S3 keys are a bit tricky to use in URLs,
+    // and when Azure tries to read them, it gets an error:
+    //
+    //      com.azure.storage.blob.models.BlobStorageException: Status code 403,
+    //      <?xml version="1.0" encoding="utf-8"?><Error><Code>CannotVerifyCopySource…
+    //
+    // In those cases, fall back to transferring the bytes directly through
+    // the replicator.  We try to avoid this because it's slower and puts more
+    // memory pressure on the replicator, but is acceptable if we're only doing
+    // it for a handful of keys.
+    val blockTransfer = new AzurePutBlockTransfer(blockSize = blockSize)
+    new AzurePutBlockFromUrlTransfer(s3Uploader,azureSizeFinder, blockTransfer)(signedUrlValidity, blockSize)
+  }
 }
