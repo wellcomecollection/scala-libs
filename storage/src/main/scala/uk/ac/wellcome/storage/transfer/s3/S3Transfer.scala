@@ -3,14 +3,11 @@ package uk.ac.wellcome.storage.transfer.s3
 import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{
-  CopyObjectRequest,
-  ObjectTagging,
-  S3ObjectInputStream
-}
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder
+import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging, S3ObjectInputStream}
+import com.amazonaws.services.s3.transfer.{Copy, TransferManagerBuilder}
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ReadError
+import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.transfer._
 
 import scala.collection.JavaConverters._
@@ -26,12 +23,8 @@ class S3Transfer(implicit s3Client: AmazonS3)
     .build
 
   override def transferWithOverwrites(src: S3ObjectLocation,
-                                      dst: S3ObjectLocation): TransferEither = {
-    def singleTransfer: TransferEither =
-      runTransfer(src, dst)
-
-    singleTransfer.retry(maxAttempts = 3)
-  }
+                                      dst: S3ObjectLocation): TransferEither =
+    runTransfer(src, dst)
 
   override def transferWithCheckForExisting(
     src: S3ObjectLocation,
@@ -112,20 +105,28 @@ class S3Transfer(implicit s3Client: AmazonS3)
         .withNewObjectTagging(new ObjectTagging(List().asJava))
 
     for {
-      transfer <- Try {
-        // This code will throw if the source object doesn't exist.
-        transferManager.copy(copyRequest)
-      } match {
-        case Success(request) => Right(request)
-        case Failure(err)     => Left(TransferSourceFailure(src, dst, err))
-      }
-
-      result <- Try {
-        transfer.waitForCopyResult()
-      } match {
-        case Success(_)   => Right(TransferPerformed(src, dst))
-        case Failure(err) => Left(TransferDestinationFailure(src, dst, err))
-      }
+      transfer <- tryCopyFromSource(src, dst, copyRequest).retry(maxAttempts = 3).left.map(err => TransferSourceFailure(src, dst, err.e))
+      result <- tryCopyToDestination(src, dst, transfer).retry(maxAttempts = 3).left.map(err => TransferDestinationFailure(src, dst, err.e))
     } yield result
+  }
+
+  private def tryCopyToDestination(src: S3ObjectLocation, dst: S3ObjectLocation, transfer: Copy) = {
+    Try {
+      transfer.waitForCopyResult()
+    } match {
+      case Success(_) => Right(TransferPerformed(src, dst))
+      case Failure(err) => Left(S3Errors.readErrors(err))
+    }
+  }
+
+  private def tryCopyFromSource(src: S3ObjectLocation, dst: S3ObjectLocation, copyRequest: CopyObjectRequest): Either[ReadError, Copy] = {
+    Try {
+      // This code will throw if the source object doesn't exist.
+      transferManager.copy(copyRequest)
+    } match {
+      case Success(request) => Right(request)
+      case Failure(err) =>
+        Left(S3Errors.readErrors(err))
+    }
   }
 }
