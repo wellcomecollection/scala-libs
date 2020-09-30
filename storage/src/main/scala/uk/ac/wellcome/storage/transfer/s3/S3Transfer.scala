@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging, S3ObjectInputStream}
-import com.amazonaws.services.s3.transfer.{Copy, TransferManagerBuilder}
+import com.amazonaws.services.s3.transfer.{Copy, TransferManager, TransferManagerBuilder}
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.ReadError
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
@@ -13,14 +13,10 @@ import uk.ac.wellcome.storage.transfer._
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Transfer(implicit s3Client: AmazonS3)
+class S3Transfer(transferManager: TransferManager)(implicit s3Client: AmazonS3)
     extends Transfer[S3ObjectLocation, S3ObjectLocation] {
 
   import uk.ac.wellcome.storage.RetryOps._
-
-  private val transferManager = TransferManagerBuilder.standard
-    .withS3Client(s3Client)
-    .build
 
   override def transferWithOverwrites(src: S3ObjectLocation,
                                       dst: S3ObjectLocation): TransferEither =
@@ -37,14 +33,14 @@ class S3Transfer(implicit s3Client: AmazonS3)
       // We have seen once case where the S3 CopyObject API returned
       // a 500 error, in a bag with multiple 20GB+ files, so we do need
       // to be able to retry failures here.
-      case Failure(_) =>
+      case Left(_) =>
         transferWithOverwrites(src, dst)
 
-      case Success(dstStream) =>
+      case Right(dstStream) =>
         getStream(src) match {
           // If both the source and the destination exist, we can skip
           // the copy operation.
-          case Success(srcStream) =>
+          case Right(srcStream) =>
             val result = compare(
               src = src,
               dst = dst,
@@ -68,12 +64,12 @@ class S3Transfer(implicit s3Client: AmazonS3)
 
             result
 
-          case Failure(err) =>
+          case Left(err) =>
             // As above, we need to abort the input stream so we don't leave streams
             // open or get warnings from the SDK.
             dstStream.abort()
             dstStream.close()
-            Left(TransferSourceFailure(src, dst, err))
+            Left(TransferSourceFailure(src, dst, err.e))
         }
     }
 
@@ -89,10 +85,14 @@ class S3Transfer(implicit s3Client: AmazonS3)
       Left(TransferOverwriteFailure(src, dst))
     }
 
-  private def getStream(location: S3ObjectLocation): Try[S3ObjectInputStream] =
-    Try {
+  private def getStream(location: S3ObjectLocation) = {
+    val errorOrStream = Try {
       s3Client.getObject(location.bucket, location.key)
-    }.map { _.getObjectContent }
+    }.toEither.left.map(error => S3Errors.readErrors(error)).map {
+      _.getObjectContent
+    }
+    errorOrStream.retry(maxAttempts = 3)
+  }
 
   private def runTransfer(src: S3ObjectLocation,
                           dst: S3ObjectLocation): TransferEither = {
@@ -128,5 +128,14 @@ class S3Transfer(implicit s3Client: AmazonS3)
       case Failure(err) =>
         Left(S3Errors.readErrors(err))
     }
+  }
+}
+
+object S3Transfer{
+  def apply(implicit s3Client: AmazonS3) = {
+    val transferManager: TransferManager = TransferManagerBuilder.standard
+      .withS3Client(s3Client)
+      .build
+    new S3Transfer(transferManager)
   }
 }
