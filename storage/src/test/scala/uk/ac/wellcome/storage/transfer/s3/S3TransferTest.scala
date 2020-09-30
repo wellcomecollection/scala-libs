@@ -1,7 +1,10 @@
 package uk.ac.wellcome.storage.transfer.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.transfer.TransferManager
+import com.amazonaws.services.s3.model.{AmazonS3Exception, CopyObjectRequest}
+import com.amazonaws.services.s3.transfer.{TransferManager, TransferManagerBuilder}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.mockito.invocation.InvocationOnMock
 import org.scalatestplus.mockito.MockitoSugar
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
@@ -9,7 +12,7 @@ import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.tags.s3.S3Tags
-import uk.ac.wellcome.storage.transfer.{Transfer, TransferNoOp, TransferPerformed, TransferSourceFailure, TransferTestCases}
+import uk.ac.wellcome.storage.transfer._
 
 class S3TransferTest
     extends TransferTestCases[
@@ -26,13 +29,21 @@ class S3TransferTest
     srcStore: S3TypedStore[Record],
     dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R]
   ): R =
-    testWith(new S3Transfer())
+    testWith(S3Transfer.apply)
 
   override def createT: Record = createRecord
 
   override def withContext[R](testWith: TestWith[Unit, R]): R =
     testWith(())
+  def s3ServerException = {
+    val exception = new AmazonS3Exception("We encountered an internal error. Please try again.")
+    exception.setStatusCode(500)
+    exception
+  }
 
+  val transferManager = TransferManagerBuilder.standard
+    .withS3Client(s3Client)
+    .build
   // This test is intended to spot warnings from the SDK if we don't close
   // the dst inputStream correctly.
   it("errors if the destination exists but the source does not") {
@@ -96,7 +107,7 @@ class S3TransferTest
     }
   }
 
-  it("retries 500 errors from S3"){
+  it("retries 500 errors from S3 when calling copy on TransferManager"){
       withNamespacePair { case (srcNamespace, dstNamespace) =>
         val src = createSrcLocation(srcNamespace)
         val dst = createDstLocation(dstNamespace)
@@ -106,8 +117,14 @@ class S3TransferTest
         withContext { implicit context =>
           withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
             withDstStore(initialEntries = Map.empty) { dstStore =>
-            val failingOnceTransfer = mock[TransferManager]
-            val transfer = new S3Transfer()
+
+              val failingOnceTransfer = mock[TransferManager]
+              when(failingOnceTransfer.copy(any[CopyObjectRequest]))
+                .thenThrow(s3ServerException)
+                .thenAnswer((invocation: InvocationOnMock) => {
+                transferManager.copy(invocation.getArguments.toList.head.asInstanceOf[CopyObjectRequest])
+              })
+            val transfer = new S3Transfer(failingOnceTransfer)
 
               val result = transfer.transfer(src, dst)
 

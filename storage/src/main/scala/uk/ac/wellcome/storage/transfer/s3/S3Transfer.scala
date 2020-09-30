@@ -3,10 +3,9 @@ package uk.ac.wellcome.storage.transfer.s3
 import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging, S3ObjectInputStream}
+import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
 import com.amazonaws.services.s3.transfer.{Copy, TransferManager, TransferManagerBuilder}
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.storage.ReadError
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.transfer._
 
@@ -119,7 +118,7 @@ class S3Transfer(transferManager: TransferManager)(implicit s3Client: AmazonS3)
     }
   }
 
-  private def tryCopyFromSource(src: S3ObjectLocation, dst: S3ObjectLocation, copyRequest: CopyObjectRequest): Either[ReadError, Copy] = {
+  private def tryCopyFromSource(src: S3ObjectLocation, dst: S3ObjectLocation, copyRequest: CopyObjectRequest) = {
     Try {
       // This code will throw if the source object doesn't exist.
       transferManager.copy(copyRequest)

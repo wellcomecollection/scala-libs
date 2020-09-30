@@ -24,7 +24,7 @@ trait S3TransferFixtures[T]
   override def withTransfer[R](
     testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R])(
     implicit store: S3TypedStore[T]): R =
-    testWith(new S3Transfer())
+    testWith(S3Transfer.apply)
 
   def withSrcNamespace[R](testWith: TestWith[Bucket, R]): R =
     withLocalS3Bucket { bucket =>

@@ -1,13 +1,14 @@
 package uk.ac.wellcome.storage.transfer.s3
 
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSummaryListing}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
 import uk.ac.wellcome.storage.transfer._
-import uk.ac.wellcome.storage.ListingFailure
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
@@ -56,7 +57,7 @@ class S3PrefixTransferTest
           super.list(prefix).map { _ ++ Seq(createS3ObjectLocation) }
       }
 
-    implicit val transfer: S3Transfer = new S3Transfer()
+    implicit val transfer: S3Transfer = S3Transfer.apply
 
     testWith(new S3PrefixTransfer())
   }
@@ -75,7 +76,7 @@ class S3PrefixTransferTest
           Left(ListingFailure(prefix))
       }
 
-    implicit val transfer: S3Transfer = new S3Transfer()
+    implicit val transfer: S3Transfer = S3Transfer.apply
 
     testWith(new S3PrefixTransfer())
   }
@@ -88,7 +89,9 @@ class S3PrefixTransferTest
   ): R = {
     implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
 
-    implicit val transfer: S3Transfer = new S3Transfer() {
+    implicit val transfer: S3Transfer = new S3Transfer(TransferManagerBuilder.standard
+      .withS3Client(s3Client)
+      .build) {
       override def transfer(
         src: S3ObjectLocation,
         dst: S3ObjectLocation,
