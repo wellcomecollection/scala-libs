@@ -3,14 +3,14 @@ package uk.ac.wellcome.storage.transfer.s3
 import com.amazonaws.services.s3.model.{AmazonS3Exception, CopyObjectRequest}
 import com.amazonaws.services.s3.transfer.{TransferManager, TransferManagerBuilder}
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.scalatestplus.mockito.MockitoSugar
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.store.s3.S3TypedStore
+import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
 import uk.ac.wellcome.storage.tags.s3.S3Tags
 import uk.ac.wellcome.storage.transfer._
 
@@ -124,7 +124,7 @@ class S3TransferTest
                 .thenAnswer((invocation: InvocationOnMock) => {
                 transferManager.copy(invocation.getArguments.toList.head.asInstanceOf[CopyObjectRequest])
               })
-            val transfer = new S3Transfer(failingOnceTransfer)
+            val transfer = new S3Transfer(failingOnceTransfer, new S3StreamStore())
 
               val result = transfer.transfer(src, dst)
 
@@ -138,4 +138,31 @@ class S3TransferTest
         }
       }
     }
+
+  it("stops retrying if TransferManager fails more than 3 times"){
+    withNamespacePair { case (srcNamespace, dstNamespace) =>
+      val src = createSrcLocation(srcNamespace)
+      val dst = createDstLocation(dstNamespace)
+
+      val t = createT
+
+      withContext { implicit context =>
+        withSrcStore(initialEntries = Map(src -> t)) { _ =>
+          withDstStore(initialEntries = Map.empty) { _ =>
+
+            val alwaysFailingTransfer = mock[TransferManager]
+            when(alwaysFailingTransfer.copy(any[CopyObjectRequest]))
+              .thenThrow(s3ServerException)
+            val transfer = new S3Transfer(alwaysFailingTransfer, new S3StreamStore())
+
+            val result = transfer.transfer(src, dst)
+
+
+            result.left.value shouldBe a[TransferSourceFailure[_,_]]
+            verify(alwaysFailingTransfer, times(3)).copy(any[CopyObjectRequest])
+          }
+        }
+      }
+    }
+  }
 }
