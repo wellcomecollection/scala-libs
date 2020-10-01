@@ -27,7 +27,7 @@ class S3PrefixTransfer()(
 
 object S3PrefixTransfer {
   def apply()(implicit s3Client: AmazonS3): S3PrefixTransfer = {
-    implicit val transfer: S3Transfer = new S3Transfer
+    implicit val transfer: S3Transfer = S3Transfer.apply
     implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
 
     new S3PrefixTransfer()

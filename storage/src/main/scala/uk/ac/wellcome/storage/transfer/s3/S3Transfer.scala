@@ -3,35 +3,28 @@ package uk.ac.wellcome.storage.transfer.s3
 import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{
-  CopyObjectRequest,
-  ObjectTagging,
-  S3ObjectInputStream
+import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
+import com.amazonaws.services.s3.transfer.{
+  Copy,
+  TransferManager,
+  TransferManagerBuilder
 }
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
+import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore}
 import uk.ac.wellcome.storage.transfer._
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Transfer(implicit s3Client: AmazonS3)
+class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
     extends Transfer[S3ObjectLocation, S3ObjectLocation] {
 
   import uk.ac.wellcome.storage.RetryOps._
 
-  private val transferManager = TransferManagerBuilder.standard
-    .withS3Client(s3Client)
-    .build
-
   override def transferWithOverwrites(src: S3ObjectLocation,
-                                      dst: S3ObjectLocation): TransferEither = {
-    def singleTransfer: TransferEither =
-      runTransfer(src, dst)
-
-    singleTransfer.retry(maxAttempts = 3)
-  }
+                                      dst: S3ObjectLocation): TransferEither =
+    runTransfer(src, dst)
 
   override def transferWithCheckForExisting(
     src: S3ObjectLocation,
@@ -44,14 +37,14 @@ class S3Transfer(implicit s3Client: AmazonS3)
       // We have seen once case where the S3 CopyObject API returned
       // a 500 error, in a bag with multiple 20GB+ files, so we do need
       // to be able to retry failures here.
-      case Failure(_) =>
+      case Left(_) =>
         transferWithOverwrites(src, dst)
 
-      case Success(dstStream) =>
+      case Right(dstStream) =>
         getStream(src) match {
           // If both the source and the destination exist, we can skip
           // the copy operation.
-          case Success(srcStream) =>
+          case Right(srcStream) =>
             val result = compare(
               src = src,
               dst = dst,
@@ -68,19 +61,16 @@ class S3Transfer(implicit s3Client: AmazonS3)
             // See: https://github.com/wellcometrust/platform/issues/3600
             //      https://github.com/aws/aws-sdk-java/issues/269
             //
-            srcStream.abort()
             srcStream.close()
-            dstStream.abort()
             dstStream.close()
 
             result
 
-          case Failure(err) =>
+          case Left(err) =>
             // As above, we need to abort the input stream so we don't leave streams
             // open or get warnings from the SDK.
-            dstStream.abort()
             dstStream.close()
-            Left(TransferSourceFailure(src, dst, err))
+            Left(TransferSourceFailure(src, dst, err.e))
         }
     }
 
@@ -96,14 +86,25 @@ class S3Transfer(implicit s3Client: AmazonS3)
       Left(TransferOverwriteFailure(src, dst))
     }
 
-  private def getStream(location: S3ObjectLocation): Try[S3ObjectInputStream] =
-    Try {
-      s3Client.getObject(location.bucket, location.key)
-    }.map { _.getObjectContent }
+  private def getStream(location: S3ObjectLocation) =
+    s3Readable.get(location).map(id => id.identifiedT)
 
   private def runTransfer(src: S3ObjectLocation,
                           dst: S3ObjectLocation): TransferEither = {
+    for {
+      transfer <- tryCopyFromSource(src, dst)
+        .retry(maxAttempts = 3)
+        .left
+        .map(err => TransferSourceFailure(src, dst, err.e))
+      result <- tryCopyToDestination(src, dst, transfer)
+        .retry(maxAttempts = 3)
+        .left
+        .map(err => TransferDestinationFailure(src, dst, err.e))
+    } yield result
+  }
 
+  private def tryCopyFromSource(src: S3ObjectLocation,
+                                dst: S3ObjectLocation) = {
     // We use tags in the verifier in the storage service to check if we've already
     // verified an object.  For safety, we drop all the tags every time an object
     // gets rewritten or copied around.
@@ -111,21 +112,34 @@ class S3Transfer(implicit s3Client: AmazonS3)
       new CopyObjectRequest(src.bucket, src.key, dst.bucket, dst.key)
         .withNewObjectTagging(new ObjectTagging(List().asJava))
 
-    for {
-      transfer <- Try {
-        // This code will throw if the source object doesn't exist.
-        transferManager.copy(copyRequest)
-      } match {
-        case Success(request) => Right(request)
-        case Failure(err)     => Left(TransferSourceFailure(src, dst, err))
-      }
+    Try {
+      // This code will throw if the source object doesn't exist.
+      transferManager.copy(copyRequest)
+    } match {
+      case Success(request) => Right(request)
+      case Failure(err) =>
+        Left(S3Errors.readErrors(err))
+    }
+  }
 
-      result <- Try {
-        transfer.waitForCopyResult()
-      } match {
-        case Success(_)   => Right(TransferPerformed(src, dst))
-        case Failure(err) => Left(TransferDestinationFailure(src, dst, err))
-      }
-    } yield result
+  private def tryCopyToDestination(src: S3ObjectLocation,
+                                   dst: S3ObjectLocation,
+                                   transfer: Copy) = {
+    Try {
+      transfer.waitForCopyResult()
+    } match {
+      case Success(_)   => Right(TransferPerformed(src, dst))
+      case Failure(err) => Left(S3Errors.readErrors(err))
+    }
+  }
+}
+
+object S3Transfer {
+  def apply(implicit s3Client: AmazonS3) = {
+    val transferManager: TransferManager = TransferManagerBuilder.standard
+      .withS3Client(s3Client)
+      .build
+    val s3Readable = new S3StreamStore()
+    new S3Transfer(transferManager, s3Readable)
   }
 }

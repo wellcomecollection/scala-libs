@@ -1,13 +1,17 @@
 package uk.ac.wellcome.storage.transfer.s3
 
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.mockito.invocation.InvocationOnMock
+import org.scalatestplus.mockito.MockitoSugar
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSummaryListing}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
 import uk.ac.wellcome.storage.transfer._
-import uk.ac.wellcome.storage.ListingFailure
 
 class S3PrefixTransferTest
     extends PrefixTransferTestCases[
@@ -21,7 +25,7 @@ class S3PrefixTransferTest
       Unit]
     with RecordGenerators
     with S3TypedStoreFixtures[Record]
-    with S3TransferFixtures[Record] {
+    with S3TransferFixtures[Record] with MockitoSugar{
 
   def createSrcPrefix(srcBucket: Bucket): S3ObjectLocationPrefix =
     createS3ObjectLocationPrefixWith(srcBucket)
@@ -56,7 +60,7 @@ class S3PrefixTransferTest
           super.list(prefix).map { _ ++ Seq(createS3ObjectLocation) }
       }
 
-    implicit val transfer: S3Transfer = new S3Transfer()
+    implicit val transfer: S3Transfer = S3Transfer.apply
 
     testWith(new S3PrefixTransfer())
   }
@@ -75,7 +79,7 @@ class S3PrefixTransferTest
           Left(ListingFailure(prefix))
       }
 
-    implicit val transfer: S3Transfer = new S3Transfer()
+    implicit val transfer: S3Transfer = S3Transfer.apply
 
     testWith(new S3PrefixTransfer())
   }
@@ -88,14 +92,12 @@ class S3PrefixTransferTest
   ): R = {
     implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
 
-    implicit val transfer: S3Transfer = new S3Transfer() {
-      override def transfer(
-        src: S3ObjectLocation,
-        dst: S3ObjectLocation,
-        checkForExisting: Boolean = true
-      ): TransferEither =
-        Left(TransferSourceFailure(src, dst))
-    }
+    implicit val transfer: S3Transfer = mock[S3Transfer]
+    when(transfer.transfer(any[S3ObjectLocation],any[S3ObjectLocation], any[Boolean])).thenAnswer((invocation: InvocationOnMock) => {
+      val src = invocation.getArgumentAt(0, classOf[S3ObjectLocation])
+      val dst = invocation.getArgumentAt(1, classOf[S3ObjectLocation])
+      Left(TransferSourceFailure(src, dst))
+    })
 
     testWith(new S3PrefixTransfer())
   }
