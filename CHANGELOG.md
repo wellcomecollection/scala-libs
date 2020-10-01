@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v22.0.0 - 2020-10-01
+
+Add retry for 500 errors from S3 in `S3Transfer`
+
 ## v21.0.0 - 2020-09-24
 
 Add a mandatory `signedUrlExpiry` parameter to `AzurePutBlockFromUrlTransfer` contructor that specifies how long the presigned URL from S3 should be valid for.
