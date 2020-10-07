@@ -13,7 +13,6 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig}
 
 import scala.collection.immutable.Seq
-import scala.util.Random
 
 object SNS {
   class Topic(val arn: String) extends AnyVal {
@@ -25,7 +24,7 @@ object SNS {
   }
 }
 
-trait SNS extends Matchers with Logging {
+trait SNS extends Matchers with Logging with RandomGenerators {
 
   import SNS._
 
@@ -43,9 +42,12 @@ trait SNS extends Matchers with Logging {
     secretKey = secretKey
   )
 
+  def createTopicName: String =
+    randomAlphanumeric()
+
   def withLocalSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
     create = {
-      val topicName = Random.alphanumeric take 10 mkString
+      val topicName = createTopicName
       val arn = snsClient
         .createTopic { builder: CreateTopicRequest.Builder =>
           builder.name(topicName)
@@ -69,7 +71,7 @@ trait SNS extends Matchers with Logging {
 
   def withLocalStackSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
     create = {
-      val topicName = Random.alphanumeric take 10 mkString
+      val topicName = createTopicName
       val arn = localStackSnsClient
         .createTopic { builder: CreateTopicRequest.Builder =>
           builder.name(topicName)

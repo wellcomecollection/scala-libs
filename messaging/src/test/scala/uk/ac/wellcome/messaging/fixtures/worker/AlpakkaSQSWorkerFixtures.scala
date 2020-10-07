@@ -16,7 +16,6 @@ import uk.ac.wellcome.monitoring.MetricsConfig
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.Random
 
 trait AlpakkaSQSWorkerFixtures
     extends WorkerFixtures
@@ -25,8 +24,7 @@ trait AlpakkaSQSWorkerFixtures
     with SQS {
 
   def createAlpakkaSQSWorkerConfig(queue: Queue,
-                                   namespace: String =
-                                     Random.alphanumeric take 10 mkString)
+                                   namespace: String = randomAlphanumeric())
     : AlpakkaSQSWorkerConfig =
     AlpakkaSQSWorkerConfig(
       metricsConfig = MetricsConfig(namespace, flushInterval = 1.second),
@@ -36,7 +34,7 @@ trait AlpakkaSQSWorkerFixtures
   def withAlpakkaSQSWorker[R](
     queue: Queue,
     process: TestInnerProcess,
-    namespace: String = Random.alphanumeric take 10 mkString
+    namespace: String = randomAlphanumeric()
   )(testWith: TestWith[
       (AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary],
        AlpakkaSQSWorkerConfig,

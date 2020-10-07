@@ -15,8 +15,6 @@ import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage._
 
-import scala.util.Random
-
 class DecoderTest
     extends AnyFunSpec
     with EitherValues
@@ -50,7 +48,7 @@ class DecoderTest
       }
 
       it("a string") {
-        val randomString = Random.nextString(8)
+        val randomString = randomAlphanumeric()
         val randomStream = createStream(randomString)
 
         stringDecoder.fromStream(randomStream) shouldBe Right(randomString)
