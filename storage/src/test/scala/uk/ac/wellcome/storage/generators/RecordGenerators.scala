@@ -12,8 +12,6 @@ case class Record(name: String)
 trait RecordGenerators extends RandomGenerators with Logging {
   implicit lazy val codec: Codec[Record] = typeCodec[Record]
 
-  val recordCount: (Int, Int) = (100, 200)
-
   def createIdentityKey: IdentityKey =
     IdentityKey(randomAlphanumeric())
 
@@ -25,8 +23,6 @@ trait RecordGenerators extends RandomGenerators with Logging {
     record
   }
 
-  def createRecords: Set[Record] = {
-    val (start, end) = recordCount
-    (1 to randomInt(from = start, to = end)).map(_ => createRecord).toSet
-  }
+  def createRecords: Set[Record] =
+    collectionOf(min = 100, max = 200) { createRecord }.toSet
 }

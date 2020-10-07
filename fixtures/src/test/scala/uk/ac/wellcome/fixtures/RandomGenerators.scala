@@ -50,6 +50,18 @@ trait RandomGenerators {
     from + randomOffset
   }
 
+  // The slightly unusual default means IntelliJ won't whinge that min=0 is
+  // the default when you use it.
+  def collectionOf[T](
+    min: Int = chooseFrom(0),
+    max: Int = 10)(f: => T): Seq[T] =
+    (1 to randomInt(from = min, to = max)).map { _ =>
+      f
+    }
+
+  def chooseFrom[T](seq: T*): T =
+    seq(Random.nextInt(seq.size))
+
   def randomInstant: Instant =
     Instant.now().plusSeconds(Random.nextInt())
 }
