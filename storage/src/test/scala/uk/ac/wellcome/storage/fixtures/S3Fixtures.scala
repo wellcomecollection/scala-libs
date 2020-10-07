@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.storage.generators.S3ObjectLocationGenerators
+import uk.ac.wellcome.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
@@ -34,7 +34,8 @@ trait S3Fixtures
     with IntegrationPatience
     with Matchers
     with EitherValues
-    with S3ObjectLocationGenerators {
+    with S3ObjectLocationGenerators
+    with StreamGenerators {
 
   import S3Fixtures._
 
@@ -54,8 +55,8 @@ trait S3Fixtures
   val brokenS3Client: AmazonS3 = S3ClientFactory.create(
     region = "nuh-uh",
     endpoint = "http://nope.nope",
-    accessKey = randomAlphanumeric,
-    secretKey = randomAlphanumeric
+    accessKey = randomAlphanumeric(),
+    secretKey = randomAlphanumeric()
   )
 
   def withLocalS3Bucket[R]: Fixture[Bucket, R] =
@@ -105,7 +106,7 @@ trait S3Fixtures
 
   def putStream(
     location: S3ObjectLocation,
-    inputStream: InputStreamWithLength = randomInputStream()): Unit = {
+    inputStream: InputStreamWithLength = createInputStream()): Unit = {
     val metadata = new ObjectMetadata()
     metadata.setContentLength(inputStream.length)
 

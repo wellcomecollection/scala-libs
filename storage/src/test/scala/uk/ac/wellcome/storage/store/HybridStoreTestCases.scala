@@ -4,7 +4,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.storage.generators.StreamGenerators
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 import uk.ac.wellcome.storage._
 
@@ -22,7 +22,7 @@ trait HybridStoreTestCases[IndexedStoreId,
       Namespace,
       HybridStoreContext]
     with Matchers
-    with RandomThings
+    with StreamGenerators
     with EitherValues {
 
   type HybridStoreImpl = HybridStore[IndexedStoreId, TypedStoreId, T]
@@ -208,7 +208,7 @@ trait HybridStoreTestCases[IndexedStoreId,
 
                     val byteLength = 256
                     val inputStream = new InputStreamWithLength(
-                      randomInputStream(byteLength),
+                      createInputStream(byteLength),
                       length = byteLength
                     )
 
