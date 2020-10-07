@@ -54,7 +54,7 @@ class MemoryHybridStoreTest
   }
 
   override def createTypedStoreId(implicit namespace: String): String =
-    s"$namespace/$randomAlphanumeric"
+    s"$namespace/${randomAlphanumeric()}"
 
   override def withStoreContext[R](testWith: TestWith[Context, R]): R = {
     implicit val underlyingStreamStore: MemoryStreamStore[String] =
@@ -70,7 +70,7 @@ class MemoryHybridStoreTest
   override def createT: Record = createRecord
     
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createId(implicit namespace: String): UUID = UUID.randomUUID()
 

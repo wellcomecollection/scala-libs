@@ -5,12 +5,7 @@ import java.io.ByteArrayInputStream
 import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
-import scala.util.Random
-
 trait RandomThings extends RandomGenerators {
-  def randomAlphanumeric: String =
-    Random.alphanumeric take 8 mkString
-
   def randomStringOfByteLength(length: Int): String = {
     // Generate bytes within UTF-16 mappable range
     // 0 to 127 maps directly to Unicode code points in the ASCII range
