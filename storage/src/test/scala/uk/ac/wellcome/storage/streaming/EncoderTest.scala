@@ -8,9 +8,9 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil.{toJson, _}
 import uk.ac.wellcome.storage.JsonEncodingError
-import uk.ac.wellcome.storage.generators.RandomThings
 
 import scala.util.Random
 
@@ -18,7 +18,7 @@ class EncoderTest
     extends AnyFunSpec
     with EitherValues
     with Matchers
-    with RandomThings
+    with RandomGenerators
     with StreamAssertions {
 
   import EncoderInstances._

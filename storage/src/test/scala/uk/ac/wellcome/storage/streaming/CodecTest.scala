@@ -4,8 +4,8 @@ import io.circe.Json
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.storage.generators.RandomThings
 
 import scala.util.Random
 
@@ -13,7 +13,7 @@ class CodecTest
     extends AnyFunSpec
     with Matchers
     with EitherValues
-    with RandomThings {
+    with RandomGenerators {
 
   import Codec._
 

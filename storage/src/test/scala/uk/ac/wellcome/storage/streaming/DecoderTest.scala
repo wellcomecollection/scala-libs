@@ -11,9 +11,9 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.generators.RandomThings
 
 import scala.util.Random
 
@@ -21,7 +21,7 @@ class DecoderTest
     extends AnyFunSpec
     with EitherValues
     with Matchers
-    with RandomThings {
+    with RandomGenerators {
 
   import DecoderInstances._
 

@@ -6,7 +6,7 @@ import java.util.UUID
 import scala.util.Random
 
 trait RandomGenerators {
-  def randomAlphanumeric(length: Int = 8): String =
+  def randomAlphanumeric(length: Int = randomInt(from = 5, to = 10)): String =
     Random.alphanumeric take length mkString
 
   def randomBytes(length: Int = 1024): Array[Byte] = {

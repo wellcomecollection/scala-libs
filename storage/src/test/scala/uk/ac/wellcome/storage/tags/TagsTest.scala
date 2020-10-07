@@ -5,15 +5,15 @@ import java.util.UUID
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.tags.memory.MemoryTags
 import uk.ac.wellcome.storage._
 
-class TagsTest extends AnyFunSpec with Matchers with EitherValues with RandomThings {
+class TagsTest extends AnyFunSpec with Matchers with EitherValues with RandomGenerators {
   def createTags: Map[String, String] =
     (1 to randomInt(from = 0, to = 25))
       .map { _ =>
-        randomAlphanumeric -> randomAlphanumeric
+        randomAlphanumeric() -> randomAlphanumeric()
       }
       .toMap
 

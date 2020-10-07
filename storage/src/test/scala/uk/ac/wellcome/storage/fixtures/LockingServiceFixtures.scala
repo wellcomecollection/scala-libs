@@ -3,8 +3,7 @@ package uk.ac.wellcome.storage.fixtures
 import grizzled.slf4j.Logging
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues, TryValues}
-import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.storage.locking._
 
 import scala.util.Try
@@ -15,7 +14,7 @@ trait LockingServiceFixtures[Ident, ContextId, LockDaoContext]
     with Matchers
     with Logging
     with LockDaoFixtures[Ident, ContextId, LockDaoContext]
-    with RandomThings {
+    with RandomGenerators {
 
   type LockDaoStub = LockDao[Ident, ContextId]
   type ResultF = Try[Either[FailedLockingServiceOp, String]]
@@ -65,8 +64,8 @@ trait LockingServiceFixtures[Ident, ContextId, LockDaoContext]
     failedLock.e shouldBe e
   }
 
-  val expectedResult: String = randomAlphanumeric
-  val expectedError: Error = new Error(randomAlphanumeric)
+  val expectedResult: String = randomAlphanumeric()
+  val expectedError: Error = new Error(randomAlphanumeric())
 
   def f = Try { expectedResult }
   def fError = Try { throw expectedError }
