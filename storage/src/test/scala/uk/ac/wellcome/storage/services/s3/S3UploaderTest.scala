@@ -18,7 +18,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
   val uploader = new S3Uploader()
 
   it("creates a pre-signed URL for an object") {
-    val content = randomAlphanumeric
+    val content = randomAlphanumeric()
 
     withLocalS3Bucket { bucket =>
       val url = uploader
@@ -35,7 +35,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
   }
 
   it("will not update an existing stored object if instructed so") {
-    val content = randomAlphanumeric
+    val content = randomAlphanumeric()
 
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
@@ -75,7 +75,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
   }
 
   it("will update an existing stored object if instructed so") {
-    val content = randomAlphanumeric
+    val content = randomAlphanumeric()
 
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
@@ -116,7 +116,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
   }
 
   it("expires the URL after the given duration") {
-    val content = randomAlphanumeric
+    val content = randomAlphanumeric()
 
     withLocalS3Bucket { bucket =>
       // Picking a good expiryLength here is tricky: too fast and the test becomes
@@ -151,7 +151,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
     val err = uploader
       .uploadAndGetURL(
         location = createS3ObjectLocation,
-        content = randomAlphanumeric,
+        content = randomAlphanumeric(),
         expiryLength = 5.minutes
       )
       .left

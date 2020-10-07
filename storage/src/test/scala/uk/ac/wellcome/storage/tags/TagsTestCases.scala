@@ -11,9 +11,11 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
 
   def createIdent(context: Context): Ident
 
+  val maxTags: Int = 25
+
   // One less than maxTags so we can append to the tags further down
   def createTags: Map[String, String] =
-    collectionOf(min = 0, max = 24) { randomAlphanumeric() -> randomAlphanumeric() }.toMap
+    collectionOf(min = 0, max = maxTags) { randomAlphanumeric() -> randomAlphanumeric() }.toMap
 
   def withContext[R](testWith: TestWith[Context, R]): R
 

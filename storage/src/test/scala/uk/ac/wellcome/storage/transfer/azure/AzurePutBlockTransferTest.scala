@@ -39,7 +39,7 @@ class AzurePutBlockTransferTest
   // Deliberately create quite a large record, so we can test the ability of
   // the Transfer object to join multiple blocks together.
   override def createT: Record =
-    Record(name = randomAlphanumericWithLength(length = blockSize * 10))
+    Record(name = randomAlphanumeric(length = blockSize * 10))
 
   override def withContext[R](testWith: TestWith[Unit, R]): R = testWith(())
 
@@ -141,7 +141,7 @@ class AzurePutBlockTransferTest
           val src = createSrcLocation(srcNamespace)
           val dst = createDstLocation(dstNamespace)
 
-          val t = Record(randomAlphanumericWithLength(length = blockSize * 10))
+          val t = Record(randomAlphanumeric(length = blockSize * 10))
 
           withContext { implicit context =>
             withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
@@ -168,8 +168,7 @@ class AzurePutBlockTransferTest
           val dst = createDstLocation(dstNamespace)
 
           assert(blockSize > 1)
-          val t =
-            Record(randomAlphanumericWithLength(length = blockSize * 10 + 1))
+          val t = Record(randomAlphanumeric(length = blockSize * 10 + 1))
 
           withContext { implicit context =>
             withSrcStore(initialEntries = Map(src -> t)) { srcStore =>

@@ -3,8 +3,7 @@ package uk.ac.wellcome.storage.services
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.storage.models.ByteRange
 import uk.ac.wellcome.storage.streaming.Codec
 import uk.ac.wellcome.storage.{DoesNotExistError, ReadError, RetryableError, StoreReadError}
@@ -13,7 +12,7 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
     extends AnyFunSpec
     with Matchers
     with EitherValues
-    with RandomThings {
+    with RandomGenerators {
   def withNamespace[R](testWith: TestWith[Namespace, R]): R
 
   def createIdentWith(namespace: Namespace): Ident
@@ -42,7 +41,7 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
       val ident = createIdentWith(namespace)
 
       val bufferSize = 500
-      val contents = randomAlphanumericWithLength(length = bufferSize * 3)
+      val contents = randomAlphanumeric(length = bufferSize * 3)
 
       writeString(ident, contents)
 
@@ -63,7 +62,7 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
       val ident = createIdentWith(namespace)
 
       val bufferSize = 500
-      val contents = randomAlphanumericWithLength(length = bufferSize * 3 + 1)
+      val contents = randomAlphanumeric(length = bufferSize * 3 + 1)
 
       writeString(ident, contents)
 
@@ -91,7 +90,7 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
     withNamespace { namespace =>
       val ident = createIdentWith(namespace)
 
-      val contents = randomAlphanumeric
+      val contents = randomAlphanumeric()
       writeString(ident, contents)
 
       var rangedReaderCalls = 0
