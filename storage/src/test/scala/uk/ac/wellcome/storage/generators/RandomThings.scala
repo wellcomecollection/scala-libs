@@ -11,20 +11,6 @@ trait RandomThings extends RandomGenerators {
   def randomAlphanumeric: String =
     Random.alphanumeric take 8 mkString
 
-  private val lowercaseLatinAlphabet = ('a' to 'z')
-
-  def randomAlphanumericWithLength(length: Int = 8): String =
-    Random.alphanumeric take length mkString
-
-  def randomLowercaseLatinAlphabetChar = lowercaseLatinAlphabet(
-    Random.nextInt(lowercaseLatinAlphabet.length - 1)
-  )
-
-  def randomLowercaseLatinAlphabetString(n: Int = 8) =
-    (1 to n) map (_ => randomLowercaseLatinAlphabetChar) mkString
-
-  def randomUTF16String = Random.nextString(8)
-
   def randomStringOfByteLength(length: Int): String = {
     // Generate bytes within UTF-16 mappable range
     // 0 to 127 maps directly to Unicode code points in the ASCII range
