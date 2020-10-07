@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v23.0.0 - 2020-10-07
+
+This release tidies up the random generators provided by `RandomGenerators`.  This trait should be the canonical source of random data for tests in the platform, rather than multiple implementations of very similar functions copy/pasted into different codebases.
+
 ## v22.0.0 - 2020-10-01
 
 Add retry for 500 errors from S3 in `S3Transfer`
