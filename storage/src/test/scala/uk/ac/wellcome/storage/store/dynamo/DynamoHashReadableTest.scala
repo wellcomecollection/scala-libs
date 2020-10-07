@@ -55,7 +55,7 @@ class DynamoHashReadableTest
     }
 
     it("finds a row with matching hashKey and version") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
       val record = createRecord
 
       val initialEntries = Set(
@@ -72,7 +72,7 @@ class DynamoHashReadableTest
     }
 
     it("fails if there is a row with matching hashKey but wrong version") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
       val record = createRecord
 
       val initialEntries = Set(

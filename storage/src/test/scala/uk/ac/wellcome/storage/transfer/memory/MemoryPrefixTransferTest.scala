@@ -24,10 +24,10 @@ class MemoryPrefixTransferTest
     MemoryStore[MemoryLocation, Record] with MemoryPrefixTransfer[MemoryLocation, MemoryLocationPrefix, Record]
 
   override def withSrcNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def withDstNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createSrcLocation(srcNamespace: String): MemoryLocation =
     createMemoryLocationWith(srcNamespace)

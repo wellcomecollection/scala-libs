@@ -16,7 +16,7 @@ class DynamoMultipleVersionStoreTest
     with RecordGenerators
     with DynamoFixtures {
 
-  override def createIdent: String = randomAlphanumeric
+  override def createIdent: String = randomAlphanumeric()
   override def createT: Record = createRecord
 
   type DynamoStoreStub = DynamoMultipleVersionStore[String, Record]
@@ -107,10 +107,10 @@ class DynamoMultipleVersionStoreTest
     withVersionedStoreContext(testWith)
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createId(implicit namespace: String): Version[String, Int] =
-    Version(randomAlphanumeric, 0)
+    Version(randomAlphanumeric(), 0)
 
   override def withStoreImpl[R](
     initialEntries: Map[Version[String, Int], Record],

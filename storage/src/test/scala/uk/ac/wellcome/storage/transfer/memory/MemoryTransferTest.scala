@@ -24,10 +24,10 @@ class MemoryTransferTest
   override def createT: Array[Byte] = randomBytes()
 
   override def withSrcNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def withDstNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def withContext[R](testWith: TestWith[MemoryStoreContext, R]): R =
     withTransferStore(initialEntries = Map.empty) { store =>

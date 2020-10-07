@@ -145,11 +145,11 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
               Set(
                 WrongEntry(
                   id,
-                  version = randomAlphanumeric,
+                  version = randomAlphanumeric(),
                   record = createRecord),
                 WrongEntry(
                   id,
-                  version = randomAlphanumeric,
+                  version = randomAlphanumeric(),
                   record = createRecord)
               )
             ))

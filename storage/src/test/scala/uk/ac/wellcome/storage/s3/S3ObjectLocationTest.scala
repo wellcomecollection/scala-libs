@@ -136,7 +136,7 @@ class S3ObjectLocationTest
 
     it("can be created from an S3ObjectSummary") {
       val bucket = createBucketName
-      val key = randomAlphanumeric
+      val key = randomAlphanumeric()
 
       val summary = new S3ObjectSummary()
       summary.setBucketName(bucket)

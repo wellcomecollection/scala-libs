@@ -23,7 +23,7 @@ class DynamoHashRangeWritableTest
     with RecordGenerators {
   type HashRangeEntry = DynamoHashRangeEntry[String, Int, Record]
 
-  def createId: String = randomAlphanumeric
+  def createId: String = randomAlphanumeric()
   def createT: Record = createRecord
 
   class HashRangeWritableImpl(
@@ -66,7 +66,7 @@ class DynamoHashRangeWritableTest
   describe("DynamoHashRangeWritable") {
 
     it("allows putting the same hash key at multiple versions") {
-      val hashKey = randomAlphanumeric
+      val hashKey = randomAlphanumeric()
 
       withLocalDynamoDbTable { table =>
         val writable = createDynamoWritableWith(
