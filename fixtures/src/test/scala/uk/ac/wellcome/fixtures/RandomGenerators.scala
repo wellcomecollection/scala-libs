@@ -9,14 +9,6 @@ trait RandomGenerators {
   def randomAlphanumeric(length: Int = randomInt(from = 5, to = 10)): String =
     Random.alphanumeric take length mkString
 
-  def randomBytes(length: Int = 1024): Array[Byte] = {
-    val byteArray = new Array[Byte](length)
-
-    Random.nextBytes(byteArray)
-
-    byteArray
-  }
-
   def randomAlphanumericWithSpace(length: Int = 8): String = {
     val str = randomAlphanumeric(length).toCharArray
 
@@ -26,6 +18,24 @@ trait RandomGenerators {
 
     val spaceIndex = Random.nextInt(str.length - 2) + 1
     str.updated(spaceIndex, ' ').toString
+  }
+
+  def randomBytes(length: Int = 1024): Array[Byte] = {
+    val byteArray = new Array[Byte](length)
+
+    Random.nextBytes(byteArray)
+
+    byteArray
+  }
+
+  def randomStringOfByteLength(length: Int): String = {
+    // Generate bytes within UTF-16 mappable range
+    // 0 to 127 maps directly to Unicode code points in the ASCII range
+    val chars = (1 to length).map { _ =>
+      randomInt(from = 97, to = 122).toByte.toChar
+    }
+
+    chars.mkString
   }
 
   def randomUUID: UUID = UUID.randomUUID()
