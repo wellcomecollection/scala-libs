@@ -35,7 +35,7 @@ trait DynamoLockDaoFixtures
     }
 
   override def createIdent: String = randomAlphanumeric()
-  override def createContextId: UUID = UUID.randomUUID()  // TODO: fix this
+  override def createContextId: UUID = randomUUID
 
   def assertNoLocks(lockTable: Table): Assertion =
     scanTable[ExpiringLock](lockTable) shouldBe empty

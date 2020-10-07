@@ -11,7 +11,7 @@ class MemoryTagsTest extends TagsTestCases[UUID, Unit] {
       new MemoryTags(initialTags)
     )
 
-  override def createIdent(context: Unit): UUID = UUID.randomUUID()
+  override def createIdent(context: Unit): UUID = randomUUID
 
   override def withContext[R](testWith: TestWith[Unit, R]): R = testWith(())
 }

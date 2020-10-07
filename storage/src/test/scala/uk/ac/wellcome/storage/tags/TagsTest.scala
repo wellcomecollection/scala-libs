@@ -17,7 +17,7 @@ class TagsTest extends AnyFunSpec with Matchers with EitherValues with RandomGen
       }
       .toMap
 
-  def createIdent: UUID = UUID.randomUUID()
+  def createIdent: UUID = randomUUID
 
   describe("update()") {
     it("wraps a ReadError from the underlying store") {

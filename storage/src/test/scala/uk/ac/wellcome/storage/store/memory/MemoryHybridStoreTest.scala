@@ -72,7 +72,7 @@ class MemoryHybridStoreTest
   override def withNamespace[R](testWith: TestWith[String, R]): R =
     testWith(randomAlphanumeric())
 
-  override def createId(implicit namespace: String): UUID = UUID.randomUUID()
+  override def createId(implicit namespace: String): UUID = randomUUID
 
   override def withBrokenPutTypedStoreImpl[R](
     testWith: TestWith[MemoryTypedStoreImpl, R])(
