@@ -8,7 +8,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.Assertion
 import org.scanamo.auto._
-import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.locking.{LockDao, LockDaoFixtures}
@@ -18,8 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait DynamoLockDaoFixtures
     extends LockDaoFixtures[String, UUID, Table]
-    with DynamoFixtures
-    with RandomGenerators {
+    with DynamoFixtures {
   def createTable(table: Table): Table =
     createLockTable(table)
 

@@ -8,7 +8,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import software.amazon.awssdk.services.cloudwatch.model.StandardUnit
 import uk.ac.wellcome.akka.fixtures.Akka
-import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
@@ -23,8 +23,7 @@ class SQSStreamTest
     with IntegrationPatience
     with Eventually
     with SQS
-    with Akka
-    with RandomGenerators {
+    with Akka {
 
   case class NamedObject(name: String)
 
