@@ -43,10 +43,10 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions wit
       Future(sender.send(body)(subject, destination))
 
     val toSend = Function.tupled(send _)
-    val messageCount = randomInt(from = 50, to = 150)
 
-    val messages = (1 to messageCount).map(i =>
-      (f"$i-${randomAlphanumeric()}", randomAlphanumeric(), randomAlphanumeric()))
+    val messages = collectionOf(min = 50, max = 150) {
+      (randomAlphanumeric(), randomAlphanumeric(), randomAlphanumeric())
+    }
 
     val eventuallyResults = Future.sequence(messages.map(toSend))
     val expectedResults = messages.map(
@@ -54,7 +54,7 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions wit
     ).toSet
 
     whenReady(eventuallyResults) { results =>
-      sender.messages.size shouldBe messageCount
+      sender.messages.size shouldBe messages.size
       results.foreach(_ shouldBe Success(()))
       sender.messages.toSet shouldBe expectedResults
     }

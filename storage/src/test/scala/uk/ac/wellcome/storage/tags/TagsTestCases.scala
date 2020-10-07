@@ -3,11 +3,10 @@ package uk.ac.wellcome.storage.tags
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, UpdateNoSourceError, UpdateNotApplied}
-import uk.ac.wellcome.storage.generators.RandomThings
 
-trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with EitherValues with RandomThings {
+trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with EitherValues with RandomGenerators {
   def withTags[R](initialTags: Map[Ident, Map[String, String]])(testWith: TestWith[Tags[Ident], R]): R
 
   def createIdent(context: Context): Ident
@@ -16,11 +15,7 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
 
   // One less than maxTags so we can append to the tags further down
   def createTags: Map[String, String] =
-    (1 to randomInt(from = 0, to = maxTags - 1))
-      .map { _ =>
-        randomAlphanumeric -> randomAlphanumeric
-      }
-      .toMap
+    collectionOf(min = 0, max = maxTags) { randomAlphanumeric() -> randomAlphanumeric() }.toMap
 
   def withContext[R](testWith: TestWith[Context, R]): R
 

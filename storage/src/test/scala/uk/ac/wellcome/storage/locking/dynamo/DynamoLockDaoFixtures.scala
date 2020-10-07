@@ -11,7 +11,6 @@ import org.scanamo.auto._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
-import uk.ac.wellcome.storage.generators.RandomThings
 import uk.ac.wellcome.storage.locking.{LockDao, LockDaoFixtures}
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
@@ -19,8 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait DynamoLockDaoFixtures
     extends LockDaoFixtures[String, UUID, Table]
-    with DynamoFixtures
-    with RandomThings {
+    with DynamoFixtures {
   def createTable(table: Table): Table =
     createLockTable(table)
 
@@ -35,8 +33,8 @@ trait DynamoLockDaoFixtures
       testWith(lockDao)
     }
 
-  override def createIdent: String = randomAlphanumeric
-  override def createContextId: UUID = UUID.randomUUID()
+  override def createIdent: String = randomAlphanumeric()
+  override def createContextId: UUID = randomUUID
 
   def assertNoLocks(lockTable: Table): Assertion =
     scanTable[ExpiringLock](lockTable) shouldBe empty

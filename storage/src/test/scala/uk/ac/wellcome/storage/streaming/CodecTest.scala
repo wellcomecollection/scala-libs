@@ -4,16 +4,14 @@ import io.circe.Json
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.storage.generators.RandomThings
-
-import scala.util.Random
 
 class CodecTest
     extends AnyFunSpec
     with Matchers
     with EitherValues
-    with RandomThings {
+    with RandomGenerators {
 
   import Codec._
 
@@ -28,14 +26,14 @@ class CodecTest
         }
 
         it("a string") {
-          val randomString = Random.nextString(8)
+          val randomString = randomAlphanumeric()
 
           val stream = stringCodec.toStream(randomString).right.value
           stringCodec.fromStream(stream).right.value shouldBe randomString
         }
 
         it("some json") {
-          val randomString = Random.nextString(8)
+          val randomString = randomAlphanumeric()
           val randomJson = Json.fromString(randomString)
 
           val stream = jsonCodec.toStream(randomJson).right.value
@@ -44,7 +42,7 @@ class CodecTest
 
         it("a type T") {
           case class NamedThing(name: String, value: Int)
-          val thing = NamedThing(name = Random.nextString(8), value = 5)
+          val thing = NamedThing(name = randomAlphanumeric(), value = 5)
 
           val stream = typeCodec[NamedThing].toStream(thing).right.value
           typeCodec[NamedThing].fromStream(stream).right.value shouldBe thing

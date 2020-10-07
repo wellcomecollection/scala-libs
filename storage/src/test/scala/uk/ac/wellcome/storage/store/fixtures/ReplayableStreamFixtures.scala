@@ -1,11 +1,11 @@
 package uk.ac.wellcome.storage.store.fixtures
 
 import org.scalatest.EitherValues
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.streaming.Codec.bytesCodec
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
-import uk.ac.wellcome.storage.generators.RandomThings
 
-trait ReplayableStreamFixtures extends EitherValues with RandomThings {
+trait ReplayableStreamFixtures extends EitherValues with RandomGenerators {
   // In the StoreTestCases, we need to assert that PUT and then GET returns an equivalent
   // value.  A regular InputStream gets consumed on the initial PUT, so we wrap it in
   // a ReplayableStream so we can do comparisons later.

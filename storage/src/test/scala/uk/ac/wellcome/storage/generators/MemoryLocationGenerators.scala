@@ -1,11 +1,12 @@
 package uk.ac.wellcome.storage.generators
 
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.providers.memory.{MemoryLocation, MemoryLocationPrefix}
 
-trait MemoryLocationGenerators extends RandomThings {
+trait MemoryLocationGenerators extends RandomGenerators {
   def createMemoryLocationWith(
-    namespace: String = randomAlphanumeric,
-    path: String = randomAlphanumeric
+    namespace: String = randomAlphanumeric(),
+    path: String = randomAlphanumeric()
   ): MemoryLocation =
     MemoryLocation(
       namespace = namespace,
@@ -16,11 +17,11 @@ trait MemoryLocationGenerators extends RandomThings {
     createMemoryLocationWith()
 
   def createMemoryLocationPrefixWith(
-    namespace: String = randomAlphanumeric
+    namespace: String = randomAlphanumeric()
   ): MemoryLocationPrefix =
     MemoryLocationPrefix(
       namespace = namespace,
-      path = randomAlphanumeric
+      path = randomAlphanumeric()
     )
 
   def createMemoryLocationPrefix: MemoryLocationPrefix =

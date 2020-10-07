@@ -57,13 +57,13 @@ class DynamoHashStoreTest
   override def createT: Record = createRecord
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createTable(table: Table): Table = createTableWithHashKey(table)
 
   override def createId(
     implicit namespace: String): Version[IdentityKey, Int] =
-    Version(id = IdentityKey(randomAlphanumeric), version = 1)
+    Version(id = IdentityKey(randomAlphanumeric()), version = 1)
 
   override def withMaxima[R](
     initialEntries: Map[Version[IdentityKey, Int], Record])(

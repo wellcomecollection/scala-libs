@@ -24,7 +24,7 @@ class DynamoHashWritableTest
     with RecordGenerators {
   type HashEntry = DynamoHashEntry[String, Int, Record]
 
-  def createId: String = randomAlphanumeric
+  def createId: String = randomAlphanumeric()
   def createT: Record = createRecord
 
   class TestHashWritable(
@@ -62,7 +62,7 @@ class DynamoHashWritableTest
 
   describe("DynamoHashWritable") {
     it("fails to overwrite a new version with an old version") {
-      val hashKey = randomAlphanumeric
+      val hashKey = randomAlphanumeric()
       val olderRecord = createRecord
       val newerRecord = createRecord
 

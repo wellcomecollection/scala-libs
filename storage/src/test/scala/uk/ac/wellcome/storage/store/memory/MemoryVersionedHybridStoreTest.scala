@@ -48,7 +48,7 @@ class MemoryVersionedHybridStoreTest
     }
   }
 
-  override def createIdent: String = randomAlphanumeric
+  override def createIdent: String = randomAlphanumeric()
 
   override def withVersionedStoreImpl[R](
     initialEntries: Entries,
@@ -98,8 +98,8 @@ class MemoryVersionedHybridStoreTest
     withVersionedStoreContext(testWith)
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createId(implicit namespace: String): Version[String, Int] =
-    Version(randomAlphanumeric, 0)
+    Version(randomAlphanumeric(), 0)
 }

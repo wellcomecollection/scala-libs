@@ -7,12 +7,14 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.DoesNotExistError
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
+import uk.ac.wellcome.storage.generators.StreamGenerators
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.services.{SizeFinder, SizeFinderTestCases}
 
 class S3SizeFinderTest
     extends SizeFinderTestCases[S3ObjectLocation, Bucket]
-    with S3Fixtures {
+    with S3Fixtures
+    with StreamGenerators {
 
   override def withContext[R](testWith: TestWith[Bucket, R]): R =
     withLocalS3Bucket { bucket =>
@@ -53,7 +55,7 @@ class S3SizeFinderTest
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
 
-      val inputStream = randomInputStream()
+      val inputStream = createInputStream()
 
       s3Client.putObject(
         new PutObjectRequest(

@@ -12,14 +12,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient
 import software.amazon.awssdk.services.cloudwatch.model.{PutMetricDataRequest, StandardUnit}
 import uk.ac.wellcome.akka.fixtures.Akka
-import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.monitoring.MetricsConfig
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
-import scala.util.Random
 
 class CloudWatchMetricsTest
     extends AnyFunSpec
@@ -28,7 +27,8 @@ class CloudWatchMetricsTest
     with ScalaFutures
     with Eventually
     with Akka
-    with IntegrationPatience {
+    with IntegrationPatience
+    with RandomGenerators {
 
   import org.mockito.Mockito._
 
@@ -134,7 +134,7 @@ class CloudWatchMetricsTest
 
   // TODO: This should use RandomGenerators
   private def createMetricName: String =
-    (Random.alphanumeric take 10 mkString) toLowerCase
+    randomAlphanumeric().toLowerCase()
 
   private def withMetricsSender[R](
     cloudWatchClient: CloudWatchClient)(

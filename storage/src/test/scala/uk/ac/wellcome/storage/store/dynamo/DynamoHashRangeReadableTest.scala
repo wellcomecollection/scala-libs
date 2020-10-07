@@ -86,7 +86,7 @@ class DynamoHashRangeReadableTest
     }
 
     it("finds a row with matching hashKey and rangeKey") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
       val record = createRecord
 
       val initialEntries = Set(
@@ -103,7 +103,7 @@ class DynamoHashRangeReadableTest
     }
 
     it("fails if there's a row with matching hash but not range key") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
       val record = createRecord
 
       val initialEntries = Set(

@@ -13,7 +13,6 @@ import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 
 import scala.collection.immutable
-import scala.util.Random
 
 object DynamoFixtures {
   case class Table(name: String, index: String)
@@ -22,7 +21,8 @@ object DynamoFixtures {
 trait DynamoFixtures
     extends Eventually
     with Matchers
-    with IntegrationPatience {
+    with IntegrationPatience
+    with RandomGenerators {
   import DynamoFixtures._
 
   private val port = 45678
@@ -42,8 +42,8 @@ trait DynamoFixtures
 
   def nonExistentTable: Table =
     Table(
-      name = Random.alphanumeric.take(10).mkString,
-      index = Random.alphanumeric.take(10).mkString
+      name = randomAlphanumeric(),
+      index = randomAlphanumeric()
     )
 
   def withSpecifiedLocalDynamoDbTable[R](
@@ -58,8 +58,8 @@ trait DynamoFixtures
   def withSpecifiedTable[R](
     tableDefinition: Table => Table): Fixture[Table, R] = fixture[Table, R](
     create = {
-      val tableName = Random.alphanumeric.take(10).mkString
-      val indexName = Random.alphanumeric.take(10).mkString
+      val tableName = randomAlphanumeric()
+      val indexName = randomAlphanumeric()
 
       tableDefinition(Table(tableName, indexName))
     },

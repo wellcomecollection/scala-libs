@@ -34,7 +34,7 @@ trait DynamoReadableTestCases[
 
   describe("DynamoReadable") {
     it("reads a row from the table") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
       val record = createRecord
 
       val initialEntries = Set(
@@ -55,14 +55,14 @@ trait DynamoReadableTestCases[
         val readable = createDynamoReadableWith(table)
 
         readable
-          .get(Version(randomAlphanumeric, 1))
+          .get(Version(randomAlphanumeric(), 1))
           .left
           .value shouldBe a[DoesNotExistError]
       }
     }
 
     it("finds nothing if there's no row with that hash key") {
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
 
       val initialEntries = Set(
         createEntry(id, v = 1, createRecord)
@@ -72,7 +72,7 @@ trait DynamoReadableTestCases[
         val readable = createDynamoReadableWith(table, initialEntries)
 
         readable
-          .get(Version(randomAlphanumeric, 1))
+          .get(Version(randomAlphanumeric(), 1))
           .left
           .value shouldBe a[DoesNotExistError]
       }
@@ -81,7 +81,7 @@ trait DynamoReadableTestCases[
     it("fails if DynamoDB has an error") {
       val readable = createDynamoReadableWith(nonExistentTable)
 
-      val result = readable.get(Version(randomAlphanumeric, 1))
+      val result = readable.get(Version(randomAlphanumeric(), 1))
       val err = result.left.value.e
 
       err shouldBe a[ResourceNotFoundException]
@@ -93,12 +93,12 @@ trait DynamoReadableTestCases[
       // This doesn't have the payload field that our DynamoEntry model requires
       case class BadModel(id: String, version: Int, t: String)
 
-      val id = randomAlphanumeric
+      val id = randomAlphanumeric()
 
       withLocalDynamoDbTable { table =>
         scanamo.exec(
           ScanamoTable[BadModel](table.name).putAll(
-            Set(BadModel(id, version = 1, t = randomAlphanumeric))
+            Set(BadModel(id, version = 1, t = randomAlphanumeric()))
           ))
 
         val readable = createDynamoReadableWith(table)
@@ -118,7 +118,7 @@ trait DynamoReadableTestCases[
     withSpecifiedTable(createWrongTable) { table =>
       val readable = createDynamoReadableWith(table)
 
-      val result = readable.get(id = Version(randomAlphanumeric, 1))
+      val result = readable.get(id = Version(randomAlphanumeric(), 1))
 
       val err = result.left.value
       err.e shouldBe a[AmazonDynamoDBException]

@@ -58,7 +58,7 @@ class DynamoVersionedHybridStoreTest
     }
   }
 
-  override def createIdent: String = randomAlphanumeric
+  override def createIdent: String = randomAlphanumeric()
 
   override def createT: Record = createRecord
 
@@ -115,8 +115,8 @@ class DynamoVersionedHybridStoreTest
     withVersionedStoreContext(testWith)
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createId(implicit namespace: String): Version[String, Int] =
-    Version(randomAlphanumeric, 0)
+    Version(randomAlphanumeric(), 0)
 }

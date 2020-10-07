@@ -108,7 +108,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val result =
           s3Tags
             .update(location) { existingTags: Map[String, String] =>
-              Right(existingTags ++ Map(randomAlphanumericWithLength(129) -> "value"))
+              Right(existingTags ++ Map(randomAlphanumeric(length = 129) -> "value"))
             }
 
         assertIsS3Exception(result) {
@@ -127,7 +127,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val result: s3Tags.UpdateEither =
           s3Tags
             .update(location) { existingTags: Map[String, String] =>
-              Right(existingTags ++ Map("key" -> randomAlphanumericWithLength(257)))
+              Right(existingTags ++ Map("key" -> randomAlphanumeric(length = 257)))
             }
 
         assertIsS3Exception(result) {

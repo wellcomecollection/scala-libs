@@ -45,11 +45,11 @@ class DynamoHashRangeStoreTest
   override def createT: Record = createRecord
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
-    testWith(randomAlphanumeric)
+    testWith(randomAlphanumeric())
 
   override def createTable(table: Table): Table =
     createTableWithHashRangeKey(table)
 
   override def createId(implicit namespace: String): Version[String, Int] =
-    Version(id = randomAlphanumeric, version = 1)
+    Version(id = randomAlphanumeric(), version = 1)
 }

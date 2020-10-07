@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.listing
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
-import uk.ac.wellcome.storage.generators.RandomThings
+import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.listing.fixtures.ListingFixtures
 
 trait ListingTestCases[Ident,
@@ -14,7 +14,7 @@ trait ListingTestCases[Ident,
     extends AnyFunSpec
     with Matchers
     with EitherValues
-    with RandomThings
+    with RandomGenerators
     with ListingFixtures[
       Ident,
       Prefix,
@@ -61,7 +61,7 @@ trait ListingTestCases[Ident,
         withListingContext { implicit context =>
           val ident = createIdent
           val prefix = createPrefixMatching(ident)
-          val entries = Seq(extendIdent(ident, randomAlphanumeric))
+          val entries = Seq(extendIdent(ident, randomAlphanumeric()))
 
           withListing(context, initialEntries = entries) { listing =>
             assertResultCorrect(

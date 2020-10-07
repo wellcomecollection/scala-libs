@@ -2,9 +2,8 @@ package uk.ac.wellcome.storage.store
 
 import java.io.{FilterInputStream, InputStream}
 
-import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.generators.RandomThings
 import uk.ac.wellcome.storage.store.fixtures.TypedStoreFixtures
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.{
@@ -26,7 +25,7 @@ trait TypedStoreTestCases[
       StreamStoreImpl,
       TypedStoreImpl,
       StreamStoreContext]
-    with RandomThings {
+    with RandomGenerators {
 
   override def withStoreImpl[R](
     initialEntries: Map[Ident, T],

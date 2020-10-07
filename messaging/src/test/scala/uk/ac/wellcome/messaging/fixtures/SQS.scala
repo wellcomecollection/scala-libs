@@ -17,7 +17,6 @@ import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
-import scala.util.Random
 
 object SQS {
   case class Queue(url: String, arn: String, visibilityTimeout: Int) {
@@ -27,7 +26,7 @@ object SQS {
   case class QueuePair(queue: Queue, dlq: Queue)
 }
 
-trait SQS extends Matchers with Logging {
+trait SQS extends Matchers with Logging with RandomGenerators {
 
   import SQS._
 
@@ -87,9 +86,12 @@ trait SQS extends Matchers with Logging {
                       attributeName = attributeName,
                       client = client)
 
+  def createQueueName: String =
+    randomAlphanumeric()
+
   def withLocalSqsQueue[R](
     client: SqsClient = sqsClient,
-    queueName: String = Random.alphanumeric take 10 mkString,
+    queueName: String = createQueueName,
     visibilityTimeout: Int = 1
   ): Fixture[Queue, R] =
     fixture[Queue, R](
@@ -131,7 +133,7 @@ trait SQS extends Matchers with Logging {
 
   def withLocalSqsQueuePair[R](visibilityTimeout: Int = 1)(
     testWith: TestWith[QueuePair, R]): R = {
-    val queueName = Random.alphanumeric take 10 mkString
+    val queueName = createQueueName
 
     withLocalSqsQueue(sqsClient, queueName = s"$queueName-dlq") { dlq =>
       withLocalSqsQueue(
@@ -190,7 +192,7 @@ trait SQS extends Matchers with Logging {
   def sendInvalidJSONto(queue: Queue): SendMessageResponse =
     sendMessageToSqsClient(
       queue = queue,
-      body = Random.alphanumeric take 50 mkString)
+      body = randomAlphanumeric())
 
   private def sendMessageToSqsClient(queue: Queue,
                                      body: String): SendMessageResponse = {

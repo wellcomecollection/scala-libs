@@ -80,7 +80,7 @@ trait DynamoHybridStoreTestCases[
     testWith(())
 
   override def createId(implicit namespace: Unit): Version[String, Int] =
-    Version(id = randomAlphanumeric, version = 1)
+    Version(id = randomAlphanumeric(), version = randomInt(from = 1, to = 10))
 
   describe("DynamoHybridStore") {
     it("appends a .json suffix to object keys") {
@@ -205,9 +205,6 @@ trait DynamoHybridStoreTestCases[
       it("if the underlying DynamoDB table doesn't exist") {
         withStoreContext {
           case (bucket, _) =>
-            val nonExistentTable =
-              Table(randomAlphanumeric, randomAlphanumeric)
-
             implicit val context = (bucket, nonExistentTable)
 
             withNamespace { implicit namespace =>
@@ -314,8 +311,9 @@ trait DynamoHybridStoreTestCases[
                                         contents: String)
 
                       putTableItem(
-                        BadRow(id.id, id.version, randomAlphanumeric),
-                        table)
+                        item = BadRow(id.id, id.version, randomAlphanumeric()),
+                        table = table
+                      )
 
                       val value = hybridStore.get(id).left.value
 

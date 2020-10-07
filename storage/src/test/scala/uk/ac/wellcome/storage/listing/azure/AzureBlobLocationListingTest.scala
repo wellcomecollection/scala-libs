@@ -5,6 +5,7 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import uk.ac.wellcome.storage.fixtures.AzureFixtures
 import uk.ac.wellcome.storage.fixtures.AzureFixtures.Container
+import uk.ac.wellcome.storage.generators.StreamGenerators
 import uk.ac.wellcome.storage.listing.ListingTestCases
 
 class AzureBlobLocationListingTest extends ListingTestCases[
@@ -13,7 +14,8 @@ class AzureBlobLocationListingTest extends ListingTestCases[
   AzureBlobLocation,
   AzureBlobLocationListing,
   Container]
-  with AzureFixtures {
+  with AzureFixtures
+  with StreamGenerators {
 
   override def createIdent(implicit container: Container): AzureBlobLocation =
     createAzureBlobLocationWith(container)
@@ -40,7 +42,7 @@ class AzureBlobLocationListingTest extends ListingTestCases[
       azureClient
         .getBlobContainerClient(location.container)
         .getBlobClient(location.name)
-        .upload(randomInputStream(length = 20), 20)
+        .upload(createInputStream(length = 20), 20)
     }
 
     testWith(

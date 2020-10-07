@@ -52,7 +52,7 @@ class S3LargeStreamReaderTest
       val location = createS3ObjectLocationWith(bucket)
       putStream(
         location,
-        inputStream = randomInputStream(length = bufferSize * 2)
+        inputStream = createInputStream(length = bufferSize * 2)
       )
 
       val spyClient = Mockito.spy(s3Client)
