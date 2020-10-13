@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.worker.monitoring.metrics
 import java.time.{Duration, Instant}
 
 import uk.ac.wellcome.messaging.worker.models._
+import uk.ac.wellcome.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,20 +20,14 @@ trait MetricsProcessor {
     implicit monitoringClient: ProcessMonitoringClient,
     ec: ExecutionContext
   ): Future[Unit] = {
-    val countResult = result match {
-      case _: Successful[_] =>
-        monitoringClient
-          .incrementCount(metricName("Successful"))
-      case _: DeterministicFailure[_] =>
-        monitoringClient
-          .incrementCount(metricName("DeterministicFailure"))
-      case _: NonDeterministicFailure[_] =>
-        monitoringClient
-          .incrementCount(metricName("NonDeterministicFailure"))
-      case _: MonitoringProcessorFailure[_] =>
-        monitoringClient
-          .incrementCount(metricName("MonitoringProcessorFailure"))
+    val resultName = result match {
+      case _: Successful[_]                 => "Successful"
+      case _: DeterministicFailure[_]       => "DeterministicFailure"
+      case _: NonDeterministicFailure[_]    => "NonDeterministicFailure"
+      case _: MonitoringProcessorFailure[_] => "MonitoringProcessorFailure"
     }
+
+    val countResult = monitoringClient.incrementCount(metricName(resultName))
 
     val recordDuration =
       monitoringClient.recordValue(
