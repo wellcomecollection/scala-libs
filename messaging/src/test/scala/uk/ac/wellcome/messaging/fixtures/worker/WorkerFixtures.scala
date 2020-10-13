@@ -4,7 +4,6 @@ import java.time.Instant
 
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import uk.ac.wellcome.messaging.worker._
 import uk.ac.wellcome.messaging.worker.models._
 import uk.ac.wellcome.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
@@ -12,7 +11,7 @@ import uk.ac.wellcome.messaging.worker.steps.MessageProcessor
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait WorkerFixtures extends Matchers with MetricsFixtures {
+trait WorkerFixtures extends Matchers {
   type MySummary = String
   type MyContext = Instant
   type TestResult = Result[MySummary]
