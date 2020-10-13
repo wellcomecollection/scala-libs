@@ -11,7 +11,6 @@ import uk.ac.wellcome.messaging.sqsworker.alpakka.{
   AlpakkaSQSWorkerConfig
 }
 import uk.ac.wellcome.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
-import uk.ac.wellcome.messaging.worker.monitoring.metrics.memory.MemoryMetricsMonitoringClient
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
@@ -43,10 +42,11 @@ trait AlpakkaSQSWorkerFixtures
       R])(implicit
           as: ActorSystem,
           ec: ExecutionContext): R = {
-      val client = new MemoryMetricsMonitoringClient()
+      implicit val metrics: MemoryMetrics = new MemoryMetrics()
+
       val metricsProcessorBuilder
         : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
-        new MetricsMonitoringProcessor[MyWork](namespace)(client, _)
+        new MetricsMonitoringProcessor[MyWork](namespace)(metrics, _)
 
       val config = createAlpakkaSQSWorkerConfig(queue, namespace)
 
@@ -58,6 +58,6 @@ trait AlpakkaSQSWorkerFixtures
           config,
           metricsProcessorBuilder)(testProcess)
 
-      testWith((worker, config, client.metrics, callCounter))
+      testWith((worker, config, metrics, callCounter))
     }
 }

@@ -3,11 +3,7 @@ package uk.ac.wellcome.messaging.fixtures.monitoring.metrics
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
-import uk.ac.wellcome.messaging.worker.monitoring.metrics.memory.MemoryMetricsMonitoringClient
-import uk.ac.wellcome.messaging.worker.monitoring.metrics.{
-  MetricsMonitoringClient,
-  MetricsMonitoringProcessor
-}
+import uk.ac.wellcome.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,9 +26,7 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
   )(
     implicit ec: ExecutionContext
   ): R = {
-    implicit val client: MetricsMonitoringClient = new MemoryMetricsMonitoringClient(metrics)
-
-    val processor = new MetricsMonitoringProcessor[Work](namespace)
+    val processor = new MetricsMonitoringProcessor[Work](namespace)(metrics, ec)
 
     testWith((namespace, metrics, processor))
   }

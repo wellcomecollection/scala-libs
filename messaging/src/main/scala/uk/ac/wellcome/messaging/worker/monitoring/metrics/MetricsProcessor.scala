@@ -13,11 +13,11 @@ trait MetricsProcessor {
 
   private def metricName(name: String) = s"$namespace/$name"
 
-  final def metric[ProcessMonitoringClient <: MetricsMonitoringClient](
+  final def metric(
     result: Result[_],
     startTime: Instant
   )(
-    implicit monitoringClient: ProcessMonitoringClient,
+    implicit metrics: Metrics[Future],
     ec: ExecutionContext
   ): Future[Unit] = {
     val resultName = result match {
@@ -27,10 +27,10 @@ trait MetricsProcessor {
       case _: MonitoringProcessorFailure[_] => "MonitoringProcessorFailure"
     }
 
-    val countResult = monitoringClient.incrementCount(metricName(resultName))
+    val countResult = metrics.incrementCount(metricName(resultName))
 
     val recordDuration =
-      monitoringClient.recordValue(
+      metrics.recordValue(
         metricName("Duration"),
         Duration
           .between(
