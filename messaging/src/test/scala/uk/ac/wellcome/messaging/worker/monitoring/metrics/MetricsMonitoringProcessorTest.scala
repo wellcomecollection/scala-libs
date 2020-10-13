@@ -25,10 +25,8 @@ class MetricsMonitoringProcessorTest
   val nonDeterministicFailMetric = "namespace/NonDeterministicFailure"
 
   it("records a success metric") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
         whenReady(recorded) { action =>
@@ -40,17 +38,15 @@ class MetricsMonitoringProcessorTest
             expectedCount = 1)
           assertMetricDurations(
             metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
     }
   }
 
   it("reports monitoring failure if recording fails") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = true) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = true) {
+      case (_, monitoringClient, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
         whenReady(recorded) { action =>
@@ -63,10 +59,8 @@ class MetricsMonitoringProcessorTest
   }
 
   it("records a deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, processor) =>
         val recorded =
           processor.recordEnd(Right(Instant.now), deterministicFailure(work))
 
@@ -79,17 +73,15 @@ class MetricsMonitoringProcessorTest
             expectedCount = 1)
           assertMetricDurations(
             metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
     }
   }
 
   it("records a non deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, processor) =>
         val recorded =
           processor.recordEnd(Right(Instant.now), nonDeterministicFailure(work))
 
@@ -102,7 +94,7 @@ class MetricsMonitoringProcessorTest
             expectedCount = 1)
           assertMetricDurations(
             metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
     }

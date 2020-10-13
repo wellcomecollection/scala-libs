@@ -20,10 +20,8 @@ class WorkerTest
     with MetricsFixtures {
 
   it("successfully processes a work and increments success metrics") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -36,20 +34,18 @@ class WorkerTest
 
           assertMetricCount(
             monitoringClient,
-            "namespace/Successful",
+            s"$namespace/Successful",
             1,
           )
 
-          assertMetricDurations(monitoringClient, "namespace/Duration", 1)
+          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
         }
     }
   }
 
   it("increments deterministic failure metric if transformation returns a Left") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -62,11 +58,11 @@ class WorkerTest
 
           assertMetricCount(
             monitoringClient,
-            "namespace/DeterministicFailure",
+            s"$namespace/DeterministicFailure",
             1,
           )
 
-          assertMetricDurations(monitoringClient, "namespace/Duration", 1)
+          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
         }
     }
   }
@@ -75,10 +71,8 @@ class WorkerTest
     "increments deterministic failure metric if transformation fails unexpectedly") {
     def transform(message: MyMessage) = throw new RuntimeException
 
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -91,20 +85,18 @@ class WorkerTest
 
           assertMetricCount(
             monitoringClient,
-            "namespace/DeterministicFailure",
+            s"$namespace/DeterministicFailure",
             1,
           )
 
-          assertMetricDurations(monitoringClient, "namespace/Duration", 1)
+          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
         }
     }
   }
 
   it("doesn't increment metrics if monitoring fails") {
-    withMetricsMonitoringProcessor[MyWork, Assertion](
-      namespace = "namespace",
-      shouldFail = true) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Assertion](shouldFail = true) {
+      case (_, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -125,10 +117,8 @@ class WorkerTest
 
   it(
     "increments deterministic failure metric if processing fails with deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           deterministicFailure,
@@ -141,21 +131,19 @@ class WorkerTest
 
           assertMetricCount(
             monitoringClient,
-            "namespace/DeterministicFailure",
+            s"$namespace/DeterministicFailure",
             1,
           )
 
-          assertMetricDurations(monitoringClient, "namespace/Duration", 1)
+          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
         }
     }
   }
 
   it(
     "increments non deterministic failure metric if processing fails with non deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
+      case (namespace, monitoringClient, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           nonDeterministicFailure,
@@ -168,11 +156,11 @@ class WorkerTest
 
           assertMetricCount(
             monitoringClient,
-            "namespace/NonDeterministicFailure",
+            s"$namespace/NonDeterministicFailure",
             1,
           )
 
-          assertMetricDurations(monitoringClient, "namespace/Duration", 1)
+          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
         }
     }
   }

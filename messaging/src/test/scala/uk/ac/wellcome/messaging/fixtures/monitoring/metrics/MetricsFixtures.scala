@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.fixtures.monitoring.metrics
 import grizzled.slf4j.Logging
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.fixtures.{RandomGenerators, TestWith}
 import uk.ac.wellcome.messaging.worker.monitoring.metrics.{
   MetricsMonitoringClient,
   MetricsMonitoringProcessor
@@ -12,7 +12,7 @@ import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MetricsFixtures extends Matchers {
+trait MetricsFixtures extends Matchers with RandomGenerators {
 
   class FakeMetricsMonitoringClient(shouldFail: Boolean = false)(
     implicit ec: ExecutionContext)
@@ -48,16 +48,17 @@ trait MetricsFixtures extends Matchers {
     testWith(fakeMonitoringClient)
   }
 
-  def withMetricsMonitoringProcessor[Work, R](namespace: String,
+  def withMetricsMonitoringProcessor[Work, R](namespace: String = s"ns-${randomAlphanumeric()}",
                                               shouldFail: Boolean = false)(
-    testWith: TestWith[(FakeMetricsMonitoringClient,
+    testWith: TestWith[(String,
+                        FakeMetricsMonitoringClient,
                         MetricsMonitoringProcessor[Work]),
                        R])(implicit ec: ExecutionContext): R = {
     withFakeMonitoringClient(shouldFail) {
       client: FakeMetricsMonitoringClient =>
         val metricsProcessor =
           new MetricsMonitoringProcessor[Work](namespace)(client, ec)
-        testWith((client, metricsProcessor))
+        testWith((namespace, client, metricsProcessor))
     }
   }
 
