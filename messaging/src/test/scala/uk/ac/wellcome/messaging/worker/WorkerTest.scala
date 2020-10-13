@@ -20,8 +20,8 @@ class WorkerTest
     with MetricsFixtures {
 
   it("successfully processes a work and increments success metrics") {
-    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
-      case (namespace, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -33,19 +33,23 @@ class WorkerTest
           worker.callCounter.calledCount shouldBe 1
 
           assertMetricCount(
-            monitoringClient,
-            s"$namespace/Successful",
-            1,
+            metrics = metrics,
+            metricName = s"$namespace/Successful",
+            expectedCount = 1
           )
 
-          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
+          assertMetricDurations(
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
+            expectedNumberDurations = 1
+          )
         }
     }
   }
 
   it("increments deterministic failure metric if transformation returns a Left") {
-    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
-      case (namespace, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -57,12 +61,16 @@ class WorkerTest
           worker.callCounter.calledCount shouldBe 0
 
           assertMetricCount(
-            monitoringClient,
-            s"$namespace/DeterministicFailure",
-            1,
+            metrics = metrics,
+            metricName = s"$namespace/DeterministicFailure",
+            expectedCount = 1
           )
 
-          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
+          assertMetricDurations(
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
+            expectedNumberDurations = 1
+          )
         }
     }
   }
@@ -71,8 +79,8 @@ class WorkerTest
     "increments deterministic failure metric if transformation fails unexpectedly") {
     def transform(message: MyMessage) = throw new RuntimeException
 
-    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
-      case (namespace, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -84,19 +92,23 @@ class WorkerTest
           worker.callCounter.calledCount shouldBe 0
 
           assertMetricCount(
-            monitoringClient,
-            s"$namespace/DeterministicFailure",
-            1,
+            metrics = metrics,
+            metricName = s"$namespace/DeterministicFailure",
+            expectedCount = 1
           )
 
-          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
+          assertMetricDurations(
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
+            expectedNumberDurations = 1
+          )
         }
     }
   }
 
   it("doesn't increment metrics if monitoring fails") {
-    withMetricsMonitoringProcessor[MyWork, Assertion](shouldFail = true) {
-      case (_, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Assertion](metrics = brokenMemoryMetrics) {
+      case (_, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           successful,
@@ -108,17 +120,17 @@ class WorkerTest
         whenReady(process) { _ =>
           worker.callCounter.calledCount shouldBe 1
 
-          monitoringClient.incrementCountCalls shouldBe Map.empty
+          metrics.incrementedCounts shouldBe empty
 
-          monitoringClient.recordValueCalls shouldBe Map.empty
+          metrics.recordedValues shouldBe empty
         }
     }
   }
 
   it(
     "increments deterministic failure metric if processing fails with deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
-      case (namespace, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           deterministicFailure,
@@ -130,20 +142,24 @@ class WorkerTest
           worker.callCounter.calledCount shouldBe 1
 
           assertMetricCount(
-            monitoringClient,
-            s"$namespace/DeterministicFailure",
-            1,
+            metrics = metrics,
+            metricName = s"$namespace/DeterministicFailure",
+            expectedCount = 1
           )
 
-          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
+          assertMetricDurations(
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
+            expectedNumberDurations = 1
+          )
         }
     }
   }
 
   it(
     "increments non deterministic failure metric if processing fails with non deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](shouldFail = false) {
-      case (namespace, monitoringClient, monitoringProcessor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,
           nonDeterministicFailure,
@@ -155,12 +171,16 @@ class WorkerTest
           worker.callCounter.calledCount shouldBe 1
 
           assertMetricCount(
-            monitoringClient,
-            s"$namespace/NonDeterministicFailure",
-            1,
+            metrics = metrics,
+            metricName = s"$namespace/NonDeterministicFailure",
+            expectedCount = 1
           )
 
-          assertMetricDurations(monitoringClient, s"$namespace/Duration", 1)
+          assertMetricDurations(
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
+            expectedNumberDurations = 1
+          )
         }
     }
   }
