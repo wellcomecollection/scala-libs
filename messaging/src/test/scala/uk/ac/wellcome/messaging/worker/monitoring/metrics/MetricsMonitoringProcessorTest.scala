@@ -25,7 +25,6 @@ class MetricsMonitoringProcessorTest
   val nonDeterministicFailMetric = "namespace/NonDeterministicFailure"
 
   it("records a success metric") {
-
     withMetricsMonitoringProcessor[MyWork, Unit](
       namespace = "namespace",
       shouldFail = false) {
@@ -45,7 +44,6 @@ class MetricsMonitoringProcessorTest
             expectedNumberDurations = 1)
         }
     }
-
   }
 
   it("reports monitoring failure if recording fails") {
@@ -84,7 +82,6 @@ class MetricsMonitoringProcessorTest
             metricName = "namespace/Duration",
             expectedNumberDurations = 1)
         }
-
     }
   }
 
@@ -108,7 +105,6 @@ class MetricsMonitoringProcessorTest
             metricName = "namespace/Duration",
             expectedNumberDurations = 1)
         }
-
     }
   }
 }
