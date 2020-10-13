@@ -93,33 +93,33 @@ trait WorkerFixtures extends Matchers with MetricsFixtures {
   def createResult(op: TestInnerProcess, callCounter: CallCounter)(
     implicit ec: ExecutionContext): MyWork => Future[TestResult] = {
 
-    (in: MyWork) =>
+    (work: MyWork) =>
       {
         callCounter.calledCount = callCounter.calledCount + 1
 
-        Future(op(in))
+        Future(op(work))
       }
   }
 
-  val successful = (in: MyWork) => {
+  val successful = (_: MyWork) => {
     Successful[MySummary](
       Some("Summary Successful")
     )
   }
 
-  val nonDeterministicFailure = (in: MyWork) =>
+  val nonDeterministicFailure = (_: MyWork) =>
     NonDeterministicFailure[MySummary](
       new RuntimeException("NonDeterministicFailure"),
       Some("Summary NonDeterministicFailure")
   )
 
-  val deterministicFailure = (in: MyWork) =>
+  val deterministicFailure = (_: MyWork) =>
     DeterministicFailure[MySummary](
       new RuntimeException("DeterministicFailure"),
       Some("Summary DeterministicFailure")
   )
 
-  val monitoringProcessorFailure = (in: MyWork) =>
+  val monitoringProcessorFailure = (_: MyWork) =>
     MonitoringProcessorFailure[MySummary](
       new RuntimeException("MonitoringProcessorFailure"),
       Some("Summary MonitoringProcessorFailure")

@@ -51,7 +51,7 @@ trait AlpakkaSQSWorkerFixtures
       val config = createAlpakkaSQSWorkerConfig(queue, namespace)
 
       val callCounter = new CallCounter()
-      val testProcess = (o: MyWork) => createResult(process, callCounter)(ec)(o)
+      val testProcess = (work: MyWork) => createResult(process, callCounter)(ec)(work)
 
       val worker =
         new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](
