@@ -26,7 +26,7 @@ trait WorkerFixtures extends Matchers {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean = false)(message: MyMessage)
+  def messageToWork(shouldFail: Boolean)(message: MyMessage)
     : (Either[Throwable, MyWork], Either[Throwable, Option[MyContext]]) =
     if (shouldFail) {
       (Left(new RuntimeException("BOOM")), Right(None))
