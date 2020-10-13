@@ -6,20 +6,20 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.messaging.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import uk.ac.wellcome.messaging.sqsworker.alpakka.{
   AlpakkaSQSWorker,
   AlpakkaSQSWorkerConfig
 }
 import uk.ac.wellcome.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
+import uk.ac.wellcome.messaging.worker.monitoring.metrics.memory.MemoryMetricsMonitoringClient
 import uk.ac.wellcome.monitoring.MetricsConfig
+import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 trait AlpakkaSQSWorkerFixtures
     extends WorkerFixtures
-    with MetricsFixtures
     with Matchers
     with SQS {
 
@@ -38,12 +38,12 @@ trait AlpakkaSQSWorkerFixtures
   )(testWith: TestWith[
       (AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary],
        AlpakkaSQSWorkerConfig,
-       FakeMetricsMonitoringClient,
+       MemoryMetrics,
        CallCounter),
       R])(implicit
           as: ActorSystem,
-          ec: ExecutionContext): R =
-    withFakeMonitoringClient(false) { client: FakeMetricsMonitoringClient =>
+          ec: ExecutionContext): R = {
+      val client = new MemoryMetricsMonitoringClient()
       val metricsProcessorBuilder
         : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
         new MetricsMonitoringProcessor[MyWork](namespace)(client, _)
@@ -58,6 +58,6 @@ trait AlpakkaSQSWorkerFixtures
           config,
           metricsProcessorBuilder)(testProcess)
 
-      testWith((worker, config, client, callCounter))
+      testWith((worker, config, client.metrics, callCounter))
     }
 }

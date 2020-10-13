@@ -8,6 +8,7 @@ import uk.ac.wellcome.messaging.worker.monitoring.metrics.{
   MetricsMonitoringClient,
   MetricsMonitoringProcessor
 }
+import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -66,6 +67,23 @@ trait MetricsFixtures extends Matchers {
     metrics.incrementCountCalls shouldBe Map(
       metricName -> expectedCount
     )
+
+  protected def assertMetricCount(metrics: MemoryMetrics,
+                                  metricName: String,
+                                  expectedCount: Int): Assertion =
+    metrics.incrementedCounts shouldBe (1 to expectedCount).map { _ => metricName}
+
+  protected def assertMetricDurations(metrics: MemoryMetrics,
+                                      metricName: String,
+                                      expectedNumberDurations: Int): Unit = {
+    metrics.recordedValues should have size expectedNumberDurations
+
+    metrics.recordedValues.foreach { value =>
+      val (metricName, recordedDuration) = value
+      metricName shouldBe metricName
+      recordedDuration should be >= 0.0
+    }
+  }
 
   protected def assertMetricDurations(metrics: FakeMetricsMonitoringClient,
                                       metricName: String,
