@@ -45,7 +45,7 @@ trait AlpakkaSQSWorkerFixtures
           ec: ExecutionContext): R =
     withFakeMonitoringClient(false) { client: FakeMetricsMonitoringClient =>
       val metricsProcessorBuilder
-        : (ExecutionContext) => MetricsMonitoringProcessor[MyWork] =
+        : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
         new MetricsMonitoringProcessor[MyWork](namespace)(client, _)
 
       val config = createAlpakkaSQSWorkerConfig(queue, namespace)
