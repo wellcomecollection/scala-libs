@@ -79,8 +79,7 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
     }
   }
 
-  override def recordValue(metricName: String,
-                           value: Double): Future[Unit] = {
+  override def recordValue(metricName: String, value: Double): Future[Unit] = {
     val metricDatumBuilder = MetricDatum
       .builder()
       .metricName(metricName)

@@ -32,10 +32,10 @@ import scala.concurrent.Future
 //        process = processMessage
 //      )
 //
-class SQSStream[T](sqsClient: SqsAsyncClient,
-                   sqsConfig: SQSConfig,
-                   metricsSender: Metrics[Future])(
-  implicit val actorSystem: ActorSystem)
+class SQSStream[T](
+  sqsClient: SqsAsyncClient,
+  sqsConfig: SQSConfig,
+  metricsSender: Metrics[Future])(implicit val actorSystem: ActorSystem)
     extends Logging {
 
   implicit val dispatcher = actorSystem.dispatcher
