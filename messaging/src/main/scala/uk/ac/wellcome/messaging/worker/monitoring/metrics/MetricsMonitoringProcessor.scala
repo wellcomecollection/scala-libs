@@ -12,7 +12,7 @@ import uk.ac.wellcome.messaging.worker.steps.MonitoringProcessor
 import scala.concurrent.{ExecutionContext, Future}
 
 final class MetricsMonitoringProcessor[Work](val namespace: String)(
-  implicit val monitoringClient: MetricsMonitoringClient,
+  implicit monitoringClient: MetricsMonitoringClient,
   val ec: ExecutionContext)
     extends MonitoringProcessor[Work, Instant, Instant]
     with MetricsProcessor {
