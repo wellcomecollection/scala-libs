@@ -4,7 +4,7 @@ import uk.ac.wellcome.monitoring.Metrics
 
 import scala.concurrent.Future
 
-class MemoryMetrics[MetricUnit]() extends Metrics[Future, MetricUnit] {
+class MemoryMetrics() extends Metrics[Future] {
   var incrementedCounts: Seq[String] = Seq.empty
 
   override def incrementCount(metricName: String): Future[Unit] = {
@@ -12,12 +12,11 @@ class MemoryMetrics[MetricUnit]() extends Metrics[Future, MetricUnit] {
     Future.successful(())
   }
 
-  var recordedValues: Seq[(String, Double, Option[MetricUnit])] = Seq.empty
+  var recordedValues: Seq[(String, Double)] = Seq.empty
 
   override def recordValue(metricName: String,
-                           value: Double,
-                           maybeUnit: Option[MetricUnit]): Future[Unit] = {
-    recordedValues = recordedValues :+ ((metricName, value, maybeUnit))
+                           value: Double): Future[Unit] = {
+    recordedValues = recordedValues :+ ((metricName, value))
     Future.successful(())
   }
 }

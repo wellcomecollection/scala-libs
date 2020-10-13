@@ -6,7 +6,6 @@ import akka.stream.scaladsl.Flow
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import software.amazon.awssdk.services.cloudwatch.model.StandardUnit
 import uk.ac.wellcome.akka.fixtures.Akka
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil._
@@ -251,14 +250,12 @@ class SQSStreamTest
     }
 
   def withSQSStreamFixtures[R](
-    testWith: TestWith[(SQSStream[NamedObject],
-                        QueuePair,
-                        MemoryMetrics[StandardUnit]),
+    testWith: TestWith[(SQSStream[NamedObject], QueuePair, MemoryMetrics),
                        R]): R =
     withActorSystem { implicit actorSystem =>
       withLocalSqsQueuePair() {
         case queuePair @ QueuePair(queue, _) =>
-          val metrics = new MemoryMetrics[StandardUnit]()
+          val metrics = new MemoryMetrics()
           withSQSStream[NamedObject, R](queue, metrics) { stream =>
             testWith((stream, queuePair, metrics))
           }
