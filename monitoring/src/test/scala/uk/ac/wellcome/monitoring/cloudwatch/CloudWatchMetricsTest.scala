@@ -58,19 +58,6 @@ class CloudWatchMetricsTest
     }
   }
 
-  it("records a value metric with a unit") {
-    val amazonCloudWatch = mock[CloudWatchClient]
-    withMetricsSender(amazonCloudWatch) { metricsSender =>
-      val metricName = createMetricName
-
-      val future = metricsSender.recordValue(metricName, 11.0, Some(StandardUnit.SECONDS))
-
-      whenReady(future) { _ =>
-        assertSingleDataPoint(amazonCloudWatch, metricName, 11.0, Some(StandardUnit.SECONDS))
-      }
-    }
-  }
-
   it("groups 20 MetricDatum into one PutMetricDataRequest") {
     val amazonCloudWatch = mock[CloudWatchClient]
     withMetricsSender(amazonCloudWatch) { metricsSender =>

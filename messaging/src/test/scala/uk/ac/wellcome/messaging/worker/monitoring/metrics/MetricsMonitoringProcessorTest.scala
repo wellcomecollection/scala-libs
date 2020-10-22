@@ -20,55 +20,43 @@ class MetricsMonitoringProcessorTest
     with WorkerFixtures
     with MetricsFixtures {
 
-  val successMetric = "namespace/Successful"
-  val deterministicFailMetric = "namespace/DeterministicFailure"
-  val nonDeterministicFailMetric = "namespace/NonDeterministicFailure"
-
   it("records a success metric") {
-
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
         whenReady(recorded) { action =>
           shouldBeSuccessful(action)
 
           assertMetricCount(
-            metrics = monitoringClient,
-            metricName = successMetric,
+            metrics = metrics,
+            metricName = s"$namespace/Successful",
             expectedCount = 1)
           assertMetricDurations(
-            metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
     }
-
   }
 
   it("reports monitoring failure if recording fails") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = true) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit](metrics = brokenMemoryMetrics) {
+      case (_, metrics, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
         whenReady(recorded) { action =>
           shouldBeMonitoringProcessorFailure(action)
 
-          monitoringClient.incrementCountCalls shouldBe Map.empty
-          monitoringClient.recordValueCalls shouldBe Map.empty
+          metrics.incrementedCounts shouldBe empty
+          metrics.recordedValues shouldBe empty
         }
     }
   }
 
   it("records a deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, processor) =>
         val recorded =
           processor.recordEnd(Right(Instant.now), deterministicFailure(work))
 
@@ -76,23 +64,20 @@ class MetricsMonitoringProcessorTest
           shouldBeSuccessful(action)
 
           assertMetricCount(
-            metrics = monitoringClient,
-            metricName = deterministicFailMetric,
+            metrics = metrics,
+            metricName = s"$namespace/DeterministicFailure",
             expectedCount = 1)
           assertMetricDurations(
-            metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
-
     }
   }
 
   it("records a non deterministic failure") {
-    withMetricsMonitoringProcessor[MyWork, Unit](
-      namespace = "namespace",
-      shouldFail = false) {
-      case (monitoringClient, processor) =>
+    withMetricsMonitoringProcessor[MyWork, Unit]() {
+      case (namespace, metrics, processor) =>
         val recorded =
           processor.recordEnd(Right(Instant.now), nonDeterministicFailure(work))
 
@@ -100,15 +85,14 @@ class MetricsMonitoringProcessorTest
           shouldBeSuccessful(action)
 
           assertMetricCount(
-            metrics = monitoringClient,
-            metricName = nonDeterministicFailMetric,
+            metrics = metrics,
+            metricName = s"$namespace/NonDeterministicFailure",
             expectedCount = 1)
           assertMetricDurations(
-            metrics = monitoringClient,
-            metricName = "namespace/Duration",
+            metrics = metrics,
+            metricName = s"$namespace/Duration",
             expectedNumberDurations = 1)
         }
-
     }
   }
 }

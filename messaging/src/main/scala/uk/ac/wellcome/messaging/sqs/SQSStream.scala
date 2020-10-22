@@ -9,7 +9,6 @@ import akka.stream.{ActorAttributes, Supervision}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
-import software.amazon.awssdk.services.cloudwatch.model.StandardUnit
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.Message
 import uk.ac.wellcome.json.JsonUtil._
@@ -33,10 +32,10 @@ import scala.concurrent.Future
 //        process = processMessage
 //      )
 //
-class SQSStream[T](sqsClient: SqsAsyncClient,
-                   sqsConfig: SQSConfig,
-                   metricsSender: Metrics[Future, StandardUnit])(
-  implicit val actorSystem: ActorSystem)
+class SQSStream[T](
+  sqsClient: SqsAsyncClient,
+  sqsConfig: SQSConfig,
+  metricsSender: Metrics[Future])(implicit val actorSystem: ActorSystem)
     extends Logging {
 
   implicit val dispatcher = actorSystem.dispatcher

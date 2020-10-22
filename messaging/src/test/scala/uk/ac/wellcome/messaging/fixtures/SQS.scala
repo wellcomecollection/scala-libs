@@ -5,7 +5,6 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
-import software.amazon.awssdk.services.cloudwatch.model.StandardUnit
 import software.amazon.awssdk.services.sqs.model._
 import software.amazon.awssdk.services.sqs.{SqsAsyncClient, SqsClient}
 import uk.ac.wellcome.fixtures._
@@ -154,7 +153,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
 
   def withSQSStream[T, R](
     queue: Queue,
-    metrics: Metrics[Future, StandardUnit] = new MemoryMetrics[StandardUnit]()
+    metrics: Metrics[Future] = new MemoryMetrics()
   )(testWith: TestWith[SQSStream[T], R])(
     implicit actorSystem: ActorSystem): R = {
     val sqsConfig = createSQSConfigWith(queue)

@@ -22,7 +22,7 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
                         metricsConfig: MetricsConfig)(
   implicit mat: Materializer,
   ec: ExecutionContext)
-    extends Metrics[Future, StandardUnit]
+    extends Metrics[Future]
     with Logging {
 
   // According to https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
@@ -79,17 +79,14 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
     }
   }
 
-  override def recordValue(metricName: String,
-                           value: Double,
-                           maybeUnit: Option[StandardUnit]): Future[Unit] = {
+  override def recordValue(metricName: String, value: Double): Future[Unit] = {
     val metricDatumBuilder = MetricDatum
       .builder()
       .metricName(metricName)
       .value(value)
       .timestamp(Instant.now())
 
-    val metricDatum = maybeUnit.fold(metricDatumBuilder.build())(unit =>
-      metricDatumBuilder.unit(unit).build())
+    val metricDatum = metricDatumBuilder.build()
 
     sourceQueue.offer(metricDatum).map { _ =>
       ()

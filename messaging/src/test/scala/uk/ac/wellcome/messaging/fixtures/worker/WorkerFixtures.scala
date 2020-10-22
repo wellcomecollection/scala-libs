@@ -4,7 +4,6 @@ import java.time.Instant
 
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import uk.ac.wellcome.messaging.worker._
 import uk.ac.wellcome.messaging.worker.models._
 import uk.ac.wellcome.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
@@ -12,7 +11,7 @@ import uk.ac.wellcome.messaging.worker.steps.MessageProcessor
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait WorkerFixtures extends Matchers with MetricsFixtures {
+trait WorkerFixtures extends Matchers {
   type MySummary = String
   type MyContext = Instant
   type TestResult = Result[MySummary]
@@ -27,7 +26,7 @@ trait WorkerFixtures extends Matchers with MetricsFixtures {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean = false)(message: MyMessage)
+  def messageToWork(shouldFail: Boolean)(message: MyMessage)
     : (Either[Throwable, MyWork], Either[Throwable, Option[MyContext]]) =
     if (shouldFail) {
       (Left(new RuntimeException("BOOM")), Right(None))
@@ -93,33 +92,33 @@ trait WorkerFixtures extends Matchers with MetricsFixtures {
   def createResult(op: TestInnerProcess, callCounter: CallCounter)(
     implicit ec: ExecutionContext): MyWork => Future[TestResult] = {
 
-    (in: MyWork) =>
+    (work: MyWork) =>
       {
         callCounter.calledCount = callCounter.calledCount + 1
 
-        Future(op(in))
+        Future(op(work))
       }
   }
 
-  val successful = (in: MyWork) => {
+  val successful = (_: MyWork) => {
     Successful[MySummary](
       Some("Summary Successful")
     )
   }
 
-  val nonDeterministicFailure = (in: MyWork) =>
+  val nonDeterministicFailure = (_: MyWork) =>
     NonDeterministicFailure[MySummary](
       new RuntimeException("NonDeterministicFailure"),
       Some("Summary NonDeterministicFailure")
   )
 
-  val deterministicFailure = (in: MyWork) =>
+  val deterministicFailure = (_: MyWork) =>
     DeterministicFailure[MySummary](
       new RuntimeException("DeterministicFailure"),
       Some("Summary DeterministicFailure")
   )
 
-  val monitoringProcessorFailure = (in: MyWork) =>
+  val monitoringProcessorFailure = (_: MyWork) =>
     MonitoringProcessorFailure[MySummary](
       new RuntimeException("MonitoringProcessorFailure"),
       Some("Summary MonitoringProcessorFailure")
