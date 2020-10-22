@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v24.0.0 - 2020-10-22
+
+### Libraries affected
+
+messaging, monitoring
+
+### Description
+
+*   Metrics.recordValue() no longer takes an optional `metricUnit` parameter, because none of our code was using it.
+*   MetricsMonitoringClient has been removed.  Any uses of it can be replaced by an instance of Metrics[Future].
+
 ## v23.0.0 - 2020-10-07
 
 This release tidies up the random generators provided by `RandomGenerators`.  This trait should be the canonical source of random data for tests in the platform, rather than multiple implementations of very similar functions copy/pasted into different codebases.
