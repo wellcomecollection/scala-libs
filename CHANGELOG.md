@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.1.0 - 2020-10-26
+
+Bump Akka to 2.6.9.  This is required for the latest version of elastic4s (7.9.1).
+
 ## v24.0.0 - 2020-10-22
 
 ### Libraries affected
