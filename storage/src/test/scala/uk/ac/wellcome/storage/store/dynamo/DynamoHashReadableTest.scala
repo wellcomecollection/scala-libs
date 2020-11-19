@@ -1,7 +1,9 @@
 package uk.ac.wellcome.storage.store.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType
+import com.amazonaws.services.dynamodbv2.model.{QueryRequest, ScalarAttributeType}
+import org.mockito.{ArgumentCaptor, Mockito}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
@@ -12,21 +14,23 @@ import org.scanamo.auto._
 class DynamoHashReadableTest
     extends DynamoReadableTestCases[
       String,
-      DynamoHashEntry[String, Int, Record]] {
+      DynamoHashEntry[String, Int, Record]]
+    with MockitoSugar {
   type HashEntry = DynamoHashEntry[String, Int, Record]
+
+  class DynamoHashReadableImpl(
+    val client: AmazonDynamoDB,
+    val table: ScanamoTable[HashEntry],
+    override val consistencyMode: ConsistencyMode = EventuallyConsistent
+  )(
+    implicit val formatHashKey: DynamoFormat[String],
+    implicit val format: DynamoFormat[HashEntry]
+  ) extends DynamoHashReadable[HashKey, Int, Record]
 
   override def createDynamoReadableWith(
     table: Table,
     initialEntries: Set[DynamoHashEntry[String, Int, Record]] = Set.empty)
     : DynamoReadableStub = {
-    class DynamoHashReadableImpl(
-      val client: AmazonDynamoDB,
-      val table: ScanamoTable[HashEntry]
-    )(
-      implicit val formatHashKey: DynamoFormat[String],
-      implicit val format: DynamoFormat[HashEntry]
-    ) extends DynamoHashReadable[HashKey, Int, Record]
-
     scanamo.exec(ScanamoTable[HashEntry](table.name).putAll(initialEntries))
 
     new DynamoHashReadableImpl(
@@ -87,6 +91,62 @@ class DynamoHashReadableTest
           .left
           .value shouldBe a[NoVersionExistsError]
       }
+    }
+  }
+
+  describe("observes the consistency setting") {
+    it("the default is eventual consistency") {
+      val mockClient = mock[AmazonDynamoDB]
+
+      withLocalDynamoDbTable { table =>
+        val readable = new DynamoHashReadableImpl(
+          mockClient, ScanamoTable[HashEntry](table.name)
+        )
+
+        readable.consistencyMode shouldBe EventuallyConsistent
+
+        readable.get(id = Version("b12345", version = 1))
+
+        getConsistentReadOnQuery(mockClient) shouldBe false
+      }
+    }
+
+    it("eventually consistent => consistent reads = false") {
+      val mockClient = mock[AmazonDynamoDB]
+
+      withLocalDynamoDbTable { table =>
+        val readable = new DynamoHashReadableImpl(
+          mockClient, ScanamoTable[HashEntry](table.name)
+        ) {
+          override val consistencyMode: ConsistencyMode = EventuallyConsistent
+        }
+
+        readable.get(id = Version("b12345", version = 1))
+
+        getConsistentReadOnQuery(mockClient) shouldBe false
+      }
+    }
+
+    it("strongly consistent => consistent reads = true") {
+      val mockClient = mock[AmazonDynamoDB]
+
+      withLocalDynamoDbTable { table =>
+        val readable = new DynamoHashReadableImpl(
+          mockClient, ScanamoTable[HashEntry](table.name)
+        ) {
+          override val consistencyMode: ConsistencyMode = StronglyConsistent
+        }
+
+        readable.get(id = Version("b12345", version = 1))
+
+        getConsistentReadOnQuery(mockClient) shouldBe true
+      }
+    }
+
+    def getConsistentReadOnQuery(mockClient: AmazonDynamoDB): Boolean = {
+      val captor = ArgumentCaptor.forClass(classOf[QueryRequest])
+      Mockito.verify(mockClient).query(captor.capture())
+      captor.getValue.getConsistentRead
     }
   }
 }

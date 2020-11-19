@@ -10,10 +10,26 @@ import uk.ac.wellcome.storage._
 
 import scala.util.{Failure, Success, Try}
 
+sealed trait ConsistencyMode
+case object StronglyConsistent extends ConsistencyMode
+case object EventuallyConsistent extends ConsistencyMode
+
 sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
     extends Readable[Ident, T] {
 
   implicit protected val format: DynamoFormat[EntryType]
+
+  // DynamoDB supports eventually consistent and strongly consistent reads.
+  //
+  //  * Eventually consistent might not return data from a recent write operation
+  //  * Strongly consistent returns the most recent data, but with higher latency
+  //    and using more throughput capacity.
+  //
+  // Our default is the same as DynamoDB (eventually consistent), but we allow
+  // overriding it if necessary.
+  //
+  // See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
+  protected val consistencyMode: ConsistencyMode = EventuallyConsistent
 
   protected val client: AmazonDynamoDB
   protected val table: Table[EntryType]
@@ -21,7 +37,10 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
   protected def createKeyExpression(id: DynamoIdent): Query[_]
 
   protected def getEntry(id: DynamoIdent): Either[ReadError, EntryType] = {
-    val ops = table.query(createKeyExpression(id))
+    val ops = consistencyMode match {
+      case EventuallyConsistent => table.query(createKeyExpression(id))
+      case StronglyConsistent   => table.consistently.query(createKeyExpression(id))
+    }
 
     Try(Scanamo(client).exec(ops)) match {
       case Success(List(Right(entry))) => Right(entry)
