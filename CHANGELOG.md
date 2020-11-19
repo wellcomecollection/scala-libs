@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.2.0 - 2020-11-19
+
+Don't build scaladocs
+
 ## v24.1.1 - 2020-10-29
 
 ### Libraries affected
