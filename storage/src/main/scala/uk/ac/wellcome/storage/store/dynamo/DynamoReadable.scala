@@ -39,7 +39,8 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
   protected def getEntry(id: DynamoIdent): Either[ReadError, EntryType] = {
     val ops = consistencyMode match {
       case EventuallyConsistent => table.query(createKeyExpression(id))
-      case StronglyConsistent   => table.consistently.query(createKeyExpression(id))
+      case StronglyConsistent =>
+        table.consistently.query(createKeyExpression(id))
     }
 
     Try(Scanamo(client).exec(ops)) match {
