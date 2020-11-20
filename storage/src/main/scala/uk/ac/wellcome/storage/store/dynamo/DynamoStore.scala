@@ -19,12 +19,12 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
   val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]],
   override val consistencyMode: ConsistencyMode = EventuallyConsistent
 ) extends Store[Version[HashKey, RangeKey], T]
-  with DynamoHashRangeReadable[HashKey, RangeKey, T]
-  with DynamoHashRangeWritable[HashKey, RangeKey, T]
-  with DynamoHashRangeMaxima[
-    HashKey,
-    RangeKey,
-    DynamoHashRangeEntry[HashKey, RangeKey, T]] {
+    with DynamoHashRangeReadable[HashKey, RangeKey, T]
+    with DynamoHashRangeWritable[HashKey, RangeKey, T]
+    with DynamoHashRangeMaxima[
+      HashKey,
+      RangeKey,
+      DynamoHashRangeEntry[HashKey, RangeKey, T]] {
 
   override protected val table =
     Table[DynamoHashRangeEntry[HashKey, RangeKey, T]](config.tableName)
