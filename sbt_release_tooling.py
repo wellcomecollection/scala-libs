@@ -21,7 +21,7 @@ The canonical version of this script is kept in the platform repo
 repos for the sake of easy distribution.
 
 Implementor note: any repo-specific config should be kept *outside* this
-script.  Put it in .travis.yml or build.sbt.
+script.  Put it in build.sbt.
 
 """
 
