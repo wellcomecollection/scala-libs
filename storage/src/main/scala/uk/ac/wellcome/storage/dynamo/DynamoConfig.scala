@@ -1,11 +1,9 @@
 package uk.ac.wellcome.storage.dynamo
 
 import javax.naming.ConfigurationException
-import uk.ac.wellcome.storage.store.dynamo.{ConsistencyMode, EventuallyConsistent}
 
 case class DynamoConfig(tableName: String,
-                        maybeIndexName: Option[String] = None,
-                        consistencyMode: ConsistencyMode = EventuallyConsistent
+                        maybeIndexName: Option[String] = None
                        ) {
   def indexName: String = maybeIndexName.getOrElse(
     throw new ConfigurationException(

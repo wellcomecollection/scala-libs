@@ -16,7 +16,8 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
   implicit val client: AmazonDynamoDB,
   val formatHashKey: DynamoFormat[HashKey],
   val formatRangeKey: DynamoFormat[RangeKey],
-  val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]]
+  val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]],
+  override val consistencyMode: ConsistencyMode = EventuallyConsistent
 ) extends Store[Version[HashKey, RangeKey], T]
   with DynamoHashRangeReadable[HashKey, RangeKey, T]
   with DynamoHashRangeWritable[HashKey, RangeKey, T]
@@ -24,9 +25,6 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
     HashKey,
     RangeKey,
     DynamoHashRangeEntry[HashKey, RangeKey, T]] {
-
-  override protected val consistencyMode =
-    config.consistencyMode
 
   override protected val table =
     Table[DynamoHashRangeEntry[HashKey, RangeKey, T]](config.tableName)
@@ -37,7 +35,8 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
   implicit val client: AmazonDynamoDB,
   val formatHashKey: DynamoFormat[HashKey],
   val formatV: DynamoFormat[V],
-  val format: DynamoFormat[DynamoHashEntry[HashKey, V, T]]
+  val format: DynamoFormat[DynamoHashEntry[HashKey, V, T]],
+  override val consistencyMode: ConsistencyMode = EventuallyConsistent
 ) extends Store[Version[HashKey, V], T]
     with DynamoHashReadable[HashKey, V, T]
     with DynamoHashWritable[HashKey, V, T]
@@ -48,9 +47,6 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
       case Left(_: DoesNotExistError) => Left(NoMaximaValueError())
       case Left(err)                  => Left(err)
     }
-
-  override protected val consistencyMode =
-    config.consistencyMode
 
   override protected val table =
     Table[DynamoHashEntry[HashKey, V, T]](config.tableName)
