@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.3.1 - 2020-11-20
+
+Fix a flaky test in S3TagsTest.
+
 ## v24.3.0 - 2020-11-19
 
 The `DynamoReadable` trait (and all extensions of it) now have a new field `consistencyMode`, which allows you to decide between:
