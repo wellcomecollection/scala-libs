@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.3.2 - 2020-11-20
+
+Removes unused travis things
+
 ## v24.3.1 - 2020-11-20
 
 Fix a flaky test in S3TagsTest.
