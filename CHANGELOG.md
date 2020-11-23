@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.4.0 - 2020-11-23
+
+Allow consistency to be set from DynamoSingleVersionStore, DynamoMultipleVersionStore
+
 ## v24.3.2 - 2020-11-20
 
 Removes unused travis things
