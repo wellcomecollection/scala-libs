@@ -16,7 +16,8 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
   implicit val client: AmazonDynamoDB,
   val formatHashKey: DynamoFormat[HashKey],
   val formatRangeKey: DynamoFormat[RangeKey],
-  val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]]
+  val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]],
+  override val consistencyMode: ConsistencyMode = EventuallyConsistent
 ) extends Store[Version[HashKey, RangeKey], T]
     with DynamoHashRangeReadable[HashKey, RangeKey, T]
     with DynamoHashRangeWritable[HashKey, RangeKey, T]
@@ -34,7 +35,8 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
   implicit val client: AmazonDynamoDB,
   val formatHashKey: DynamoFormat[HashKey],
   val formatV: DynamoFormat[V],
-  val format: DynamoFormat[DynamoHashEntry[HashKey, V, T]]
+  val format: DynamoFormat[DynamoHashEntry[HashKey, V, T]],
+  override val consistencyMode: ConsistencyMode = EventuallyConsistent
 ) extends Store[Version[HashKey, V], T]
     with DynamoHashReadable[HashKey, V, T]
     with DynamoHashWritable[HashKey, V, T]
