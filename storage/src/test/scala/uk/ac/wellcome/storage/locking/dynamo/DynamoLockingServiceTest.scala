@@ -15,7 +15,7 @@ class DynamoLockingServiceTest
   override def getCurrentLocks(lockDao: LockDaoStub,
                                lockDaoContext: Table): Set[String] =
     scanTable[ExpiringLock](lockDaoContext)
-      .map { _.right.value }
+      .map { _.value }
       .map { _.id }
       .toSet
 }

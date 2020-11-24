@@ -29,7 +29,7 @@ class DynamoVersionedHybridStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     withVersionedStoreContext { storeContext =>
       initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).right.value
+        case (k, v) => storeContext.put(k)(v).value
       }
 
       val vhs = new DynamoVersionedStoreImpl(storeContext) {
@@ -46,7 +46,7 @@ class DynamoVersionedHybridStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     withVersionedStoreContext { storeContext =>
       initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).right.value
+        case (k, v) => storeContext.put(k)(v).value
       }
 
       val vhs = new DynamoVersionedStoreImpl(storeContext) {
@@ -69,7 +69,7 @@ class DynamoVersionedHybridStoreTest
                                               Record])(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     initialEntries.map {
-      case (k, v) => storeContext.put(k)(v).right.value
+      case (k, v) => storeContext.put(k)(v).value
     }
 
     testWith(

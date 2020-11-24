@@ -22,7 +22,7 @@ trait VersionedStoreWithoutOverwriteTestCases[Id, T, VersionedStoreContext]
 
             debug(s"Got $result")
 
-            result.right.value shouldBe Identified(Version(id, 1), t1)
+            result.value shouldBe Identified(Version(id, 1), t1)
           }
         }
 
@@ -44,19 +44,19 @@ trait VersionedStoreWithoutOverwriteTestCases[Id, T, VersionedStoreContext]
               Version(id, 5) -> t5
             )
           ) { store =>
-            store.get(Version(id, 1)).right.value shouldBe Identified(
+            store.get(Version(id, 1)).value shouldBe Identified(
               Version(id, 1),
               t1)
-            store.get(Version(id, 2)).right.value shouldBe Identified(
+            store.get(Version(id, 2)).value shouldBe Identified(
               Version(id, 2),
               t2)
-            store.get(Version(id, 3)).right.value shouldBe Identified(
+            store.get(Version(id, 3)).value shouldBe Identified(
               Version(id, 3),
               t3)
-            store.get(Version(id, 4)).right.value shouldBe Identified(
+            store.get(Version(id, 4)).value shouldBe Identified(
               Version(id, 4),
               t4)
-            store.get(Version(id, 5)).right.value shouldBe Identified(
+            store.get(Version(id, 5)).value shouldBe Identified(
               Version(id, 5),
               t5)
           }

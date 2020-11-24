@@ -44,7 +44,7 @@ trait S3ListingTestCases[ListingResult]
           val queryLocation = location.copy(bucket = queryBucket.name)
           val prefix = queryLocation.asPrefix
 
-          listing.list(prefix).right.value shouldBe empty
+          listing.list(prefix).value shouldBe empty
         }
       }
     }
@@ -65,7 +65,7 @@ trait S3ListingTestCases[ListingResult]
         putStream(location)
 
         val prefix = location.join("subdir").asPrefix
-        listing.list(prefix).right.value shouldBe empty
+        listing.list(prefix).value shouldBe empty
       }
     }
 
@@ -80,7 +80,7 @@ trait S3ListingTestCases[ListingResult]
 
         val smallBatchListing = createS3Listing(batchSize = 5)
         assertResultCorrect(
-          smallBatchListing.list(location.asPrefix).right.value,
+          smallBatchListing.list(location.asPrefix).value,
           entries = locations
         )
       }

@@ -28,7 +28,7 @@ class EncoderTest
         val stream = bytesEncoder.toStream(bytes)
 
         IOUtils.contentEquals(
-          stream.right.value,
+          stream.value,
           new ByteArrayInputStream(bytes)) shouldBe true
       }
 
@@ -37,7 +37,7 @@ class EncoderTest
         val stream = stringEncoder.toStream(randomString)
 
         assertStreamEquals(
-          stream.right.value,
+          stream.value,
           randomString,
           expectedLength = randomString.getBytes.length)
       }
@@ -50,7 +50,7 @@ class EncoderTest
 
         // len( "{8 chars}" ) ~> 10
         assertStreamEquals(
-          stream.right.value,
+          stream.value,
           toJson(randomString).get,
           expectedLength = randomJson.noSpaces.getBytes.length)
       }
@@ -63,7 +63,7 @@ class EncoderTest
 
         // len( {"name":"Michael J. Fox","age":14"} ) ~> 34
         assertStreamEquals(
-          stream.right.value,
+          stream.value,
           toJson(michael).get,
           expectedLength = 34)
       }

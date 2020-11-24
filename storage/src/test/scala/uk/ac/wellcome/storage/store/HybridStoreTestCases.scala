@@ -88,15 +88,15 @@ trait HybridStoreTestCases[IndexedStoreId,
                   val hybridStoreEntry = createT
 
                   val putResult = hybridStore.put(id)(hybridStoreEntry)
-                  val putValue = putResult.right.value
+                  val putValue = putResult.value
 
                   val indexedResult = indexedStore.get(putValue.id)
-                  val indexedValue = indexedResult.right.value
+                  val indexedValue = indexedResult.value
 
                   val typedStoreId = indexedValue.identifiedT
 
                   val typedResult = typedStore.get(typedStoreId)
-                  val typedValue = typedResult.right.value
+                  val typedValue = typedResult.value
                   typedValue.identifiedT shouldBe hybridStoreEntry
                 }
               }
@@ -204,7 +204,7 @@ trait HybridStoreTestCases[IndexedStoreId,
                     hybridStoreImpl.put(id)(createT) shouldBe a[Right[_, _]]
 
                     val typeStoreId =
-                      indexedStore.get(id).right.value.identifiedT
+                      indexedStore.get(id).value.identifiedT
 
                     val byteLength = 256
                     val inputStream = new InputStreamWithLength(

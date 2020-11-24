@@ -45,7 +45,6 @@ class AzurePutBlockFromURLTransferTest
 
           transfer
             .transfer(srcSummary, dst, checkForExisting = true)
-            .right
             .value shouldBe TransferNoOp(srcSummary, dst)
         }
       }
@@ -66,7 +65,6 @@ class AzurePutBlockFromURLTransferTest
 
           transfer
             .transfer(srcSummary, dst, checkForExisting = true)
-            .right
             .value shouldBe TransferNoOp(srcSummary, dst)
         }
       }
@@ -114,7 +112,7 @@ class AzurePutBlockFromURLTransferTest
             checkForExisting = true
           ) shouldBe a[Right[_, _]]
 
-          dstStore.get(dst).right.value.identifiedT shouldBe "Hello world"
+          dstStore.get(dst).value.identifiedT shouldBe "Hello world"
         }
       }
     }

@@ -191,7 +191,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
 
         // Use a fresh instance of S3Tags so we use the unmocked client,
         // and not one with a mocked return value for getObjectTagging.
-        new S3Tags().get(location).right.value.identifiedT shouldBe Map("colour" -> "red")
+        new S3Tags().get(location).value.identifiedT shouldBe Map("colour" -> "red")
       }
     }
 

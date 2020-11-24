@@ -21,7 +21,7 @@ trait S3TypedStoreFixtures[T]
 
     initialEntries.foreach {
       case (location, t) =>
-        val stream = codec.toStream(t).right.value
+        val stream = codec.toStream(t).value
 
         putStream(location, stream)
     }

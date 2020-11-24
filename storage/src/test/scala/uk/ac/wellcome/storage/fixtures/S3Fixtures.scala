@@ -94,7 +94,7 @@ trait S3Fixtures
       s3Object.getObjectContent,
       length = s3Object.getObjectMetadata.getContentLength
     )
-    stringCodec.fromStream(inputStream).right.value
+    stringCodec.fromStream(inputStream).value
   }
 
   def getJsonFromS3(location: S3ObjectLocation): Json =

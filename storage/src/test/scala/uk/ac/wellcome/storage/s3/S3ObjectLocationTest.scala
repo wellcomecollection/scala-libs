@@ -54,7 +54,7 @@ class S3ObjectLocationTest
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = item)
 
-          getTableItem[IdentifiedLocation](id = item.id, table = table).get.right.value shouldBe item
+          getTableItem[IdentifiedLocation](id = item.id, table = table).get.value shouldBe item
         }
       }
 
@@ -70,7 +70,7 @@ class S3ObjectLocationTest
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = oldItem)
 
-          getTableItem[IdentifiedLocation](id = item.id, table = table).get.right.value shouldBe item
+          getTableItem[IdentifiedLocation](id = item.id, table = table).get.value shouldBe item
         }
       }
     }
@@ -181,7 +181,7 @@ class S3ObjectLocationTest
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = item)
 
-          getTableItem[IdentifiedLocation](id = item.id, table = table).get.right.value shouldBe item
+          getTableItem[IdentifiedLocation](id = item.id, table = table).get.value shouldBe item
         }
       }
 
@@ -197,7 +197,7 @@ class S3ObjectLocationTest
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = oldItem)
 
-          getTableItem[IdentifiedLocation](id = item.id, table = table).get.right.value shouldBe item
+          getTableItem[IdentifiedLocation](id = item.id, table = table).get.value shouldBe item
         }
       }
     }

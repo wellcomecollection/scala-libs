@@ -83,8 +83,8 @@ class S3TransferTest
           transfer.transfer(src, dst) shouldBe a[Right[_, _]]
         }
 
-        s3Tags.get(src).right.value.identifiedT shouldBe Map("srcTag" -> "srcValue")
-        s3Tags.get(dst).right.value.identifiedT shouldBe empty
+        s3Tags.get(src).value.identifiedT shouldBe Map("srcTag" -> "srcValue")
+        s3Tags.get(dst).value.identifiedT shouldBe empty
       }
     }
   }
@@ -100,9 +100,9 @@ class S3TransferTest
             _.transfer(src, src)
           }
 
-        result.right.value shouldBe TransferNoOp(src, src)
+        result.value shouldBe TransferNoOp(src, src)
 
-        store.get(src).right.value.identifiedT shouldBe t
+        store.get(src).value.identifiedT shouldBe t
       }
     }
   }
@@ -129,10 +129,10 @@ class S3TransferTest
               val result = transfer.transfer(src, dst)
 
 
-              result.right.value shouldBe TransferPerformed(src, dst)
+              result.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src).right.value.identifiedT shouldBe t
-              dstStore.get(dst).right.value.identifiedT shouldBe t
+              srcStore.get(src).value.identifiedT shouldBe t
+              dstStore.get(dst).value.identifiedT shouldBe t
             }
           }
         }

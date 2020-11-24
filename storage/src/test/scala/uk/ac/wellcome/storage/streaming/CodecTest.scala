@@ -21,31 +21,31 @@ class CodecTest
         it("a byte array") {
           val bytes = randomBytes()
 
-          val stream = bytesCodec.toStream(bytes).right.value
-          bytesCodec.fromStream(stream).right.value shouldBe bytes
+          val stream = bytesCodec.toStream(bytes).value
+          bytesCodec.fromStream(stream).value shouldBe bytes
         }
 
         it("a string") {
           val randomString = randomAlphanumeric()
 
-          val stream = stringCodec.toStream(randomString).right.value
-          stringCodec.fromStream(stream).right.value shouldBe randomString
+          val stream = stringCodec.toStream(randomString).value
+          stringCodec.fromStream(stream).value shouldBe randomString
         }
 
         it("some json") {
           val randomString = randomAlphanumeric()
           val randomJson = Json.fromString(randomString)
 
-          val stream = jsonCodec.toStream(randomJson).right.value
-          jsonCodec.fromStream(stream).right.value shouldBe randomJson
+          val stream = jsonCodec.toStream(randomJson).value
+          jsonCodec.fromStream(stream).value shouldBe randomJson
         }
 
         it("a type T") {
           case class NamedThing(name: String, value: Int)
           val thing = NamedThing(name = randomAlphanumeric(), value = 5)
 
-          val stream = typeCodec[NamedThing].toStream(thing).right.value
-          typeCodec[NamedThing].fromStream(stream).right.value shouldBe thing
+          val stream = typeCodec[NamedThing].toStream(thing).value
+          typeCodec[NamedThing].fromStream(stream).value shouldBe thing
         }
       }
     }

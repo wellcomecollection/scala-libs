@@ -151,10 +151,10 @@ class AzurePutBlockTransferTest
                     _.transfer(src, dst)
                   }
 
-                result.right.value shouldBe TransferPerformed(src, dst)
+                result.value shouldBe TransferPerformed(src, dst)
 
-                srcStore.get(src).right.value.identifiedT shouldBe t
-                dstStore.get(dst).right.value.identifiedT shouldBe t
+                srcStore.get(src).value.identifiedT shouldBe t
+                dstStore.get(dst).value.identifiedT shouldBe t
               }
             }
           }
@@ -178,10 +178,10 @@ class AzurePutBlockTransferTest
                     _.transfer(src, dst)
                   }
 
-                result.right.value shouldBe TransferPerformed(src, dst)
+                result.value shouldBe TransferPerformed(src, dst)
 
-                srcStore.get(src).right.value.identifiedT shouldBe t
-                dstStore.get(dst).right.value.identifiedT shouldBe t
+                srcStore.get(src).value.identifiedT shouldBe t
+                dstStore.get(dst).value.identifiedT shouldBe t
               }
             }
           }
@@ -228,7 +228,7 @@ class AzurePutBlockTransferTest
         }
 
         val result = transfer.transfer(src, dst)
-        result.right.value shouldBe TransferPerformed(src, dst)
+        result.value shouldBe TransferPerformed(src, dst)
 
         // "Hello world" is 11 bytes long.  Bytes 1-5 were already written, which means
         // the transfer should have written 6-10 and 11-.
@@ -269,11 +269,10 @@ class AzurePutBlockTransferTest
           val transfer = new AzureFlakyBlockTransfer(maxFailures = 1)
 
           val result = transfer.transfer(src, dst)
-          result.right.value shouldBe TransferPerformed(src, dst)
+          result.value shouldBe TransferPerformed(src, dst)
 
           AzureTypedStore[String]
             .get(dst)
-            .right
             .value
             .identifiedT shouldBe "Hello world"
       }

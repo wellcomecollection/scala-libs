@@ -93,10 +93,10 @@ trait DynamoHybridStoreTestCases[
                 val hybridStoreEntry = createT
 
                 val putResult = hybridStore.put(id)(hybridStoreEntry)
-                val putValue = putResult.right.value
+                val putValue = putResult.value
 
                 val dynamoResult = indexedStore.get(putValue.id)
-                val dynamoValue = dynamoResult.right.value
+                val dynamoValue = dynamoResult.value
 
                 val s3Location = dynamoValue.identifiedT
 
@@ -245,7 +245,7 @@ trait DynamoHybridStoreTestCases[
                       hybridStore.put(id)(hybridStoreEntry) shouldBe a[
                         Right[_, _]]
 
-                      val indexedEntry = indexedStore.get(id).right.value
+                      val indexedEntry = indexedStore.get(id).value
                       val s3Location = indexedEntry.identifiedT
 
                       s3Client.deleteObject(s3Location.bucket, s3Location.key)
@@ -276,7 +276,7 @@ trait DynamoHybridStoreTestCases[
                       hybridStore.put(id)(hybridStoreEntry) shouldBe a[
                         Right[_, _]]
 
-                      val indexedEntry = indexedStore.get(id).right.value
+                      val indexedEntry = indexedStore.get(id).value
                       val s3Location = indexedEntry.identifiedT
 
                       s3Client.deleteObject(s3Location.bucket, s3Location.key)

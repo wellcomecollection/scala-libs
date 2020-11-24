@@ -12,7 +12,7 @@ trait ReplayableStreamFixtures extends EitherValues with RandomGenerators {
 
   class ReplayableStream(val originalBytes: Array[Byte], length: Long)
       extends InputStreamWithLength(
-        inputStream = bytesCodec.toStream(originalBytes).right.value,
+        inputStream = bytesCodec.toStream(originalBytes).value,
         length = length
       )
 

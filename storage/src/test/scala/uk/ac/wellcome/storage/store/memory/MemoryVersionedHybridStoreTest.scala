@@ -17,7 +17,7 @@ class MemoryVersionedHybridStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     withVersionedStoreContext { storeContext =>
       initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).right.value
+        case (k, v) => storeContext.put(k)(v).value
       }
 
       val versionedHybridStore =
@@ -35,7 +35,7 @@ class MemoryVersionedHybridStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     withVersionedStoreContext { storeContext =>
       initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).right.value
+        case (k, v) => storeContext.put(k)(v).value
       }
 
       val versionedHybridStore =
@@ -56,7 +56,7 @@ class MemoryVersionedHybridStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
 
     initialEntries.map {
-      case (k, v) => storeContext.put(k)(v).right.value
+      case (k, v) => storeContext.put(k)(v).value
     }
 
     val versionedHybridStore =

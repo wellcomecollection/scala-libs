@@ -19,7 +19,7 @@ trait MemoryStreamStoreFixtures[Ident]
         case (id, inputStream) =>
           (
             id,
-            bytesCodec.fromStream(inputStream).right.value
+            bytesCodec.fromStream(inputStream).value
           )
       }
 

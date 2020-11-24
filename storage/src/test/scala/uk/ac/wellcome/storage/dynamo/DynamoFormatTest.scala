@@ -43,7 +43,6 @@ trait DynamoFormatTestCases[T]
       scanamo
         .exec(scanamoTable.get('id -> record.id))
         .get
-        .right
         .value shouldBe record
     }
   }

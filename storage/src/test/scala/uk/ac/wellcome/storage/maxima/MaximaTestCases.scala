@@ -28,7 +28,7 @@ trait MaximaTestCases
         )
 
         withMaxima(initialEntries) {
-          _.max(id).right.value shouldBe 1
+          _.max(id).value shouldBe 1
         }
       }
 
@@ -43,7 +43,7 @@ trait MaximaTestCases
         )
 
         withMaxima(initialEntries) {
-          _.max(id).right.value shouldBe 5
+          _.max(id).value shouldBe 5
         }
       }
 
@@ -58,7 +58,7 @@ trait MaximaTestCases
         )
 
         withMaxima(initialEntries) {
-          _.max(id).right.value shouldBe 3
+          _.max(id).value shouldBe 3
         }
       }
 

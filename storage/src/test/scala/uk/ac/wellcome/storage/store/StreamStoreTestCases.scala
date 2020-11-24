@@ -62,7 +62,7 @@ trait StreamStoreTestCases[
           val initialEntry = ReplayableStream(randomBytes())
 
           withStoreImpl(initialEntries = Map(id -> initialEntry)) { store =>
-            val retrievedEntry = store.get(id).right.value
+            val retrievedEntry = store.get(id).value
 
             assertEqualT(initialEntry, retrievedEntry.identifiedT)
           }

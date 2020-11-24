@@ -69,7 +69,7 @@ class DynamoHashReadableTest
       withLocalDynamoDbTable { table =>
         val readable = createDynamoReadableWith(table, initialEntries)
 
-        readable.get(Version(id, 1)).right.value shouldBe Identified(
+        readable.get(Version(id, 1)).value shouldBe Identified(
           Version(id, 1),
           record)
       }

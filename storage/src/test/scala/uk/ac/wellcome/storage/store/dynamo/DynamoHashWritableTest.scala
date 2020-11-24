@@ -48,7 +48,6 @@ class DynamoHashWritableTest
         ScanamoTable[HashEntry](table.name).get('id -> hashKey)
       )
       .value
-      .right
       .value
       .payload
 

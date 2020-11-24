@@ -70,7 +70,7 @@ class S3SizeFinderTest
 
       val sizeFinder = new S3SizeFinder()(spyClient)
 
-      sizeFinder.getSize(location).right.value shouldBe inputStream.length
+      sizeFinder.getSize(location).value shouldBe inputStream.length
 
       verify(spyClient, never()).getObject(any[String], any[String])
       verify(spyClient, never()).getObject(any[GetObjectRequest])

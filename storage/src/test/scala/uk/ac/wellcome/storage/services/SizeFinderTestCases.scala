@@ -32,7 +32,7 @@ trait SizeFinderTestCases[Ident, Context]
           _.getSize(ident)
         }
 
-        result.right.value shouldBe 19
+        result.value shouldBe 19
       }
     }
 
