@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.transfer.s3
 
 import com.amazonaws.services.s3.model.{AmazonS3Exception, CopyObjectRequest}
 import com.amazonaws.services.s3.transfer.{TransferManager, TransferManagerBuilder}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.scalatestplus.mockito.MockitoSugar

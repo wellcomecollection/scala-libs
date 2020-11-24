@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Assertion

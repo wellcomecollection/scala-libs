@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.services.s3
 
 import com.amazonaws.services.s3.model._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.DoesNotExistError
