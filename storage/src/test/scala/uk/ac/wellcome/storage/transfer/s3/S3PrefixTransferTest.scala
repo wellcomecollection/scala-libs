@@ -94,8 +94,8 @@ class S3PrefixTransferTest
 
     implicit val transfer: S3Transfer = mock[S3Transfer]
     when(transfer.transfer(any[S3ObjectLocation],any[S3ObjectLocation], any[Boolean])).thenAnswer((invocation: InvocationOnMock) => {
-      val src = invocation.getArgumentAt(0, classOf[S3ObjectLocation])
-      val dst = invocation.getArgumentAt(1, classOf[S3ObjectLocation])
+      val src = invocation.getArgument[S3ObjectLocation](0)
+      val dst = invocation.getArgument[S3ObjectLocation](1)
       Left(TransferSourceFailure(src, dst))
     })
 
