@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.5.0 - 2020-11-24
+
+Bump scalatest to 3.2.3 and scalatestplus-mockito to 3.1.2.0.
+
 ## v24.4.0 - 2020-11-23
 
 Allow consistency to be set from DynamoSingleVersionStore, DynamoMultipleVersionStore
