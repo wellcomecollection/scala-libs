@@ -18,8 +18,9 @@ object Dependencies {
     val typesafe = "1.3.2"
     val logback = "1.1.8"
     val mockito = "1.10.19"
-    val scalatest = "3.1.1"
-    val scalatestplusMockito = "3.1.0.0"
+    val scalatest = "3.2.3"
+    val scalatestPlus = "3.1.2.0"
+    val scalatestPlusMockitoArtifactId = "mockito-3-2"
     val scanamo = "1.0.0-M10"
     val apacheCommons = "2.6"
 
@@ -36,7 +37,7 @@ object Dependencies {
 
   val testDependencies = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % Test,
-    "org.scalatestplus" %% "mockito-1-10" % versions.scalatestplusMockito % Test,
+    "org.scalatestplus" %% versions.scalatestPlusMockitoArtifactId % versions.scalatestPlus % Test,
     "org.mockito" % "mockito-core" % versions.mockito % Test
   )
 
