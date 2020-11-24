@@ -27,8 +27,8 @@ trait MaximaTestCases
           Version(id, 1) -> createRecord
         )
 
-        withMaxima(initialEntries) { maxima =>
-          maxima.max(id).right.value shouldBe 1
+        withMaxima(initialEntries) {
+          _.max(id).right.value shouldBe 1
         }
       }
 
@@ -42,8 +42,8 @@ trait MaximaTestCases
           Version(id, 5) -> createRecord
         )
 
-        withMaxima(initialEntries) { maxima =>
-          maxima.max(id).right.value shouldBe 5
+        withMaxima(initialEntries) {
+          _.max(id).right.value shouldBe 5
         }
       }
 
@@ -57,17 +57,14 @@ trait MaximaTestCases
           Version(createIdentityKey, 5) -> createRecord
         )
 
-        withMaxima(initialEntries) { maxima =>
-          maxima.max(id).right.value shouldBe 3
+        withMaxima(initialEntries) {
+          _.max(id).right.value shouldBe 3
         }
       }
 
       it("errors if there are no matching entries") {
-        withMaxima(initialEntries = Map.empty) { maxima =>
-          maxima
-            .max(createIdentityKey)
-            .left
-            .value shouldBe a[NoMaximaValueError]
+        withMaxima(initialEntries = Map.empty) {
+          _.max(createIdentityKey).left.value shouldBe a[NoMaximaValueError]
         }
       }
     }
