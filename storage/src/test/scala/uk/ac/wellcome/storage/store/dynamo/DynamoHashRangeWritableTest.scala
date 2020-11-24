@@ -51,7 +51,6 @@ class DynamoHashRangeWritableTest
           'id -> hashKey and 'version -> v)
       )
       .value
-      .right
       .value
       .payload
 

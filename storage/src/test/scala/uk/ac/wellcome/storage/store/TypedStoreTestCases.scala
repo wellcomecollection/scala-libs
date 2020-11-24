@@ -43,7 +43,7 @@ trait TypedStoreTestCases[
   def withBrokenStreamStore[R](testWith: TestWith[StreamStoreImpl, R]): R
 
   class CloseDetectionStream(bytes: Array[Byte])
-      extends FilterInputStream(bytesCodec.toStream(bytes).right.value) {
+      extends FilterInputStream(bytesCodec.toStream(bytes).value) {
     var isClosed = false
 
     override def close(): Unit = {
@@ -124,7 +124,7 @@ trait TypedStoreTestCases[
 
       it("errors if the data in the stream store is the wrong format") {
         withNamespace { implicit namespace =>
-          val stream = stringCodec.toStream("Not a JSON string").right.value
+          val stream = stringCodec.toStream("Not a JSON string").value
 
           withSingleValueStreamStore(stream) { streamStore =>
             withTypedStore(streamStore, initialEntries = Map.empty) {

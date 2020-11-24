@@ -22,7 +22,7 @@ class AzureLargeStreamReaderTest
     location: AzureBlobLocation,
     contents: String
   ): Unit =
-    AzureTypedStore[String].put(location)(contents).right.value
+    AzureTypedStore[String].put(location)(contents).value
 
   override def withRangedReader[R](
     testWith: TestWith[RangedReader[AzureBlobLocation], R]

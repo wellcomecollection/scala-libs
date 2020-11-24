@@ -68,7 +68,7 @@ trait PrefixTransferTestCases[
                   )
                 }
 
-              result.right.value shouldBe PrefixTransferSuccess(0)
+              result.value shouldBe PrefixTransferSuccess(0)
             }
           }
         }
@@ -96,10 +96,10 @@ trait PrefixTransferTestCases[
                   )
                 }
 
-              result.right.value shouldBe PrefixTransferSuccess(1)
+              result.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(srcLocation).right.value.identifiedT shouldBe t
-              dstStore.get(dstLocation).right.value.identifiedT shouldBe t
+              srcStore.get(srcLocation).value.identifiedT shouldBe t
+              dstStore.get(dstLocation).value.identifiedT shouldBe t
             }
           }
         }
@@ -129,7 +129,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              result.right.value shouldBe PrefixTransferSuccess(objectCount)
+              result.value shouldBe PrefixTransferSuccess(objectCount)
 
               // TODO: Check the objects were copied correctly
             }
@@ -165,7 +165,7 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix)
                 }
 
-              result.right.value shouldBe PrefixTransferSuccess(objectCount)
+              result.value shouldBe PrefixTransferSuccess(objectCount)
 
               // TODO: Check only the prefixed objects were copied correctly
             }
@@ -271,8 +271,8 @@ trait PrefixTransferTestCases[
               failure.successes shouldBe 0
               failure.failures shouldBe 1
 
-              srcStore.get(src).right.value.identifiedT shouldBe srcT
-              dstStore.get(dst).right.value.identifiedT shouldBe dstT
+              srcStore.get(src).value.identifiedT shouldBe srcT
+              dstStore.get(dst).value.identifiedT shouldBe dstT
             }
           }
         }
@@ -298,10 +298,10 @@ trait PrefixTransferTestCases[
                   _.transferPrefix(srcPrefix = srcPrefix, dstPrefix = dstPrefix, checkForExisting = false)
                 }
 
-              result.right.value shouldBe PrefixTransferSuccess(1)
+              result.value shouldBe PrefixTransferSuccess(1)
 
-              srcStore.get(src).right.value.identifiedT shouldBe srcT
-              dstStore.get(dst).right.value.identifiedT shouldBe srcT
+              srcStore.get(src).value.identifiedT shouldBe srcT
+              dstStore.get(dst).value.identifiedT shouldBe srcT
             }
           }
         }

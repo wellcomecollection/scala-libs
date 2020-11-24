@@ -46,9 +46,9 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
       writeString(ident, contents)
 
       withLargeStreamReader(bufferSize) { reader =>
-        val result = reader.get(ident).right.value
+        val result = reader.get(ident).value
         val retrievedContents =
-          Codec.stringCodec.fromStream(result.identifiedT).right.value
+          Codec.stringCodec.fromStream(result.identifiedT).value
 
         retrievedContents shouldBe contents
       }
@@ -67,9 +67,9 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
       writeString(ident, contents)
 
       withLargeStreamReader(bufferSize) { reader =>
-        val result = reader.get(ident).right.value
+        val result = reader.get(ident).value
         val retrievedContents =
-          Codec.stringCodec.fromStream(result.identifiedT).right.value
+          Codec.stringCodec.fromStream(result.identifiedT).value
 
         retrievedContents shouldBe contents
       }

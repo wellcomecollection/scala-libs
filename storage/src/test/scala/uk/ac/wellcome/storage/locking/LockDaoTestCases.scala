@@ -50,8 +50,8 @@ trait LockDaoTestCases[Ident, ContextId, LockDaoContext]
         val id1 = createIdent
         val id2 = createIdent
 
-        lockDao.lock(id1, contextId).right.value.id shouldBe id1
-        lockDao.lock(id2, contextId).right.value.id shouldBe id2
+        lockDao.lock(id1, contextId).value.id shouldBe id1
+        lockDao.lock(id2, contextId).value.id shouldBe id2
       }
     }
 
@@ -62,7 +62,7 @@ trait LockDaoTestCases[Ident, ContextId, LockDaoContext]
         val contextId1 = createContextId
         val contextId2 = createContextId
 
-        lockDao.lock(id, contextId1).right.value.id shouldBe id
+        lockDao.lock(id, contextId1).value.id shouldBe id
 
         lockDao.lock(id, contextId2).left.value shouldBe a[LockFailure[_]]
       }
@@ -75,11 +75,11 @@ trait LockDaoTestCases[Ident, ContextId, LockDaoContext]
         val contextId1 = createContextId
         val contextId2 = createContextId
 
-        lockDao.lock(id, contextId1).right.value.id shouldBe id
+        lockDao.lock(id, contextId1).value.id shouldBe id
 
-        lockDao.unlock(contextId1).right.value shouldBe a[BoxedUnit]
+        lockDao.unlock(contextId1).value shouldBe a[BoxedUnit]
 
-        lockDao.lock(id, contextId2).right.value.id shouldBe id
+        lockDao.lock(id, contextId2).value.id shouldBe id
       }
     }
 

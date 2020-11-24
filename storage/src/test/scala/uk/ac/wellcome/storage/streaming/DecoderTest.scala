@@ -35,7 +35,7 @@ class DecoderTest
           length = byteArray.length
         )
 
-        bytesDecoder.fromStream(stream).right.value shouldBe byteArray
+        bytesDecoder.fromStream(stream).value shouldBe byteArray
       }
 
       it("a byte array without a specified length") {
@@ -43,7 +43,6 @@ class DecoderTest
 
         bytesDecoder
           .fromStream(new ByteArrayInputStream(byteArray))
-          .right
           .value shouldBe byteArray
       }
 

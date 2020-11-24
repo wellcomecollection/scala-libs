@@ -27,7 +27,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           content = content,
           expiryLength = 5.minutes
         )
-        .right
         .value
 
       getUrl(url) shouldBe content
@@ -46,7 +45,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           content = content,
           expiryLength = 5.minutes
         )
-        .right
         .value
 
       val lastModified = getLastModified(location)
@@ -62,7 +60,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           expiryLength = 5.minutes,
           checkExists = true
         )
-        .right
         .value
 
       val newLastModified = getLastModified(location)
@@ -86,7 +83,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           content = content,
           expiryLength = 5.minutes
         )
-        .right
         .value
 
       val lastModified = getLastModified(location)
@@ -101,7 +97,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           content = content,
           expiryLength = 5.minutes
         )
-        .right
         .value
 
       val newLastModified = getLastModified(location)
@@ -130,7 +125,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
           content = content,
           expiryLength = 3.seconds
         )
-        .right
         .value
 
       getUrl(url) shouldBe content

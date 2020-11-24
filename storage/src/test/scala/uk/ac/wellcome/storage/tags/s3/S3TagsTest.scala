@@ -2,8 +2,8 @@ package uk.ac.wellcome.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model._
-import org.mockito.Matchers._
-import org.mockito.Mockito.{ _}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
@@ -191,7 +191,7 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
 
         // Use a fresh instance of S3Tags so we use the unmocked client,
         // and not one with a mocked return value for getObjectTagging.
-        new S3Tags().get(location).right.value.identifiedT shouldBe Map("colour" -> "red")
+        new S3Tags().get(location).value.identifiedT shouldBe Map("colour" -> "red")
       }
     }
 

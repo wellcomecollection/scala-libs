@@ -37,7 +37,7 @@ trait LockingServiceFixtures[Ident, ContextId, LockDaoContext]
   }
 
   def successfulRightOf(result: ResultF): String =
-    result.success.value.right.value
+    result.success.value.value
 
   def successfulLeftOf(result: ResultF): FailedLockingServiceOp =
     result.success.value.left.value

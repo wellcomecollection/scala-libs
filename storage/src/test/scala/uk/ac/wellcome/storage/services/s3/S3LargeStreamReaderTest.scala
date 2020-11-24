@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.services.s3
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
@@ -60,8 +60,8 @@ class S3LargeStreamReaderTest
         new S3LargeStreamReader(bufferSize = bufferSize)(s3Client = spyClient)
 
       // Consume all the bytes from the stream, even if we don't look at them.
-      val inputStream = reader.get(location).right.value.identifiedT
-      stringCodec.fromStream(inputStream).right.value
+      val inputStream = reader.get(location).value.identifiedT
+      stringCodec.fromStream(inputStream).value
 
       // One to get the size of the object, two to read the contents
       Mockito

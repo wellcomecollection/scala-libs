@@ -55,10 +55,10 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.right.value shouldBe TransferPerformed(src, dst)
+              result.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src).right.value.identifiedT shouldBe t
-              dstStore.get(dst).right.value.identifiedT shouldBe t
+              srcStore.get(src).value.identifiedT shouldBe t
+              dstStore.get(dst).value.identifiedT shouldBe t
             }
           }
         }
@@ -113,8 +113,8 @@ trait TransferTestCases[
               result.left.value.src shouldBe src
               result.left.value.dst shouldBe dst
 
-              srcStore.get(src).right.value.identifiedT shouldBe srcT
-              dstStore.get(dst).right.value.identifiedT shouldBe dstT
+              srcStore.get(src).value.identifiedT shouldBe srcT
+              dstStore.get(dst).value.identifiedT shouldBe dstT
             }
           }
         }
@@ -137,9 +137,9 @@ trait TransferTestCases[
                   _.transfer(src, dst)
                 }
 
-              result.right.value shouldBe TransferNoOp(src, dst)
-              srcStore.get(src).right.value.identifiedT shouldBe t
-              dstStore.get(dst).right.value.identifiedT shouldBe t
+              result.value shouldBe TransferNoOp(src, dst)
+              srcStore.get(src).value.identifiedT shouldBe t
+              dstStore.get(dst).value.identifiedT shouldBe t
             }
           }
         }
@@ -185,10 +185,10 @@ trait TransferTestCases[
                   _.transfer(src, dst, checkForExisting = false)
                 }
 
-              result.right.value shouldBe TransferPerformed(src, dst)
+              result.value shouldBe TransferPerformed(src, dst)
 
-              srcStore.get(src).right.value.identifiedT shouldBe srcT
-              dstStore.get(dst).right.value.identifiedT shouldBe srcT
+              srcStore.get(src).value.identifiedT shouldBe srcT
+              dstStore.get(dst).value.identifiedT shouldBe srcT
             }
           }
         }

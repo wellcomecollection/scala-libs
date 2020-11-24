@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.services.s3
 
 import com.amazonaws.services.s3.model._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.DoesNotExistError
@@ -70,7 +70,7 @@ class S3SizeFinderTest
 
       val sizeFinder = new S3SizeFinder()(spyClient)
 
-      sizeFinder.getSize(location).right.value shouldBe inputStream.length
+      sizeFinder.getSize(location).value shouldBe inputStream.length
 
       verify(spyClient, never()).getObject(any[String], any[String])
       verify(spyClient, never()).getObject(any[GetObjectRequest])

@@ -29,7 +29,7 @@ trait RangedReaderTestCases[Ident, Namespace]
         _.getBytes(ident, range = ClosedByteRange(start = 1, count = 4))
       }
 
-      receivedBytes.right.value shouldBe "ello".getBytes()
+      receivedBytes.value shouldBe "ello".getBytes()
     }
   }
 
@@ -43,7 +43,7 @@ trait RangedReaderTestCases[Ident, Namespace]
         _.getBytes(ident, range = OpenByteRange(start = 6))
       }
 
-      receivedBytes.right.value shouldBe "world".getBytes()
+      receivedBytes.value shouldBe "world".getBytes()
     }
   }
 
@@ -57,7 +57,7 @@ trait RangedReaderTestCases[Ident, Namespace]
         _.getBytes(ident, range = ClosedByteRange(start = 6, count = 50))
       }
 
-      receivedBytes.right.value shouldBe "world".getBytes()
+      receivedBytes.value shouldBe "world".getBytes()
     }
   }
 

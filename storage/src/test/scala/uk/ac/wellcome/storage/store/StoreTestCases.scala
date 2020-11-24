@@ -26,7 +26,7 @@ trait StoreTestCases[Id, T, Namespace, StoreContext]
           val t = createT
 
           withStoreImpl(initialEntries = Map(id -> t)) { store =>
-            val storedEntry = store.get(id).right.value
+            val storedEntry = store.get(id).value
 
             storedEntry shouldBe a[Identified[_, _]]
             storedEntry.id shouldBe id
@@ -60,7 +60,7 @@ trait StoreTestCases[Id, T, Namespace, StoreContext]
           }
 
           withStoreImpl(initialEntries = Map.empty, storeContext) { store2 =>
-            val retrievedEntry: Identified[Id, T] = store2.get(id).right.value
+            val retrievedEntry: Identified[Id, T] = store2.get(id).value
             retrievedEntry.id shouldBe id
             assertEqualT(t, retrievedEntry.identifiedT)
           }
@@ -97,7 +97,7 @@ trait StoreWithOverwritesTestCases[Id, T, Namespace, StoreContext]
         withEmptyStoreImpl { store =>
           store.put(id)(t1) shouldBe a[Right[_, _]]
 
-          val storedEntry1 = store.get(id).right.value
+          val storedEntry1 = store.get(id).value
 
           storedEntry1 shouldBe a[Identified[_, _]]
           storedEntry1.id shouldBe id
@@ -105,7 +105,7 @@ trait StoreWithOverwritesTestCases[Id, T, Namespace, StoreContext]
 
           store.put(id)(t2) shouldBe a[Right[_, _]]
 
-          val storedEntry2 = store.get(id).right.value
+          val storedEntry2 = store.get(id).value
 
           storedEntry2 shouldBe a[Identified[_, _]]
           storedEntry2.id shouldBe id

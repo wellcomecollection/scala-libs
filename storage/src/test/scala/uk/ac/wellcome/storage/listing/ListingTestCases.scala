@@ -37,7 +37,7 @@ trait ListingTestCases[Ident,
           val prefix = createPrefixMatching(ident)
 
           withListing(context, initialEntries = Seq.empty) { listing =>
-            listing.list(prefix).right.value shouldBe empty
+            listing.list(prefix).value shouldBe empty
           }
         }
       }
@@ -50,7 +50,7 @@ trait ListingTestCases[Ident,
 
           withListing(context, initialEntries = entries) { listing =>
             assertResultCorrect(
-              result = listing.list(prefix).right.value,
+              result = listing.list(prefix).value,
               entries = entries
             )
           }
@@ -65,7 +65,7 @@ trait ListingTestCases[Ident,
 
           withListing(context, initialEntries = entries) { listing =>
             assertResultCorrect(
-              result = listing.list(prefix).right.value,
+              result = listing.list(prefix).value,
               entries = entries
             )
           }
@@ -82,7 +82,7 @@ trait ListingTestCases[Ident,
 
           withListing(context, initialEntries = entries) { listing =>
             assertResultCorrect(
-              result = listing.list(prefix).right.value,
+              result = listing.list(prefix).value,
               entries = entries
             )
           }
@@ -102,7 +102,7 @@ trait ListingTestCases[Ident,
           withListing(context, initialEntries = entries ++ extraEntries) {
             listing =>
               assertResultCorrect(
-                result = listing.list(prefix).right.value,
+                result = listing.list(prefix).value,
                 entries = entries
               )
           }

@@ -23,7 +23,7 @@ class RetryOpsTest extends AnyFunSpec with Matchers with EitherValues {
     val retryableFunction = (canOnlyBeCalledOnce _).retry(maxAttempts = 3)
 
     val result = retryableFunction("hello")
-    result.right.value shouldBe "HELLO"
+    result.value shouldBe "HELLO"
   }
 
   it("if N=1–5 are retryable and N=6 is a Right[…], it succeeds") {
@@ -42,7 +42,7 @@ class RetryOpsTest extends AnyFunSpec with Matchers with EitherValues {
     }
 
     val retryableFunction = (countCalls _).retry(maxAttempts)
-    retryableFunction("hello").right.value shouldBe "hello"
+    retryableFunction("hello").value shouldBe "hello"
   }
 
   it("if N=1 is retryable and N=2 is a Left[…], it fails") {

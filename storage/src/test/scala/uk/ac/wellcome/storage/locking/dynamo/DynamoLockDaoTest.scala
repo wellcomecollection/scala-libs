@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model._
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,7 +32,6 @@ class DynamoLockDaoTest
         withLockDao(lockTable) { lockDao =>
           lockDao
             .lock(staticId, staticContextId)
-            .right
             .value
             .id shouldBe staticId
 
@@ -46,7 +45,6 @@ class DynamoLockDaoTest
         withLockDao(lockTable) { lockDao =>
           lockDao
             .lock(staticId, staticContextId)
-            .right
             .value
             .id shouldBe staticId
 
@@ -59,7 +57,6 @@ class DynamoLockDaoTest
 
           lockDao
             .lock(staticId, staticContextId)
-            .right
             .value
             .id shouldBe staticId
 
@@ -79,7 +76,6 @@ class DynamoLockDaoTest
 
           lockDao
             .lock(staticId, staticContextId)
-            .right
             .value
             .id shouldBe staticId
 
@@ -92,7 +88,7 @@ class DynamoLockDaoTest
           Thread.sleep(2000)
 
           // Confirm we can lock expired lock
-          lockDao.lock(staticId, contextId).right.value.id shouldBe staticId
+          lockDao.lock(staticId, contextId).value.id shouldBe staticId
         }
       }
     }
@@ -100,7 +96,7 @@ class DynamoLockDaoTest
     it("removes a lock from DynamoDB after unlocking") {
       withLocalDynamoDbTable { lockTable =>
         withLockDao(lockTable, seconds = 1) { lockDao =>
-          lockDao.lock(staticId, staticContextId).right.value
+          lockDao.lock(staticId, staticContextId).value
           lockDao.unlock(staticContextId)
           assertNoLocks(lockTable)
         }
