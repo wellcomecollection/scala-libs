@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.6.0 - 2020-11-24
+
+Bump the version of akka to 2.6.10.
+
 ## v24.5.0 - 2020-11-24
 
 Bump scalatest to 3.2.3 and scalatestplus-mockito to 3.1.2.0.
