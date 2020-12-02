@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{QueryRequest, ScalarAttributeType}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, ScalarAttributeType}
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
@@ -144,8 +144,8 @@ class DynamoHashReadableTest
     }
 
     def getConsistentReadOnQuery(mockClient: AmazonDynamoDB): Boolean = {
-      val captor = ArgumentCaptor.forClass(classOf[QueryRequest])
-      Mockito.verify(mockClient).query(captor.capture())
+      val captor = ArgumentCaptor.forClass(classOf[GetItemRequest])
+      Mockito.verify(mockClient).getItem(captor.capture())
       captor.getValue.getConsistentRead
     }
   }
