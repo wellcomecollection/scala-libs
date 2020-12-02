@@ -93,7 +93,8 @@ trait DynamoHashRangeReadable[HashKey, RangeKey, T]
   implicit val formatHashKey: DynamoFormat[HashKey]
   implicit val formatRangeKey: DynamoFormat[RangeKey]
 
-  protected def createKeyExpression(id: Version[HashKey, RangeKey]): UniqueKey[_] =
+  protected def createKeyExpression(
+    id: Version[HashKey, RangeKey]): UniqueKey[_] =
     'id -> id.id and 'version -> id.version
 
   override def get(id: Version[HashKey, RangeKey]): ReadEither =
