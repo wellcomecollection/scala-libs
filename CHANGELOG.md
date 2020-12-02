@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v24.6.1 - 2020-12-02
+
+Improve the efficiency of reading items from the Dynamo stores.
+
 ## v24.6.0 - 2020-11-24
 
 Bump the version of akka to 2.6.10.
