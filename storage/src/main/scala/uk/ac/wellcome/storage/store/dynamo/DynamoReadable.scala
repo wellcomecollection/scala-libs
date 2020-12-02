@@ -1,7 +1,8 @@
 package uk.ac.wellcome.storage.store.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import org.scanamo.query.Query
+import org.scanamo.error.DynamoReadError
+import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
 import uk.ac.wellcome.storage.dynamo.{DynamoHashEntry, DynamoHashRangeEntry}
@@ -34,26 +35,24 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
   protected val client: AmazonDynamoDB
   protected val table: Table[EntryType]
 
-  protected def createKeyExpression(id: DynamoIdent): Query[_]
+  protected def createKeyExpression(id: DynamoIdent): UniqueKey[_]
 
   protected def getEntry(id: DynamoIdent): Either[ReadError, EntryType] = {
     val ops = consistencyMode match {
-      case EventuallyConsistent => table.query(createKeyExpression(id))
+      case EventuallyConsistent => table.get(createKeyExpression(id))
       case StronglyConsistent =>
-        table.consistently.query(createKeyExpression(id))
+        table.consistently.get(createKeyExpression(id))
     }
 
     Try(Scanamo(client).exec(ops)) match {
-      case Success(List(Right(entry))) => Right(entry)
-      case Success(List(Left(err))) =>
+      case Success(Some(Right(entry))) => Right(entry)
+
+      case Success(Some(Left(err: DynamoReadError))) =>
         val daoReadError = new Error(s"DynamoReadError: ${err.toString}")
         Left(StoreReadError(daoReadError))
 
-      case Success(list) if list.length > 1 =>
-        Left(
-          MultipleRecordsError()
-        )
-      case Success(Nil) => Left(DoesNotExistError())
+      case Success(None) => Left(DoesNotExistError())
+
       case Failure(err) => Left(StoreReadError(err))
     }
   }
@@ -67,7 +66,7 @@ trait DynamoHashReadable[HashKey, V, T]
       T] {
   implicit protected val formatHashKey: DynamoFormat[HashKey]
 
-  protected def createKeyExpression(id: HashKey): Query[_] =
+  protected def createKeyExpression(id: HashKey): UniqueKey[_] =
     'id -> id
 
   override def get(id: Version[HashKey, V]): ReadEither = {
@@ -94,7 +93,7 @@ trait DynamoHashRangeReadable[HashKey, RangeKey, T]
   implicit val formatHashKey: DynamoFormat[HashKey]
   implicit val formatRangeKey: DynamoFormat[RangeKey]
 
-  protected def createKeyExpression(id: Version[HashKey, RangeKey]): Query[_] =
+  protected def createKeyExpression(id: Version[HashKey, RangeKey]): UniqueKey[_] =
     'id -> id.id and 'version -> id.version
 
   override def get(id: Version[HashKey, RangeKey]): ReadEither =

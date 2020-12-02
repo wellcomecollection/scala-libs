@@ -128,11 +128,11 @@ trait DynamoReadableTestCases[
   def assertErrorsOnBadKeyName(createWrongTable: Table => Table): Assertion =
     assertErrorsOnWrongTableDefinition(
       createWrongTable,
-      message = "Query condition missed key schema element")
+      message = "One of the required keys was not given a value")
 
   def assertErrorsOnBadKeyType(createWrongTable: Table => Table): Assertion =
     assertErrorsOnWrongTableDefinition(
       createWrongTable,
       message =
-        "One or more parameter values were invalid: Condition parameter type does not match schema type")
+        "Type mismatch for attribute to update")
 }

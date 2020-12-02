@@ -80,7 +80,7 @@ class DynamoHashRangeReadableTest
       it("range key is missing") {
         assertErrorsOnWrongTableDefinition(
           table => createTableWithHashKey(table),
-          message = "Query key condition not supported"
+          message = "The number of conditions on the keys is invalid"
         )
       }
     }
