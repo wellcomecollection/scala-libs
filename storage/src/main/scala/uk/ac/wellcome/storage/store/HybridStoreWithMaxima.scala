@@ -13,8 +13,7 @@ trait HybridStoreWithMaxima[Id, V, TypedStoreId, T]
   override def max(id: Id): MaxEither =
     indexedStore
       .max(id)
-      .map { case Identified(Version(_, version), typedStoreId) => (version, typedStoreId) }
-      .flatMap { case (version, typedStoreId) =>
+      .flatMap { case Identified(Version(_, version), typedStoreId) =>
         typedStore
           .get(typedStoreId)
           .map { case Identified(_, t) => Identified(Version(id, version), t) }
