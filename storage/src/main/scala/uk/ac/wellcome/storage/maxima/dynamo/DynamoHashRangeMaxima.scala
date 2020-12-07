@@ -5,7 +5,12 @@ import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.maxima.Maxima
-import uk.ac.wellcome.storage.{Identified, MaximaReadError, NoMaximaValueError, Version}
+import uk.ac.wellcome.storage.{
+  Identified,
+  MaximaReadError,
+  NoMaximaValueError,
+  Version
+}
 
 import scala.util.{Failure, Success, Try}
 
@@ -14,7 +19,8 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
 
   implicit protected val formatHashKey: DynamoFormat[HashKey]
   implicit protected val formatRangeKey: DynamoFormat[RangeKey]
-  implicit protected val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]]
+  implicit protected val format: DynamoFormat[
+    DynamoHashRangeEntry[HashKey, RangeKey, T]]
 
   protected val client: AmazonDynamoDB
   protected val table: Table[DynamoHashRangeEntry[HashKey, RangeKey, T]]

@@ -2,11 +2,7 @@ package uk.ac.wellcome.storage.maxima.memory
 
 import uk.ac.wellcome.storage.maxima.Maxima
 import uk.ac.wellcome.storage.store.memory.MemoryStoreBase
-import uk.ac.wellcome.storage.{
-  Identified,
-  NoMaximaValueError,
-  Version
-}
+import uk.ac.wellcome.storage.{Identified, NoMaximaValueError, Version}
 
 trait MemoryMaxima[Id, T]
     extends Maxima[Id, Version[Id, Int], T]

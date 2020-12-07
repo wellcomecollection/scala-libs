@@ -22,7 +22,8 @@ class VersionedStore[Id, V, T](
   private def increment(v: V): V = N.plus(v, N.one)
 
   private def nextVersionFor(id: Id): Either[ReadError, V] =
-    store.max(id)
+    store
+      .max(id)
       .map { case Identified(Version(_, version), _) => increment(version) }
 
   private val matchErrors: PartialFunction[
@@ -86,11 +87,10 @@ class VersionedStore[Id, V, T](
     }
 
   def getLatest(id: Id): ReadEither =
-    store.max(id)
-      .left.map {
-        case NoMaximaValueError(_) => NoVersionExistsError()
-        case err => err
-      }
+    store.max(id).left.map {
+      case NoMaximaValueError(_) => NoVersionExistsError()
+      case err                   => err
+    }
 
   def put(id: Version[Id, V])(t: T): WriteEither =
     store.max(id.id) match {
