@@ -12,7 +12,7 @@ trait MaximaTestCases
     with Matchers
     with RecordGenerators
     with EitherValues {
-  type MaximaStub = Maxima[IdentityKey, Int]
+  type MaximaStub = Maxima[IdentityKey, Version[IdentityKey, Int], Record]
 
   def withMaxima[R](initialEntries: Map[Version[IdentityKey, Int], Record])(
     testWith: TestWith[MaximaStub, R]): R

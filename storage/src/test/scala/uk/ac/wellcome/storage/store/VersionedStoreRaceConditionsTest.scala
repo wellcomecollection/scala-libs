@@ -31,8 +31,10 @@ class VersionedStoreRaceConditionsTest
 
     // The two stores share their entries, but we want to gate the calls
     // to max() in this store.
-    private val stoppingStore = new Store[Version[String, Int], String] with Maxima[String, Int] {
-      override def max(id: String): Either[MaximaError, Int] = {
+    // TODO: Don't use string as the value in this store.
+    private val stoppingStore = new Store[Version[String, Int], String]
+        with Maxima[String, Version[String, Int], String] {
+      override def max(id: String): MaxEither = {
         debug(s"Calling max(id = $id)")
         debug(s"max: actualMaxCalls = $actualMaxCalls, allowedMaxCalls = $allowedMaxCalls")
         while (allowedMaxCalls <= actualMaxCalls) {

@@ -24,7 +24,7 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
     with DynamoHashRangeMaxima[
       HashKey,
       RangeKey,
-      DynamoHashRangeEntry[HashKey, RangeKey, T]] {
+      T] {
 
   override protected val table =
     Table[DynamoHashRangeEntry[HashKey, RangeKey, T]](config.tableName)
@@ -40,10 +40,10 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
 ) extends Store[Version[HashKey, V], T]
     with DynamoHashReadable[HashKey, V, T]
     with DynamoHashWritable[HashKey, V, T]
-    with Maxima[HashKey, V] {
-  override def max(hashKey: HashKey): Either[ReadError, V] =
-    getEntry(hashKey).map { _.version } match {
-      case Right(value)               => Right(value)
+    with Maxima[HashKey, Version[HashKey, V], T] {
+  override def max(hashKey: HashKey): MaxEither =
+    getEntry(hashKey) match {
+      case Right(value)               => Right(Identified(Version(value.hashKey, value.version), value.payload))
       case Left(_: DoesNotExistError) => Left(NoMaximaValueError())
       case Left(err)                  => Left(err)
     }

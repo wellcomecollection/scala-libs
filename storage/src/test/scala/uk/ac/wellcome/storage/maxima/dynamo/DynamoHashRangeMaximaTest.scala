@@ -33,7 +33,7 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
       implicit val formatHashKey: DynamoFormat[IdentityKey],
       implicit val formatRangeKey: DynamoFormat[Int],
       implicit val format: DynamoFormat[Entry]
-    ) extends DynamoHashRangeMaxima[IdentityKey, Int, Entry] {
+    ) extends DynamoHashRangeMaxima[IdentityKey, Int, Record] {
       val table = ScanamoTable[Entry](dynamoTable.name)
 
       val client: AmazonDynamoDB = dynamoClient
