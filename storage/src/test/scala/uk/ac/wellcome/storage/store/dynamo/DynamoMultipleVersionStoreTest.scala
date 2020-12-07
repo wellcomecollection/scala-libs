@@ -73,12 +73,20 @@ class DynamoMultipleVersionStoreTest
     initialEntries: Map[Version[String, Int], Record])(
     testWith: TestWith[VersionedStoreImpl, R]): R =
     withLocalDynamoDbTable { table =>
-      val store = new DynamoStoreStub(
-        config = createDynamoConfigWith(table)
-      ) {
+      val config = createDynamoConfigWith(table)
+
+      val underlying =
+        new DynamoHashRangeStore[String, Int, Record](config) {
+          override def max(hashKey: String): MaxEither =
+            Left(StoreReadError(new Error("BOOM!")))
+        }
+
+      val store = new DynamoStoreStub(config) {
         override def get(id: Version[String, Int]): ReadEither = {
           Left(StoreReadError(new Error("BOOM!")))
         }
+
+        override val store = underlying
       }
 
       insertEntries(table)(initialEntries)
