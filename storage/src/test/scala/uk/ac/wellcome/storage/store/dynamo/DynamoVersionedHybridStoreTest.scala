@@ -6,8 +6,8 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.{DynamoFixtures, S3Fixtures}
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
 import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 
@@ -26,21 +26,30 @@ class DynamoVersionedHybridStoreTest
     createTableWithHashRangeKey(table)
 
   override def withFailingGetVersionedStore[R](initialEntries: Entries)(
-    testWith: TestWith[VersionedStoreImpl, R]): R = {
-    withVersionedStoreContext { storeContext =>
-      initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).value
-      }
+    testWith: TestWith[VersionedStoreImpl, R]): R =
+    withTypedStoreAndPrefix { case (typedStore, prefix) =>
+      withIndexedStore { indexedStore =>
+        val store =
+          new DynamoHybridStoreWithMaxima[
+            String,
+            Int,
+            Record](prefix)(indexedStore, typedStore) {
+            override def max(id: String): MaxEither =
+              Left(StoreReadError(new Error("BOOM!")))
+          }
 
-      val vhs = new DynamoVersionedStoreImpl(storeContext) {
-        override def get(id: Version[String, Int]): ReadEither = {
-          Left(StoreReadError(new Error("BOOM!")))
+        initialEntries.map {
+          case (k, v) => store.put(k)(v).value
         }
-      }
 
-      testWith(vhs)
+        val vhs = new DynamoVersionedStoreImpl(store) {
+          override def get(id: Version[String, Int]): ReadEither =
+            Left(StoreReadError(new Error("BOOM!")))
+        }
+
+        testWith(vhs)
+      }
     }
-  }
 
   override def withFailingPutVersionedStore[R](initialEntries: Entries)(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
@@ -77,21 +86,32 @@ class DynamoVersionedHybridStoreTest
         storeContext))
   }
 
+  private def withTypedStoreAndPrefix[R](
+    testWith: TestWith[(S3TypedStore[Record], S3ObjectLocationPrefix), R]
+ ): R =
+    withLocalS3Bucket { bucket =>
+      val prefix = createS3ObjectLocationPrefixWith(bucket)
+
+      testWith((S3TypedStore[Record], prefix))
+    }
+
+  private def withIndexedStore[R](
+    testWith: TestWith[DynamoHashRangeStore[String, Int, S3ObjectLocation], R]
+  ): R =
+    withLocalDynamoDbTable { table =>
+      val dynamoConfig = DynamoConfig(table.name, table.index)
+
+      val indexedStore =
+        new DynamoHashRangeStore[String, Int, S3ObjectLocation](
+          dynamoConfig)
+
+      testWith(indexedStore)
+    }
+
   override def withVersionedStoreContext[R](
     testWith: TestWith[DynamoHybridStoreWithMaxima[String, Int, Record], R]): R =
-    withLocalS3Bucket { bucket =>
-      withLocalDynamoDbTable { table =>
-        val streamStore = new S3StreamStore()
-        val typedStore = new S3TypedStore[Record]()(codec, streamStore)
-
-        val dynamoConfig = DynamoConfig(table.name, table.index)
-
-        val indexedStore =
-          new DynamoHashRangeStore[String, Int, S3ObjectLocation](
-            dynamoConfig)
-
-        val prefix = createS3ObjectLocationPrefixWith(bucket)
-
+    withTypedStoreAndPrefix { case (typedStore, prefix) =>
+      withIndexedStore { indexedStore =>
         testWith(
           new DynamoHybridStoreWithMaxima[
             String,

@@ -6,7 +6,7 @@ import uk.ac.wellcome.storage.maxima.memory.MemoryMaxima
 import uk.ac.wellcome.storage.store.VersionedStore
 
 class MemoryVersionedStore[Id, T](
-  store: MemoryStore[Version[Id, Int], T] with Maxima[Id, Int]
+  store: MemoryStore[Version[Id, Int], T] with Maxima[Id, Version[Id, Int], T]
 ) extends VersionedStore[Id, Int, T](store)
 
 object MemoryVersionedStore {

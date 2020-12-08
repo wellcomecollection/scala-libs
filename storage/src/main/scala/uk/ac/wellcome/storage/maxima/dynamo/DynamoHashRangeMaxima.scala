@@ -3,30 +3,36 @@ package uk.ac.wellcome.storage.maxima.dynamo
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
-import uk.ac.wellcome.storage.dynamo.DynamoHashRangeKeyPair
+import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.maxima.Maxima
-import uk.ac.wellcome.storage.{MaximaError, MaximaReadError, NoMaximaValueError}
+import uk.ac.wellcome.storage.{
+  Identified,
+  MaximaReadError,
+  NoMaximaValueError,
+  Version
+}
 
 import scala.util.{Failure, Success, Try}
 
-trait DynamoHashRangeMaxima[
-  HashKey, RangeKey, Row <: DynamoHashRangeKeyPair[HashKey, RangeKey]]
-    extends Maxima[HashKey, RangeKey] {
+trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
+    extends Maxima[HashKey, Version[HashKey, RangeKey], T] {
 
   implicit protected val formatHashKey: DynamoFormat[HashKey]
   implicit protected val formatRangeKey: DynamoFormat[RangeKey]
-  implicit protected val format: DynamoFormat[Row]
+  implicit protected val format: DynamoFormat[
+    DynamoHashRangeEntry[HashKey, RangeKey, T]]
 
   protected val client: AmazonDynamoDB
-  protected val table: Table[Row]
+  protected val table: Table[DynamoHashRangeEntry[HashKey, RangeKey, T]]
 
-  override def max(hashKey: HashKey): Either[MaximaError, RangeKey] = {
+  override def max(hashKey: HashKey): MaxEither = {
     val ops = table.descending
       .limit(1)
       .query('id -> hashKey)
 
     Try(Scanamo(client).exec(ops)) match {
-      case Success(List(Right(entry))) => Right(entry.rangeKey)
+      case Success(List(Right(row))) =>
+        Right(Identified(Version(row.hashKey, row.rangeKey), row.payload))
       case Success(List(Left(err))) =>
         val error = new Error(s"DynamoReadError: ${err.toString}")
         Left(MaximaReadError(error))

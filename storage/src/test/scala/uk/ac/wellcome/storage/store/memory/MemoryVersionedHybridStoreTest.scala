@@ -15,20 +15,30 @@ class MemoryVersionedHybridStoreTest
 
   override def withFailingGetVersionedStore[R](initialEntries: Entries)(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
-    withVersionedStoreContext { storeContext =>
-      initialEntries.map {
-        case (k, v) => storeContext.put(k)(v).value
+    implicit val indexedStore: MemoryStore[Version[String, Int], String] with MemoryMaxima[String, String] =
+      new MemoryStore[Version[String, Int], String](Map.empty)
+        with MemoryMaxima[String, String]
+
+    implicit val typedStore: MemoryTypedStore[String, Record] =
+      MemoryTypedStore[String, Record](initialEntries = Map.empty)
+
+    val store = new MemoryHybridStoreWithMaxima[String, Record]() {
+      override def max(id: String): MaxEither =
+        Left(StoreReadError(new Error("BOOM!")))
+    }
+
+    initialEntries.map {
+      case (k, v) => store.put(k)(v).value
+    }
+
+    val versionedHybridStore =
+      new MemoryVersionedHybridStore[String, Record](store) {
+        override def get(id: Version[String, Int]): ReadEither = {
+          Left(StoreReadError(new Error("BOOM!")))
+        }
       }
 
-      val versionedHybridStore =
-        new MemoryVersionedHybridStore[String, Record](storeContext) {
-          override def get(id: Version[String, Int]): ReadEither = {
-            Left(StoreReadError(new Error("BOOM!")))
-          }
-        }
-
-      testWith(versionedHybridStore)
-    }
+    testWith(versionedHybridStore)
   }
 
   override def withFailingPutVersionedStore[R](initialEntries: Entries)(
@@ -68,20 +78,14 @@ class MemoryVersionedHybridStoreTest
   override def withVersionedStoreContext[R](
     testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R])
     : R = {
-    val indexedStore = new MemoryStore[Version[String, Int], String](Map.empty)
-    with MemoryMaxima[String, String]
+    implicit val indexedStore: MemoryStore[Version[String, Int], String] with MemoryMaxima[String, String] =
+      new MemoryStore[Version[String, Int], String](Map.empty)
+        with MemoryMaxima[String, String]
 
-    val memoryStoreForStreamStore =
-      new MemoryStore[String, Array[Byte]](Map.empty)
-    val streamStore = new MemoryStreamStore[String](memoryStoreForStreamStore)
-    val typedStore =
-      new MemoryTypedStore[String, Record](Map.empty)(streamStore, codec)
+    implicit val typedStore: MemoryTypedStore[String, Record] =
+      MemoryTypedStore[String, Record](initialEntries = Map.empty)
 
-    testWith(
-      new MemoryHybridStoreWithMaxima[String, Record]()(
-        typedStore,
-        indexedStore,
-        codec))
+    testWith(new MemoryHybridStoreWithMaxima[String, Record]())
   }
 
   override def createT: Record = createRecord

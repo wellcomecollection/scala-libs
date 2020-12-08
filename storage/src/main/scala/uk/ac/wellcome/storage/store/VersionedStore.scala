@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.maxima.Maxima
 import scala.util.{Failure, Success, Try}
 
 class VersionedStore[Id, V, T](
-  val store: Store[Version[Id, V], T] with Maxima[Id, V]
+  val store: Store[Version[Id, V], T] with Maxima[Id, Version[Id, V], T]
 )(implicit N: Numeric[V], O: Ordering[V])
     extends Store[Version[Id, V], T]
     with Logging {
@@ -22,7 +22,9 @@ class VersionedStore[Id, V, T](
   private def increment(v: V): V = N.plus(v, N.one)
 
   private def nextVersionFor(id: Id): Either[ReadError, V] =
-    store.max(id).map(increment)
+    store
+      .max(id)
+      .map { case Identified(Version(_, version), _) => increment(version) }
 
   private val matchErrors: PartialFunction[
     StorageEither,
@@ -85,22 +87,19 @@ class VersionedStore[Id, V, T](
     }
 
   def getLatest(id: Id): ReadEither =
-    store.max(id) match {
-      case Right(v) => get(Version(id, v))
-      case Left(NoMaximaValueError(_)) =>
-        Left(NoVersionExistsError())
-      case Left(err) => Left(err)
+    store.max(id).left.map {
+      case NoMaximaValueError(_) => NoVersionExistsError()
+      case err                   => err
     }
 
   def put(id: Version[Id, V])(t: T): WriteEither =
     store.max(id.id) match {
-      case Right(latestV) if O.gt(latestV, id.version) =>
+      case Right(latest) if O.gt(latest.id.version, id.version) =>
         Left(HigherVersionExistsError())
-      case Right(latestV) if latestV == id.version =>
+      case Right(latest) if latest.id.version == id.version =>
         Left(VersionAlreadyExistsError())
       case _ =>
-        store
-          .put(id)(t)
+        store.put(id)(t)
     }
 
   def putLatest(id: Id)(t: T): WriteEither = {

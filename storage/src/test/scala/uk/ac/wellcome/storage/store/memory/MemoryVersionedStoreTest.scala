@@ -49,10 +49,11 @@ class MemoryVersionedStoreTest
     testWith: TestWith[VersionedStoreImpl, R]): R = {
     val store = new MemoryStore[Version[String, Int], Record](initialEntries)
     with MemoryMaxima[String, Record] {
-      override def get(id: Version[String, Int])
-        : Either[ReadError, Identified[Version[String, Int], Record]] = {
+      override def get(id: Version[String, Int]): ReadEither =
         Left(StoreReadError(new Error("BOOM!")))
-      }
+
+      override def max(id: String): MaxEither =
+        Left(StoreReadError(new Error("BOOM!")))
     }
     testWith(new MemoryVersionedStore(store))
   }

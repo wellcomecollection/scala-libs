@@ -2,11 +2,9 @@ package uk.ac.wellcome.storage.store.fixtures
 
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage._
-import uk.ac.wellcome.storage.maxima.Maxima
-import uk.ac.wellcome.storage.store.{Store, VersionedStore}
+import uk.ac.wellcome.storage.store.VersionedStore
 
 trait VersionedStoreFixtures[Id, V, T, VersionedStoreContext] {
-  type StoreWithMaximaImpl = Store[Version[Id, V], T] with Maxima[Id, V]
   type VersionedStoreImpl = VersionedStore[Id, V, T]
 
   type Entries = Map[Version[Id, V], T]
