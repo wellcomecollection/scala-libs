@@ -9,7 +9,7 @@ import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
-import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
 
 class DynamoVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[
@@ -35,7 +35,7 @@ class DynamoVersionedHybridStoreTest
             Int,
             Record](prefix)(indexedStore, typedStore) {
             override def max(id: String): MaxEither =
-              Left(StoreReadError(new Error("BOOM!")))
+              Left(MaximaReadError(new Error("BOOM!")))
           }
 
         initialEntries.map {
