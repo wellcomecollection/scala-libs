@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v25.0.1 - 2020-12-08
+
+The error type of Maxima.max() should be MaximaError, not ReadError.
+
 ## v25.0.0 - 2020-12-08
 
 This release changes the behaviour of Maxima to return an `Identified[_, _]`, rather than a single value.
