@@ -8,7 +8,7 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store._
-import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
 import org.scanamo.auto._
 
 class DynamoSingleVersionStoreTest
@@ -78,7 +78,7 @@ class DynamoSingleVersionStoreTest
       val underlying =
         new DynamoHashStore[String, Int, Record](config) {
           override def max(hashKey: String): MaxEither =
-            Left(StoreReadError(new Error("BOOM!")))
+            Left(MaximaReadError(new Error("BOOM!")))
         }
 
       val store = new DynamoStoreStub(config) {

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.memory
 
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.maxima.memory.MemoryMaxima
 import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
@@ -24,7 +24,7 @@ class MemoryVersionedHybridStoreTest
 
     val store = new MemoryHybridStoreWithMaxima[String, Record]() {
       override def max(id: String): MaxEither =
-        Left(StoreReadError(new Error("BOOM!")))
+        Left(MaximaReadError(new Error("BOOM!")))
     }
 
     initialEntries.map {

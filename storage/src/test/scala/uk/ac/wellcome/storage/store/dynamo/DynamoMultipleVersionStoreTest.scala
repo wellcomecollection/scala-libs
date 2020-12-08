@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.model.BatchWriteItemResult
 import org.scanamo.auto._
 import org.scanamo.{Table => ScanamoTable}
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
@@ -78,7 +78,7 @@ class DynamoMultipleVersionStoreTest
       val underlying =
         new DynamoHashRangeStore[String, Int, Record](config) {
           override def max(hashKey: String): MaxEither =
-            Left(StoreReadError(new Error("BOOM!")))
+            Left(MaximaReadError(new Error("BOOM!")))
         }
 
       val store = new DynamoStoreStub(config) {

@@ -53,7 +53,7 @@ class MemoryVersionedStoreTest
         Left(StoreReadError(new Error("BOOM!")))
 
       override def max(id: String): MaxEither =
-        Left(StoreReadError(new Error("BOOM!")))
+        Left(MaximaReadError(new Error("BOOM!")))
     }
     testWith(new MemoryVersionedStore(store))
   }

@@ -43,7 +43,7 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
       case Right(value) =>
         Right(Identified(Version(value.hashKey, value.version), value.payload))
       case Left(_: DoesNotExistError) => Left(NoMaximaValueError())
-      case Left(err)                  => Left(err)
+      case Left(err: ReadError)       => Left(MaximaReadError(err.e))
     }
 
   override protected val table =
