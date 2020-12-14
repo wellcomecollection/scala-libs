@@ -7,8 +7,8 @@ trait HybridStore[IndexedStoreId, TypedStoreId, T]
     extends Store[IndexedStoreId, T]
     with Logging {
 
-  implicit protected val indexedStore: Store[IndexedStoreId, TypedStoreId]
-  implicit protected val typedStore: TypedStore[TypedStoreId, T]
+  implicit val indexedStore: Store[IndexedStoreId, TypedStoreId]
+  implicit val typedStore: TypedStore[TypedStoreId, T]
 
   protected def createTypeStoreId(id: IndexedStoreId): TypedStoreId
 
