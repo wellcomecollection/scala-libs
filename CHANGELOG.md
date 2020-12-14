@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v25.0.3 - 2020-12-14
+
+Expose the underlying stores in a VersionedHybridStore and a HybridStore as public attributes.
+
 ## v25.0.2 - 2020-12-14
 
 Treat a `NativeIoException` when reading a blob from Azure as retryable.
