@@ -14,9 +14,10 @@ trait HybridStoreWithMaxima[Id, V, TypedStoreId, T]
     extends HybridStore[Version[Id, V], TypedStoreId, T]
     with Maxima[Id, Version[Id, V], T] {
 
-  override implicit val indexedStore: Store[
+  override implicit val indexedStore: Store[Version[Id, V], TypedStoreId] with Maxima[
+    Id,
     Version[Id, V],
-    TypedStoreId] with Maxima[Id, Version[Id, V], TypedStoreId]
+    TypedStoreId]
 
   override def max(id: Id): MaxEither =
     indexedStore
