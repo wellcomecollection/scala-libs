@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v25.0.2 - 2020-12-14
+
+Treat a `NativeIoException` when reading a blob from Azure as retryable.
+
 ## v25.0.1 - 2020-12-08
 
 The error type of Maxima.max() should be MaximaError, not ReadError.
