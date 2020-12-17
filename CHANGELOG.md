@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v25.0.4 - 2020-12-17
+
+### Libraries affected
+
+`messaging`
+
+### Description
+
+Log warning when receive throwable in SQSStream
+
 ## v25.0.3 - 2020-12-14
 
 Expose the underlying stores in a VersionedHybridStore and a HybridStore as public attributes.
