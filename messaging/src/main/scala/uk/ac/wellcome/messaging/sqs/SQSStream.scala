@@ -96,7 +96,9 @@ class SQSStream[T](
       logException(e)
       metricsSender.incrementCount(s"${metricName}_failure")
       Supervision.Resume
-    case _ => Supervision.Stop
+    case throwable =>
+      logger.warn(s"Recived throwable: $throwable. Shutting down.")
+      Supervision.Stop
   }
 
   private def logException(exception: Throwable): Unit = {
