@@ -79,6 +79,14 @@ class SQSStream[T](
       .toMat(sink)(Keep.right)
       .withAttributes(ActorAttributes.supervisionStrategy(decider(metricName)))
       .run()
+      .map { _ =>
+        logger.info("SQSStream finished processing messages.");
+        Done
+      }
+      .recover { case err =>
+        logger.info(s"SQSStream finished processing with error: $err");
+        Done
+      }
   }
 
   // Defines a "supervision strategy" -- this tells Akka how to react
