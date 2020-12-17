@@ -83,9 +83,10 @@ class SQSStream[T](
         logger.info("SQSStream finished processing messages.");
         Done
       }
-      .recover { case err =>
-        logger.info(s"SQSStream finished processing with error: $err");
-        Done
+      .recover {
+        case err =>
+          logger.info(s"SQSStream finished processing with error: $err");
+          Done
       }
   }
 
