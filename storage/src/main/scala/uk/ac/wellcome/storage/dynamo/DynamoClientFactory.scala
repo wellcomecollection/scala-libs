@@ -1,28 +1,27 @@
 package uk.ac.wellcome.storage.dynamo
 
-import software.amazon.awssdk.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import software.amazon.awssdk.client.builder.AwsClientBuilder.EndpointConfiguration
+import java.net.URI
+import software.amazon.awssdk.auth.credentials.{StaticCredentialsProvider, AwsBasicCredentials}
 import software.amazon.awssdk.services.dynamodb.{
   DynamoDbClient,
   DynamoDbClientBuilder
 }
+import software.amazon.awssdk.regions.Region
 
 object DynamoClientFactory {
   def create(region: String,
              endpoint: String,
              accessKey: String,
              secretKey: String): DynamoDbClient = {
-    val standardClient = DynamoDbClientBuilder.standard
+    val builder = DynamoDbClient.builder().region(Region.of(region))
     if (endpoint.isEmpty)
-      standardClient
-        .withRegion(region)
-        .build()
+      builder.build()
     else
-      standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
+      builder
+        .credentialsProvider(
+          StaticCredentialsProvider.create(
+            AwsBasicCredentials.create(accessKey, secretKey)))
+        .endpointOverride(URI.create(endpoint))
         .build()
   }
 }

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.s3
 
-import software.amazon.awssdk.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import software.amazon.awssdk.auth.credentials.{StaticCredentialsProvider, AwsBasicCredentials}
 import software.amazon.awssdk.client.builder.AwsClientBuilder.EndpointConfiguration
 import software.amazon.awssdk.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 
@@ -16,8 +16,8 @@ object S3ClientFactory {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)))
+        .withCredentials(new StaticCredentialsProvider(
+          new AwsBasicCredentials(accessKey, secretKey)))
         .withPathStyleAccessEnabled(true)
         .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
         .build()
