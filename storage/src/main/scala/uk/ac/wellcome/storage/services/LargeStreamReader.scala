@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
   *
   * For example, from S3:
   *
-  *     com.amazonaws.SdkClientException: Data read has a different length than the expected:
+  *     software.amazon.awssdk.SdkClientException: Data read has a different length than the expected:
   *     dataLength=1234; expectedLength=56789
   *
   * and Azure:

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.BatchWriteItemResult
+import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemResult
 import org.scanamo.{Table => ScanamoTable}
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry

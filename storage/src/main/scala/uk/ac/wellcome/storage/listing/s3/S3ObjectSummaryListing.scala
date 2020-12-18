@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.listing.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.iterable.S3Objects
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.iterable.S3Objects
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.s3.S3ObjectLocationPrefix

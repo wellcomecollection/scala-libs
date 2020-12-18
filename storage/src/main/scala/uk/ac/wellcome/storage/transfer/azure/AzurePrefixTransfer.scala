@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.transfer.azure
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import uk.ac.wellcome.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import uk.ac.wellcome.storage.listing.Listing
 import uk.ac.wellcome.storage.listing.s3.S3ObjectSummaryListing

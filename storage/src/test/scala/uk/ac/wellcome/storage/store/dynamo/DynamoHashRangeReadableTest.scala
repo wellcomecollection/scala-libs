@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType
 import org.scanamo.{Table => ScanamoTable}
 import org.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, Version}
@@ -21,7 +21,7 @@ class DynamoHashRangeReadableTest
     initialEntries: Set[DynamoHashRangeEntry[String, Int, Record]])
     : DynamoReadableStub = {
     class DynamoHashRangeReadableImpl(
-      val client: AmazonDynamoDB,
+      val client: DynamoDbClient,
       val table: ScanamoTable[HashRangeEntry]
     )(
       implicit val formatHashKey: DynamoFormat[String],

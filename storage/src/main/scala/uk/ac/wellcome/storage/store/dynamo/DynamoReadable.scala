@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import org.scanamo.error.DynamoReadError
 import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
@@ -32,7 +32,7 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
   // See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
   protected val consistencyMode: ConsistencyMode = EventuallyConsistent
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   protected val table: Table[EntryType]
 
   protected def createKeyExpression(id: DynamoIdent): UniqueKey[_]

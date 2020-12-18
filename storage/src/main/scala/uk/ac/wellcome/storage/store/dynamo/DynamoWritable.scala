@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
 import org.scanamo.query._
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 
 sealed trait DynamoWritable[Ident, EntryType, T] extends Writable[Ident, T] {
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   protected val table: Table[EntryType]
 
   protected def parseEntry(entry: EntryType): T

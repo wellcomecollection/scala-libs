@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.locking.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
   ConditionalCheckFailedException,
   PutItemResult
 }
@@ -20,7 +20,7 @@ trait ScanamoHelpers[T] {
 
   implicit val df: DynamoFormat[T]
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   val scanamo = Scanamo(client)
 
   protected val table: ScanamoTable[T]

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.{AmazonDynamoDBException, ConditionalCheckFailedException, ResourceNotFoundException}
+import software.amazon.awssdk.services.dynamodb.model.{DynamoDBException, ConditionalCheckFailedException, ResourceNotFoundException}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
@@ -100,7 +100,7 @@ trait DynamoWritableTestCases[Ident, T, EntryType <: DynamoEntry[Ident, T]]
       val result = writable.put(id = Version(createId, 1))(createT)
 
       val err = result.left.value
-      err.e shouldBe a[AmazonDynamoDBException]
+      err.e shouldBe a[DynamoDBException]
       err.e.getMessage should startWith(message)
     }
 

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.maxima.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
@@ -22,7 +22,7 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
   implicit protected val format: DynamoFormat[
     DynamoHashRangeEntry[HashKey, RangeKey, T]]
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   protected val table: Table[DynamoHashRangeEntry[HashKey, RangeKey, T]]
 
   override def max(hashKey: HashKey): MaxEither = {
@@ -40,7 +40,7 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
       case Failure(err) => Left(MaximaReadError(err))
 
       // This case should be impossible to hit in practice -- limit(1)
-      // means we should only get a single result from DynamoDB.
+      // means we should only get a single result from DynamoDbClient.
       case result =>
         val error = new Error(
           s"Unknown error from Scanamo! $result"

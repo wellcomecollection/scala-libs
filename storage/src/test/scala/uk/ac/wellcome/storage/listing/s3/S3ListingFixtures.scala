@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.listing.s3
 
-import com.amazonaws.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.AmazonS3
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket

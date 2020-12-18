@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.listing.s3
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.SdkClientException
+import software.amazon.awssdk.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.listing.ListingTestCases

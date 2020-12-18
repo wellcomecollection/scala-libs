@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, ScalarAttributeType}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{GetItemRequest, ScalarAttributeType}
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
@@ -19,7 +19,7 @@ class DynamoHashReadableTest
   type HashEntry = DynamoHashEntry[String, Int, Record]
 
   class DynamoHashReadableImpl(
-    val client: AmazonDynamoDB,
+    val client: DynamoDbClient,
     val table: ScanamoTable[HashEntry],
     override val consistencyMode: ConsistencyMode = EventuallyConsistent
   )(
@@ -96,7 +96,7 @@ class DynamoHashReadableTest
 
   describe("observes the consistency setting") {
     it("the default is eventual consistency") {
-      val mockClient = mock[AmazonDynamoDB]
+      val mockClient = mock[DynamoDbClient]
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
@@ -112,7 +112,7 @@ class DynamoHashReadableTest
     }
 
     it("eventually consistent => consistent reads = false") {
-      val mockClient = mock[AmazonDynamoDB]
+      val mockClient = mock[DynamoDbClient]
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
@@ -128,7 +128,7 @@ class DynamoHashReadableTest
     }
 
     it("strongly consistent => consistent reads = true") {
-      val mockClient = mock[AmazonDynamoDB]
+      val mockClient = mock[DynamoDbClient]
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
@@ -143,7 +143,7 @@ class DynamoHashReadableTest
       }
     }
 
-    def getConsistentReadOnQuery(mockClient: AmazonDynamoDB): Boolean = {
+    def getConsistentReadOnQuery(mockClient: DynamoDbClient): Boolean = {
       val captor = ArgumentCaptor.forClass(classOf[GetItemRequest])
       Mockito.verify(mockClient).getItem(captor.capture())
       captor.getValue.getConsistentRead

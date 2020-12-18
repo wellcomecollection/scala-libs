@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import org.scanamo.{DynamoFormat, Table}
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.dynamo.{
@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.maxima.dynamo.DynamoHashRangeMaxima
 import uk.ac.wellcome.storage.store._
 
 class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
-  implicit val client: AmazonDynamoDB,
+  implicit val client: DynamoDbClient,
   val formatHashKey: DynamoFormat[HashKey],
   val formatRangeKey: DynamoFormat[RangeKey],
   val format: DynamoFormat[DynamoHashRangeEntry[HashKey, RangeKey, T]],
@@ -29,7 +29,7 @@ class DynamoHashRangeStore[HashKey, RangeKey, T](val config: DynamoConfig)(
 }
 
 class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
-  implicit val client: AmazonDynamoDB,
+  implicit val client: DynamoDbClient,
   val formatHashKey: DynamoFormat[HashKey],
   val formatV: DynamoFormat[V],
   val format: DynamoFormat[DynamoHashEntry[HashKey, V, T]],

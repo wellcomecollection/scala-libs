@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.transfer.azure
 
 import java.io.ByteArrayInputStream
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import com.azure.storage.blob.models.BlobRange
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil._

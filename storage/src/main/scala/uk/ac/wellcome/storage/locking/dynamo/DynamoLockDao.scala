@@ -4,8 +4,8 @@ import java.util.UUID
 
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{DeleteItemResult, PutItemResult}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
 import org.scanamo.semiauto._
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 class DynamoLockDao(
-  val client: AmazonDynamoDB,
+  val client: DynamoDbClient,
   config: DynamoLockDaoConfig
 )(implicit val ec: ExecutionContext)
     extends LockDao[String, UUID]

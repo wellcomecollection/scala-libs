@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.services.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.storage.ReadError
 import uk.ac.wellcome.storage.models.{ByteRange, ClosedByteRange, OpenByteRange}

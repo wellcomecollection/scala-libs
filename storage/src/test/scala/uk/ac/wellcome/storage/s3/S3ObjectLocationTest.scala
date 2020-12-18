@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.s3
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scanamo.auto._
@@ -41,7 +41,7 @@ class S3ObjectLocationTest
       }
     }
 
-    describe("DynamoDB") {
+    describe("DynamoDbClient") {
       case class IdentifiedLocation(
         id: String, location: S3ObjectLocation
       )
@@ -50,7 +50,7 @@ class S3ObjectLocationTest
         id = "cat", location = S3ObjectLocation(bucket = "my-bukkit", key = "cat.jpg")
       )
 
-      it("can store a location in DynamoDB") {
+      it("can store a location in DynamoDbClient") {
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = item)
 
@@ -58,7 +58,7 @@ class S3ObjectLocationTest
         }
       }
 
-      it("can retrieve an old-style location from DynamoDB") {
+      it("can retrieve an old-style location from DynamoDbClient") {
         case class OldLocation(namespace: String, path: String)
         case class OldItem(id: String, location: OldLocation)
 
@@ -168,7 +168,7 @@ class S3ObjectLocationTest
       }
     }
 
-    describe("DynamoDB") {
+    describe("DynamoDbClient") {
       case class IdentifiedLocation(
         id: String, location: S3ObjectLocationPrefix
       )
@@ -177,7 +177,7 @@ class S3ObjectLocationTest
         id = "cats", location = S3ObjectLocationPrefix(bucket = "my-bukkit", keyPrefix = "dir/of/cats")
       )
 
-      it("can store a location in DynamoDB") {
+      it("can store a location in DynamoDbClient") {
         withLocalDynamoDbTable { table =>
           putTableItem(table = table, item = item)
 
@@ -185,7 +185,7 @@ class S3ObjectLocationTest
         }
       }
 
-      it("can retrieve an old-style location from DynamoDB") {
+      it("can retrieve an old-style location from DynamoDbClient") {
         case class OldPrefix(namespace: String, path: String)
         case class OldItem(id: String, location: OldPrefix)
 

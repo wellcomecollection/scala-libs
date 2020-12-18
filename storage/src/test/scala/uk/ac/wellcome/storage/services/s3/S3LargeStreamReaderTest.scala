@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.services.s3
 
-import com.amazonaws.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import uk.ac.wellcome.fixtures.TestWith

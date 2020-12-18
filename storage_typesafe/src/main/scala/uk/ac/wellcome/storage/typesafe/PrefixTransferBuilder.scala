@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.typesafe
 
-import com.amazonaws.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.AmazonS3
 import com.typesafe.config.Config
 import uk.ac.wellcome.storage.transfer.s3.S3PrefixTransfer
 import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._

@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  AmazonDynamoDBException,
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDBException,
   ScalarAttributeType
 }
 import org.scalatest.OptionValues
@@ -27,7 +27,7 @@ class DynamoHashRangeWritableTest
   def createT: Record = createRecord
 
   class HashRangeWritableImpl(
-    val client: AmazonDynamoDB,
+    val client: DynamoDbClient,
     val table: ScanamoTable[HashRangeEntry]
   )(
     implicit val formatRangeKey: DynamoFormat[Int]
@@ -103,7 +103,7 @@ class DynamoHashRangeWritableTest
 
         val err = result.left.value
 
-        err.e shouldBe a[AmazonDynamoDBException]
+        err.e shouldBe a[DynamoDBException]
         err.e.getMessage should include(
           "Hash primary key values must be under 2048 bytes")
       }

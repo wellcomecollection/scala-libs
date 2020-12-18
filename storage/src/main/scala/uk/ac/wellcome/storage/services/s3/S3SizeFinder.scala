@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.services.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.services.SizeFinder

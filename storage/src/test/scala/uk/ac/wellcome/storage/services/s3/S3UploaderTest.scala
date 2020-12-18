@@ -4,7 +4,7 @@ import java.io.IOException
 import java.net.URL
 import java.util.Date
 
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.services.s3.model.AmazonS3Exception
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.storage._

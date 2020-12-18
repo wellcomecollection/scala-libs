@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.{AmazonDynamoDBException, ResourceNotFoundException}
+import software.amazon.awssdk.services.dynamodb.model.{DynamoDBException, ResourceNotFoundException}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
@@ -78,7 +78,7 @@ trait DynamoReadableTestCases[
       }
     }
 
-    it("fails if DynamoDB has an error") {
+    it("fails if DynamoDbClient has an error") {
       val readable = createDynamoReadableWith(nonExistentTable)
 
       val result = readable.get(Version(randomAlphanumeric(), 1))
@@ -121,7 +121,7 @@ trait DynamoReadableTestCases[
       val result = readable.get(id = Version(randomAlphanumeric(), 1))
 
       val err = result.left.value
-      err.e shouldBe a[AmazonDynamoDBException]
+      err.e shouldBe a[DynamoDBException]
       err.e.getMessage should startWith(message)
     }
 

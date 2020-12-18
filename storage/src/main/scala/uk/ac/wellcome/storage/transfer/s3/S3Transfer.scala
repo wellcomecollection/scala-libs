@@ -2,9 +2,9 @@ package uk.ac.wellcome.storage.transfer.s3
 
 import java.io.InputStream
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
-import com.amazonaws.services.s3.transfer.{
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.{CopyObjectRequest, ObjectTagging}
+import software.amazon.awssdk.services.s3.transfer.{
   Copy,
   TransferManager,
   TransferManagerBuilder

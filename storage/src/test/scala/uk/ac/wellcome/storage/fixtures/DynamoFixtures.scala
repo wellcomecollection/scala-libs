@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.fixtures
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model._
+import software.amazon.awssdk.services.dynamodb.util.TableUtils.waitUntilActive
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scanamo.error.DynamoReadError
@@ -31,7 +31,7 @@ trait DynamoFixtures
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  implicit val dynamoClient: AmazonDynamoDB = DynamoClientFactory.create(
+  implicit val dynamoClient: DynamoDbClient = DynamoClientFactory.create(
     region = regionName,
     endpoint = dynamoDBEndPoint,
     accessKey = accessKey,
@@ -47,7 +47,7 @@ trait DynamoFixtures
     )
 
   def withSpecifiedLocalDynamoDbTable[R](
-    createTable: AmazonDynamoDB => Table): Fixture[Table, R] =
+    createTable: DynamoDbClient => Table): Fixture[Table, R] =
     fixture[Table, R](
       create = createTable(dynamoClient),
       destroy = { table =>

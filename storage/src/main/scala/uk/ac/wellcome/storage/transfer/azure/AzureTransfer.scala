@@ -3,8 +3,8 @@ package uk.ac.wellcome.storage.transfer.azure
 import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URL
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{S3ObjectInputStream, S3ObjectSummary}
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.{S3ObjectInputStream, S3ObjectSummary}
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{
   BlobRange,

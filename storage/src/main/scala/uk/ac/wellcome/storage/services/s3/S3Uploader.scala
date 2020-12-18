@@ -3,9 +3,9 @@ package uk.ac.wellcome.storage.services.s3
 import java.net.URL
 import java.util
 
-import com.amazonaws.HttpMethod
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
+import software.amazon.awssdk.HttpMethod
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model.GeneratePresignedUrlRequest
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.store.s3.S3StreamStore

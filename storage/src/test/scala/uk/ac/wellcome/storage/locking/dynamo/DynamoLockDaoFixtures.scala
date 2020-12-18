@@ -3,9 +3,9 @@ package uk.ac.wellcome.storage.locking.dynamo
 import java.time.Duration
 import java.util.UUID
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model._
+import software.amazon.awssdk.services.dynamodb.util.TableUtils.waitUntilActive
 import org.scalatest.Assertion
 import org.scanamo.auto._
 import uk.ac.wellcome.fixtures.TestWith
@@ -40,7 +40,7 @@ trait DynamoLockDaoFixtures
     scanTable[ExpiringLock](lockTable) shouldBe empty
 
   def withLockDao[R](
-    dynamoClient: AmazonDynamoDB,
+    dynamoClient: DynamoDbClient,
     lockTable: Table,
     seconds: Int = 180)(testWith: TestWith[DynamoLockDao, R]): R = {
     val rowLockDaoConfig = DynamoLockDaoConfig(
@@ -56,7 +56,7 @@ trait DynamoLockDaoFixtures
     testWith(dynamoLockDao)
   }
 
-  def withLockDao[R](dynamoDbClient: AmazonDynamoDB)(
+  def withLockDao[R](dynamoDbClient: DynamoDbClient)(
     testWith: TestWith[DynamoLockDao, R]): R =
     withLocalDynamoDbTable { lockTable =>
       withLockDao(dynamoDbClient, lockTable) { lockDao =>

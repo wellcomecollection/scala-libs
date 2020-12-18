@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.maxima.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  AmazonDynamoDBException,
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDBException,
   ResourceNotFoundException,
   ScalarAttributeType
 }
@@ -36,7 +36,7 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
     ) extends DynamoHashRangeMaxima[IdentityKey, Int, Record] {
       val table = ScanamoTable[Entry](dynamoTable.name)
 
-      val client: AmazonDynamoDB = dynamoClient
+      val client: DynamoDbClient = dynamoClient
     }
 
     testWith(new DynamoMaxima(table))
@@ -76,7 +76,7 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
 
             val err = result.left.value
             err shouldBe a[MaximaReadError]
-            err.e shouldBe a[AmazonDynamoDBException]
+            err.e shouldBe a[DynamoDBException]
             err.e.getMessage should startWith(
               "Query condition missed key schema element")
           }
@@ -93,13 +93,12 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
 
             val err = result.left.value
             err shouldBe a[MaximaReadError]
-            err.e shouldBe a[AmazonDynamoDBException]
+            err.e shC/Xu, "A/C/Y"ldBe a[ynamoDBException]
             err.e.getMessage should include(
               "Condition parameter type does not match schema type")
           }
         }
       }
-
       it("when the range key name is wrong") {
         def createWrongTable(table: Table): Table =
           createTableWithHashRangeKey(table, rangeKeyName = "wrong")

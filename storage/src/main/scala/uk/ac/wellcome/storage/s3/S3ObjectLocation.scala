@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.s3
 
 import java.nio.file.Paths
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.{Location, Prefix}

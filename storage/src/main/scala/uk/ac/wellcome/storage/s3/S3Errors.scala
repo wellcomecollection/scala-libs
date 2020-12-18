@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.s3
 
 import java.net.SocketTimeoutException
 
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.services.s3.model.AmazonS3Exception
 import uk.ac.wellcome.storage.{
   DoesNotExistError,
   ReadError,

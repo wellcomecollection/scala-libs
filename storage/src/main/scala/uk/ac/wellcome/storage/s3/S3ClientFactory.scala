@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.s3
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import software.amazon.awssdk.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import software.amazon.awssdk.client.builder.AwsClientBuilder.EndpointConfiguration
+import software.amazon.awssdk.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 
 object S3ClientFactory {
   def create(region: String,

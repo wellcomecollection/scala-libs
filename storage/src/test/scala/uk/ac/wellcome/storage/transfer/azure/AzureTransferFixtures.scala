@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.transfer.azure
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.model.S3ObjectSummary
 import uk.ac.wellcome.fixtures.RandomGenerators
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 

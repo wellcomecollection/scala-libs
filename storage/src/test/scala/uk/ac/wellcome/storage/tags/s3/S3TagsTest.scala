@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.tags.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model._
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.model._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing

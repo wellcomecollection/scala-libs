@@ -1,8 +1,8 @@
 package uk.ac.wellcome.storage.fixtures
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.iterable.S3Objects
-import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, S3ObjectSummary}
+import software.amazon.awssdk.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.iterable.S3Objects
+import software.amazon.awssdk.services.s3.model.{ObjectMetadata, PutObjectRequest, S3ObjectSummary}
 import grizzled.slf4j.Logging
 import io.circe.parser.parse
 import io.circe.{Decoder, Json}

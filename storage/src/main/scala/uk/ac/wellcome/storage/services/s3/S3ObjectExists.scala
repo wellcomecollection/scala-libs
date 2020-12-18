@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.services.s3
 
-import com.amazonaws.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.AmazonS3
 import uk.ac.wellcome.storage.StoreReadError
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.services.ObjectExists
