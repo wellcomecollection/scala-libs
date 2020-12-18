@@ -38,6 +38,7 @@ trait MetricsProcessor {
             Instant.now()
           )
           .getSeconds
+          .toDouble
       )
 
     Future

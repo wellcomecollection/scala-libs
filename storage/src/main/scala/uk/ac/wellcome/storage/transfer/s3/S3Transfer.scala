@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.s3.{S3Errors, S3ObjectLocation}
 import uk.ac.wellcome.storage.store.s3.{S3StreamReadable, S3StreamStore}
 import uk.ac.wellcome.storage.transfer._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)

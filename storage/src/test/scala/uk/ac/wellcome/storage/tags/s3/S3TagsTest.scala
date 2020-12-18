@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.tags.{Tags, TagsTestCases}
 import uk.ac.wellcome.storage.UpdateWriteError
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLocation, Bucket] with S3Fixtures with MockitoSugar {
   // We can associate with at most 10 tags on an object; see

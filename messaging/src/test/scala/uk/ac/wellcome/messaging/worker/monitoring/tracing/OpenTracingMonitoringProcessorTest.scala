@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.fixtures.monitoring.tracing.TracingFixtures
 import uk.ac.wellcome.messaging.fixtures.worker.WorkerFixtures
 import uk.ac.wellcome.messaging.worker.models.MonitoringProcessorFailure
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class OpenTracingMonitoringProcessorTest
     extends AnyFunSpec

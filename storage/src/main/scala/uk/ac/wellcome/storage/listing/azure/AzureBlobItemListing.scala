@@ -8,7 +8,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.azure.AzureBlobLocationPrefix
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 class AzureBlobItemListing(implicit blobClient: BlobServiceClient)

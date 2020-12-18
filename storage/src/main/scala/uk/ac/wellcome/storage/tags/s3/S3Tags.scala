@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.store.RetryableReadable
 import uk.ac.wellcome.storage.tags.Tags
 import uk.ac.wellcome.storage._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)

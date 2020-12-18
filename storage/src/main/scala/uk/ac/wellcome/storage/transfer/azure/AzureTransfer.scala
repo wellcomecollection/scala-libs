@@ -22,7 +22,7 @@ import uk.ac.wellcome.storage.services.s3.{S3RangedReader, S3Uploader}
 import uk.ac.wellcome.storage.transfer._
 import uk.ac.wellcome.storage.{RetryableError, StoreWriteError}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 

@@ -116,7 +116,7 @@ class SQSStream[T](
         logger.warn(s"Recognised failure: ${exception.getMessage}")
       case exception: JsonDecodingError =>
         logger.warn(s"JSON decoding error: ${exception.getMessage}")
-      case exception: Exception =>
+      case exception =>
         logger.error(
           s"Unrecognised failure while: ${exception.getMessage}",
           exception)

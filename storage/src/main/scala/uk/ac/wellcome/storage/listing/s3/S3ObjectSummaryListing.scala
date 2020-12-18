@@ -7,7 +7,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ListingFailure
 import uk.ac.wellcome.storage.s3.S3ObjectLocationPrefix
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3ObjectSummaryListing(batchSize: Int = 1000)(

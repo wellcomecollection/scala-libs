@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.streaming.Codec._
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object S3Fixtures {
   class Bucket(val name: String) extends AnyVal {

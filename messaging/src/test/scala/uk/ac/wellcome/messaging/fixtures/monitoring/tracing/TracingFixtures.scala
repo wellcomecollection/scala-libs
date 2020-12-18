@@ -10,7 +10,7 @@ import uk.ac.wellcome.messaging.worker.monitoring.tracing.{
   OpenTracingSpanSerializer
 }
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
 trait TracingFixtures extends Matchers { this: Suite =>

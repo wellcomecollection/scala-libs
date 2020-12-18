@@ -73,7 +73,9 @@ trait Worker[Message,
         response.asInstanceOf[Action] match {
           case _: Retry     => retryAction(message)
           case _: Completed => completedAction(message)
+          case _ => ???
         }
+      case _ => ???
     }
 
 }

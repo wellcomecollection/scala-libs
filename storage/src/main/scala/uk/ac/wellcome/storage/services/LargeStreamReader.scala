@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.store.Readable
 import uk.ac.wellcome.storage.streaming.InputStreamWithLength
 import uk.ac.wellcome.storage.{Identified, ReadError}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /** If you hold open an InputStream for a long time, eventually the network times out
   * and you get an error.

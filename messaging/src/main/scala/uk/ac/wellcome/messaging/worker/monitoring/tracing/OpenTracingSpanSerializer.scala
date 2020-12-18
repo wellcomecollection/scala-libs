@@ -5,7 +5,7 @@ import java.util
 import io.opentracing.propagation.{Format, TextMapAdapter}
 import io.opentracing.{SpanContext, Tracer}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * This trait allows to send and receive information

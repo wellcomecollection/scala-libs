@@ -4,7 +4,7 @@ import co.elastic.apm.opentracing.ElasticApmTracer
 import com.typesafe.config.Config
 import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object ApmOpenTracingTracerBuilder {
   def buildCloudwatchMonitoringClient(config: Config): ElasticApmTracer = {
