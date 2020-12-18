@@ -7,10 +7,7 @@ object Dependencies {
     val elasticApm = "1.12.0"
 
     // Must match version used by Scanamo
-    val aws = "1.11.504"
-
-    // Moving what we can to version 2 of the AWS SDKs
-    val aws2 = "2.11.14"
+    val aws = "2.14.22"
 
     val azure = "12.7.0"
 
@@ -21,11 +18,9 @@ object Dependencies {
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0.0-M10"
+    val scanamo = "1.0-M13"
     val apacheCommons = "2.6"
-
-    // Provides slf4j-api
-    val grizzled = "1.3.2"
+    val grizzledSlf4j = "1.3.4"
   }
 
   val circeDependencies = Seq(
@@ -42,7 +37,7 @@ object Dependencies {
   )
 
   val sl4jDependencies = Seq(
-    "org.clapper" %% "grizzled-slf4j" % versions.grizzled
+    "org.clapper" %% "grizzled-slf4j" % versions.grizzledSlf4j
   )
 
   val loggingDependencies = Seq(
@@ -70,7 +65,6 @@ object Dependencies {
 
   val scanamoDependencies = Seq(
     "org.scanamo" %% "scanamo" % versions.scanamo,
-    "org.scanamo" %% "scanamo-time" % versions.scanamo
   )
 
   val openTracingDependencies = Seq(
@@ -84,13 +78,13 @@ object Dependencies {
   )
 
   val monitoringDependencies = Seq(
-    "software.amazon.awssdk" % "cloudwatch" % versions.aws2
+    "software.amazon.awssdk" % "cloudwatch" % versions.aws
   ) ++
     testDependencies
 
   val messagingDependencies = Seq(
-    "software.amazon.awssdk" % "sns" % versions.aws2,
-    "software.amazon.awssdk" % "sqs" % versions.aws2,
+    "software.amazon.awssdk" % "sns" % versions.aws,
+    "software.amazon.awssdk" % "sqs" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
     // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
@@ -117,8 +111,8 @@ object Dependencies {
 
   val storageDependencies: Seq[ModuleID] = Seq(
     "com.azure" % "azure-storage-blob" % versions.azure,
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
+    "software.amazon.awssdk" % "dynamodb" % versions.aws,
+    "software.amazon.awssdk" % "s3" % versions.aws,
   ) ++
     scanamoDependencies ++
     apacheCommons
