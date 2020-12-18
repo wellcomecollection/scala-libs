@@ -25,34 +25,30 @@ object EnrichConfig {
       System.exit(1)
     }
 
-    def getStringOption(path: String): Option[String] = {
+    def getStringOption(path: String): Option[String] =
       getPathValue(path) { cleanPath =>
         underlying.getString(cleanPath)
       }
-    }
 
-    def requireString(path: String): String = {
+    def requireString(path: String): String =
       getStringOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
           s"No value found for path ${cleanUpPath(path)}"
         )
       }
-    }
 
-    def getIntOption(path: String): Option[Int] = {
+    def getIntOption(path: String): Option[Int] =
       getPathValue(path) { cleanPath =>
         underlying.getInt(cleanPath)
       }
-    }
 
-    def requireInt(path: String): Int = {
+    def requireInt(path: String): Int =
       getIntOption(path) getOrElse {
         emergencyStop(path)
         throw new Throwable(
           s"No value found for path ${cleanUpPath(path)}"
         )
       }
-    }
   }
 }
