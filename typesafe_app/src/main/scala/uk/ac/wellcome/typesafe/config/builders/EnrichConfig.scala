@@ -26,8 +26,8 @@ object EnrichConfig {
     }
 
     def getStringOption(path: String): Option[String] =
-      getPathValue(path) { cleanPath =>
-        underlying.getString(cleanPath)
+      getPathValue(path) {
+        underlying.getString
       }
 
     def requireString(path: String): String =
@@ -39,8 +39,8 @@ object EnrichConfig {
       }
 
     def getIntOption(path: String): Option[Int] =
-      getPathValue(path) { cleanPath =>
-        underlying.getInt(cleanPath)
+      getPathValue(path) {
+        underlying.getInt
       }
 
     def requireInt(path: String): Int =
