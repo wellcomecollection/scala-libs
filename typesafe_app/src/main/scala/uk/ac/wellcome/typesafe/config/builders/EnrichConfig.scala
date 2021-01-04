@@ -50,5 +50,10 @@ object EnrichConfig {
           s"No value found for path ${cleanUpPath(path)}"
         )
       }
+
+    def getBooleanOption(path: String): Option[Boolean] =
+      getPathValue(path) {
+        underlying.getBoolean
+      }
   }
 }
