@@ -36,7 +36,6 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
     }
   }
 
-
   describe("getIntOption") {
     it("returns the value when a path is available") {
       val myConfig = ConfigFactory.parseString(configString)
@@ -48,6 +47,29 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
       val myConfig = ConfigFactory.parseString(configString)
 
       myConfig.getIntOption("example.config.nopath") shouldBe None
+    }
+  }
+
+  describe("getBooleanOption") {
+    val config = ConfigFactory.parseString(
+      """
+        |islander1 {
+        |  alwaysTellsTruth = true
+        |}
+        |islander2 {
+        |  alwaysTellsTruth = false
+        |}
+        |islander3 {}
+        |""".stripMargin
+    )
+
+    it("recognises true/false values") {
+      config.getBooleanOption("islander1.alwaysTellsTruth") shouldBe Some(true)
+      config.getBooleanOption("islander2.alwaysTellsTruth") shouldBe Some(false)
+    }
+
+    it("returns None for a missing value") {
+      config.getBooleanOption("islander3.alwaysTellsTruth") shouldBe None
     }
   }
 
