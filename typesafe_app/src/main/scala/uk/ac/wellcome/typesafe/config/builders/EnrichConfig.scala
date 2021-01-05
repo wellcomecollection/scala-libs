@@ -55,6 +55,16 @@ object EnrichConfig {
       }
     }
 
+    def getBooleanOption(path: String): Option[Boolean] =
+      getStringOption(path) match {
+        case None => None
+        case Some("true") => Some(true)
+        case Some("false") => Some(false)
+        case Some(value) => throw new Exception(
+          s"Expected 'true' or 'false', received '$value'"
+        )
+      }
+
     @deprecated(
       message =
         "This method may not work as expected and will be removed in a coming release!",
