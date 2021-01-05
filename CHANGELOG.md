@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v25.1.0 - 2021-01-05
+
+### Libraries affected
+
+`typesafe_app`
+
+### Description
+
+*   Remove some deprecated and now-unused methods on EnrichConfig
+*   Add a new getBooleanOption method to EnrichConfig
+
 ## v25.0.4 - 2020-12-17
 
 ### Libraries affected
