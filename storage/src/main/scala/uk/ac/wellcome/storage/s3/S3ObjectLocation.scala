@@ -107,8 +107,6 @@ trait S3Decodable {
       }
     }
 
-  case class OldLocation(namespace: String, path: String)
-
   def createDynamoFormat[T](
     decoder: (String, String) => T,
     keyField: String,
