@@ -4,10 +4,7 @@ import java.nio.file.Paths
 
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import io.circe.{Decoder, DecodingFailure, HCursor}
-import org.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.{Location, Prefix}
-
-import scala.util.{Failure, Success, Try}
 
 case class S3ObjectLocation(
   bucket: String,
@@ -106,30 +103,6 @@ trait S3Decodable {
         case (_, Left(decodingFailure)) => Left(decodingFailure)
       }
     }
-
-  case class OldLocation(namespace: String, path: String)
-
-  def createDynamoFormat[T](
-    decoder: (String, String) => T,
-    keyField: String,
-    encoder: T => Map[String, String]
-  ): DynamoFormat[T] =
-    DynamoFormat.coercedXmap[T, Map[String, String], Throwable](
-      read = { values: Map[String, String] =>
-        val oldStyle = Try { decoder(values("namespace"), values("path")) }
-        val newStyle = Try { decoder(values("bucket"), values(keyField)) }
-
-        (oldStyle, newStyle) match {
-          case (Success(location), _) => location
-          case (_, Success(location)) => location
-          case (_, Failure(err))      => throw err
-        }
-      }
-    )(
-      write = { t: T =>
-        encoder(t)
-      }
-    )
 }
 
 case object S3ObjectLocation extends S3Decodable {
@@ -138,15 +111,6 @@ case object S3ObjectLocation extends S3Decodable {
       (bucket: String, key: String) =>
         S3ObjectLocation(bucket = bucket, key = key)
     }
-
-  implicit val format: DynamoFormat[S3ObjectLocation] =
-    createDynamoFormat[S3ObjectLocation](
-      decoder = (bucket: String, key: String) =>
-        S3ObjectLocation(bucket = bucket, key = key),
-      keyField = "key",
-      encoder = (location: S3ObjectLocation) =>
-        Map("bucket" -> location.bucket, "key" -> location.key)
-    )
 
   def apply(summary: S3ObjectSummary): S3ObjectLocation =
     S3ObjectLocation(
@@ -161,13 +125,4 @@ case object S3ObjectLocationPrefix extends S3Decodable {
       (bucket: String, keyPrefix: String) =>
         S3ObjectLocationPrefix(bucket = bucket, keyPrefix = keyPrefix)
     }
-
-  implicit val format: DynamoFormat[S3ObjectLocationPrefix] =
-    createDynamoFormat[S3ObjectLocationPrefix](
-      decoder = (bucket: String, keyPrefix: String) =>
-        S3ObjectLocationPrefix(bucket = bucket, keyPrefix = keyPrefix),
-      keyField = "keyPrefix",
-      encoder = (location: S3ObjectLocationPrefix) =>
-        Map("bucket" -> location.bucket, "keyPrefix" -> location.keyPrefix)
-    )
 }
