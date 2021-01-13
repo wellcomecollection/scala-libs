@@ -5,7 +5,10 @@ import java.util.UUID
 import cats.data.EitherT
 import cats.implicits._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{BatchWriteItemResult, PutItemResult}
+import com.amazonaws.services.dynamodbv2.model.{
+  BatchWriteItemResult,
+  PutItemResult
+}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
 import org.scanamo.semiauto._
@@ -96,7 +99,8 @@ class DynamoLockDao(
       _ <- deleteLocks(rowLocks)
     } yield ()
 
-  private def deleteLocks(rowLocks: List[ExpiringLock]): Either[Throwable, Unit] =
+  private def deleteLocks(
+    rowLocks: List[ExpiringLock]): Either[Throwable, Unit] =
     Try {
       val ids = rowLocks.map { _.id }.toSet
       val ops = table.deleteAll('id -> ids)
@@ -109,7 +113,9 @@ class DynamoLockDao(
           throw new Throwable(s"Unable to unlock all locks in batch $rowLocks")
         }
       }
-    }.map { _ => () }.toEither
+    }.map { _ =>
+      ()
+    }.toEither
 
   private def queryLocks(contextId: ContextId) = Try {
     val queryT = EitherT(
