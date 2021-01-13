@@ -103,6 +103,21 @@ class DynamoLockDaoTest
       }
     }
 
+    it("can lock > 25 locks") {
+      // 25 is more than the BatchSize supported for a single BatchWriteItem
+      // operation in DynamoDB.
+      withLocalDynamoDbTable { lockTable =>
+        withLockDao(lockTable, seconds = 1) { lockDao =>
+          (1 to 50).map { id =>
+            lockDao.lock(id.toString, staticContextId).value
+          }
+
+          lockDao.unlock(staticContextId)
+          assertNoLocks(lockTable)
+        }
+      }
+    }
+
     describe("Locking problems") {
       it("fails if there is a problem writing the lock") {
         val mockClient = mock[AmazonDynamoDB]

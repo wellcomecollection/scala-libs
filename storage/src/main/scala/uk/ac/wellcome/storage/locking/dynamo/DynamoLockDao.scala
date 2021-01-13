@@ -5,7 +5,7 @@ import java.util.UUID
 import cats.data.EitherT
 import cats.implicits._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
+import com.amazonaws.services.dynamodbv2.model.{BatchWriteItemResult, PutItemResult}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
 import org.scanamo.semiauto._
@@ -96,25 +96,20 @@ class DynamoLockDao(
       _ <- deleteLocks(rowLocks)
     } yield ()
 
-  private def deleteLocks(
-    rowLocks: List[ExpiringLock]): Either[Error, List[DeleteItemResult]] = {
-    val deleteT = EitherT(
-      rowLocks.map { rowLock =>
-        toEither(
-          scanamo.exec(table.delete('id -> rowLock.id))
-        )
+  private def deleteLocks(rowLocks: List[ExpiringLock]): Either[Throwable, Unit] =
+    Try {
+      val ids = rowLocks.map { _.id }.toSet
+      val ops = table.deleteAll('id -> ids)
+      val results: List[BatchWriteItemResult] = scanamo.exec(ops)
+
+      results.foreach { batchWriteResult =>
+        if (batchWriteResult.getUnprocessedItems.isEmpty) {
+          ()
+        } else {
+          throw new Throwable(s"Unable to unlock all locks in batch $rowLocks")
+        }
       }
-    )
-
-    val deleteErrors = deleteT.swap.collectRight
-    val deletions = deleteT.collectRight
-
-    if (deleteErrors.isEmpty) {
-      Right(deletions)
-    } else {
-      Left(new Error(s"Deleting $rowLocks failed with $deleteErrors"))
-    }
-  }
+    }.map { _ => () }.toEither
 
   private def queryLocks(contextId: ContextId) = Try {
     val queryT = EitherT(
