@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v25.1.2 - 2021-01-14
+
+This release changes DynamoLockDao to use BatchWriteItem to release locks.  This will have no impact on callers, but should make unlocking faster and cheaper if you lock multiple IDs.
+
 ## v25.1.1 - 2021-01-12
 
 Remove a now-unused custom DynamoFormat for S3ObjectLocation.
