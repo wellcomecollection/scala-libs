@@ -1,9 +1,13 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.{AmazonDynamoDBException, ConditionalCheckFailedException, ResourceNotFoundException}
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
+import software.amazon.awssdk.services.dynamodb.model.{
+  ConditionalCheckFailedException,
+  ResourceNotFoundException
+}
 import uk.ac.wellcome.storage.{RetryableError, Version}
 import uk.ac.wellcome.storage.dynamo.DynamoEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
@@ -100,7 +104,7 @@ trait DynamoWritableTestCases[Ident, T, EntryType <: DynamoEntry[Ident, T]]
       val result = writable.put(id = Version(createId, 1))(createT)
 
       val err = result.left.value
-      err.e shouldBe a[AmazonDynamoDBException]
+      err.e shouldBe a[AmazonS3Exception]
       err.e.getMessage should startWith(message)
     }
 

@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import org.scanamo.query._
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
 import uk.ac.wellcome.storage.{
   Identified,
   RetryableError,
