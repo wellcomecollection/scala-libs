@@ -1,15 +1,21 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.BatchWriteItemResult
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import org.scanamo.{Table => ScanamoTable}
 import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{
+  MaximaReadError,
+  StoreReadError,
+  StoreWriteError,
+  Version
+}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store._
+
+import scala.language.higherKinds
 
 class DynamoMultipleVersionStoreTest
     extends VersionedStoreWithoutOverwriteTestCases[String, Record, Table]
@@ -25,7 +31,7 @@ class DynamoMultipleVersionStoreTest
     createTableWithHashRangeKey(table)
 
   private def insertEntries(table: Table)(
-    entries: Map[Version[String, Int], Record]): Seq[BatchWriteItemResult] = {
+    entries: Map[Version[String, Int], Record]): Unit = {
     val scanamoTable =
       new ScanamoTable[DynamoHashRangeEntry[String, Int, Record]](table.name)
 

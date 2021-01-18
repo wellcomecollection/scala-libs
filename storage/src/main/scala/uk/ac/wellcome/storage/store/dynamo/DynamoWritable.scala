@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import org.scanamo.query._
 import org.scanamo.syntax._
-import org.scanamo.{DynamoFormat, Scanamo, Table}
+import org.scanamo.{ConditionNotMet, DynamoFormat, Scanamo, Table}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
 import uk.ac.wellcome.storage.{
   Identified,
   RetryableError,
@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 
 sealed trait DynamoWritable[Ident, EntryType, T] extends Writable[Ident, T] {
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   protected val table: Table[EntryType]
 
   protected def parseEntry(entry: EntryType): T
@@ -33,12 +33,13 @@ sealed trait DynamoWritable[Ident, EntryType, T] extends Writable[Ident, T] {
 
     Try(Scanamo(client).exec(ops)) match {
       case Success(Right(_)) => Right(Identified(id, parseEntry(entry)))
-      case Success(Left(err: ConditionalCheckFailedException)) =>
-        Left(new StoreWriteError(err) with RetryableError)
+      case Success(Left(err: ConditionNotMet)) =>
+        Left(new StoreWriteError(err.e) with RetryableError)
+      case Success(Left(err)) =>
+        Left(StoreWriteError(new Throwable(s"Error from Scanamo: $err")))
       case Failure(err: ConditionalCheckFailedException) =>
         Left(new StoreWriteError(err) with RetryableError)
-      case Success(Left(err)) => Left(StoreWriteError(err))
-      case Failure(err)       => Left(StoreWriteError(err))
+      case Failure(err) => Left(StoreWriteError(err))
     }
   }
 }
@@ -60,9 +61,9 @@ trait DynamoHashWritable[HashKey, V, T]
 
   override protected def tableGiven(id: Version[HashKey, V])
     : ConditionalOperation[DynamoHashEntry[HashKey, V, T], _] =
-    table.given(
-      not(attributeExists('id)) or
-        (attributeExists('id) and 'version < id.version)
+    table.when(
+      not(attributeExists("id")) or
+        (attributeExists("id") and "version" < id.version)
     )
 }
 
@@ -85,7 +86,7 @@ trait DynamoHashRangeWritable[HashKey, RangeKey, T]
 
   override protected def tableGiven(id: Version[HashKey, RangeKey])
     : ConditionalOperation[DynamoHashRangeEntry[HashKey, RangeKey, T], _] =
-    table.given(
-      not(attributeExists('id))
+    table.when(
+      not(attributeExists("id"))
     )
 }

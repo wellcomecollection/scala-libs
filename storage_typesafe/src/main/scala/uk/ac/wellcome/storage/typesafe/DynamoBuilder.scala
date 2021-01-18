@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.typesafe
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.typesafe.config.Config
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import uk.ac.wellcome.config.models.AWSClientConfig
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 import uk.ac.wellcome.typesafe.config.builders.AWSClientConfigBuilder
@@ -23,7 +23,7 @@ object DynamoBuilder extends AWSClientConfigBuilder {
   }
 
   private def buildDynamoClient(
-    awsClientConfig: AWSClientConfig): AmazonDynamoDB =
+    awsClientConfig: AWSClientConfig): DynamoDbClient =
     DynamoClientFactory.create(
       region = awsClientConfig.region,
       endpoint = awsClientConfig.endpoint.getOrElse(""),
@@ -31,7 +31,7 @@ object DynamoBuilder extends AWSClientConfigBuilder {
       secretKey = awsClientConfig.secretKey.getOrElse("")
     )
 
-  def buildDynamoClient(config: Config): AmazonDynamoDB =
+  def buildDynamoClient(config: Config): DynamoDbClient =
     buildDynamoClient(
       awsClientConfig = buildAWSClientConfig(config, namespace = "dynamo")
     )

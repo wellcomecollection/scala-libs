@@ -1,12 +1,14 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.{StoreReadError, StoreWriteError, Version}
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.fixtures.S3Fixtures.Bucket
 import uk.ac.wellcome.storage.generators.Record
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
+
+import scala.language.higherKinds
 
 class DynamoHybridStoreTest
     extends DynamoHybridStoreTestCases[

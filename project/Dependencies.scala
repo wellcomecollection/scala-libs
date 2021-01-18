@@ -6,11 +6,10 @@ object Dependencies {
     val akkaStreamAlpakka = "1.1.2"
     val elasticApm = "1.12.0"
 
-    // Must match version used by Scanamo
     val aws = "1.11.504"
 
     // Moving what we can to version 2 of the AWS SDKs
-    val aws2 = "2.11.14"
+    val aws2 = "2.15.66"
 
     val azure = "12.7.0"
 
@@ -21,7 +20,7 @@ object Dependencies {
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0.0-M10"
+    val scanamo = "1.0-M13"
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
@@ -69,8 +68,7 @@ object Dependencies {
   )
 
   val scanamoDependencies = Seq(
-    "org.scanamo" %% "scanamo" % versions.scanamo,
-    "org.scanamo" %% "scanamo-time" % versions.scanamo
+    "org.scanamo" %% "scanamo" % versions.scanamo
   )
 
   val openTracingDependencies = Seq(
@@ -117,7 +115,7 @@ object Dependencies {
 
   val storageDependencies: Seq[ModuleID] = Seq(
     "com.azure" % "azure-storage-blob" % versions.azure,
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
+    "software.amazon.awssdk" % "dynamodb" % versions.aws2,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++
     scanamoDependencies ++

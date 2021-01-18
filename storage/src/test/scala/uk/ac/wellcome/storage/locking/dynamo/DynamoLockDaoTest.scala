@@ -1,14 +1,18 @@
 package uk.ac.wellcome.storage.locking.dynamo
 
 import java.util.UUID
-
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  DeleteItemRequest,
+  DynamoDbException,
+  PutItemRequest,
+  QueryRequest
+}
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.locking.{
@@ -16,6 +20,8 @@ import uk.ac.wellcome.storage.locking.{
   LockFailure,
   UnlockFailure
 }
+
+import scala.language.higherKinds
 
 class DynamoLockDaoTest
     extends LockDaoTestCases[String, UUID, Table]
@@ -120,10 +126,10 @@ class DynamoLockDaoTest
 
     describe("Locking problems") {
       it("fails if there is a problem writing the lock") {
-        val mockClient = mock[AmazonDynamoDB]
+        val mockClient = mock[DynamoDbClient]
 
         val putItem = mockClient.putItem(any[PutItemRequest])
-        val error = new InternalServerErrorException("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(putItem).thenThrow(error)
 
@@ -138,10 +144,10 @@ class DynamoLockDaoTest
 
     describe("Unlocking problems") {
       it("fails to read the context locks") {
-        val mockClient = mock[AmazonDynamoDB]
+        val mockClient = mock[DynamoDbClient]
 
         val query = mockClient.query(any[QueryRequest])
-        val error = new InternalServerErrorException("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(query).thenThrow(error)
 
@@ -153,9 +159,9 @@ class DynamoLockDaoTest
       }
 
       it("fails to delete the lock") {
-        val mockClient = mock[AmazonDynamoDB]
+        val mockClient = mock[DynamoDbClient]
 
-        val error = new InternalServerErrorException("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(mockClient.query(any[QueryRequest]))
           .thenThrow(error)

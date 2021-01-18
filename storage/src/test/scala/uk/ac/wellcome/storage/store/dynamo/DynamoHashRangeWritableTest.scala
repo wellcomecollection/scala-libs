@@ -1,18 +1,20 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  AmazonDynamoDBException,
-  ScalarAttributeType
-}
 import org.scalatest.OptionValues
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import org.scanamo.syntax._
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDbException,
+  ScalarAttributeType
+}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.Version
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
+
+import scala.language.higherKinds
 
 class DynamoHashRangeWritableTest
     extends DynamoWritableTestCases[
@@ -27,7 +29,7 @@ class DynamoHashRangeWritableTest
   def createT: Record = createRecord
 
   class HashRangeWritableImpl(
-    val client: AmazonDynamoDB,
+    val client: DynamoDbClient,
     val table: ScanamoTable[HashRangeEntry]
   )(
     implicit val formatRangeKey: DynamoFormat[Int]
@@ -48,7 +50,7 @@ class DynamoHashRangeWritableTest
     scanamo
       .exec(
         ScanamoTable[HashRangeEntry](table.name).get(
-          'id -> hashKey and 'version -> v)
+          "id" === hashKey and "version" === v)
       )
       .value
       .value
@@ -103,7 +105,7 @@ class DynamoHashRangeWritableTest
 
         val err = result.left.value
 
-        err.e shouldBe a[AmazonDynamoDBException]
+        err.e shouldBe a[DynamoDbException]
         err.e.getMessage should include(
           "Hash primary key values must be under 2048 bytes")
       }

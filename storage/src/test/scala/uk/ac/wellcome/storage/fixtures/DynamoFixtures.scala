@@ -1,14 +1,21 @@
 package uk.ac.wellcome.storage.fixtures
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model._
-import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import org.scanamo.error.DynamoReadError
 import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
-import org.scanamo.{DynamoFormat, Scanamo, Table => ScanamoTable}
+import org.scanamo.{DynamoFormat, DynamoReadError, Scanamo, Table => ScanamoTable}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  AttributeDefinition,
+  CreateTableRequest,
+  DeleteTableRequest,
+  DescribeTableRequest,
+  KeySchemaElement,
+  KeyType,
+  ProvisionedThroughput,
+  ScalarAttributeType
+}
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 
@@ -31,7 +38,7 @@ trait DynamoFixtures
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  implicit val dynamoClient: AmazonDynamoDB = DynamoClientFactory.create(
+  implicit val dynamoClient: DynamoDbClient = DynamoClientFactory.create(
     region = regionName,
     endpoint = dynamoDBEndPoint,
     accessKey = accessKey,
@@ -47,11 +54,13 @@ trait DynamoFixtures
     )
 
   def withSpecifiedLocalDynamoDbTable[R](
-    createTable: AmazonDynamoDB => Table): Fixture[Table, R] =
+    createTable: DynamoDbClient => Table): Fixture[Table, R] =
     fixture[Table, R](
       create = createTable(dynamoClient),
       destroy = { table =>
-        dynamoClient.deleteTable(table.name)
+        dynamoClient.deleteTable(
+          DeleteTableRequest.builder().tableName(table.name).build()
+        )
       }
     )
 
@@ -64,7 +73,9 @@ trait DynamoFixtures
       tableDefinition(Table(tableName, indexName))
     },
     destroy = { table =>
-      dynamoClient.deleteTable(table.name)
+      dynamoClient.deleteTable(
+        DeleteTableRequest.builder().tableName(table.name).build()
+      )
     }
   )
 
@@ -75,16 +86,12 @@ trait DynamoFixtures
 
   def createTable(table: DynamoFixtures.Table): Table
 
-  def putTableItem[T: DynamoFormat](
-    item: T,
-    table: Table): Option[Either[DynamoReadError, T]] =
+  def putTableItem[T: DynamoFormat](item: T, table: Table): Unit =
     scanamo.exec(
       ScanamoTable[T](table.name).put(item)
     )
 
-  def putTableItems[T: DynamoFormat](
-    items: Seq[T],
-    table: Table): List[BatchWriteItemResult] =
+  def putTableItems[T: DynamoFormat](items: Seq[T], table: Table): Unit =
     scanamo.exec(
       ScanamoTable[T](table.name).putAll(items.toSet)
     )
@@ -93,12 +100,12 @@ trait DynamoFixtures
     id: String,
     table: Table): Option[Either[DynamoReadError, T]] =
     scanamo.exec(
-      ScanamoTable[T](table.name).get('id -> id)
+      ScanamoTable[T](table.name).get("id" === id)
     )
 
-  def deleteTableItem(key: UniqueKey[_], table: Table): DeleteItemResult =
+  def deleteTableItem[T: DynamoFormat](key: UniqueKey[_], table: Table): Unit =
     scanamo.exec(
-      ScanamoTable(table.name).delete(key)
+      ScanamoTable[T](table.name).delete(key)
     )
 
   def getExistingTableItem[T: DynamoFormat](id: String, table: Table): T = {
@@ -121,12 +128,25 @@ trait DynamoFixtures
     )
 
   def createTableFromRequest(table: Table,
-                             request: CreateTableRequest): Table = {
+                             requestBuilder: CreateTableRequest.Builder): Table = {
+    val request =
+      requestBuilder
+        .provisionedThroughput(
+          ProvisionedThroughput.builder()
+            .readCapacityUnits(1L)
+            .writeCapacityUnits(1L)
+            .build()
+        )
+        .build()
+
     dynamoClient.createTable(request)
 
-    eventually {
-      waitUntilActive(dynamoClient, table.name)
-    }
+    // See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/waiters.html
+    val waiter = dynamoClient.waiter()
+    waiter.waitUntilTableExists(
+      DescribeTableRequest.builder().tableName(table.name).build()
+    )
+
     table
   }
 
@@ -137,20 +157,19 @@ trait DynamoFixtures
   ): Table =
     createTableFromRequest(
       table = table,
-      new CreateTableRequest()
-        .withTableName(table.name)
-        .withKeySchema(
-          new KeySchemaElement()
-            .withAttributeName(keyName)
-            .withKeyType(KeyType.HASH))
-        .withAttributeDefinitions(
-          new AttributeDefinition()
-            .withAttributeName(keyName)
-            .withAttributeType(keyType)
+      CreateTableRequest.builder()
+        .tableName(table.name)
+        .keySchema(
+          KeySchemaElement.builder()
+            .attributeName(keyName)
+            .keyType(KeyType.HASH)
+            .build())
+        .attributeDefinitions(
+          AttributeDefinition.builder()
+            .attributeName(keyName)
+            .attributeType(keyType)
+            .build()
         )
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))
     )
 
   def createTableWithHashRangeKey(
@@ -161,24 +180,27 @@ trait DynamoFixtures
     rangeKeyType: ScalarAttributeType = ScalarAttributeType.N): Table =
     createTableFromRequest(
       table = table,
-      new CreateTableRequest()
-        .withTableName(table.name)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName(hashKeyName)
-          .withKeyType(KeyType.HASH))
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName(rangeKeyName)
-          .withKeyType(KeyType.RANGE))
-        .withAttributeDefinitions(
-          new AttributeDefinition()
-            .withAttributeName(hashKeyName)
-            .withAttributeType(hashKeyType),
-          new AttributeDefinition()
-            .withAttributeName(rangeKeyName)
-            .withAttributeType(rangeKeyType)
+      CreateTableRequest.builder()
+        .tableName(table.name)
+        .keySchema(
+          KeySchemaElement.builder()
+            .attributeName(hashKeyName)
+            .keyType(KeyType.HASH)
+            .build(),
+          KeySchemaElement.builder()
+            .attributeName(rangeKeyName)
+            .keyType(KeyType.RANGE)
+            .build()
         )
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))
+        .attributeDefinitions(
+          AttributeDefinition.builder()
+            .attributeName(hashKeyName)
+            .attributeType(hashKeyType)
+            .build(),
+          AttributeDefinition.builder()
+            .attributeName(rangeKeyName)
+            .attributeType(rangeKeyType)
+            .build()
+        )
     )
 }

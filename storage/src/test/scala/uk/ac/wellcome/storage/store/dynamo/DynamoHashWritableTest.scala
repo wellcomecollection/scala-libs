@@ -1,19 +1,21 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  AmazonDynamoDBException,
-  ConditionalCheckFailedException,
-  ScalarAttributeType
-}
 import org.scalatest.OptionValues
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import org.scanamo.syntax._
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model.{
+  ConditionalCheckFailedException,
+  DynamoDbException,
+  ScalarAttributeType
+}
 import uk.ac.wellcome.storage.Version
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
+
+import scala.language.higherKinds
 
 class DynamoHashWritableTest
     extends DynamoWritableTestCases[
@@ -28,7 +30,7 @@ class DynamoHashWritableTest
   def createT: Record = createRecord
 
   class TestHashWritable(
-    val client: AmazonDynamoDB,
+    val client: DynamoDbClient,
     val table: ScanamoTable[HashEntry]
   )(
     implicit val formatV: DynamoFormat[Int]
@@ -45,7 +47,7 @@ class DynamoHashWritableTest
   override def getT(table: Table)(hashKey: String, v: Int): Record =
     scanamo
       .exec(
-        ScanamoTable[HashEntry](table.name).get('id -> hashKey)
+        ScanamoTable[HashEntry](table.name).get("id" === hashKey)
       )
       .value
       .value
@@ -95,7 +97,7 @@ class DynamoHashWritableTest
 
         val err = result.left.value
 
-        err.e shouldBe a[AmazonDynamoDBException]
+        err.e shouldBe a[DynamoDbException]
         err.e.getMessage should include(
           "Hash primary key values must be under 2048 bytes")
       }

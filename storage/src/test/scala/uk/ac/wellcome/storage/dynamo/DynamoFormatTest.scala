@@ -4,19 +4,17 @@ import java.net.URI
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-
+import org.scanamo.generic.auto._
 import org.scanamo.syntax._
-import org.scanamo.DynamoFormat
+import org.scanamo.{DynamoFormat, InvalidPropertiesError, Table => ScanamoTable}
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
-import org.scanamo.auto._
-import org.scanamo.error.InvalidPropertiesError
-import org.scanamo.{Table => ScanamoTable}
-
 import DynamoTimeFormat._
+
+import scala.language.higherKinds
 
 trait DynamoFormatTestCases[T]
     extends AnyFunSpec
@@ -41,7 +39,7 @@ trait DynamoFormatTestCases[T]
 
       scanamo.exec(scanamoTable.put(record))
       scanamo
-        .exec(scanamoTable.get('id -> record.id))
+        .exec(scanamoTable.get("id" === record.id))
         .get
         .value shouldBe record
     }
@@ -56,7 +54,7 @@ trait DynamoFormatTestCases[T]
       scanamo.exec(ScanamoTable[BadRecord](table.name).put(record))
 
       val scanamoTable = ScanamoTable[RecordT](table.name)
-      val err = scanamo.exec(scanamoTable.get('id -> record.id)).get.left.value
+      val err = scanamo.exec(scanamoTable.get("id" === record.id)).get.left.value
       err shouldBe a[InvalidPropertiesError]
     }
   }
