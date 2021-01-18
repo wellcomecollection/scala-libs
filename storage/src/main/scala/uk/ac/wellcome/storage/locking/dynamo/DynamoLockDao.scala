@@ -70,7 +70,8 @@ class DynamoLockDao(
 
     Try { scanamo.exec(table.when(canLock).put(lock)) } match {
       case Success(Right(_)) => Right(())
-      case Success(Left(err)) => Left(new Throwable(s"Error from Scanamo: $err"))
+      case Success(Left(err)) =>
+        Left(new Throwable(s"Error from Scanamo: $err"))
       case Failure(err) => Left(err)
     }
   }
