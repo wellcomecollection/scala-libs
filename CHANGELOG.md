@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.0.0 - 2021-01-18
+
+This release bumps the version of Scanamo to 1.0-M13, and the AWS SDK for DynamoDB to V2.
+
 ## v25.1.2 - 2021-01-14
 
 This release changes DynamoLockDao to use BatchWriteItem to release locks.  This will have no impact on callers, but should make unlocking faster and cheaper if you lock multiple IDs.
