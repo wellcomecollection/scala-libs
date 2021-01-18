@@ -1,7 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
 import uk.ac.wellcome.fixtures.TestWith
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import org.scanamo.{Table => ScanamoTable}
 import uk.ac.wellcome.storage.{IdentityKey, Version}
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
@@ -10,6 +10,8 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.maxima.MaximaTestCases
 import uk.ac.wellcome.storage.store.StoreWithoutOverwritesTestCases
+
+import scala.language.higherKinds
 
 class DynamoHashStoreTest
     extends StoreWithoutOverwritesTestCases[

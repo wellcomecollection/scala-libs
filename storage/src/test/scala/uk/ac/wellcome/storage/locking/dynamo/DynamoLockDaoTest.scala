@@ -5,7 +5,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
   DeleteItemRequest,
@@ -19,6 +19,8 @@ import uk.ac.wellcome.storage.locking.{
   LockFailure,
   UnlockFailure
 }
+
+import scala.language.higherKinds
 
 class DynamoLockDaoTest
     extends LockDaoTestCases[String, UUID, Table]

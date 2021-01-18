@@ -7,8 +7,7 @@ import org.scanamo.DynamoFormat
 package object dynamo {
   implicit val uriDynamoFormat: DynamoFormat[URI] =
     DynamoFormat.coercedXmap[URI, String, URISyntaxException](
-      new URI(_)
-    )(
+      new URI(_),
       _.toString
     )
 }

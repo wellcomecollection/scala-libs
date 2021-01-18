@@ -5,13 +5,15 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
 import org.scanamo.{Table => ScanamoTable}
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.storage.dynamo.DynamoEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, Version}
-import org.scanamo.auto._
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException
+
+import scala.language.higherKinds
 
 trait DynamoReadableTestCases[
   DynamoIdent, EntryType <: DynamoEntry[String, Record]]

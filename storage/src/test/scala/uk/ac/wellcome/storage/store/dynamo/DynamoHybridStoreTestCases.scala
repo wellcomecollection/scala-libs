@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage._
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
@@ -10,6 +10,8 @@ import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store._
 import uk.ac.wellcome.storage.store.s3.{S3StreamStore, S3TypedStore}
+
+import scala.language.higherKinds
 
 trait DynamoHybridStoreTestCases[
   DynamoStoreImpl <: Store[Version[String, Int], S3ObjectLocation]]

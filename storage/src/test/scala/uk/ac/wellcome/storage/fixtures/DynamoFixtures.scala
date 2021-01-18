@@ -103,9 +103,9 @@ trait DynamoFixtures
       ScanamoTable[T](table.name).get("id" === id)
     )
 
-  def deleteTableItem(key: UniqueKey[_], table: Table): Unit =
+  def deleteTableItem[T: DynamoFormat](key: UniqueKey[_], table: Table): Unit =
     scanamo.exec(
-      ScanamoTable(table.name).delete(key)
+      ScanamoTable[T](table.name).delete(key)
     )
 
   def getExistingTableItem[T: DynamoFormat](id: String, table: Table): T = {

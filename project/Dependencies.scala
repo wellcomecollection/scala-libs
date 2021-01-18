@@ -21,7 +21,6 @@ object Dependencies {
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
     val scanamo = "1.0-M13"
-    val scanamoTime = "1.0.0-M10"
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
@@ -69,8 +68,7 @@ object Dependencies {
   )
 
   val scanamoDependencies = Seq(
-    "org.scanamo" %% "scanamo" % versions.scanamo,
-    "org.scanamo" %% "scanamo-time" % versions.scanamoTime
+    "org.scanamo" %% "scanamo" % versions.scanamo
   )
 
   val openTracingDependencies = Seq(

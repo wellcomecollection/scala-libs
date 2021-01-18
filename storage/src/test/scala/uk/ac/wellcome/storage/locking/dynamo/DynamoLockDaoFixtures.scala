@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.locking.dynamo
 import java.time.Duration
 import java.util.UUID
 import org.scalatest.Assertion
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
   AttributeDefinition,
@@ -21,6 +21,7 @@ import uk.ac.wellcome.storage.locking.{LockDao, LockDaoFixtures}
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.higherKinds
 
 trait DynamoLockDaoFixtures
     extends LockDaoFixtures[String, UUID, Table]

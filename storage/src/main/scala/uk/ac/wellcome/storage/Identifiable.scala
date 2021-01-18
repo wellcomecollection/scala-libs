@@ -15,8 +15,7 @@ case class IdentityKey(underlying: String) extends AnyVal {
 case object IdentityKey {
   implicit def format: DynamoFormat[IdentityKey] =
     DynamoFormat.iso[IdentityKey, String](
-      IdentityKey(_)
-    )(
+      IdentityKey(_),
       _.underlying
     )
 }

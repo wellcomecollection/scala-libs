@@ -3,16 +3,18 @@ package uk.ac.wellcome.storage.store.dynamo
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.Record
 import uk.ac.wellcome.storage.{Identified, NoVersionExistsError, Version}
-import org.scanamo.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
   GetItemRequest,
   ScalarAttributeType
 }
+
+import scala.language.higherKinds
 
 class DynamoHashReadableTest
     extends DynamoReadableTestCases[

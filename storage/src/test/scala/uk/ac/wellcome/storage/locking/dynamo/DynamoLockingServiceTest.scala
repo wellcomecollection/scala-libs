@@ -3,10 +3,12 @@ package uk.ac.wellcome.storage.locking.dynamo
 import java.util.UUID
 
 import org.scalatest.EitherValues
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.locking.LockingServiceTestCases
+
+import scala.language.higherKinds
 
 class DynamoLockingServiceTest
     extends LockingServiceTestCases[String, UUID, Table]

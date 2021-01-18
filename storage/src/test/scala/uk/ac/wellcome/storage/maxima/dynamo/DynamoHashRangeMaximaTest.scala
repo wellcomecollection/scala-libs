@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.maxima.dynamo
 
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
   ResourceNotFoundException,
@@ -16,6 +16,8 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.Record
 import uk.ac.wellcome.storage.maxima.MaximaTestCases
 import uk.ac.wellcome.storage.{IdentityKey, Version}
+
+import scala.language.higherKinds
 
 class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
   type Entry = DynamoHashRangeEntry[IdentityKey, Int, Record]

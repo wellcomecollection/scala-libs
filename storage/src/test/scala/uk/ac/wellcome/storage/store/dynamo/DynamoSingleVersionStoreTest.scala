@@ -1,6 +1,7 @@
 package uk.ac.wellcome.storage.store.dynamo
 
 import org.scanamo.{Table => ScanamoTable}
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
@@ -13,7 +14,8 @@ import uk.ac.wellcome.storage.{
   StoreWriteError,
   Version
 }
-import org.scanamo.auto._
+
+import scala.language.higherKinds
 
 class DynamoSingleVersionStoreTest
     extends VersionedStoreWithOverwriteTestCases[String, Record, Table]

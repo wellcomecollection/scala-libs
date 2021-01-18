@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import org.scanamo.auto._
+import org.scanamo.generic.auto._
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
@@ -9,7 +9,14 @@ import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import uk.ac.wellcome.storage.store.s3.S3TypedStore
 import uk.ac.wellcome.storage.store.VersionedStoreWithOverwriteTestCases
-import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{
+  MaximaReadError,
+  StoreReadError,
+  StoreWriteError,
+  Version
+}
+
+import scala.language.higherKinds
 
 class DynamoVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[

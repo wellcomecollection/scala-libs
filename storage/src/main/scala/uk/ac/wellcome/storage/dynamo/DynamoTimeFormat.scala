@@ -13,6 +13,8 @@ object DynamoTimeFormat {
   // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-before-you-start.html#time-to-live-ttl-before-you-start-formatting
   // https://github.com/scanamo/scanamo/blob/v1.0.0-M10/java-time/src/main/scala/org/scanamo/time/JavaTimeFormats.scala#L20
   implicit val instantAsLongSecondsFormat: DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, Long, ArithmeticException](x =>
-      Instant.ofEpochSecond(x))(x => x.getEpochSecond)
+    DynamoFormat.coercedXmap[Instant, Long, ArithmeticException](
+      Instant.ofEpochSecond,
+      _.getEpochSecond
+    )
 }
