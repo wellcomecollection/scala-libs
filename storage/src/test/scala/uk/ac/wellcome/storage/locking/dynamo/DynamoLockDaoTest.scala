@@ -9,6 +9,7 @@ import org.scanamo.generic.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
   DeleteItemRequest,
+  DynamoDbException,
   PutItemRequest,
   QueryRequest
 }
@@ -128,7 +129,7 @@ class DynamoLockDaoTest
         val mockClient = mock[DynamoDbClient]
 
         val putItem = mockClient.putItem(any[PutItemRequest])
-        val error = new Throwable("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(putItem).thenThrow(error)
 
@@ -146,7 +147,7 @@ class DynamoLockDaoTest
         val mockClient = mock[DynamoDbClient]
 
         val query = mockClient.query(any[QueryRequest])
-        val error = new Throwable("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(query).thenThrow(error)
 
@@ -160,7 +161,7 @@ class DynamoLockDaoTest
       it("fails to delete the lock") {
         val mockClient = mock[DynamoDbClient]
 
-        val error = new Throwable("FAILED")
+        val error = DynamoDbException.builder().message("BOOM!").build()
 
         when(mockClient.query(any[QueryRequest]))
           .thenThrow(error)

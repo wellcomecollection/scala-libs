@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class DynamoLockDao(
   val client: DynamoDbClient,
@@ -68,7 +68,11 @@ class DynamoLockDao(
     val canLock =
       lockHasExpired or lockNotFound or lockAlreadyExists
 
-    toEither(scanamo.exec(table.when(canLock).put(lock)))
+    Try { scanamo.exec(table.when(canLock).put(lock)) } match {
+      case Success(Right(_)) => Right(())
+      case Success(Left(err)) => Left(new Throwable(s"Error from Scanamo: $err"))
+      case Failure(err) => Left(err)
+    }
   }
 
   // Unlock

@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.maxima.dynamo
 
-import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import org.scanamo.generic.auto._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDbException,
   ResourceNotFoundException,
   ScalarAttributeType
 }
@@ -78,7 +78,7 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
 
             val err = result.left.value
             err shouldBe a[MaximaReadError]
-            err.e shouldBe a[AmazonS3Exception]  // TODO: Fix this
+            err.e shouldBe a[DynamoDbException]
             err.e.getMessage should startWith(
               "Query condition missed key schema element")
           }
@@ -95,7 +95,7 @@ class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
 
             val err = result.left.value
             err shouldBe a[MaximaReadError]
-            err.e shouldBe a[AmazonS3Exception]  // TODO: Fix this
+            err.e shouldBe a[DynamoDbException]
             err.e.getMessage should include(
               "Condition parameter type does not match schema type")
           }
