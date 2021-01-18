@@ -1,6 +1,5 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.model.BatchWriteItemResult
 import org.scanamo.{Table => ScanamoTable}
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.dynamo.DynamoHashEntry
@@ -8,7 +7,12 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.store._
-import uk.ac.wellcome.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
+import uk.ac.wellcome.storage.{
+  MaximaReadError,
+  StoreReadError,
+  StoreWriteError,
+  Version
+}
 import org.scanamo.auto._
 
 class DynamoSingleVersionStoreTest
@@ -25,7 +29,7 @@ class DynamoSingleVersionStoreTest
     createTableWithHashKey(table)
 
   private def insertEntries(table: Table)(
-    entries: Map[Version[String, Int], Record]): Seq[BatchWriteItemResult] = {
+    entries: Map[Version[String, Int], Record]): Unit = {
     val scanamoTable =
       new ScanamoTable[DynamoHashEntry[String, Int, Record]](table.name)
 

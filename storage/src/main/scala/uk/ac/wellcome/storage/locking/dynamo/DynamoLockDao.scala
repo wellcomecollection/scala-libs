@@ -1,19 +1,14 @@
 package uk.ac.wellcome.storage.locking.dynamo
 
 import java.util.UUID
-
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  BatchWriteItemResult,
-  PutItemResult
-}
 import grizzled.slf4j.Logging
 import org.scanamo.query.Condition
 import org.scanamo.semiauto._
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import uk.ac.wellcome.storage.locking.{LockDao, LockFailure, UnlockFailure}
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
@@ -21,7 +16,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 class DynamoLockDao(
-  val client: AmazonDynamoDB,
+  val client: DynamoDbClient,
   config: DynamoLockDaoConfig
 )(implicit val ec: ExecutionContext)
     extends LockDao[String, UUID]
@@ -59,20 +54,20 @@ class DynamoLockDao(
     )
   }
 
-  private def lockOp(lock: ExpiringLock): Either[Throwable, PutItemResult] = {
-    val lockFound = attributeExists(symbol = 'id)
+  private def lockOp(lock: ExpiringLock): Either[Throwable, Unit] = {
+    val lockFound = attributeExists("id")
     val lockNotFound = not(lockFound)
 
-    val isExpired = Condition('expires < lock.created)
+    val isExpired = Condition("expires" < lock.created)
 
     val lockHasExpired = Condition(lockFound and isExpired)
 
-    val lockAlreadyExists = Condition('contextId -> lock.contextId)
+    val lockAlreadyExists = Condition("contextId" === lock.contextId)
 
     val canLock =
       lockHasExpired or lockNotFound or lockAlreadyExists
 
-    safePutItem(table.given(canLock).put(lock))
+    toEither(scanamo.exec(table.when(canLock).put(lock)))
   }
 
   // Unlock
@@ -103,23 +98,15 @@ class DynamoLockDao(
     rowLocks: List[ExpiringLock]): Either[Throwable, Unit] =
     Try {
       val ids = rowLocks.map { _.id }.toSet
-      val ops = table.deleteAll('id -> ids)
-      val results: List[BatchWriteItemResult] = scanamo.exec(ops)
-
-      results.foreach { batchWriteResult =>
-        if (batchWriteResult.getUnprocessedItems.isEmpty) {
-          ()
-        } else {
-          throw new Throwable(s"Unable to unlock all locks in batch $rowLocks")
-        }
-      }
+      val ops = table.deleteAll("id" in ids)
+      scanamo.exec(ops)
     }.map { _ =>
       ()
     }.toEither
 
   private def queryLocks(contextId: ContextId) = Try {
     val queryT = EitherT(
-      scanamo.exec(table.index(index).query('contextId -> contextId))
+      scanamo.exec(table.index(index).query("contextId" === contextId))
     )
 
     val readErrors = queryT.swap.collectRight

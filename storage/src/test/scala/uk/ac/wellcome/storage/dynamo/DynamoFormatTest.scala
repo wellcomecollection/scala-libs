@@ -41,7 +41,7 @@ trait DynamoFormatTestCases[T]
 
       scanamo.exec(scanamoTable.put(record))
       scanamo
-        .exec(scanamoTable.get('id -> record.id))
+        .exec(scanamoTable.get("id" === record.id))
         .get
         .value shouldBe record
     }
@@ -56,7 +56,7 @@ trait DynamoFormatTestCases[T]
       scanamo.exec(ScanamoTable[BadRecord](table.name).put(record))
 
       val scanamoTable = ScanamoTable[RecordT](table.name)
-      val err = scanamo.exec(scanamoTable.get('id -> record.id)).get.left.value
+      val err = scanamo.exec(scanamoTable.get("id" === record.id)).get.left.value
       err shouldBe a[InvalidPropertiesError]
     }
   }

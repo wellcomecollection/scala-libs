@@ -1,10 +1,9 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import org.scanamo.error.DynamoReadError
 import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Scanamo, Table}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import uk.ac.wellcome.storage.dynamo.{DynamoHashEntry, DynamoHashRangeEntry}
 import uk.ac.wellcome.storage.store.Readable
 import uk.ac.wellcome.storage._
@@ -32,7 +31,7 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
   // See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
   protected val consistencyMode: ConsistencyMode = EventuallyConsistent
 
-  protected val client: AmazonDynamoDB
+  protected val client: DynamoDbClient
   protected val table: Table[EntryType]
 
   protected def createKeyExpression(id: DynamoIdent): UniqueKey[_]
@@ -47,7 +46,7 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
     Try(Scanamo(client).exec(ops)) match {
       case Success(Some(Right(entry))) => Right(entry)
 
-      case Success(Some(Left(err: DynamoReadError))) =>
+      case Success(Some(Left(err))) =>
         val daoReadError = new Error(s"DynamoReadError: ${err.toString}")
         Left(StoreReadError(daoReadError))
 
@@ -67,7 +66,7 @@ trait DynamoHashReadable[HashKey, V, T]
   implicit protected val formatHashKey: DynamoFormat[HashKey]
 
   protected def createKeyExpression(id: HashKey): UniqueKey[_] =
-    'id -> id
+    "id" === id
 
   override def get(id: Version[HashKey, V]): ReadEither = {
     val storedEntry = getEntry(id.id)
@@ -95,7 +94,7 @@ trait DynamoHashRangeReadable[HashKey, RangeKey, T]
 
   protected def createKeyExpression(
     id: Version[HashKey, RangeKey]): UniqueKey[_] =
-    'id -> id.id and 'version -> id.version
+    "id" === id.id and "version" === id.version
 
   override def get(id: Version[HashKey, RangeKey]): ReadEither =
     getEntry(id).map { entry =>
