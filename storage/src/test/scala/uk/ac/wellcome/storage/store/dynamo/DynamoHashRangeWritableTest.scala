@@ -1,12 +1,14 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.OptionValues
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import org.scanamo.generic.auto._
 import org.scanamo.syntax._
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
-import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType
+import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDbException,
+  ScalarAttributeType
+}
 import uk.ac.wellcome.storage.dynamo.DynamoHashRangeEntry
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.Version
@@ -103,7 +105,7 @@ class DynamoHashRangeWritableTest
 
         val err = result.left.value
 
-        err.e shouldBe a[AmazonS3Exception]
+        err.e shouldBe a[DynamoDbException]
         err.e.getMessage should include(
           "Hash primary key values must be under 2048 bytes")
       }

@@ -12,7 +12,8 @@ import software.amazon.awssdk.services.dynamodb.model.{
   KeySchemaElement,
   KeyType,
   Projection,
-  ProjectionType
+  ProjectionType,
+  ProvisionedThroughput
 }
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures
@@ -109,6 +110,12 @@ trait DynamoLockDaoFixtures
               KeySchemaElement.builder()
                 .attributeName("contextId")
                 .keyType(KeyType.HASH)
+                .build()
+            )
+            .provisionedThroughput(
+              ProvisionedThroughput.builder()
+                .readCapacityUnits(1L)
+                .writeCapacityUnits(1L)
                 .build()
             )
             .build()

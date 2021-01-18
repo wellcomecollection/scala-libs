@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.store.dynamo
 
 import org.scanamo.query._
 import org.scanamo.syntax._
-import org.scanamo.{DynamoFormat, Scanamo, Table}
+import org.scanamo.{ConditionNotMet, DynamoFormat, Scanamo, Table}
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
 import uk.ac.wellcome.storage.{
@@ -33,6 +33,8 @@ sealed trait DynamoWritable[Ident, EntryType, T] extends Writable[Ident, T] {
 
     Try(Scanamo(client).exec(ops)) match {
       case Success(Right(_)) => Right(Identified(id, parseEntry(entry)))
+      case Success(Left(err: ConditionNotMet)) =>
+        Left(new StoreWriteError(err.e) with RetryableError)
       case Success(Left(err)) => Left(StoreWriteError(new Throwable(s"Error from Scanamo: $err")))
       case Failure(err: ConditionalCheckFailedException) =>
         Left(new StoreWriteError(err) with RetryableError)

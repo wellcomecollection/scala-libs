@@ -1,6 +1,5 @@
 package uk.ac.wellcome.storage.store.dynamo
 
-import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
@@ -11,7 +10,10 @@ import uk.ac.wellcome.storage.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.fixtures.DynamoFixtures.Table
 import uk.ac.wellcome.storage.generators.{Record, RecordGenerators}
 import uk.ac.wellcome.storage.{DoesNotExistError, Identified, Version}
-import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException
+import software.amazon.awssdk.services.dynamodb.model.{
+  DynamoDbException,
+  ResourceNotFoundException
+}
 
 import scala.language.higherKinds
 
@@ -124,7 +126,7 @@ trait DynamoReadableTestCases[
       val result = readable.get(id = Version(randomAlphanumeric(), 1))
 
       val err = result.left.value
-      err.e shouldBe a[AmazonS3Exception]
+      err.e shouldBe a[DynamoDbException]
       err.e.getMessage should startWith(message)
     }
 
