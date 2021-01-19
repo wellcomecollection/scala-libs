@@ -23,7 +23,9 @@ trait MessageSender[Destination] extends Logging {
   def send(body: String): Try[Unit] =
     underlying.send(body)(subject, destination) match {
       case Failure(err) =>
-        error(s"Unable to send message (body=$body) to destination $destination: $err", err)
+        error(
+          s"Unable to send message (body=$body) to destination $destination: $err",
+          err)
         Failure(err)
 
       case Success(_) => Success(())
@@ -32,7 +34,9 @@ trait MessageSender[Destination] extends Logging {
   def sendT[T](t: T)(implicit encoder: Encoder[T]): Try[Unit] =
     underlying.sendT[T](t)(subject, destination) match {
       case Failure(err) =>
-        error(s"Unable to send message (t=$t) to destination $destination: $err", err)
+        error(
+          s"Unable to send message (t=$t) to destination $destination: $err",
+          err)
         Failure(err)
 
       case Success(_) => Success(())
