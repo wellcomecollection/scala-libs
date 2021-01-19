@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.json.JsonUtil.toJson
 
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 trait IndividualMessageSender[Destination] {
   def send(body: String)(subject: String, destination: Destination): Try[Unit]
@@ -21,16 +21,20 @@ trait MessageSender[Destination] extends Logging {
   val destination: Destination
 
   def send(body: String): Try[Unit] =
-    underlying.send(body)(subject, destination)
-      .failed.map { err: Throwable =>
+    underlying.send(body)(subject, destination) match {
+      case Failure(err) =>
         error(s"Unable to send message (body=$body) to destination $destination: $err", err)
         Failure(err)
-      }
+
+      case Success(_) => Success(())
+    }
 
   def sendT[T](t: T)(implicit encoder: Encoder[T]): Try[Unit] =
-    underlying.sendT[T](t)(subject, destination)
-      .failed.map { err =>
+    underlying.sendT[T](t)(subject, destination) match {
+      case Failure(err) =>
         error(s"Unable to send message (t=$t) to destination $destination: $err", err)
         Failure(err)
-      }
+
+      case Success(_) => Success(())
+    }
 }
