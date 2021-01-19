@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.0.2 - 2021-01-19
+
+Fix a typo in an error log from SQSStream.
+
 ## v26.0.1 - 2021-01-19
 
 Log failures from a MessageSender as an error.  This should make SNS failures more obvious.
