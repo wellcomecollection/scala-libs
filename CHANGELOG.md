@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.0.1 - 2021-01-19
+
+Log failures from a MessageSender as an error.  This should make SNS failures more obvious.
+
 ## v26.0.0 - 2021-01-18
 
 This release bumps the version of Scanamo to 1.0-M13, and the AWS SDK for DynamoDB to V2.
