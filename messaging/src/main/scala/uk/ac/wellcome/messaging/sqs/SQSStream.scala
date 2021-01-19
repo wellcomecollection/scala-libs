@@ -106,7 +106,7 @@ class SQSStream[T](
       metricsSender.incrementCount(s"${metricName}_failure")
       Supervision.Resume
     case throwable =>
-      logger.warn(s"Recived throwable: $throwable. Shutting down.")
+      logger.warn(s"Received throwable: $throwable. Shutting down.")
       Supervision.Stop
   }
 
