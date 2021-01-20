@@ -10,7 +10,6 @@ import software.amazon.awssdk.services.dynamodb.model.{
   AttributeDefinition,
   CreateTableRequest,
   DeleteTableRequest,
-  DescribeTableRequest,
   KeySchemaElement,
   KeyType,
   ProvisionedThroughput,
@@ -19,6 +18,7 @@ import software.amazon.awssdk.services.dynamodb.model.{
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 
+import scala.collection.JavaConverters._
 import scala.collection.immutable
 
 object DynamoFixtures {
@@ -141,11 +141,9 @@ trait DynamoFixtures
 
     dynamoClient.createTable(request)
 
-    // See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/waiters.html
-    val waiter = dynamoClient.waiter()
-    waiter.waitUntilTableExists(
-      DescribeTableRequest.builder().tableName(table.name).build()
-    )
+    eventually {
+      dynamoClient.listTables().tableNames().asScala should contain(table.name)
+    }
 
     table
   }
