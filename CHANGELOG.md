@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.1.0 - 2021-01-20
+
+Bump the version of Alpakka Streams to 2.0.2.
+
 ## v26.0.2 - 2021-01-19
 
 Fix a typo in an error log from SQSStream.
