@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   lazy val versions = new {
     val akka = "2.6.10"
-    val akkaStreamAlpakka = "1.1.2"
+    val akkaStreamAlpakka = "2.0.2"
     val elasticApm = "1.12.0"
 
     val aws = "1.11.504"
