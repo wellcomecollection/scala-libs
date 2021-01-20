@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.2.0 - 2021-01-20
+
+Roll back the AWS SDK and other dependencies to known good versions.
+
 ## v26.1.0 - 2021-01-20
 
 Bump the version of Alpakka Streams to 2.0.2.
