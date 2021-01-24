@@ -78,9 +78,11 @@ trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
           } else {
             existingResults ++ Set(
               Left(
-                LockFailure(id, e = new Throwable(
-                  s"Skipping locking $id; other IDs have already failed to lock"
-                ))
+                LockFailure(
+                  id,
+                  e = new Throwable(
+                    s"Skipping locking $id; other IDs have already failed to lock"
+                  ))
               )
             )
           }
