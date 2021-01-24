@@ -62,7 +62,36 @@ trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
     */
   private def getLocks(ids: Set[lockDao.Ident],
                        contextId: lockDao.ContextId): LockingServiceResult = {
-    val lockResults = ids.map { lockDao.lock(_, contextId) }
+
+    // We lock the IDs one-by-one, but if any ID fails to lock, we skip
+    // even trying to lock the remaining IDs.
+    //
+    // This reduces the amount of churn in the LockDao: we're skipping creating
+    // and deleting a lock we know will never be used.
+    val lockResults =
+      ids.foldLeft(Set[lockDao.LockResult]())(
+        (existingResults: Set[lockDao.LockResult], id) => {
+          val failedIds = getFailedLocks(existingResults).map { _.id }
+
+          if (failedIds.isEmpty) {
+            existingResults ++ Set(lockDao.lock(id, contextId))
+          } else {
+            existingResults ++ Set(
+              Left(
+                LockFailure(id, e = new Throwable(
+                  s"Skipping locking $id; other IDs have already failed to lock"
+                ))
+              )
+            )
+          }
+        }
+      )
+
+    assert(
+      lockResults.size == ids.size,
+      s"Got the wrong number of lockResults: size($lockResults) != size($ids)"
+    )
+
     val failedLocks = getFailedLocks(lockResults)
 
     if (failedLocks.isEmpty) {
