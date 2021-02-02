@@ -31,6 +31,8 @@ trait DynamoFormatTestCases[T]
   implicit val dynamoFormat: DynamoFormat[T]
 
   case class RecordT(id: String, t: T)
+  case class RecordTPlus(id: String, t: T, extra: Boolean)
+  case class RecordTPlusDefault(id: String, t: T, extra: Boolean = true)
 
   it("allows storing and retrieving an instance of T") {
     val record = RecordT(id = "1", t = createT)
@@ -62,12 +64,10 @@ trait DynamoFormatTestCases[T]
   }
 
   it("ignores extra fields") {
-    case class RecordTPlus(id: String, t: T, extra: Boolean)
-
     val id = "2"
     val t = createT
     val record = RecordT(id = id, t = t)
-    val recordPlus = RecordTPlus(id = id, t = t, extra = true)
+    val recordPlus = RecordTPlus(id = id, t = t, extra = false)
 
     withLocalDynamoDbTable { table =>
       scanamo.exec(ScanamoTable[RecordTPlus](table.name).put(recordPlus))
@@ -76,6 +76,35 @@ trait DynamoFormatTestCases[T]
         .get
         .value shouldBe record
 
+    }
+  }
+
+  it("errors if fields are missing and there is no default value") {
+    val record = RecordT(id = "3", t = createT)
+
+    withLocalDynamoDbTable { table =>
+      scanamo.exec(ScanamoTable[RecordT](table.name).put(record))
+
+      val scanamoTable = ScanamoTable[RecordTPlus](table.name)
+      val err =
+        scanamo.exec(scanamoTable.get("id" === record.id)).get.left.value
+      err shouldBe a[InvalidPropertiesError]
+    }
+  }
+
+  it("uses default values if fields are missing") {
+    val id = "4"
+    val t = createT
+    val record = RecordT(id = id, t = t)
+    val recordTPlusDefault = RecordTPlusDefault(id = id, t = t)
+
+    withLocalDynamoDbTable { table =>
+      scanamo.exec(ScanamoTable[RecordT](table.name).put(record))
+      scanamo
+        .exec(
+          ScanamoTable[RecordTPlusDefault](table.name).get("id" === record.id))
+        .get
+        .value shouldBe recordTPlusDefault
     }
   }
 }
