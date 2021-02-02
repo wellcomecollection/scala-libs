@@ -4,6 +4,7 @@ import java.net.URI
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+
 import org.scanamo.generic.auto._
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, InvalidPropertiesError, Table => ScanamoTable}
@@ -54,8 +55,27 @@ trait DynamoFormatTestCases[T]
       scanamo.exec(ScanamoTable[BadRecord](table.name).put(record))
 
       val scanamoTable = ScanamoTable[RecordT](table.name)
-      val err = scanamo.exec(scanamoTable.get("id" === record.id)).get.left.value
+      val err =
+        scanamo.exec(scanamoTable.get("id" === record.id)).get.left.value
       err shouldBe a[InvalidPropertiesError]
+    }
+  }
+
+  it("ignores extra fields") {
+    case class RecordTPlus(id: String, t: T, extra: Boolean)
+
+    val id = "2"
+    val t = createT
+    val record = RecordT(id = id, t = t)
+    val recordPlus = RecordTPlus(id = id, t = t, extra = true)
+
+    withLocalDynamoDbTable { table =>
+      scanamo.exec(ScanamoTable[RecordTPlus](table.name).put(recordPlus))
+      scanamo
+        .exec(ScanamoTable[RecordT](table.name).get("id" === record.id))
+        .get
+        .value shouldBe record
+
     }
   }
 }
