@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.2.1 - 2021-02-02
+
+Add some tests to describe dynamo formatting behaviour
+
 ## v26.2.0 - 2021-01-20
 
 Roll back the AWS SDK and other dependencies to known good versions.
