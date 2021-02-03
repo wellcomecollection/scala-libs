@@ -63,7 +63,7 @@ class SQSStream[T](
   )(implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
-    val decodedSupervisedSource = source
+    val decodedSource = source
       .map { message =>
         (message, fromJson[T](message.body).get)
       }
@@ -76,7 +76,7 @@ class SQSStream[T](
       }
       .toMat(sink)(Keep.right)
 
-    graphBetween(decodedSupervisedSource, loggingSink)
+    graphBetween(decodedSource, loggingSink)
       .withAttributes(ActorAttributes.supervisionStrategy(decider(metricName)))
       .run()
       .map { _ =>
