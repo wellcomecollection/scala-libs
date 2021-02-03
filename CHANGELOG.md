@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.3.0 - 2021-02-03
+
+Adds the option to pass to SQSStream a function that creates an entire RunnableGraph from a source and sink.
+
 ## v26.2.1 - 2021-02-02
 
 Add some tests to describe dynamo formatting behaviour
