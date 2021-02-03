@@ -2,10 +2,11 @@ package uk.ac.wellcome.messaging.sqs
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{Flow, Keep}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import software.amazon.awssdk.services.sqs.model.Message
 import uk.ac.wellcome.akka.fixtures.Akka
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil._
@@ -238,6 +239,90 @@ class SQSStreamTest
     }
   }
 
+  describe("runGraph") {
+    it("processes messages when a graph is non-linear") {
+      withSQSStreamFixtures {
+        case (messageStream, QueuePair(queue, dlq), metricsSender) =>
+          sendNamedObjects(queue = queue, start = 1, count = 5)
+
+          val received = new ConcurrentLinkedQueue[NamedObject]()
+          val streamName = randomAlphanumeric(10)
+
+          messageStream.runGraph(streamName) { (source, sink) =>
+            source.zipWithIndex
+              .divertTo(
+                sink.contramap[((Message, NamedObject), Long)] {
+                  case ((msg, namedObject), _) =>
+                    received.add(
+                      namedObject.copy(name = "Diverted " + namedObject.name))
+                    msg
+                }, {
+                  case (_, i) => i >= 3
+                }
+              )
+              .map {
+                case ((msg, namedObject), _) =>
+                  received.add(namedObject)
+                  msg
+              }
+              .toMat(sink)(Keep.right)
+          }
+          eventually {
+            received should contain theSameElementsAs createNamedObjects(
+              count = 5).zipWithIndex.map {
+              case (obj, i) if i >= 3 => obj.copy(name = "Diverted " + obj.name)
+              case (obj, _)           => obj
+            }
+
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+
+            metricsSender.incrementedCounts shouldBe Seq.fill(5)(
+              s"${streamName}_ProcessMessage_success",
+            )
+          }
+      }
+    }
+
+    it("handles failures when a graph is non-linear") {
+      withSQSStreamFixtures {
+        case (messageStream, QueuePair(queue, dlq), metricsSender) =>
+          sendNamedObjects(queue = queue, start = 0, count = 5)
+
+          val received = new ConcurrentLinkedQueue[NamedObject]()
+          val streamName = randomAlphanumeric(10)
+
+          messageStream.runGraph(streamName) { (source, sink) =>
+            source.zipWithIndex
+              .divertTo(
+                sink.contramap[((Message, NamedObject), Long)] { _ =>
+                  throw new RuntimeException("oops")
+                }, {
+                  case (_, i) => i >= 3
+                }
+              )
+              .map {
+                case ((msg, namedObject), _) =>
+                  received.add(namedObject)
+                  msg
+              }
+              .toMat(sink)(Keep.right)
+          }
+          eventually {
+            received should contain theSameElementsAs
+              createNamedObjects(start = 0, count = 3)
+
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, size = 2)
+
+            metricsSender.incrementedCounts shouldBe
+              Seq.fill(3)(s"${streamName}_ProcessMessage_success") ++
+                Seq.fill(3 * 2)(s"${streamName}_ProcessMessage_failure")
+          }
+      }
+    }
+  }
+
   private def createNamedObjects(start: Int = 1,
                                  count: Int): List[NamedObject] =
     (start until start + count).map { i =>
@@ -250,8 +335,8 @@ class SQSStreamTest
     }
 
   def withSQSStreamFixtures[R](
-    testWith: TestWith[(SQSStream[NamedObject], QueuePair, MemoryMetrics),
-                       R]): R =
+    testWith: TestWith[(SQSStream[NamedObject], QueuePair, MemoryMetrics), R])
+    : R =
     withActorSystem { implicit actorSystem =>
       withLocalSqsQueuePair() {
         case queuePair @ QueuePair(queue, _) =>

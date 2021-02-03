@@ -2,9 +2,8 @@ package uk.ac.wellcome.messaging.sqs
 
 import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs.MessageAction
-import akka.stream.alpakka.sqs.MessageAction.Delete
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorAttributes, Supervision}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
@@ -58,25 +57,26 @@ class SQSStream[T](
         }
     )
 
-  def runStream(
-    streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
-    implicit decoder: Decoder[T]): Future[Done] = {
+  def runGraph(streamName: String)(
+    graphBetween: (Source[(Message, T), NotUsed],
+                   Sink[Message, Future[Done]]) => RunnableGraph[Future[Done]]
+  )(implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
-    val src = modifySource(source.map { message =>
-      (message, fromJson[T](message.body).get)
-    })
+    val decodedSource = source
+      .map { message =>
+        (message, fromJson[T](message.body).get)
+      }
 
-    val srcWithLogging: Source[Delete, NotUsed] = src
+    val loggingSink = Flow[Message]
       .map { m =>
         metricsSender.incrementCount(s"${metricName}_success")
         debug(s"Deleting message ${m.messageId()}")
-        (MessageAction.Delete(m))
+        MessageAction.Delete(m)
       }
-
-    srcWithLogging
       .toMat(sink)(Keep.right)
+
+    graphBetween(decodedSource, loggingSink)
       .withAttributes(ActorAttributes.supervisionStrategy(decider(metricName)))
       .run()
       .map { _ =>
@@ -89,6 +89,14 @@ class SQSStream[T](
           Done
       }
   }
+
+  def runStream(
+    streamName: String,
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
+    implicit decoder: Decoder[T]): Future[Done] =
+    runGraph(streamName) { (source, sink) =>
+      modifySource(source).toMat(sink)(Keep.right)
+    }
 
   // Defines a "supervision strategy" -- this tells Akka how to react
   // if one of the elements fails.  We want to log the failing message,
