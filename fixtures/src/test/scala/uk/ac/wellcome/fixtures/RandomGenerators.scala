@@ -61,9 +61,8 @@ trait RandomGenerators {
   def chooseFrom[T](seq: T*): T =
     seq(Random.nextInt(seq.size))
 
-  def randomSample[T](seq: Seq[T])(
-    size: Int = randomInt(from = 1, to = seq.size)
-  ): Seq[T] = Random.shuffle(seq).take(size)
+  def randomSample[T](seq: Seq[T], size: Int): Seq[T] =
+    Random.shuffle(seq).take(size)
 
   def randomInstant: Instant =
     Instant.now().plusSeconds(Random.nextInt())
