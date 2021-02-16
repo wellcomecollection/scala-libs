@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.3.1 - 2021-02-16
+
+Adds a method to RandomGenerators for taking a random sample from a given Seq
+
 ## v26.3.0 - 2021-02-03
 
 Adds the option to pass to SQSStream a function that creates an entire RunnableGraph from a source and sink.
