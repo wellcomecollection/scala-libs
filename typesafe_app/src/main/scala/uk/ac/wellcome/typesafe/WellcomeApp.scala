@@ -18,6 +18,9 @@ trait WellcomeApp extends App with Logging {
         error("Fatal error:", e)
     } finally {
       info(s"Terminating worker.")
-      System.exit(1)
+      exit()
     }
+
+  protected def exit(): Unit =
+    System.exit(1)
 }

@@ -25,8 +25,9 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
 
       new DummyRunnable(config)
     }
-  }
 
+    override protected def exit(): Unit = ()
+  }
 
   describe("when main is called") {
     DummyWellcomeTypesafeApp.main(Array.empty)
