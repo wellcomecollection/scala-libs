@@ -33,11 +33,11 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
 
     val config = calledWith.get
 
-    it("should call run in the set Runnable") {
+    it("calls run() in the set Runnable") {
       calledWith shouldBe a[Some[_]]
     }
 
-    it("should set the expected logging config") {
+    it("sets the expected logging config") {
       val loggers = config.getList("akka.loggers")
       loggers.size() shouldBe 1
       loggers.get(0).unwrapped() shouldBe "akka.event.slf4j.Slf4jLogger"
@@ -46,7 +46,7 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
       loggingFilter shouldBe "akka.event.slf4j.Slf4jLoggingFilter"
     }
 
-    it("should set the expected overridden config") {
+    it("sets the expected overridden config") {
       val overriddenConfig = config.getString("overridden.config")
       overriddenConfig shouldBe "value"
     }
