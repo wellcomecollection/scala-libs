@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v26.3.2 - 2021-02-17
+
+If a service using `WellcomeApp` throws a terminal exception, it should actually stop running.
+Currently, services hang around forever until they get purged by autoscaling.
+
 ## v26.3.1 - 2021-02-16
 
 Adds a method to RandomGenerators for taking a random sample from a given Seq
