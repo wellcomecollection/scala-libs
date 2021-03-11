@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.4.0 - 2021-03-11
+
+Add `elasticsearch` and `elasticsearch_typesafe` modules
+
 ## v26.3.2 - 2021-02-17
 
 If a service using `WellcomeApp` throws a terminal exception, it should actually stop running.
