@@ -37,6 +37,21 @@ lazy val monitoring_typesafe = Common.setupProject(
   localDependencies = Seq(monitoring)
 )
 
+lazy val elasticsearch = Common.setupProject(
+  project,
+  "elasticsearch",
+  projectVersion,
+  localDependencies = Seq(fixtures, json),
+  externalDependencies = Dependencies.elasticsearchDependencies
+)
+
+lazy val elasticsearch_typesafe = Common.setupProject(
+  project,
+  "elasticsearch_typesafe",
+  projectVersion,
+  localDependencies = Seq(elasticsearch, typesafe_app)
+)
+
 lazy val storage = Common.setupProject(
   project,
   "storage",
