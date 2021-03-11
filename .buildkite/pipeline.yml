@@ -82,7 +82,7 @@ steps:
           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
           network: "host"
           always-pull: true
-          command: ["project elasticsearch", "test"]
+          command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
   - label: test elasticsearch_typesafe
     plugins:
       - docker#v3.5.0:
