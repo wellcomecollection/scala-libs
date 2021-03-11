@@ -16,7 +16,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{Assertion, Suite}
 import uk.ac.wellcome.elasticsearch._
-import uk.ac.wellcome.elasticsearch.model.CanonicalId
+import uk.ac.wellcome.elasticsearch.model.IndexId
 import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 import uk.ac.wellcome.json.utils.JsonAssertions
@@ -108,14 +108,14 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchEventuallyHas[T](index: Index, documents: T*)(
-    implicit id: CanonicalId[T],
+    implicit id: IndexId[T],
     encoder: Encoder[T]): Seq[Assertion] =
     documents.map { document =>
       val documentJson = toJson(document).get
 
       eventually {
         val response: Response[GetResponse] = elasticClient.execute {
-          get(index, id.canonicalId(document))
+          get(index, id.indexId(document))
         }.await
 
         val getResponse = response.result
@@ -157,14 +157,14 @@ trait ElasticsearchFixtures
     }
 
   def assertElasticsearchNeverHas[T](index: Index, documents: T*)(
-    implicit id: CanonicalId[T]): Unit = {
+    implicit id: IndexId[T]): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
     documents.foreach { document =>
       val response: Response[GetResponse] = elasticClient
-        .execute(get(index, id.canonicalId(document)))
+        .execute(get(index, id.indexId(document)))
         .await
 
       response.result.found shouldBe false
