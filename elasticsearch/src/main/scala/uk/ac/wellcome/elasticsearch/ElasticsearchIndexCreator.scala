@@ -42,19 +42,20 @@ class ElasticsearchIndexCreator(
           .settings(Map("mapping.total_fields.limit" -> 2000))
       }
 
-  private def update= for {
-    originalMapping <- elasticClient.execute(getMapping(index.name))
-    originalMeta = originalMapping.result.head.meta
-    mergedMeta = originalMeta ++ mapping.meta
+  private def update =
+    for {
+      originalMapping <- elasticClient.execute(getMapping(index.name))
+      originalMeta = originalMapping.result.head.meta
+      mergedMeta = originalMeta ++ mapping.meta
 
-    resp<- elasticClient
-    .execute(
-    putMapping(index.name)
-    .dynamic(mapping.dynamic.getOrElse(DynamicMapping.Strict))
-      .meta(mergedMeta)
-    .as(mapping.fields)
-    )
-  }yield resp
+      resp <- elasticClient
+        .execute(
+          putMapping(index.name)
+            .dynamic(mapping.dynamic.getOrElse(DynamicMapping.Strict))
+            .meta(mergedMeta)
+            .as(mapping.fields)
+        )
+    } yield resp
 
   private def handleEsError[T](resp: Response[T]) =
     if (resp.isError) {
