@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.4.1 - 2021-03-16
+
+Add possibility to update metadata supplied in an index mapping.
+
 ## v26.4.0 - 2021-03-11
 
 Add `elasticsearch` and `elasticsearch_typesafe` modules
