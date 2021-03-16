@@ -2,10 +2,10 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.analysis.Analysis
-import com.sksamuel.elastic4s.{RequestFailure, Response}
 import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
+import com.sksamuel.elastic4s.{RequestFailure, Response}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
@@ -97,6 +97,40 @@ class ElasticsearchIndexCreatorTest
       }
     }
   }
+
+  it("creates metadata when creating an index"){
+    val customMeta = Map("bleurgh" -> "blargh")
+
+    object IndexConfigWithMetadata extends IndexConfig {
+      val mapping = properties().meta(customMeta)
+      val analysis = Analysis(Nil)
+    }
+    withLocalElasticsearchIndex(IndexConfigWithMetadata) { index =>
+    whenReady(elasticClient.execute(getMapping(index.name))){mapping =>
+      mapping.result.head.meta shouldBe customMeta
+    }
+  }}
+
+  it("updates metadata when creating an index"){
+    val customMeta1 = Map("versions.1" -> 1)
+    val customMeta2 = Map("versions.2" -> 2)
+
+    object IndexConfigWithMetadata1 extends IndexConfig {
+      val mapping = properties().meta(customMeta1)
+      val analysis = Analysis(Nil)
+    }
+    object IndexConfigWithMetadata2 extends IndexConfig {
+      val mapping = properties().meta(customMeta2)
+      val analysis = Analysis(Nil)
+    }
+    withLocalElasticsearchIndex(IndexConfigWithMetadata1) { index =>
+      withLocalElasticsearchIndex(IndexConfigWithMetadata2, index = index) { _ =>
+        whenReady(elasticClient.execute(getMapping(index.name))){mapping =>
+          mapping.result.head.meta shouldBe Map("versions.1" -> 1, "versions.2" -> 2)
+        }
+      }
+    }}
+
 
   it("create an index where inserting a doc of an unexpected type fails") {
     withLocalElasticsearchIndex(TestIndexConfig) { index =>
