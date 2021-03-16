@@ -1,10 +1,11 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.ElasticApi.createIndex
-import com.sksamuel.elastic4s.{ElasticClient, Index, Response}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.mappings.dynamictemplate.DynamicMapping
+import com.sksamuel.elastic4s.{ElasticClient, Index, Response}
 import grizzled.slf4j.Logging
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class ElasticsearchIndexCreator(
@@ -41,13 +42,19 @@ class ElasticsearchIndexCreator(
           .settings(Map("mapping.total_fields.limit" -> 2000))
       }
 
-  private def update =
-    elasticClient
-      .execute(
-        putMapping(index.name)
-          .dynamic(mapping.dynamic.getOrElse(DynamicMapping.Strict))
-          .as(mapping.fields)
-      )
+  private def update= for {
+    originalMapping <- elasticClient.execute(getMapping(index.name))
+    originalMeta = originalMapping.result.head.meta
+    mergedMeta = originalMeta ++ mapping.meta
+
+    resp<- elasticClient
+    .execute(
+    putMapping(index.name)
+    .dynamic(mapping.dynamic.getOrElse(DynamicMapping.Strict))
+      .meta(mergedMeta)
+    .as(mapping.fields)
+    )
+  }yield resp
 
   private def handleEsError[T](resp: Response[T]) =
     if (resp.isError) {
