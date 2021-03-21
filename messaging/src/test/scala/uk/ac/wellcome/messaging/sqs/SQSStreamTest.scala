@@ -34,9 +34,11 @@ class SQSStreamTest
   }
 
   it("reads messages off a queue, processes them and deletes them") {
+    val messages = createNamedObjects(start = 1, count = 20)
+
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
-        sendNamedObjects(queue = queue, count = 3)
+        messages.foreach { sendSqsMessage(queue, _) }
 
         val received = new ConcurrentLinkedQueue[NamedObject]()
         val streamName = randomAlphanumeric(10)
@@ -45,14 +47,12 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          received should contain theSameElementsAs createNamedObjects(
-            count = 3)
+          received should contain theSameElementsAs messages
 
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
         }
     }
-
   }
 
   it("increments *_ProcessMessage metric when successful") {
