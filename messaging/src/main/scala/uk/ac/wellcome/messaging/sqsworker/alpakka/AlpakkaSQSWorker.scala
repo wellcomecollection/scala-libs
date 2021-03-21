@@ -47,7 +47,7 @@ class AlpakkaSQSWorker[Work,
 
   val parallelism: Int = config.sqsConfig.parallelism
   val source = SqsSource(config.sqsConfig.queueUrl)
-  val sink = SqsAckSink(config.sqsConfig.queueUrl)
+  val sink = SqsAckSink.grouped(config.sqsConfig.queueUrl)
 
   val retryAction: SQSAction = (message: SQSMessage) =>
     MessageAction

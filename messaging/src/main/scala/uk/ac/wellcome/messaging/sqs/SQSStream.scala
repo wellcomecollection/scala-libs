@@ -42,7 +42,7 @@ class SQSStream[T](
   private val source: Source[Message, NotUsed] =
     SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink: Sink[MessageAction, Future[Done]] =
-    SqsAckSink(sqsConfig.queueUrl)(sqsClient)
+    SqsAckSink.grouped(sqsConfig.queueUrl)(sqsClient)
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =

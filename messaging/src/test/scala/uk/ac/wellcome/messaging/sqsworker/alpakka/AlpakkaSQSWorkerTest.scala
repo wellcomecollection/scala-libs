@@ -58,6 +58,41 @@ class AlpakkaSQSWorkerTest
       }
     }
 
+    it("processes lots of messages") {
+      val works = (1 to 20).map { i => MyWork(s"my-work-$i") }
+
+      withLocalSqsQueuePair() {
+        case QueuePair(queue, dlq) =>
+          withActorSystem { implicit actorSystem =>
+            withAlpakkaSQSWorker(queue, successful, namespace) {
+              case (worker, _, metrics, callCounter) =>
+                worker.start
+
+
+                works.foreach { sendNotificationToSQS(queue, _) }
+
+                eventually {
+                  callCounter.calledCount shouldBe works.size
+
+                  assertMetricCount(
+                    metrics = metrics,
+                    metricName = s"$namespace/Successful",
+                    expectedCount = works.size
+                  )
+                  assertMetricDurations(
+                    metrics = metrics,
+                    metricName = s"$namespace/Duration",
+                    expectedNumberDurations = works.size
+                  )
+
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 0)
+                }
+            }
+          }
+      }
+    }
+
     it(
       "consumes a message and increments non deterministic failure metrics metrics") {
       withLocalSqsQueuePair() {
