@@ -59,7 +59,7 @@ class AlpakkaSQSWorkerTest
     }
 
     it("processes lots of messages") {
-      val works = (1 to 11).map { i => MyWork(s"my-work-$i") }
+      val works = (1 to 20).map { i => MyWork(s"my-work-$i") }
 
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>

@@ -34,7 +34,7 @@ class SQSStreamTest
   }
 
   it("reads messages off a queue, processes them and deletes them") {
-    val messages = createNamedObjects(count = 15)
+    val messages = createNamedObjects(count = 20)
 
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
