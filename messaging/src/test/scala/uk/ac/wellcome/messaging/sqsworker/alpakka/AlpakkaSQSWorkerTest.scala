@@ -1,8 +1,9 @@
 package uk.ac.wellcome.messaging.sqsworker.alpakka
 
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.wellcome.akka.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
@@ -17,9 +18,14 @@ class AlpakkaSQSWorkerTest
     with AlpakkaSQSWorkerFixtures
     with MetricsFixtures
     with ScalaFutures
-    with IntegrationPatience
     with Eventually
     with Akka {
+
+  val config: PatienceConfig =
+    PatienceConfig(
+      timeout = scaled(Span(30, Seconds)),
+      interval = scaled(Span(150, Millis))
+    )
 
   val namespace = "AlpakkaSQSWorkerTest"
 
