@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v26.4.2 - 2021-03-22
+
+SQSStream and AlpakkaSQSWorker are now using DeleteMessageBatch rather than DeleteMessage.
+This should have no user-visible effects.
+
 ## v26.4.1 - 2021-03-16
 
 Add possibility to update metadata supplied in an index mapping.
