@@ -1,6 +1,6 @@
 package uk.ac.wellcome.messaging.sqsworker.alpakka
 
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{AbstractPatienceConfiguration, Eventually, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -19,9 +19,10 @@ class AlpakkaSQSWorkerTest
     with MetricsFixtures
     with ScalaFutures
     with Eventually
+    with AbstractPatienceConfiguration
     with Akka {
 
-  val config: PatienceConfig =
+  override implicit val patienceConfig: PatienceConfig =
     PatienceConfig(
       timeout = scaled(Span(30, Seconds)),
       interval = scaled(Span(150, Millis))
