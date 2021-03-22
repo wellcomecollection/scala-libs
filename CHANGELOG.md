@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.4.3 - 2021-03-22
+
+This patch makes the locking service slightly more efficient in scenarios where multiple processes are trying to acquire overlapping sets of locks.
+
 ## v26.4.2 - 2021-03-22
 
 SQSStream and AlpakkaSQSWorker are now using DeleteMessageBatch rather than DeleteMessage.
