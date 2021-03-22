@@ -67,7 +67,11 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
         withLockDao(lockDaoContext) { lockDao =>
           withLockingService(lockDao) { service =>
             assertLockSuccess(service.withLocks(lockIds) {
-              assertFailedLock(service.withLocks(lockIds)(f), lockIds)
+              assertFailedLock(
+                result = service.withLocks(lockIds)(f),
+                lockIds = lockIds,
+                expectedFailures = lockIds
+              )
 
               // Check the original locks were preserved
               getCurrentLocks(lockDao, lockDaoContext) shouldBe lockIds
@@ -85,8 +89,10 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
           withLockingService(lockDao) { service =>
             assertLockSuccess(service.withLocks(lockIds) {
               assertFailedLock(
-                service.withLocks(overlappingLockIds)(f),
-                commonLockIds)
+                result = service.withLocks(overlappingLockIds)(f),
+                lockIds = commonLockIds,
+                expectedFailures = overlappingLockIds
+              )
 
               // Check the original locks were preserved
               getCurrentLocks(lockDao, lockDaoContext) shouldBe lockIds
@@ -127,8 +133,9 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
         assertLockSuccess(service.withLocks(lockIds) {
 
           assertFailedLock(
-            service.withLocks(overlappingLockIds)(f),
-            commonLockIds
+            result = service.withLocks(overlappingLockIds)(f),
+            lockIds = commonLockIds,
+            expectedFailures = overlappingLockIds
           )
 
           assertLockSuccess(

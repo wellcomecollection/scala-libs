@@ -4,6 +4,7 @@ import cats._
 import cats.data._
 import grizzled.slf4j.Logging
 
+import scala.annotation.tailrec
 import scala.language.higherKinds
 
 trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
@@ -60,27 +61,31 @@ trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
     * unlock the entire context and report a failure.
     *
     */
+  @tailrec
   private def getLocks(ids: Set[lockDao.Ident],
-                       contextId: lockDao.ContextId): LockingServiceResult = {
-    val lockResults = ids.map { lockDao.lock(_, contextId) }
-    val failedLocks = getFailedLocks(lockResults)
-
-    if (failedLocks.isEmpty) {
+                       contextId: lockDao.ContextId): LockingServiceResult =
+    // We lock the IDs one-by-one, but if any ID fails to lock, we skip
+    // even trying to lock the remaining IDs.
+    //
+    // This reduces the amount of churn in the LockDao: we're skipping creating
+    // and deleting a lock we know will never be used.
+    if (ids.isEmpty) {
       Right(contextId)
     } else {
-      unlock(contextId)
-      Left(FailedLock(contextId, failedLocks))
-    }
-  }
-
-  private def getFailedLocks(
-    lockResults: Set[lockDao.LockResult]): Set[LockFailure[lockDao.Ident]] =
-    lockResults.foldLeft(Set.empty[LockFailure[lockDao.Ident]]) { (acc, o) =>
-      o match {
-        case Right(_)         => acc
-        case Left(failedLock) => acc + failedLock
+      lockDao.lock(ids.head, contextId) match {
+        case Left(failure) =>
+          Left(FailedLock(contextId, ids.tail.map(skipped) + failure))
+        case Right(_) => getLocks(ids.tail, contextId)
       }
     }
+
+  private def skipped[Ident](id: Ident): LockFailure[Ident] =
+    LockFailure(
+      id,
+      e = new Throwable(
+        s"Skipping locking $id; other IDs have already failed to lock"
+      )
+    )
 
   private def unlock(contextId: lockDao.ContextId): Unit =
     lockDao
