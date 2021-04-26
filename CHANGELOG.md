@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.5.0 - 2021-04-26
+
+Add the first piece of a shared HTTP library, with some models from the catalogue API.
+
 ## v26.4.3 - 2021-03-22
 
 This patch makes the locking service slightly more efficient in scenarios where multiple processes are trying to acquire overlapping sets of locks.
