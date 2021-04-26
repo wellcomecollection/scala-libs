@@ -86,7 +86,7 @@ lazy val http = Common.setupProject(
   project,
   "http",
   projectVersion,
-  localDependencies = Seq(json),
+  localDependencies = Seq(json, monitoring),
   externalDependencies = Dependencies.httpDependencies
 )
 
