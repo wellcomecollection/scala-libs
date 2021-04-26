@@ -27,4 +27,3 @@ case object ContextResponse {
         .getOrElse(json)
     }
 }
-
