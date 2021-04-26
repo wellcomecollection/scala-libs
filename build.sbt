@@ -82,6 +82,14 @@ lazy val messaging_typesafe = Common.setupProject(
   localDependencies = Seq(messaging, monitoring_typesafe)
 )
 
+lazy val http = Common.setupProject(
+  project,
+  "http",
+  projectVersion,
+  localDependencies = Seq(json),
+  externalDependencies = Dependencies.httpDependencies
+)
+
 /**
  * To release to the Wellcome maven repo in S3 locally, uncomment this:
  **/
