@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.6.0 - 2021-04-26
+
+This release adds the shared `HttpMetrics` class.
+
 ## v26.5.0 - 2021-04-26
 
 Add the first piece of a shared HTTP library, with some models from the catalogue API.
