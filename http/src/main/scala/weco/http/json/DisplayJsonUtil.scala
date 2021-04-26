@@ -14,7 +14,7 @@ import io.circe.syntax._
   *     render the complete value for disambiguation.
   *
   */
-object DisplayJsonUtil extends AutoDerivation {
+trait DisplayJsonUtil extends AutoDerivation {
   val printer: Printer = Printer.noSpaces.copy(
     dropNullValues = true
   )
@@ -27,3 +27,5 @@ object DisplayJsonUtil extends AutoDerivation {
     printer.print(value.asJson)
   }
 }
+
+object DisplayJsonUtil extends DisplayJsonUtil
