@@ -1,4 +1,4 @@
-package weco.http
+package weco.http.monitoring
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCode}
 import grizzled.slf4j.Logging
