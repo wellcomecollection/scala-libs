@@ -1,4 +1,4 @@
-package weco.http
+package weco.http.monitoring
 
 import akka.http.scaladsl.model.StatusCodes
 import org.scalatest.funspec.AnyFunSpec

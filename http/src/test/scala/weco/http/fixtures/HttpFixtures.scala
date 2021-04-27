@@ -3,7 +3,7 @@ package weco.http.fixtures
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
-import weco.http.HttpMetricResults
+import weco.http.monitoring.HttpMetricResults
 
 trait HttpFixtures extends Matchers {
   def assertMetricSent(
