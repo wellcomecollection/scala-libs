@@ -215,21 +215,21 @@ def release():
     print(f"Commit range: {commit_range}")
 
     if not is_default_branch():
-        print('Trying to release while not on master?')
+        print('Trying to release while not on main?')
         sys.exit(1)
 
     if has_release():
         print('Updating changelog and version')
 
         update_for_pending_release()
-        
+
         print('Attempting a release.')
 
         git("config", "user.name", "Buildkite on behalf of Wellcome Collection")
         git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
         git("remote", "add", "ssh-origin", repo(), exit_on_error=False)
 
-        git('push', 'ssh-origin', 'HEAD:master')
+        git('push', 'ssh-origin', 'HEAD:main')
         git('push', 'ssh-origin', '--tag')
     else:
         print("No release detected, exit gracefully.")

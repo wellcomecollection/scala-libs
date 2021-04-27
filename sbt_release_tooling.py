@@ -312,15 +312,15 @@ def release():
     print('Latest released version: %s' % last_release)
 
     HEAD = hash_for_name('HEAD')
-    MASTER = hash_for_name('origin/master')
+    MAIN = hash_for_name('origin/main')
 
-    print('Current head:   %s' % HEAD)
-    print('Current master: %s' % MASTER)
+    print('Current head: %s' % HEAD)
+    print('Current main: %s' % MAIN)
 
-    on_master = is_ancestor(HEAD, MASTER)
+    on_main = is_ancestor(HEAD, MAIN)
 
-    if not on_master:
-        print('Trying to release while not on master?')
+    if not on_main:
+        print('Trying to release while not on main?')
         sys.exit(1)
 
     if has_release():
@@ -332,7 +332,7 @@ def release():
 
     print('Attempting a release.')
 
-    git('push', 'ssh-origin', 'HEAD:master')
+    git('push', 'ssh-origin', 'HEAD:main')
     git('push', 'ssh-origin', '--tag')
 
 
