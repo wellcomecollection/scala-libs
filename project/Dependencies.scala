@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val akka = "2.6.11"
+    val akka = "2.6.10"
     val akkaStreamAlpakka = "1.1.2"
     val elasticApm = "1.12.0"
 
@@ -55,7 +55,7 @@ object Dependencies {
     //      one that uses the same version of akka-http and a compatible Circe:
     //      https://github.com/hseeberger/akka-http-json/blob/master/build.sbt
     //
-    val akkaHttp = "10.1.10"
+    val akkaHttp = "10.1.11"
   }
 
   val circeDependencies = Seq(
