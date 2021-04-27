@@ -15,7 +15,7 @@ import io.circe.syntax._
   *
   */
 trait DisplayJsonUtil extends AutoDerivation {
-  val printer: Printer = Printer.noSpaces.copy(
+  implicit val printer: Printer = Printer.noSpaces.copy(
     dropNullValues = true
   )
 
