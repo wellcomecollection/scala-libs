@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.7.1 - 2021-04-27
+
+Make the printer on `DisplayJsonUtil` an implicit value.
+
 ## v26.7.0 - 2021-04-27
 
 This release add the `ErrorDirectives` and `FutureDirectives` traits.
