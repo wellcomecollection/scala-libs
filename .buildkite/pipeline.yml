@@ -103,7 +103,7 @@ steps:
           command: ["project elasticsearch_typesafe", "test"]
   - wait
   - label: cut release
-    if: build.branch == "master"
+    if: build.branch == "main"
     plugins:
       - docker#v3.5.0:
           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
@@ -116,7 +116,7 @@ steps:
     command: "/workdir/.buildkite/scripts/release.py"
   - wait
   - label: publish fixtures
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: fixtures
     plugins:
@@ -130,7 +130,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish http
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: http
     plugins:
@@ -144,7 +144,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish json
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: json
     plugins:
@@ -158,7 +158,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish typesafe_app
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: typesafe_app
     plugins:
@@ -172,7 +172,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish messaging
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: messaging
     plugins:
@@ -186,7 +186,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish messaging_typesafe
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: messaging_typesafe
     plugins:
@@ -200,7 +200,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish monitoring
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: monitoring
     plugins:
@@ -214,7 +214,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish monitoring_typesafe
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: monitoring_typesafe
     plugins:
@@ -228,7 +228,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish storage
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: storage
     plugins:
@@ -242,7 +242,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish storage_typesafe
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: storage_typesafe
     plugins:
@@ -256,7 +256,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish elasticseach
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: elasticsearch
     plugins:
@@ -270,7 +270,7 @@ steps:
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish elasticsearch_typesafe
-    if: build.branch == "master"
+    if: build.branch == "main"
     env:
       PROJECT: elasticsearch_typesafe
     plugins:
