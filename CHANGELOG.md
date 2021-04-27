@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v26.7.0 - 2021-04-27
+
+This release add the `ErrorDirectives` and `FutureDirectives` traits.
+These are split out from the `CustomDirectives` traits that used to live in our application repos.
+
+It also adds `akka-http-circe` as a dependency of the http lib.
+
 ## v26.6.0 - 2021-04-26
 
 This release adds the shared `HttpMetrics` class.
