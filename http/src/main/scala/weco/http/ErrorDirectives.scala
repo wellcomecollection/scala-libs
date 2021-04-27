@@ -7,7 +7,11 @@ import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.models.{ContextResponse, DisplayError}
 
-trait ErrorDirectives extends Directives with FailFastCirceSupport with Logging with DisplayJsonUtil {
+trait ErrorDirectives
+    extends Directives
+    with FailFastCirceSupport
+    with Logging
+    with DisplayJsonUtil {
   import weco.http.models.ContextResponse._
 
   def context: String
