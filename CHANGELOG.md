@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.7.3 - 2021-04-27
+
+Bump the version of akka-http to 10.1.11 (but actually correctly).
+
 ## v26.7.2 - 2021-04-27
 
 Bump the version of akka-http to 2.6.11.
