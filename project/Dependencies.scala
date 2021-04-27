@@ -15,6 +15,7 @@ object Dependencies {
 
     val azure = "12.7.0"
 
+    val akkaHttpCirce = "1.32.0"
     val circe = "0.13.0"
     val typesafe = "1.3.2"
     val jackson = "2.12.3"
@@ -99,7 +100,8 @@ object Dependencies {
   )
 
   val akkaHttpDependencies = Seq(
-    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp
+    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
+    "de.heikoseeberger" %% "akka-http-circe" % versions.akkaHttpCirce
   )
 
   val apacheCommons = Seq(
