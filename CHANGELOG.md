@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v26.7.2 - 2021-04-27
+
+Bump the version of akka-http to 2.6.11.
+
+Tweak the behaviour of FutureDirectives.
+
 ## v26.7.1 - 2021-04-27
 
 Make the printer on `DisplayJsonUtil` an implicit value.
