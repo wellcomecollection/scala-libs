@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.9.1 - 2021-04-30
+
+Remember to publish http_typesafe
+
 ## v26.9.0 - 2021-04-30
 
 Add WellcomeHttpApp
