@@ -90,6 +90,13 @@ lazy val http = Common.setupProject(
   externalDependencies = Dependencies.httpDependencies
 )
 
+lazy val http_typesafe = Common.setupProject(
+  project,
+  "http_typesafe",
+  projectVersion,
+  localDependencies = Seq(http)
+)
+
 /**
  * To release to the Wellcome maven repo in S3 locally, uncomment this:
  **/
