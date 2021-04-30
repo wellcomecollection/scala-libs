@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.9.0 - 2021-04-30
+
+Add WellcomeHttpApp
+
 ## v26.8.0 - 2021-04-29
 
 Adds Tracing trait supporting APM tracing to typesafe_app lib, in order to make it available to all apps by default.
