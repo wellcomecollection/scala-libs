@@ -14,11 +14,10 @@ import uk.ac.wellcome.json.JsonUtil.toJson
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 import weco.http.fixtures.HttpFixtures
-import weco.http.models.ContextResponse
 import weco.http.monitoring.HttpMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class WellcomeHttpAppFeatureTest
   extends AnyFunSpec
@@ -28,23 +27,20 @@ class WellcomeHttpAppFeatureTest
     with JsonAssertions {
 
   val exampleApi = new ExampleApi {
-    override implicit val ec: ExecutionContext = global
-
     override def getTransform(): ExampleResource = ExampleResource("hello world")
 
-    override def postTransform(exampleResource: ExampleResource): (StatusCode, HttpEntity.Strict) = {
-      (StatusCodes.Accepted, HttpEntity.Empty)
-    }
+    override def postTransform(exampleResource: ExampleResource): String = "ok"
+
+    override def context: String = contextURLTest
   }
 
   val brokenGetExampleApi = new ExampleApi {
-    override implicit val ec: ExecutionContext = global
-
     override def getTransform(): ExampleResource = throw new Exception("BOOM!!!")
 
-    override def postTransform(exampleResource: ExampleResource): (StatusCode, HttpEntity.Strict) =
+    override def postTransform(exampleResource: ExampleResource): String =
       throw new Exception("BOOM!!!")
 
+    override def context: String = contextURLTest
   }
 
   describe("GET") {
@@ -122,6 +118,7 @@ class WellcomeHttpAppFeatureTest
       }
     }
 
+    // TODO: Expecting more detailed json errors here like in storage service
     it("returns a WATWAT if the request is malformed") {
       withApp(exampleApi.routes) { _ =>
 
@@ -148,9 +145,7 @@ class WellcomeHttpAppFeatureTest
     }
   }
 
-  val contextURLTest = new URL(
-    "http://api.wellcomecollection.org/example/v1/context.json"
-  )
+  val contextURLTest = "http://api.wellcomecollection.org/example/v1/context.json"
 
   def assertIsDisplayError(
                             response: HttpResponse,
@@ -190,7 +185,7 @@ class WellcomeHttpAppFeatureTest
         routes = routes,
         httpMetrics = httpMetrics,
         httpServerConfig = httpServerConfigTest,
-        contextURL = contextURLTest,
+        contextURL = new URL(contextURLTest),
         appName = metricsName
       )
 
@@ -204,10 +199,9 @@ class WellcomeHttpAppFeatureTest
 case class ExampleResource(name: String)
 
 trait ExampleApi extends FutureDirectives {
-
   def getTransform(): ExampleResource
 
-  def postTransform(exampleResource: ExampleResource)
+  def postTransform(exampleResource: ExampleResource): String
 
   val routes: Route = concat(
     pathPrefix("example") {
@@ -215,17 +209,11 @@ trait ExampleApi extends FutureDirectives {
         entity(as[ExampleResource]) {
           exampleResource: ExampleResource =>
             withFuture {
-              Future(
-                complete(
-                  Accepted -> ContextResponse(context = new URL("http://www.example.com"), result = ExampleResource(name = "terry"))
-                )
-              )
+              Future(complete(Accepted -> postTransform(exampleResource)))
             }
         }
       } ~ get {
-        val result = getTransform()
-
-        complete(result)
+        complete(getTransform())
       }
     }
   )
