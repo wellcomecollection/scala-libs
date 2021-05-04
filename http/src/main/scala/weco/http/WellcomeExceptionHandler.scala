@@ -5,7 +5,7 @@ import java.net.URL
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.server.ExceptionHandler
 import grizzled.slf4j.Logging
-import weco.http.models.InternalServerErrorResponse
+import weco.http.models.{ContextResponse, DisplayError}
 import weco.http.monitoring.HttpMetrics
 
 trait WellcomeExceptionHandler extends Logging {
@@ -22,10 +22,15 @@ trait WellcomeExceptionHandler extends Logging {
     ExceptionHandler {
       case err: Exception =>
         logger.error(s"Unexpected exception $err")
-        val error = InternalServerErrorResponse(
+
+        val error = ContextResponse(
           context = contextURL,
-          statusCode = InternalServerError
+          DisplayError(
+            statusCode = InternalServerError,
+            description = "An internal error occurred attempting to process this request!"
+          )
         )
+
         httpMetrics.sendMetric(InternalServerError)
         complete(InternalServerError -> error)
     }

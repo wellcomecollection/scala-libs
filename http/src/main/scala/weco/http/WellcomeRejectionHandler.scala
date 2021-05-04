@@ -5,15 +5,11 @@ import java.net.URL
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model.StatusCodes.BadRequest
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{
-  MalformedRequestContentRejection,
-  RejectionHandler,
-  StandardRoute
-}
+import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, StandardRoute}
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import io.circe.CursorOp
-import weco.http.models.{InternalServerErrorResponse, UserErrorResponse}
+import weco.http.models.{ContextResponse, DisplayError}
 import weco.http.monitoring.HttpMetrics
 
 import scala.concurrent.ExecutionContext
@@ -21,7 +17,6 @@ import scala.concurrent.ExecutionContext
 trait WellcomeRejectionHandler {
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
-  import uk.ac.wellcome.json.JsonUtil._
 
   val httpMetrics: HttpMetrics
   val contextURL: URL
@@ -79,10 +74,12 @@ trait WellcomeRejectionHandler {
     }
 
     complete(
-      BadRequest -> UserErrorResponse(
+      BadRequest -> ContextResponse(
         context = contextURL,
-        statusCode = BadRequest,
-        description = message.toList.mkString("\n")
+        DisplayError(
+          statusCode = BadRequest,
+          description = message.toList.mkString("\n")
+        )
       )
     )
   }
@@ -96,16 +93,21 @@ trait WellcomeRejectionHandler {
       .mapAsync(parallelism = 1)(data => {
         val description = data.utf8String
         if (statusCode.intValue() >= 500) {
-          val response = InternalServerErrorResponse(
+          val response = ContextResponse(
             context = contextURL,
-            statusCode = statusCode
+            DisplayError(
+              statusCode = statusCode,
+              description = "An internal error occurred attempting to process this request!"
+            )
           )
           Marshal(response).to[MessageEntity]
         } else {
-          val response = UserErrorResponse(
+          val response = ContextResponse(
             context = contextURL,
-            statusCode = statusCode,
-            description = description
+            DisplayError(
+              statusCode = statusCode,
+              description = description
+            )
           )
           Marshal(response).to[MessageEntity]
         }
