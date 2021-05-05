@@ -162,7 +162,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         httpServerConfig = httpServerConfigTest,
         contextUrl = ExampleApp.contextUrl,
         appName = metricsName
-      )(actorSystem.getOrElse(defaultActorSystem), ec)
+      )(actorSystem.getOrElse(defaultActorSystem), global)
 
       app.run()
 
