@@ -25,11 +25,7 @@ trait WellcomeExceptionHandler extends Logging {
 
         val error = ContextResponse(
           context = contextURL,
-          DisplayError(
-            statusCode = InternalServerError,
-            description =
-              "An internal error occurred attempting to process this request!"
-          )
+          DisplayError(statusCode = InternalServerError)
         )
 
         httpMetrics.sendMetric(InternalServerError)
