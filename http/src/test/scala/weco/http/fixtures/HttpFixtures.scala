@@ -21,16 +21,14 @@ import weco.http.WellcomeHttpApp
 import weco.http.fixtures.ExampleApp.context
 import weco.http.models.HTTPServerConfig
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait HttpFixtures extends Akka with ScalaFutures with Matchers
   with JsonAssertions{
 
-  implicit val ec: ExecutionContext
-
   private def whenRequestReady[R](
-                                   r: HttpRequest
-                                 )(testWith: TestWith[HttpResponse, R]): R =
+    r: HttpRequest
+  )(testWith: TestWith[HttpResponse, R]): R =
     withActorSystem { implicit actorSystem =>
       val request = Http().singleRequest(r)
       whenReady(request) { response: HttpResponse =>
