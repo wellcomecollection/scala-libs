@@ -127,7 +127,7 @@ class WellcomeHttpAppFeatureTest
           string =
             """
               |{
-              |
+              | "age": 48
               |}
               |""".stripMargin
         )
@@ -139,6 +139,31 @@ class WellcomeHttpAppFeatureTest
             response = response,
             description = "An internal error occurred attempting to process this request!",
             statusCode = BadRequest
+          )
+        }
+      }
+    }
+
+    it("returns an InternalServerError if an exception is thrown") {
+      withApp(brokenGetExampleApi.routes) { _ =>
+
+        val entity = HttpEntity(
+          contentType = ContentTypes.`application/json`,
+          string =
+            """
+              |{
+              | "name": "gary"
+              |}
+              |""".stripMargin
+        )
+
+        val path = "/example"
+
+        whenPostRequestReady(path, entity) { response =>
+          assertIsDisplayError(
+            response = response,
+            description = "An internal error occurred attempting to process this request!",
+            statusCode = InternalServerError
           )
         }
       }
