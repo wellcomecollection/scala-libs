@@ -7,16 +7,11 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.http.fixtures.HttpFixtures
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class WellcomeHttpAppFeatureTest
   extends AnyFunSpec
     with Matchers
     with HttpFixtures
     with IntegrationPatience {
-
-  override implicit val ec: ExecutionContext = global
 
   import weco.http.fixtures.ExampleApp._
 
