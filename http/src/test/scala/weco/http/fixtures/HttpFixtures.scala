@@ -2,6 +2,7 @@ package weco.http.fixtures
 
 import java.net.URL
 
+import akka.actor.ActorSystem
 import org.scalatest.Assertion
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
@@ -151,22 +152,22 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
     }
   }
 
-  def withApp[R](routes: Route)(testWith: TestWith[WellcomeHttpApp, R]): R =
-    withActorSystem { implicit actorSystem =>
+  def withApp[R](routes: Route, httpMetrics: Option[HttpMetrics] = None, actorSystem: Option[ActorSystem] = None)(testWith: TestWith[WellcomeHttpApp, R]): R =
+    withActorSystem { implicit defaultActorSystem =>
       val metricsName = "example.app"
 
-      val httpMetrics = new HttpMetrics(
+      val defaultHttpMetrics: HttpMetrics = new HttpMetrics(
         name = metricsName,
         metrics = new MemoryMetrics
       )
 
       val app = new WellcomeHttpApp(
         routes = routes,
-        httpMetrics = httpMetrics,
+        httpMetrics = httpMetrics.getOrElse(defaultHttpMetrics),
         httpServerConfig = httpServerConfigTest,
         contextURL = new URL(context),
         appName = metricsName
-      )
+      )(actorSystem.getOrElse(defaultActorSystem), ec)
 
       app.run()
 
