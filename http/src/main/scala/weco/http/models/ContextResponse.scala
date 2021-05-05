@@ -1,34 +1,28 @@
 package weco.http.models
 
 import io.circe.{Encoder, Json}
-import io.circe.generic.extras.JsonKey
-import io.circe.generic.extras.semiauto.deriveConfiguredEncoder
-import uk.ac.wellcome.json.JsonUtil._
+import io.circe.syntax._
 
 import java.net.URL
 
-case class ContextResponse[T: Encoder](
-  @JsonKey("@context") context: String,
-  result: T
+// This is deliberately a regular class, not a case class, so callers are
+// forced to use the encoder we've defined below, and not the automatically
+// derived encoder for case classes.
+class ContextResponse[T: Encoder](
+  val contextUrl: URL,
+  val result: T
 )
 
 case object ContextResponse {
-
   def apply[T: Encoder](contextUrl: URL, result: T): ContextResponse[T] =
-    ContextResponse(context = contextUrl.toString, result = result)
+    new ContextResponse(contextUrl = contextUrl, result = result)
 
-  // Flattens the 'result' field into the rest of the object
+  // Add the @context field to the serialised version of T
   implicit def encoder[T: Encoder]: Encoder[ContextResponse[T]] =
-    deriveConfiguredEncoder[ContextResponse[T]].mapJson { json =>
-      json.asObject
-        .flatMap { obj =>
-          obj.toMap
-            .get("result")
-            .flatMap(_.asObject.map(_.toList))
-            .map { fields =>
-              Json.obj(fields ++ obj.filterKeys(_ != "result").toList: _*)
-            }
+    (response: ContextResponse[T]) => {
+      response.result.asJson
+        .mapObject { json =>
+          json.add("@context", Json.fromString(response.contextUrl.toString))
         }
-        .getOrElse(json)
     }
 }
