@@ -27,7 +27,8 @@ trait WellcomeExceptionHandler extends Logging {
           context = contextURL,
           DisplayError(
             statusCode = InternalServerError,
-            description = "An internal error occurred attempting to process this request!"
+            description =
+              "An internal error occurred attempting to process this request!"
           )
         )
 
