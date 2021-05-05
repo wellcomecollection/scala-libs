@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.9.2 - 2021-05-05
+
+Make the `ElasticClient` in `ElasticsearchFixtures` an implicit value.
+
 ## v26.9.1 - 2021-04-30
 
 Remember to publish http_typesafe
