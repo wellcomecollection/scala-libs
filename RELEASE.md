@@ -1,3 +1,9 @@
-RELEASE_TYPE: patch
+RELEASE_TYPE: minor
 
-Don't require an ExecutionContext implicit in HttpFixtures.
+This standardises the use of context URLs with a new trait:
+
+```scala
+trait HasContextUrl {
+  def contextUrl: URL
+}
+```

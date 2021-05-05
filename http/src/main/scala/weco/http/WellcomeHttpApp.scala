@@ -19,7 +19,7 @@ class WellcomeHttpApp(
   routes: Route,
   httpServerConfig: HTTPServerConfig,
   val httpMetrics: HttpMetrics,
-  val contextURL: URL,
+  val contextUrl: URL,
   val appName: String
 )(
   implicit

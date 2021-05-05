@@ -1,7 +1,5 @@
 package weco.http.fixtures
 
-import java.net.URL
-
 import akka.actor.ActorSystem
 import org.scalatest.Assertion
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
@@ -19,7 +17,6 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.json.JsonUtil.toJson
 import uk.ac.wellcome.json.utils.JsonAssertions
 import weco.http.WellcomeHttpApp
-import weco.http.fixtures.ExampleApp.context
 import weco.http.models.HTTPServerConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -138,7 +135,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         jsonResponse,
         s"""
            |{
-           |  "@context": "$context",
+           |  "@context": "${ExampleApp.contextUrl}",
            |  "errorType": "http",
            |  "httpStatus": ${statusCode.intValue()},
            |  "label": "${statusCode.reason()}",
@@ -163,7 +160,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         routes = routes,
         httpMetrics = httpMetrics.getOrElse(defaultHttpMetrics),
         httpServerConfig = httpServerConfigTest,
-        contextURL = new URL(context),
+        contextUrl = ExampleApp.contextUrl,
         appName = metricsName
       )(actorSystem.getOrElse(defaultActorSystem), ec)
 

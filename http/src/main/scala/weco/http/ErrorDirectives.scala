@@ -11,10 +11,9 @@ trait ErrorDirectives
     extends Directives
     with ErrorAccumulatingCirceSupport
     with Logging
-    with DisplayJsonUtil {
+    with DisplayJsonUtil
+    with HasContextUrl {
   import weco.http.models.ContextResponse._
-
-  def context: String
 
   def gone(description: String): Route =
     error(
@@ -35,7 +34,7 @@ trait ErrorDirectives
 
   private def error(err: DisplayError): Route =
     complete(
-      err.httpStatus -> ContextResponse(context = context, result = err)
+      err.httpStatus -> ContextResponse(context = contextUrl, result = err)
     )
 
   def internalError(err: Throwable): Route = {
