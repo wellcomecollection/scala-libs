@@ -14,8 +14,8 @@ case class ContextResponse[T: Encoder](
 
 case object ContextResponse {
 
-  def apply[T: Encoder](context: URL, result: T): ContextResponse[T] =
-    ContextResponse(context = context.toString, result = result)
+  def apply[T: Encoder](contextUrl: URL, result: T): ContextResponse[T] =
+    ContextResponse(context = contextUrl.toString, result = result)
 
   // Flattens the 'result' field into the rest of the object
   implicit def encoder[T: Encoder]: Encoder[ContextResponse[T]] =

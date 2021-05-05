@@ -34,7 +34,7 @@ trait ErrorDirectives
 
   private def error(err: DisplayError): Route =
     complete(
-      err.httpStatus -> ContextResponse(context = contextUrl, result = err)
+      err.httpStatus -> ContextResponse(contextUrl = contextUrl, result = err)
     )
 
   def internalError(err: Throwable): Route = {

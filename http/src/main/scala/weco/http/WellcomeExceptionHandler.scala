@@ -21,7 +21,7 @@ trait WellcomeExceptionHandler extends Logging with HasContextUrl {
         logger.error(s"Unexpected exception $err")
 
         val error = ContextResponse(
-          context = contextUrl,
+          contextUrl = contextUrl,
           DisplayError(statusCode = InternalServerError)
         )
 
