@@ -40,8 +40,8 @@ class WellcomeHttpAppFeatureTest
                |  "name" : "hello world"
                |}""".stripMargin
 
-          withStringEntity(response.entity) { actualJson =>
-            assertJsonStringsAreEqual(actualJson, expectedJson)
+          withStringEntity(response.entity) {
+            assertJsonStringsAreEqual(_, expectedJson)
           }
         }
       }
@@ -191,4 +191,3 @@ class WellcomeHttpAppFeatureTest
     }
   }
 }
-
