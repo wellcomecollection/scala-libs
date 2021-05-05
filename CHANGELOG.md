@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.10.0 - 2021-05-05
+
+Simplify error handling in http lib, add some tests for WellcomeHttpApp
+
 ## v26.9.2 - 2021-05-05
 
 Make the `ElasticClient` in `ElasticsearchFixtures` an implicit value.
