@@ -99,11 +99,7 @@ trait WellcomeRejectionHandler {
         if (statusCode.intValue() >= 500) {
           val response = ContextResponse(
             context = contextURL,
-            DisplayError(
-              statusCode = statusCode,
-              description =
-                "An internal error occurred attempting to process this request!"
-            )
+            DisplayError(statusCode = statusCode)
           )
           Marshal(response).to[MessageEntity]
         } else {
