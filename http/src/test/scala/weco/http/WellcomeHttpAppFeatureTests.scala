@@ -65,7 +65,7 @@ class WellcomeHttpAppFeatureTest
         whenGetRequestReady(path) { response =>
           assertIsDisplayError(
             response = response,
-            description = "An internal error occurred attempting to process this request!",
+            description = null,
             statusCode = InternalServerError
           )
         }
@@ -183,7 +183,7 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description = "An internal error occurred attempting to process this request!",
+            description = null,
             statusCode = InternalServerError
           )
         }
