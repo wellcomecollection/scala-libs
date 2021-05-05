@@ -1,47 +1,24 @@
 package weco.http
 
-import java.net.URL
-
-import akka.http.scaladsl.model.StatusCodes.{Accepted, BadRequest, InternalServerError, NotFound}
+import akka.http.scaladsl.model.StatusCodes.{BadRequest, InternalServerError, NotFound}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
-import org.scalatest.Assertion
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.json.JsonUtil.toJson
-import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 import weco.http.fixtures.HttpFixtures
-import weco.http.monitoring.HttpMetrics
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class WellcomeHttpAppFeatureTest
   extends AnyFunSpec
     with Matchers
     with HttpFixtures
-    with IntegrationPatience
-    with JsonAssertions {
+    with IntegrationPatience {
 
-  val exampleApi = new ExampleApi {
-    override def getTransform(): ExampleResource = ExampleResource("hello world")
+  override implicit val ec: ExecutionContext = global
 
-    override def postTransform(exampleResource: ExampleResource): String = "ok"
-
-    override def context: String = contextURLTest
-  }
-
-  val brokenGetExampleApi = new ExampleApi {
-    override def getTransform(): ExampleResource = throw new Exception("BOOM!!!")
-
-    override def postTransform(exampleResource: ExampleResource): String =
-      throw new Exception("BOOM!!!")
-
-    override def context: String = contextURLTest
-  }
+  import weco.http.fixtures.ExampleApp._
 
   describe("GET") {
     it("responds to a request") {
@@ -118,10 +95,32 @@ class WellcomeHttpAppFeatureTest
       }
     }
 
-    // TODO: Expecting more detailed json errors here like in storage service
-    it("returns a WATWAT if the request is malformed") {
+    it("returns a NotFound error if you try an unrecognised path") {
       withApp(exampleApi.routes) { _ =>
+        val entity = HttpEntity(
+          contentType = ContentTypes.`application/json`,
+          string =
+            """
+              |{
+              | "name": "The Count"
+              |}
+              |""".stripMargin
+        )
 
+        val path = "/not-found"
+
+        whenPostRequestReady(path, entity) { response =>
+          assertIsDisplayError(
+            response = response,
+            description = "The requested resource could not be found.",
+            statusCode = NotFound
+          )
+        }
+      }
+    }
+
+    it("returns a BadRequest with readable error with valid (but incorrect) json") {
+      withApp(exampleApi.routes) { _ =>
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
           string =
@@ -137,7 +136,29 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description = "An internal error occurred attempting to process this request!",
+            description = "Invalid value at .name: required property not supplied.",
+            statusCode = BadRequest
+          )
+        }
+      }
+    }
+
+    it("returns a BadRequest with readable error within json") {
+      withApp(exampleApi.routes) { _ =>
+        val entity = HttpEntity(
+          contentType = ContentTypes.`application/json`,
+          string =
+            """
+              |this.isnt.json: is_it?
+              |""".stripMargin
+        )
+
+        val path = "/example"
+
+        whenPostRequestReady(path, entity) { response =>
+          assertIsDisplayError(
+            response = response,
+            description = "The request content was malformed:\nexpected true got 'this.i...' (line 2, column 1)",
             statusCode = BadRequest
           )
         }
@@ -169,77 +190,5 @@ class WellcomeHttpAppFeatureTest
       }
     }
   }
-
-  val contextURLTest = "http://api.wellcomecollection.org/example/v1/context.json"
-
-  def assertIsDisplayError(
-                            response: HttpResponse,
-                            description: String,
-                            statusCode: StatusCode = StatusCodes.BadRequest
-                          ): Assertion = {
-    response.status shouldBe statusCode
-    response.entity.contentType shouldBe ContentTypes.`application/json`
-
-    withStringEntity(response.entity) { jsonResponse =>
-      assertJsonStringsAreEqual(
-        jsonResponse,
-        s"""
-           |{
-           |  "@context": "$contextURLTest",
-           |  "errorType": "http",
-           |  "httpStatus": ${statusCode.intValue()},
-           |  "label": "${statusCode.reason()}",
-           |  "description": ${toJson(description).get},
-           |  "type": "Error"
-           |}
-           |""".stripMargin
-      )
-    }
-  }
-
-  def withApp[R](routes: Route)(testWith: TestWith[WellcomeHttpApp, R]): R =
-    withActorSystem { implicit actorSystem =>
-      val metricsName = "example.app"
-
-      val httpMetrics = new HttpMetrics(
-        name = metricsName,
-        metrics = new MemoryMetrics
-      )
-
-      val app = new WellcomeHttpApp(
-        routes = routes,
-        httpMetrics = httpMetrics,
-        httpServerConfig = httpServerConfigTest,
-        contextURL = new URL(contextURLTest),
-        appName = metricsName
-      )
-
-      app.run()
-
-      testWith(app)
-
-    }
 }
 
-case class ExampleResource(name: String)
-
-trait ExampleApi extends FutureDirectives {
-  def getTransform(): ExampleResource
-
-  def postTransform(exampleResource: ExampleResource): String
-
-  val routes: Route = concat(
-    pathPrefix("example") {
-      post {
-        entity(as[ExampleResource]) {
-          exampleResource: ExampleResource =>
-            withFuture {
-              Future(complete(Accepted -> postTransform(exampleResource)))
-            }
-        }
-      } ~ get {
-        complete(getTransform())
-      }
-    }
-  )
-}
