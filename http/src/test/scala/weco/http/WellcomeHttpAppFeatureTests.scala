@@ -65,7 +65,6 @@ class WellcomeHttpAppFeatureTest
         whenGetRequestReady(path) { response =>
           assertIsDisplayError(
             response = response,
-            description = null,
             statusCode = InternalServerError
           )
         }
@@ -183,7 +182,6 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description = null,
             statusCode = InternalServerError
           )
         }

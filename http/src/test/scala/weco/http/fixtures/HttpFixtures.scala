@@ -3,12 +3,11 @@ package weco.http.fixtures
 import java.net.URL
 
 import org.scalatest.Assertion
-import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
 import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{GET, POST}
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse, RequestEntity, StatusCode, StatusCodes}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse, RequestEntity, StatusCode}
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Sink
 import io.circe.parser._
@@ -104,12 +103,33 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
       s"${name}_HttpResponse_$result"
     )
 
-
+  def assertIsDisplayError(
+                            response: HttpResponse,
+                            statusCode: StatusCode
+                          ): Assertion = {
+    assertIsDisplayError(
+      response = response,
+      description = None,
+      statusCode = statusCode
+    )
+  }
 
   def assertIsDisplayError(
                             response: HttpResponse,
                             description: String,
-                            statusCode: StatusCode = StatusCodes.BadRequest
+                            statusCode: StatusCode
+                          ): Assertion = {
+    assertIsDisplayError(
+      response = response,
+      description = Some(description),
+      statusCode = statusCode
+    )
+  }
+
+  def assertIsDisplayError(
+                            response: HttpResponse,
+                            description: Option[String],
+                            statusCode: StatusCode
                           ): Assertion = {
     response.status shouldBe statusCode
     response.entity.contentType shouldBe ContentTypes.`application/json`
@@ -123,7 +143,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
            |  "errorType": "http",
            |  "httpStatus": ${statusCode.intValue()},
            |  "label": "${statusCode.reason()}",
-           |  "description": ${toJson(description).get},
+           |  "description": ${description.map(d=>toJson(d).get).getOrElse("null")},
            |  "type": "Error"
            |}
            |""".stripMargin
@@ -151,6 +171,5 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
       app.run()
 
       testWith(app)
-
     }
 }
