@@ -7,7 +7,10 @@ import weco.http.json.DisplayJsonUtil
 import weco.http.models.{ContextResponse, DisplayError}
 import weco.http.monitoring.HttpMetrics
 
-trait WellcomeExceptionHandler extends Logging with HasContextUrl with DisplayJsonUtil {
+trait WellcomeExceptionHandler
+    extends Logging
+    with HasContextUrl
+    with DisplayJsonUtil {
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 
