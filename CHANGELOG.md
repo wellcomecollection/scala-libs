@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v26.11.0 - 2021-05-06
+
+This standardises the use of context URLs with a new trait:
+
+```scala
+trait HasContextUrl {
+  def contextUrl: URL
+}
+```
+
 ## v26.10.1 - 2021-05-05
 
 
