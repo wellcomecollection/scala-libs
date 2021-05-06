@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait HttpFixtures extends Akka with ScalaFutures with Matchers
   with JsonAssertions{
 
-  val contextUrl: URL
+  def contextUrl: URL
 
   private def whenRequestReady[R](
     r: HttpRequest

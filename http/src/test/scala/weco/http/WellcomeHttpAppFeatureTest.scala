@@ -17,7 +17,7 @@ class WellcomeHttpAppFeatureTest
 
   import weco.http.fixtures.ExampleApp._
 
-  override val contextUrl: URL = weco.http.fixtures.ExampleApp.contextUrl
+  override def contextUrl: URL = weco.http.fixtures.ExampleApp.contextUrl
 
   describe("GET") {
     it("responds to a request") {
