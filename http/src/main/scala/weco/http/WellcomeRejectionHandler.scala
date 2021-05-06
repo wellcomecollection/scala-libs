@@ -1,7 +1,5 @@
 package weco.http
 
-import java.net.URL
-
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model.StatusCodes.BadRequest
 import akka.http.scaladsl.model._
@@ -18,12 +16,11 @@ import weco.http.monitoring.HttpMetrics
 
 import scala.concurrent.ExecutionContext
 
-trait WellcomeRejectionHandler {
+trait WellcomeRejectionHandler extends HasContextUrl {
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 
   val httpMetrics: HttpMetrics
-  val contextURL: URL
 
   implicit val ec: ExecutionContext
   implicit val rejectionHandler: RejectionHandler = buildRejectionHandler()
@@ -79,7 +76,7 @@ trait WellcomeRejectionHandler {
 
     complete(
       BadRequest -> ContextResponse(
-        context = contextURL,
+        contextUrl = contextUrl,
         DisplayError(
           statusCode = BadRequest,
           description = message.toList.mkString("\n")
@@ -98,13 +95,13 @@ trait WellcomeRejectionHandler {
         val description = data.utf8String
         if (statusCode.intValue() >= 500) {
           val response = ContextResponse(
-            context = contextURL,
+            contextUrl = contextUrl,
             DisplayError(statusCode = statusCode)
           )
           Marshal(response).to[MessageEntity]
         } else {
           val response = ContextResponse(
-            context = contextURL,
+            contextUrl = contextUrl,
             DisplayError(
               statusCode = statusCode,
               description = description

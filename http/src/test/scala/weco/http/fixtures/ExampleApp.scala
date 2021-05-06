@@ -4,12 +4,12 @@ import akka.http.scaladsl.model.StatusCodes.Accepted
 import akka.http.scaladsl.server.Route
 import weco.http.FutureDirectives
 
+import java.net.URL
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ExampleApp {
-  val context = "http://api.wellcomecollection.org/example/v1/context.json"
+  val contextUrl = new URL("http://api.wellcomecollection.org/example/v1/context.json")
 
   case class ExampleResource(name: String)
 
@@ -32,15 +32,14 @@ object ExampleApp {
         }
       }
     )
+
+    override def contextUrl: URL = ExampleApp.contextUrl
   }
 
   val exampleApi = new ExampleApi {
-
     override def getTransform(): ExampleResource = ExampleResource("hello world")
 
     override def postTransform(exampleResource: ExampleResource): String = "ok"
-
-    override def context: String = ExampleApp.context
   }
 
   val brokenGetExampleApi = new ExampleApi {
@@ -48,7 +47,5 @@ object ExampleApp {
 
     override def postTransform(exampleResource: ExampleResource): String =
       throw new Exception("BOOM!!!")
-
-    override def context: String = ExampleApp.context
   }
 }
