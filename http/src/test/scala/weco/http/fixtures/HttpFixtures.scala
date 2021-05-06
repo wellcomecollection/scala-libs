@@ -139,7 +139,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         jsonResponse,
         s"""
            |{
-           |  "@context": "${contextUrl}",
+           |  "@context": "$contextUrl",
            |  "errorType": "http",
            |  "httpStatus": ${statusCode.intValue()},
            |  "label": "${statusCode.reason()}",
