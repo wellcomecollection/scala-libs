@@ -1,5 +1,7 @@
 package weco.http.fixtures
 
+import java.net.URL
+
 import akka.actor.ActorSystem
 import org.scalatest.Assertion
 import uk.ac.wellcome.monitoring.memory.MemoryMetrics
@@ -23,6 +25,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait HttpFixtures extends Akka with ScalaFutures with Matchers
   with JsonAssertions{
+
+  val contextUrl: URL
 
   private def whenRequestReady[R](
     r: HttpRequest
@@ -135,7 +139,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         jsonResponse,
         s"""
            |{
-           |  "@context": "${ExampleApp.contextUrl}",
+           |  "@context": "${contextUrl}",
            |  "errorType": "http",
            |  "httpStatus": ${statusCode.intValue()},
            |  "label": "${statusCode.reason()}",
