@@ -1,5 +1,7 @@
 package weco.http
 
+import java.net.URL
+
 import akka.http.scaladsl.model.StatusCodes.{BadRequest, InternalServerError, NotFound}
 import akka.http.scaladsl.model._
 import org.scalatest.concurrent.IntegrationPatience
@@ -14,6 +16,8 @@ class WellcomeHttpAppFeatureTest
     with IntegrationPatience {
 
   import weco.http.fixtures.ExampleApp._
+
+  override def contextUrl: URL = weco.http.fixtures.ExampleApp.contextUrl
 
   describe("GET") {
     it("responds to a request") {
