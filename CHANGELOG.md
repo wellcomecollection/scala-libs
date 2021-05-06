@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.12.0 - 2021-05-06
+
+Fix assertIsDisplayError
+
 ## v26.11.0 - 2021-05-06
 
 This standardises the use of context URLs with a new trait:
