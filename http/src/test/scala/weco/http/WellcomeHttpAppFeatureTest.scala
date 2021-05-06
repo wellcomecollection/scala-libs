@@ -59,7 +59,7 @@ class WellcomeHttpAppFeatureTest
     }
 
     it("returns an InternalServerError if an exception is thrown") {
-      withApp(brokenGetExampleApi.routes) { _ =>
+      withApp(brokenExampleApi.routes) { _ =>
         val path = "/example"
         whenGetRequestReady(path) { response =>
           assertIsDisplayError(
@@ -164,7 +164,7 @@ class WellcomeHttpAppFeatureTest
     }
 
     it("returns an InternalServerError if an exception is thrown") {
-      withApp(brokenGetExampleApi.routes) { _ =>
+      withApp(brokenExampleApi.routes) { _ =>
 
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
