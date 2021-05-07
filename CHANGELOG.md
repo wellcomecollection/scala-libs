@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.12.1 - 2021-05-07
+
+Change assertDisplayError() so it doesn't expect `"description": null` in the JSON output if there is no description.
+
 ## v26.12.0 - 2021-05-06
 
 Fix assertIsDisplayError
