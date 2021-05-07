@@ -24,7 +24,7 @@ import weco.http.models.HTTPServerConfig
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait HttpFixtures extends Akka with ScalaFutures with Matchers
-  with JsonAssertions{
+  with JsonAssertions {
 
   def contextUrl: URL
 
@@ -169,7 +169,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         routes = routes,
         httpMetrics = httpMetrics.getOrElse(defaultHttpMetrics),
         httpServerConfig = httpServerConfigTest,
-        contextUrl = ExampleApp.contextUrl,
+        contextUrl = contextUrl,
         appName = metricsName
       )(actorSystem.getOrElse(defaultActorSystem), global)
 
