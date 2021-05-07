@@ -134,20 +134,25 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
     response.status shouldBe statusCode
     response.entity.contentType shouldBe ContentTypes.`application/json`
 
-    withStringEntity(response.entity) { jsonResponse =>
-      assertJsonStringsAreEqual(
-        jsonResponse,
-        s"""
-           |{
-           |  "@context": "$contextUrl",
-           |  "errorType": "http",
-           |  "httpStatus": ${statusCode.intValue()},
-           |  "label": "${statusCode.reason()}",
-           |  "description": ${description.map(d=>toJson(d).get).getOrElse("null")},
-           |  "type": "Error"
-           |}
-           |""".stripMargin
-      )
+    val jsonDescription = description match {
+      case Some(desc) => s""" "description": ${toJson(desc).get}, """
+      case _ => ""
+    }
+
+    val expectedJson =
+      s"""
+         |{
+         |  "@context": "$contextUrl",
+         |  "errorType": "http",
+         |  "httpStatus": ${statusCode.intValue()},
+         |  "label": "${statusCode.reason()}",
+         |  $jsonDescription
+         |  "type": "Error"
+         |}
+         |""".stripMargin
+
+    withStringEntity(response.entity) {
+      assertJsonStringsAreEqual(_, expectedJson)
     }
   }
 

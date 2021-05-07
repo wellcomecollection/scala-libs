@@ -42,7 +42,7 @@ object ExampleApp {
     override def postTransform(exampleResource: ExampleResource): String = "ok"
   }
 
-  val brokenGetExampleApi = new ExampleApi {
+  val brokenExampleApi = new ExampleApi {
     override def getTransform(): ExampleResource = throw new Exception("BOOM!!!")
 
     override def postTransform(exampleResource: ExampleResource): String =
