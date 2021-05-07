@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.12.2 - 2021-05-07
+
+The elasticsearch_typesafe library now requires that you configure at least a host, username and password.
+
 ## v26.12.1 - 2021-05-07
 
 Change assertDisplayError() so it doesn't expect `"description": null` in the JSON output if there is no description.
