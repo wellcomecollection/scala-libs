@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.12.3 - 2021-05-07
+
+Fix contextUrl leaking into fixture
+
 ## v26.12.2 - 2021-05-07
 
 The elasticsearch_typesafe library now requires that you configure at least a host, username and password.
