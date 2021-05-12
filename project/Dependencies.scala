@@ -72,11 +72,16 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
-  val testDependencies = Seq(
-    "org.scalatest" %% "scalatest" % versions.scalatest % Test,
+  val scalatestDependencies = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % Test
+  )
+
+  val mockitoDependencies = Seq(
     "org.scalatestplus" %% versions.scalatestPlusMockitoArtifactId % versions.scalatestPlus % Test,
     "org.mockito" % "mockito-core" % versions.mockito % Test
   )
+
+  val testDependencies: Seq[ModuleID] = scalatestDependencies ++ mockitoDependencies
 
   val sl4jDependencies = Seq(
     "org.clapper" %% "grizzled-slf4j" % versions.grizzled
@@ -162,8 +167,9 @@ object Dependencies {
       sl4jDependencies ++
       testDependencies
 
-  val fixturesDependencies =
-    sl4jDependencies
+  val fixturesDependencies: Seq[ModuleID] =
+    sl4jDependencies ++
+      scalatestDependencies
 
   val typesafeAppDependencies =
     akkaDependencies ++
