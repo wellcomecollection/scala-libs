@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.13.0 - 2021-05-13
+
+This adds TimeAssertions to the fixtures library.
+
 ## v26.12.3 - 2021-05-07
 
 Fix contextUrl leaking into fixture
