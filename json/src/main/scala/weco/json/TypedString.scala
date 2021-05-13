@@ -48,7 +48,7 @@ trait TypedString[T <: TypedString[_]] {
 
   override def equals(that: Any): Boolean =
     that match {
-      case that if that.getClass == this.getClass =>
+      case that if this.canEqual(that) =>
         this.underlying == that.asInstanceOf[T].underlying
       case _ => false
     }
