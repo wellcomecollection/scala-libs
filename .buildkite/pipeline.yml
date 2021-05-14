@@ -143,6 +143,20 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish http_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: http_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
   - label: publish json
     if: build.branch == "main"
     env:

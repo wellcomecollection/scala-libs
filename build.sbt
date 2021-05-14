@@ -1,4 +1,4 @@
-val projectVersion = "26.7.3"
+val projectVersion = "26.14.0"
 
 lazy val fixtures = Common.setupProject(
   project,
@@ -88,6 +88,13 @@ lazy val http = Common.setupProject(
   projectVersion,
   localDependencies = Seq(json, monitoring),
   externalDependencies = Dependencies.httpDependencies
+)
+
+lazy val http_typesafe = Common.setupProject(
+  project,
+  "http_typesafe",
+  projectVersion,
+  localDependencies = Seq(http)
 )
 
 /**

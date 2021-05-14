@@ -4,8 +4,8 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.6.10"
     val akkaStreamAlpakka = "1.1.2"
-    val elasticApm = "1.12.0"
 
+    val elasticApm = "1.22.0"
     val elastic4s = "7.12.1"
 
     val aws = "1.11.504"
@@ -64,6 +64,7 @@ object Dependencies {
     "io.circe" %% "circe-generic-extras" % versions.circe,
     "io.circe" %% "circe-parser" % versions.circe
   )
+
   val elasticsearchDependencies = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-client-esjava" % versions.elastic4s,
@@ -71,11 +72,17 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-json-circe" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
-  val testDependencies = Seq(
-    "org.scalatest" %% "scalatest" % versions.scalatest % Test,
+
+  val scalatestDependencies = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % Test
+  )
+
+  val mockitoDependencies = Seq(
     "org.scalatestplus" %% versions.scalatestPlusMockitoArtifactId % versions.scalatestPlus % Test,
     "org.mockito" % "mockito-core" % versions.mockito % Test
   )
+
+  val testDependencies: Seq[ModuleID] = scalatestDependencies ++ mockitoDependencies
 
   val sl4jDependencies = Seq(
     "org.clapper" %% "grizzled-slf4j" % versions.grizzled
@@ -118,6 +125,11 @@ object Dependencies {
     "io.opentracing" % "opentracing-mock" % "0.33.0" % Test
   )
 
+  val elasticApmAgentDependencies = Seq(
+    "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm,
+    "co.elastic.apm" % "apm-agent-api" % versions.elasticApm,
+  )
+
   val elasticApmBridgeDependencies = Seq(
     "co.elastic.apm" % "apm-opentracing" % versions.elasticApm,
     "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm
@@ -156,13 +168,15 @@ object Dependencies {
       sl4jDependencies ++
       testDependencies
 
-  val fixturesDependencies =
-    sl4jDependencies
+  val fixturesDependencies: Seq[ModuleID] =
+    sl4jDependencies ++
+      scalatestDependencies
 
   val typesafeAppDependencies =
     akkaDependencies ++
       loggingDependencies ++
       typesafeDependencies ++
+      elasticApmAgentDependencies ++
       testDependencies
 
   val storageDependencies: Seq[ModuleID] = Seq(
