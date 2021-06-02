@@ -53,7 +53,7 @@ class ElasticsearchIndexCreator(
           putMapping(index.name)
             .dynamic(mapping.dynamic.getOrElse(DynamicMapping.Strict))
             .meta(mergedMeta)
-            .as(mapping.fields)
+            .as(mapping.properties)
         )
     } yield resp
 

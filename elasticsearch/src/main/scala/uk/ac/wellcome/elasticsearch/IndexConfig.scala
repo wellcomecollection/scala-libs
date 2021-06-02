@@ -11,5 +11,5 @@ trait IndexConfig {
 
 object NoStrictMapping extends IndexConfig {
   val analysis: Analysis = Analysis(analyzers = List())
-  val mapping: MappingDefinition = MappingDefinition.empty
+  val mapping: MappingDefinition = MappingDefinition()
 }
