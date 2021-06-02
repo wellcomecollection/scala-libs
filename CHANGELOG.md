@@ -1,5 +1,65 @@
 # CHANGELOG
 
+## v26.14.0 - 2021-05-13
+
+Add a TypedString type for times when we want to use a type in place of a string, but we still want the value to serialise as a string in JSON/DynamoDB.
+
+We already have code for this in various places; this consolidates it into one place.
+
+## v26.13.0 - 2021-05-13
+
+This adds TimeAssertions to the fixtures library.
+
+## v26.12.3 - 2021-05-07
+
+Fix contextUrl leaking into fixture
+
+## v26.12.2 - 2021-05-07
+
+The elasticsearch_typesafe library now requires that you configure at least a host, username and password.
+
+## v26.12.1 - 2021-05-07
+
+Change assertDisplayError() so it doesn't expect `"description": null` in the JSON output if there is no description.
+
+## v26.12.0 - 2021-05-06
+
+Fix assertIsDisplayError
+
+## v26.11.0 - 2021-05-06
+
+This standardises the use of context URLs with a new trait:
+
+```scala
+trait HasContextUrl {
+  def contextUrl: URL
+}
+```
+
+## v26.10.1 - 2021-05-05
+
+
+
+## v26.10.0 - 2021-05-05
+
+Simplify error handling in http lib, add some tests for WellcomeHttpApp
+
+## v26.9.2 - 2021-05-05
+
+Make the `ElasticClient` in `ElasticsearchFixtures` an implicit value.
+
+## v26.9.1 - 2021-04-30
+
+Remember to publish http_typesafe
+
+## v26.9.0 - 2021-04-30
+
+Add WellcomeHttpApp
+
+## v26.8.0 - 2021-04-29
+
+Adds Tracing trait supporting APM tracing to typesafe_app lib, in order to make it available to all apps by default.
+
 ## v26.7.3 - 2021-04-27
 
 Bump the version of akka-http to 10.1.11 (but actually correctly).

@@ -2,19 +2,18 @@ package weco.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.models.{ContextResponse, DisplayError}
 
 trait ErrorDirectives
     extends Directives
-    with FailFastCirceSupport
+    with ErrorAccumulatingCirceSupport
     with Logging
-    with DisplayJsonUtil {
+    with DisplayJsonUtil
+    with HasContextUrl {
   import weco.http.models.ContextResponse._
-
-  def context: String
 
   def gone(description: String): Route =
     error(
@@ -35,7 +34,7 @@ trait ErrorDirectives
 
   private def error(err: DisplayError): Route =
     complete(
-      err.httpStatus -> ContextResponse(context = context, result = err)
+      err.httpStatus -> ContextResponse(contextUrl = contextUrl, result = err)
     )
 
   def internalError(err: Throwable): Route = {
