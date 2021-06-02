@@ -4,8 +4,9 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.6.10"
     val akkaStreamAlpakka = "1.1.2"
+
     val elasticApm = "1.22.0"
-    val elastic4s = "7.10.1"
+    val elastic4s = "7.12.2"
 
     val aws = "1.11.504"
 
