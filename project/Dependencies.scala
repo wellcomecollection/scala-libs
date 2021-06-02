@@ -6,7 +6,7 @@ object Dependencies {
     val akkaStreamAlpakka = "1.1.2"
     val elasticApm = "1.12.0"
 
-    val elastic4s = "7.12.1"
+    val elastic4s = "7.12.2"
 
     val aws = "1.11.504"
 
