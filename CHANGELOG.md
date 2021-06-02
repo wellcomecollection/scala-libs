@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.15.0 - 2021-06-02
+
+Bump elasticsearch and elastic4s to 7.12.2
+
 ## v26.14.0 - 2021-05-13
 
 Add a TypedString type for times when we want to use a type in place of a string, but we still want the value to serialise as a string in JSON/DynamoDB.
