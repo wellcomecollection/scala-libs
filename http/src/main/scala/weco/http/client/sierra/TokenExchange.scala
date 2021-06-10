@@ -17,9 +17,9 @@ trait TokenExchange[C, T] {
   def getToken(credentials: C): Future[T] =
     cachedToken match {
       case Some((token, expiryTime))
-        if expiryTime
-          .minusSeconds(expiryGracePeriod)
-          .isAfter(Instant.now()) =>
+          if expiryTime
+            .minusSeconds(expiryGracePeriod)
+            .isAfter(Instant.now()) =>
         Future.successful(token)
 
       case _ =>

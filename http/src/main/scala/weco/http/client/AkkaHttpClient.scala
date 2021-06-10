@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AkkaHttpClient(val baseUri: Uri)(implicit system: ActorSystem,
                                        val ec: ExecutionContext)
-  extends HttpClient {
+    extends HttpClient {
   override def singleRequest(request: HttpRequest): Future[HttpResponse] =
     Http().singleRequest(request)
 }

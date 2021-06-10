@@ -3,7 +3,11 @@ package weco.http.client.sierra
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, OAuth2BearerToken}
+import akka.http.scaladsl.model.headers.{
+  Authorization,
+  BasicHttpCredentials,
+  OAuth2BearerToken
+}
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal}
 import weco.http.client.HttpClient
 import weco.http.json.CirceMarshalling
@@ -20,7 +24,7 @@ class SierraOauthHttpClient(
   val system: ActorSystem,
   val ec: ExecutionContext
 ) extends HttpClient
-  with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
+    with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
 
   override val baseUri: Uri = underlying.baseUri
 
@@ -37,8 +41,8 @@ class SierraOauthHttpClient(
   // to fetch a new token.
   //
   override protected def getNewToken(
-                                      credentials: BasicHttpCredentials
-                                    ): Future[(OAuth2BearerToken, Instant)] =
+    credentials: BasicHttpCredentials
+  ): Future[(OAuth2BearerToken, Instant)] =
     for {
       tokenResponse <- underlying.post[Unit](
         path = tokenPath,
