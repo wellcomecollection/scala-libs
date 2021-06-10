@@ -10,20 +10,24 @@ import weco.http.json.CirceMarshalling
 import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpClient {
-  val baseUri: Uri
-
   implicit val ec: ExecutionContext
 
   def singleRequest(request: HttpRequest): Future[HttpResponse]
+}
 
-  private def buildUri(
-    path: Path,
-    params: Map[String, String]
-  ): Uri =
+trait HttpClientWithBaseUri extends HttpClient {
+  val baseUri: Uri
+
+  protected def buildUri(
+                          path: Path,
+                          params: Map[String, String]
+                        ): Uri =
     baseUri
       .withPath(baseUri.path ++ Slash(path))
       .withQuery(Query(params))
+}
 
+trait HttpGet extends HttpClientWithBaseUri {
   def get(path: Path,
           params: Map[String, String] = Map.empty): Future[HttpResponse] = {
     val request = HttpRequest(
@@ -33,13 +37,17 @@ trait HttpClient {
 
     singleRequest(request)
   }
+}
+
+trait HttpPost extends HttpClientWithBaseUri {
+  val baseUri: Uri
 
   def post[In](path: Path,
                body: Option[In] = None,
                params: Map[String, String] = Map.empty,
                headers: List[HttpHeader] = Nil)(
-    implicit encoder: Encoder[In]
-  ): Future[HttpResponse] = {
+                implicit encoder: Encoder[In]
+              ): Future[HttpResponse] = {
     implicit val um: ToEntityMarshaller[In] = CirceMarshalling.fromEncoder[In]
 
     for {

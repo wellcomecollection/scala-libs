@@ -3,20 +3,16 @@ package weco.http.client.sierra
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{
-  Authorization,
-  BasicHttpCredentials,
-  OAuth2BearerToken
-}
+import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal}
-import weco.http.client.HttpClient
+import weco.http.client.{HttpClient, HttpGet, HttpPost}
 import weco.http.json.CirceMarshalling
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraOauthHttpClient(
-  underlying: HttpClient,
+  underlying: HttpPost with HttpGet,
   val tokenPath: Path = Path("v5/token"),
   val credentials: BasicHttpCredentials
 )(
@@ -25,8 +21,6 @@ class SierraOauthHttpClient(
   val ec: ExecutionContext
 ) extends HttpClient
     with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
-
-  override val baseUri: Uri = underlying.baseUri
 
   import uk.ac.wellcome.json.JsonUtil._
 
