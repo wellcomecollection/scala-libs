@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.2 - 2021-06-10
+
+Break up HttpClient so a `baseUri` isn't required unless you're using the GET and POST convenience helpers.
+
 ## v26.17.1 - 2021-06-10
 
 Add some tests for SierraOauthHttpClient.
