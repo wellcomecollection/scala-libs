@@ -5,6 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.time.Instant
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
@@ -14,11 +15,11 @@ class TokenExchangeTest extends AnyFunSpec with Matchers with ScalaFutures {
   type Token = String
 
   class MemoryTokenExchange(
-                             tokens: Seq[(Credentials, Instant)]
-                           )(implicit val ec: ExecutionContext)
+    tokens: Seq[(Credentials, Instant)]
+  )(implicit val ec: ExecutionContext)
     extends TokenExchange[Credentials, Token] {
     var calls = 0
-    override protected val expiryGracePeriod = 0
+    override val expiryGracePeriod: Duration = 0.seconds
 
     override protected def getNewToken(
                                         credentials: Credentials): Future[(Token, Instant)] =

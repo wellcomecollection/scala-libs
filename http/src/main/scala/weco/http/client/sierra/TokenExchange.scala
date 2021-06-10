@@ -1,6 +1,7 @@
 package weco.http.client.sierra
 
 import java.time.Instant
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenExchange[C, T] {
@@ -8,7 +9,7 @@ trait TokenExchange[C, T] {
 
   // How many seconds before the token expires should we go back and
   // fetch a new token?
-  protected val expiryGracePeriod: Int = 60
+  val expiryGracePeriod: Duration
 
   implicit val ec: ExecutionContext
 
@@ -18,7 +19,7 @@ trait TokenExchange[C, T] {
     cachedToken match {
       case Some((token, expiryTime))
           if expiryTime
-            .minusSeconds(expiryGracePeriod)
+            .minusSeconds(expiryGracePeriod.toSeconds)
             .isAfter(Instant.now()) =>
         Future.successful(token)
 
