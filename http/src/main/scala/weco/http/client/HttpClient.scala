@@ -19,9 +19,9 @@ trait HttpClientWithBaseUri extends HttpClient {
   val baseUri: Uri
 
   protected def buildUri(
-                          path: Path,
-                          params: Map[String, String]
-                        ): Uri =
+    path: Path,
+    params: Map[String, String]
+  ): Uri =
     baseUri
       .withPath(baseUri.path ++ Slash(path))
       .withQuery(Query(params))
@@ -46,8 +46,8 @@ trait HttpPost extends HttpClientWithBaseUri {
                body: Option[In] = None,
                params: Map[String, String] = Map.empty,
                headers: List[HttpHeader] = Nil)(
-                implicit encoder: Encoder[In]
-              ): Future[HttpResponse] = {
+    implicit encoder: Encoder[In]
+  ): Future[HttpResponse] = {
     implicit val um: ToEntityMarshaller[In] = CirceMarshalling.fromEncoder[In]
 
     for {
