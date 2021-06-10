@@ -25,7 +25,9 @@ class SierraOauthHttpClient(
   implicit
   val system: ActorSystem,
   val ec: ExecutionContext
-) extends HttpClient with HttpGet with HttpPost
+) extends HttpClient
+    with HttpGet
+    with HttpPost
     with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
 
   import uk.ac.wellcome.json.JsonUtil._
