@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.1 - 2021-06-10
+
+Add some tests for SierraOauthHttpClient.
+
 ## v26.17.0 - 2021-06-10
 
 Bump the version of Akka to be happy with the new version of elastic4s.
