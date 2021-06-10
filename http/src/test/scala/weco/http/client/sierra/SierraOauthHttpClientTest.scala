@@ -34,7 +34,6 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       |    "code": "-  ",
       |    "display": "Available"
       |  },
-      |  "barcode": "D59.14 (Germany file)",
       |  "callNumber": "665618i"
       |}
       |""".stripMargin
