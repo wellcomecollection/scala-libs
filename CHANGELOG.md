@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.0 - 2021-06-10
+
+Bump the version of Akka to be happy with the new version of elastic4s.
+
 ## v26.16.0 - 2021-06-10
 
 This adds HTTP client-related classes from the catalogue-api repo.
