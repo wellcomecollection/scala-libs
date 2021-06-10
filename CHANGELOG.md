@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.16.0 - 2021-06-10
+
+This adds HTTP client-related classes from the catalogue-api repo.
+
 ## v26.15.0 - 2021-06-02
 
 Bump elasticsearch and elastic4s to 7.12.2
