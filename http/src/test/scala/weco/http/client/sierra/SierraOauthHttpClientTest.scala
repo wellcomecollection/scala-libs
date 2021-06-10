@@ -6,7 +6,7 @@ import akka.http.scaladsl.model._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import uk.ac.wellcome.akka.fixtures.Akka
-import weco.http.client.MemoryHttpClient
+import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.http.fixtures.HttpFixtures
 
 import java.net.URL
@@ -76,7 +76,9 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       )
     )
 
-    val underlying = new MemoryHttpClient(responses)
+    val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
+      override val baseUri: Uri = Uri("http://sierra:1234")
+    }
 
     withActorSystem { implicit actorSystem =>
       val authClient = new SierraOauthHttpClient(underlying, credentials = credentials)
@@ -160,7 +162,9 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       )
     )
 
-    val underlying = new MemoryHttpClient(responses)
+    val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
+      override val baseUri: Uri = Uri("http://sierra:1234")
+    }
 
     withActorSystem { implicit actorSystem =>
       val authClient = new SierraOauthHttpClient(

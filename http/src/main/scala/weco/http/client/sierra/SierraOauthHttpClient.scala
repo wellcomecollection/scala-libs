@@ -25,7 +25,7 @@ class SierraOauthHttpClient(
   implicit
   val system: ActorSystem,
   val ec: ExecutionContext
-) extends HttpClient
+) extends HttpClient with HttpGet with HttpPost
     with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
 
   import uk.ac.wellcome.json.JsonUtil._
@@ -81,4 +81,6 @@ class SierraOauthHttpClient(
 
       response <- underlying.singleRequest(authenticatedRequest)
     } yield response
+
+  override val baseUri: Uri = underlying.baseUri
 }
