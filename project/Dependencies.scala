@@ -2,9 +2,6 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val akka = "2.6.10"
-    val akkaStreamAlpakka = "1.1.2"
-
     val elasticApm = "1.22.0"
     val elastic4s = "7.12.2"
 
@@ -32,6 +29,19 @@ object Dependencies {
     // Provides slf4j-api
     val grizzled = "1.3.2"
 
+    // This has to match the version of akka used by elastic4s
+    // Otherwise we get errors like:
+    //
+    //      An exception or error caused a run to abort: You are using version 2.6.14 of Akka,
+    //      but it appears you (perhaps indirectly) also depend on older versions of related
+    //      artifacts. You can solve this by adding an explicit dependency on version 2.6.14
+    //      of the [akka-slf4j, akka-stream, akka-testkit] artifacts to your project.
+    //
+    // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
+    //
+    val akka = "2.6.14"
+    val akkaStreamAlpakka = "3.0.1"
+
     // Getting the akka-http dependencies right can be fiddly and takes some work.
     // In particular you need to use the same version of akka-http everywhere, or you
     // get errors (from LargeResponsesTest) like:
@@ -49,7 +59,7 @@ object Dependencies {
     //
     //   2. Look at the corresponding akka-http dependency in alpakka:
     //      https://github.com/akka/alpakka/blob/master/project/Dependencies.scala
-    //      (At time of writing, alpakka v1.1.2 pulls in akka-http 10.1.10)
+    //      (At time of writing, alpakka v3.0.1 pulls in akka-http 10.1.11)
     //
     //   3. Look at versions of akka-http-json.  Browse the Git tags until you find
     //      one that uses the same version of akka-http and a compatible Circe:
