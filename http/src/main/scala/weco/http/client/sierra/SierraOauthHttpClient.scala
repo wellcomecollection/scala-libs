@@ -13,12 +13,14 @@ import weco.http.client.HttpClient
 import weco.http.json.CirceMarshalling
 
 import java.time.Instant
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraOauthHttpClient(
   underlying: HttpClient,
   val tokenPath: Path = Path("v5/token"),
-  val credentials: BasicHttpCredentials
+  val credentials: BasicHttpCredentials,
+  val expiryGracePeriod: Duration = 60.seconds
 )(
   implicit
   val system: ActorSystem,
