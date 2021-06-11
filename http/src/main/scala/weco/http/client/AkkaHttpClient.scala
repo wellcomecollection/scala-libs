@@ -7,9 +7,9 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AkkaHttpClient(implicit system: ActorSystem,
-                     val ec: ExecutionContext)
-    extends HttpClient with Logging {
+class AkkaHttpClient(implicit system: ActorSystem, val ec: ExecutionContext)
+    extends HttpClient
+    with Logging {
   override def singleRequest(request: HttpRequest): Future[HttpResponse] = {
     debug(s"About to send request $request")
     Http().singleRequest(request)
