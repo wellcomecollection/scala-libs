@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.3 - 2021-06-11
+
+Tweak AkkaHttpClient so it logs requests and a baseUri isn't required.
+
 ## v26.17.2 - 2021-06-10
 
 Break up HttpClient so a `baseUri` isn't required unless you're using the GET and POST convenience helpers.
