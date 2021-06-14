@@ -51,7 +51,15 @@ class SierraOauthHttpClient(
         headers = List(Authorization(credentials))
       )
 
-      accessToken <- Unmarshal(tokenResponse).to[SierraAccessToken]
+      accessToken <- tokenResponse.status match {
+        case StatusCodes.OK => Unmarshal(tokenResponse).to[SierraAccessToken]
+        case code =>
+          Unmarshal(tokenResponse).to[String].flatMap { resp =>
+            Future.failed(
+              new Throwable(s"Unexpected status code $code from $tokenPath: $resp")
+            )
+          }
+      }
 
       result = (
         OAuth2BearerToken(accessToken.accessToken),
