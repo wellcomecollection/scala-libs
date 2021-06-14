@@ -1,6 +1,15 @@
 package weco.http.client
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{
+  ContentTypes,
+  HttpEntity,
+  HttpRequest,
+  HttpResponse
+}
+import akka.util.ByteString
+import io.circe.Json
+import io.circe.parser.parse
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class MemoryHttpClient(
@@ -17,6 +26,10 @@ class MemoryHttpClient(
 
       // These checks all amount to "nextReq != request", but the specific
       // checks are meant to make it easier to debug particular issues.
+      if (nextReq.method != request.method) {
+        throw new RuntimeException(
+          s"Expected request with method ${nextReq.method}, got method with URI ${request.method}")
+      }
 
       if (nextReq.uri != request.uri) {
         throw new RuntimeException(
@@ -28,11 +41,32 @@ class MemoryHttpClient(
           s"Expected request with headers ${nextReq.headers}, got request with headers ${request.headers}")
       }
 
-      if (nextReq != request) {
+      if (!areEquivalent(nextReq.entity, request.entity)) {
         throw new RuntimeException(
-          s"Expected request $nextReq, but got $request")
+          s"Requests have different entities: ${nextReq.entity} / ${request.entity}")
       }
 
       nextResp
+    }
+
+  private def areEquivalent(e1: HttpEntity, e2: HttpEntity): Boolean =
+    (e1, e2) match {
+      case (entity1, entity2) if entity1 == entity2 => true
+
+      case (
+          HttpEntity.Strict(ContentTypes.`application/json`, json1),
+          HttpEntity.Strict(ContentTypes.`application/json`, json2))
+          if parseOrElse(json1) == parseOrElse(json2) =>
+        true
+
+      case _ => false
+    }
+
+  private def parseOrElse(json: ByteString): Json =
+    parse(new String(json.toArray[Byte])) match {
+      case Right(t) => t
+      case Left(err) =>
+        println(s"Error trying to parse string <<$json>>")
+        throw err
     }
 }
