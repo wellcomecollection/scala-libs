@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.6 - 2021-06-14
+
+Provide a better error message if we can't get the access token in the Sierra OAuth HttpClient.
+
 ## v26.17.5 - 2021-06-14
 
 Provide a better error message if you pass invalid JSON to HttpFixtures.createJsonHttpEntityWith().
