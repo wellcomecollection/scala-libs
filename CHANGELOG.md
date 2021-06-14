@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.4 - 2021-06-14
+
+Don't hard-code a version of the Sierra API in SierraOauthHttpClient.
+
 ## v26.17.3 - 2021-06-11
 
 Tweak AkkaHttpClient so it logs requests and a baseUri isn't required.
