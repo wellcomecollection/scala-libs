@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.5 - 2021-06-14
+
+Provide a better error message if you pass invalid JSON to HttpFixtures.createJsonHttpEntityWith().
+
 ## v26.17.4 - 2021-06-14
 
 Don't hard-code a version of the Sierra API in SierraOauthHttpClient.
