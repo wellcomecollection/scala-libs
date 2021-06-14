@@ -7,6 +7,7 @@ trait IndexConfig {
   def mapping: MappingDefinition
   def analysis: Analysis
   def shards: Int = 1
+  val settings = Map()
 }
 
 object NoStrictMapping extends IndexConfig {
