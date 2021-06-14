@@ -1,6 +1,11 @@
 package weco.http.client
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{
+  ContentTypes,
+  HttpEntity,
+  HttpRequest,
+  HttpResponse
+}
 import akka.util.ByteString
 import io.circe.Json
 import io.circe.parser.parse
@@ -26,7 +31,6 @@ class MemoryHttpClient(
           s"Expected request with method ${nextReq.method}, got method with URI ${request.method}")
       }
 
-
       if (nextReq.uri != request.uri) {
         throw new RuntimeException(
           s"Expected request with URI ${nextReq.uri}, got request with URI ${request.uri}")
@@ -38,7 +42,8 @@ class MemoryHttpClient(
       }
 
       if (!areEquivalent(nextReq.entity, request.entity)) {
-        throw new RuntimeException(s"Requests have different entities: ${nextReq.entity} / ${request.entity}")
+        throw new RuntimeException(
+          s"Requests have different entities: ${nextReq.entity} / ${request.entity}")
       }
 
       nextResp
@@ -48,8 +53,11 @@ class MemoryHttpClient(
     (e1, e2) match {
       case (entity1, entity2) if entity1 == entity2 => true
 
-      case (HttpEntity.Strict(ContentTypes.`application/json`, json1), HttpEntity.Strict(ContentTypes.`application/json`, json2))
-        if parseOrElse(json1) == parseOrElse(json2) => true
+      case (
+          HttpEntity.Strict(ContentTypes.`application/json`, json1),
+          HttpEntity.Strict(ContentTypes.`application/json`, json2))
+          if parseOrElse(json1) == parseOrElse(json2) =>
+        true
 
       case _ => false
     }
