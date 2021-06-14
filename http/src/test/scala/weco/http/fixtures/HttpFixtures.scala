@@ -51,10 +51,13 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
   }
 
   def createJsonHttpEntityWith(jsonString: String): RequestEntity =
-    HttpEntity(
-      ContentTypes.`application/json`,
-      parse(jsonString).right.get.noSpaces
-    )
+    parse(jsonString) match {
+      case Right(json) =>
+        HttpEntity(ContentTypes.`application/json`, json.noSpaces)
+
+      case Left(err) =>
+        throw new IllegalArgumentException(s"Unable to parse JSON ($err):\n$jsonString")
+    }
 
   def whenPostRequestReady[R](
                                path: String,
