@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.17.7 - 2021-06-14
+
+Be a bit more tolerant of equality when comparing JSON entities in MemoryHttpClient.
+
 ## v26.17.6 - 2021-06-14
 
 Provide a better error message if we can't get the access token in the Sierra OAuth HttpClient.
