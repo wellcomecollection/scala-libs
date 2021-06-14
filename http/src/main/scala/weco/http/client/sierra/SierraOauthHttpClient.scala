@@ -56,7 +56,8 @@ class SierraOauthHttpClient(
         case code =>
           Unmarshal(tokenResponse).to[String].flatMap { resp =>
             Future.failed(
-              new Throwable(s"Unexpected status code $code from $tokenPath: $resp")
+              new Throwable(
+                s"Unexpected status code $code from $tokenPath: $resp")
             )
           }
       }
