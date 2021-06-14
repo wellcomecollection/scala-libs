@@ -76,13 +76,13 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
     )
 
     val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
-      override val baseUri: Uri = Uri("http://sierra:1234")
+      override val baseUri: Uri = Uri("http://sierra:1234/v5")
     }
 
     withActorSystem { implicit actorSystem =>
       val authClient = new SierraOauthHttpClient(underlying, credentials = credentials)
 
-      val future = authClient.get(path = Path("v5/items/1601017"))
+      val future = authClient.get(path = Path("items/1601017"))
 
       whenReady(future) { resp =>
         withStringEntity(resp.entity) {
@@ -162,7 +162,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
     )
 
     val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
-      override val baseUri: Uri = Uri("http://sierra:1234")
+      override val baseUri: Uri = Uri("http://sierra:1234/v5")
     }
 
     withActorSystem { implicit actorSystem =>
@@ -172,7 +172,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
         expiryGracePeriod = 3.seconds
       )
 
-      val future1 = authClient.get(path = Path("v5/items/1601017"))
+      val future1 = authClient.get(path = Path("items/1601017"))
 
       whenReady(future1) { resp1 =>
         withStringEntity(resp1.entity) {
@@ -182,7 +182,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
 
       Thread.sleep(1000)
 
-      val future2 = authClient.get(path = Path("v5/items/1601017"))
+      val future2 = authClient.get(path = Path("items/1601017"))
 
       whenReady(future2) { resp2 =>
         withStringEntity(resp2.entity) {

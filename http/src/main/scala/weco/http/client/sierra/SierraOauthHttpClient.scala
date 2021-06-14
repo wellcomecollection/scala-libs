@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SierraOauthHttpClient(
   underlying: HttpPost with HttpGet,
-  val tokenPath: Path = Path("v5/token"),
+  val tokenPath: Path = Path("token"),
   val credentials: BasicHttpCredentials,
   val expiryGracePeriod: Duration = 60.seconds
 )(
