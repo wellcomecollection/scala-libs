@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+import shutil
 import tempfile
 
 from commands import git
@@ -21,6 +22,23 @@ def working_directory(path):
         os.chdir(prev_cwd)
 
 
+@contextlib.contextlib
+def cloned_repo(git_url):
+    """
+    Clones the repository and changes the working directory to the cloned
+    repo.  Cleans up the clone when it's done.
+    """
+    repo_dir = tempfile.mkdtemp()
+
+    git("clone", git_url, repo_dir)
+
+    try:
+        with working_directory(repo_dir):
+            yield
+    finally:
+        shutil.rmtree(repo_dir)
+
+
 def update_scala_libs_version(new_version):
     old_lines = list(open("project/Dependencies.scala"))
 
@@ -38,12 +56,14 @@ if __name__ == '__main__':
     for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
         repo_dir = tempfile.mkdtemp()
 
-        git("clone", f"git@github.com:wellcomecollection/{repo}.git", repo_dir)
-
-        with working_directory(repo_dir):
+        with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
             update_scala_libs_version(new_version)
 
             branch_name = f"bump-scala-libs-to-{new_version}"
+
+            git("config", "--local", "user.email", "digital@wellcomecollection.org")
+            git("config", "--local", "user.name", "BuildKite on behalf of Wellcome Collection")
+
             git("checkout", "-b", branch_name)
             git("add", "project/Dependencies.scala")
             git("commit", "-m", f"Bump scala-libs to {new_version}")
