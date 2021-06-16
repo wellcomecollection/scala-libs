@@ -297,3 +297,8 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
+  - label: "open downstream PRs"
+    if: build.branch == "main"
+    commands:
+      - "pip3 install --user boto3 httpx"
+      - "python3 .buildkite/scripts/open_downstream_prs.py"
