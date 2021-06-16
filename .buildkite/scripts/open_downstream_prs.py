@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
             branch_name = f"bump-scala-libs-to-{new_version}"
 
-            git("config", "--local", "user.email", "digital@wellcomecollection.org")
+            git("config", "--local", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
             git("config", "--local", "user.name", "BuildKite on behalf of Wellcome Collection")
 
             git("checkout", "-b", branch_name)
