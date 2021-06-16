@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     pr_body = "\n".join([
         "Changelog entry:\n"
-    ] + ["> {line}" for line in changelog.splitlines()])
+    ] + [f"> {line}" for line in changelog.splitlines()])
 
     for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
@@ -112,7 +112,7 @@ if __name__ == '__main__':
                 json={
                     "head": branch_name,
                     "base": "main",
-                    "title": "Bump scala-libs to {new_version}",
+                    "title": f"Bump scala-libs to {new_version}",
                     "maintainer_can_modify": True,
                     "body": pr_body,
                 }
