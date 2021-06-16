@@ -16,7 +16,7 @@ trait RandomGenerators {
     // to replace with a space,
     // avoiding the beginning or the end.
     val spaceIndex = Random.nextInt(str.length - 2) + 1
-    str.updated(spaceIndex, ' ')).toString
+    str.updated(spaceIndex, ' ').toString
   }
 
   def randomBytes(length: Int = 1024): Array[Byte] = {
