@@ -22,7 +22,7 @@ def working_directory(path):
         os.chdir(prev_cwd)
 
 
-@contextlib.contextlib
+@contextlib.contextmanager
 def cloned_repo(git_url):
     """
     Clones the repository and changes the working directory to the cloned
