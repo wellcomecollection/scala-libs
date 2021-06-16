@@ -67,4 +67,4 @@ if __name__ == '__main__':
             git("commit", "-m", f"Bump scala-libs to {new_version}")
             git("push", "origin", branch_name)
 
-        print(os.listdir(tmp_dir))
+        break
