@@ -118,6 +118,8 @@ if __name__ == '__main__':
                 }
             )
 
+            print(r.json())
+
             r.raise_for_status()
 
         break
