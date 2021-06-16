@@ -53,7 +53,7 @@ def update_scala_libs_version(new_version):
 
 
 def get_github_api_key():
-    session = boto3.session()
+    session = boto3.Session()
     secrets_client = session.client("secretsmanager")
 
     secret_value = secrets_client.get_secret_value(SecretId="builds/github_wecobot/scala_libs_pr_bumps")
