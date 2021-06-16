@@ -139,6 +139,6 @@ def create_downstream_pull_requests(new_release):
 
 if __name__ == '__main__':
     create_downstream_pull_requests(
-        new_version=latest_version()
+        new_release=latest_version()
     )
 
