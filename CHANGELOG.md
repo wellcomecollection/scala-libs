@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.18.1 - 2021-06-16
+
+A no-op change to trigger a release and test the auto-bumping.
+
 ## v26.18.0 - 2021-06-16
 
 Add an HTTP typesafe builder for the SierraOauthHttpClient.
