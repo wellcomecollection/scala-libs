@@ -6,6 +6,7 @@ import shutil
 import tempfile
 
 import boto3
+import httpx
 
 from commands import git
 
