@@ -13,6 +13,7 @@ conflict with a manually created PR/branch.
 
 import contextlib
 import os
+import re
 import shutil
 import tempfile
 
@@ -94,6 +95,14 @@ def get_changelog_entry():
     return "\n".join(lines).strip()
 
 
+def get_last_merged_pr_number():
+    for line in git("log", "--oneline").splitlines():
+        m = re.match(r"^[0-9a-f]{8} Merge pull request #(?P<pr_number>\d+)", line)
+
+        if m is not None:
+            return m.group("pr_number")
+
+
 def create_downstream_pull_requests(new_version):
     api_key = get_github_api_key()
 
@@ -101,9 +110,13 @@ def create_downstream_pull_requests(new_version):
 
     changelog = get_changelog_entry()
 
+    pr_number = get_last_merged_pr_number()
+
     pr_body = "\n".join([
         "Changelog entry:\n"
-    ] + [f"> {line}" for line in changelog.splitlines()])
+    ] + [f"> {line}" for line in changelog.splitlines()] + [
+        f"\nSee wellcomecollection/scala-libs#{pr_number}"
+    ])
 
     for repo in DOWNSTREAM_REPOS:
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
@@ -133,9 +146,18 @@ def create_downstream_pull_requests(new_version):
 
             try:
                 r.raise_for_status()
+                new_pr_number = r.json()["number"]
             except Exception:
                 print(r.json())
                 raise
+
+            r = client.post(
+                f"https://api.github.com/repos/wellcomecollection/{repo}/pulls/{new_pr_number}/requested_reviewers",
+                headers={"Accept": "application/vnd.github.v3+json"},
+                json={"reviewers": ["scala-devs"]}
+            )
+
+            r.raise_for_status()
 
 
 if __name__ == '__main__':
