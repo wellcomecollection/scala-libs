@@ -54,8 +54,6 @@ if __name__ == '__main__':
     new_version = "v26.18.0"
 
     for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
-        repo_dir = tempfile.mkdtemp()
-
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
             update_scala_libs_version(new_version)
 
