@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+"""
+Whenever CI releases a new version of scala-libs, this script will create
+a pull request in downstream repos that bumps to the new version.
+
+This ensures that our repos don't fall behind, and any breaking changes can
+be resolved promptly.
+
+This script is quite light on error handling -- because it runs almost as
+soon as the release becomes available, it seems unlikely that it would
+conflict with a manually created PR/branch.
+"""
 
 import contextlib
 import os
@@ -9,6 +20,10 @@ import boto3
 import httpx
 
 from commands import git
+from release import latest_version
+
+
+DOWNSTREAM_REPOS = ("catalogue-api", "catalogue-pipeline", "storage-service")
 
 
 @contextlib.contextmanager
@@ -78,11 +93,8 @@ def get_changelog_entry():
     return "\n".join(lines).strip()
 
 
-if __name__ == '__main__':
-    new_version = "v26.18.0"
-
+def create_downstream_pull_requests(new_release):
     api_key = get_github_api_key()
-    print(api_key[:4])
 
     client = httpx.Client(auth=("weco-bot", api_key))
 
@@ -92,7 +104,7 @@ if __name__ == '__main__':
         "Changelog entry:\n"
     ] + [f"> {line}" for line in changelog.splitlines()])
 
-    for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
+    for repo in DOWNSTREAM_REPOS:
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
             update_scala_libs_version(new_version)
 
@@ -118,8 +130,15 @@ if __name__ == '__main__':
                 }
             )
 
-            print(r.json())
+            try:
+                r.raise_for_status()
+            except Exception:
+                print(r.json())
+                raise
 
-            r.raise_for_status()
 
-        break
+if __name__ == '__main__':
+    create_downstream_pull_requests(
+        new_version=latest_version()
+    )
+

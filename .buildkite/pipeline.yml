@@ -1,304 +1,304 @@
 steps:
+  - label: format
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/format.py"
+  - wait
+  - label: test fixtures
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project fixtures", "test"]
+  - label: test http
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project http", "test"]
+  - label: test json
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project json", "test"]
+  - label: test typesafe_app
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project typesafe_app", "test"]
+  - label: test messaging
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
+  - label: test messaging_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project messaging_typesafe", "test"]
+  - label: test storage
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project storage", "dockerComposeUp", "test", "dockerComposeStop"]
+  - label: test storage_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project storage_typesafe", "test"]
+  - label: test elasticsearch
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
+  - label: test elasticsearch_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project elasticsearch_typesafe", "test"]
+  - wait
+  - label: cut release
+    if: build.branch == "main"
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/release.py"
+  - wait
+  - label: publish fixtures
+    if: build.branch == "main"
+    env:
+      PROJECT: fixtures
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish http
+    if: build.branch == "main"
+    env:
+      PROJECT: http
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish http_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: http_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish json
+    if: build.branch == "main"
+    env:
+      PROJECT: json
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish typesafe_app
+    if: build.branch == "main"
+    env:
+      PROJECT: typesafe_app
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish messaging
+    if: build.branch == "main"
+    env:
+      PROJECT: messaging
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish messaging_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: messaging_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish monitoring
+    if: build.branch == "main"
+    env:
+      PROJECT: monitoring
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish monitoring_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: monitoring_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish storage
+    if: build.branch == "main"
+    env:
+      PROJECT: storage
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish storage_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: storage_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish elasticseach
+    if: build.branch == "main"
+    env:
+      PROJECT: elasticsearch
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish elasticsearch_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: elasticsearch_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
   - label: "open downstream PRs"
+    if: build.branch == "main"
     commands:
       - "pip3 install --user boto3 httpx"
       - "python3 .buildkite/scripts/open_downstream_prs.py"
-# steps:
-#   - label: format
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/format.py"
-#   - wait
-#   - label: test fixtures
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project fixtures", "test"]
-#   - label: test http
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project http", "test"]
-#   - label: test json
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project json", "test"]
-#   - label: test typesafe_app
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project typesafe_app", "test"]
-#   - label: test messaging
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
-#   - label: test messaging_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project messaging_typesafe", "test"]
-#   - label: test storage
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project storage", "dockerComposeUp", "test", "dockerComposeStop"]
-#   - label: test storage_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project storage_typesafe", "test"]
-#   - label: test elasticsearch
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
-#   - label: test elasticsearch_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           command: ["project elasticsearch_typesafe", "test"]
-#   - wait
-#   - label: cut release
-#     if: build.branch == "main"
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/release.py"
-#   - wait
-#   - label: publish fixtures
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: fixtures
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish http
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: http
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish http_typesafe
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: http_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish json
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: json
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish typesafe_app
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: typesafe_app
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish messaging
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: messaging
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish messaging_typesafe
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: messaging_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish monitoring
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: monitoring
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish monitoring_typesafe
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: monitoring_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish storage
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: storage
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish storage_typesafe
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: storage_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish elasticseach
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: elasticsearch
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
-#   - label: publish elasticsearch_typesafe
-#     if: build.branch == "main"
-#     env:
-#       PROJECT: elasticsearch_typesafe
-#     plugins:
-#       - docker#v3.5.0:
-#           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-#           mount-ssh-agent: true
-#           volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-#           network: "host"
-#           always-pull: true
-#           propagate-environment: true
-#           entrypoint: "/usr/bin/python3"
-#     command: "/workdir/.buildkite/scripts/publish.py"
