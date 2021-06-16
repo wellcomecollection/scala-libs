@@ -93,7 +93,7 @@ def get_changelog_entry():
     return "\n".join(lines).strip()
 
 
-def create_downstream_pull_requests(new_release):
+def create_downstream_pull_requests(new_version):
     api_key = get_github_api_key()
 
     client = httpx.Client(auth=("weco-bot", api_key))
@@ -139,6 +139,5 @@ def create_downstream_pull_requests(new_release):
 
 if __name__ == '__main__':
     create_downstream_pull_requests(
-        new_release=latest_version()
+        new_version=latest_version()
     )
-
