@@ -44,8 +44,8 @@ def update_scala_libs_version(new_version):
 
     with open("project/Dependencies.scala", "w") as out_file:
         for line in old_lines:
-            if line.startswith("    val defaultVersion"):
-                out_file.write(f'    val defaultVersion = "{new_version}"\n')
+            if line.startswith("  val defaultVersion"):
+                out_file.write(f'  val defaultVersion = "{new_version}"\n')
             else:
                 out_file.write(line)
 
