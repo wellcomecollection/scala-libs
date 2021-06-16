@@ -109,7 +109,7 @@ if __name__ == '__main__':
             r = client.post(
                 f"https://api.github.com/repos/wellcomecollection/{repo}/pulls",
                 headers={"Accept": "application/vnd.github.v3+json"},
-                data={
+                json={
                     "head": branch_name,
                     "base": "main",
                     "title": "Bump scala-libs to {new_version}",
