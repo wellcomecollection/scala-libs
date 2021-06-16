@@ -64,7 +64,7 @@ def update_scala_libs_version(new_version):
         for line in old_lines:
             if line.startswith("  val defaultVersion"):
                 version_string = new_version.strip('v')
-                out_file.write(f'  val defaultVersion = "{version_string}"  // This is automatically bumped by the scala-libs release process, do not edit this line manually\n')
+                out_file.write(f'  val defaultVersion = "{version_string}" // This is automatically bumped by the scala-libs release process, do not edit this line manually\n')
             else:
                 out_file.write(line)
 
