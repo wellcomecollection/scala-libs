@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.18.2 - 2021-06-16
+
+Provide a better error message when MemoryHttpClient runs out of prepared responses.
+
 ## v26.18.1 - 2021-06-16
 
 A no-op change to trigger a release and test the auto-bumping.
