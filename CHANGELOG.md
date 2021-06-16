@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.18.0 - 2021-06-16
+
+Add an HTTP typesafe builder for the SierraOauthHttpClient.
+
 ## v26.17.7 - 2021-06-14
 
 Be a bit more tolerant of equality when comparing JSON entities in MemoryHttpClient.
