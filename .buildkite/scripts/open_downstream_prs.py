@@ -5,6 +5,8 @@ import os
 import shutil
 import tempfile
 
+import boto3
+
 from commands import git
 
 
@@ -50,8 +52,20 @@ def update_scala_libs_version(new_version):
                 out_file.write(line)
 
 
+def get_github_api_key():
+    session = boto3.session()
+    secrets_client = session.client("secretsmanager")
+
+    secret_value = secrets_client.get_secret_value(SecretId="builds/github_wecobot/scala_libs_pr_bumps")
+
+    return secret_value["SecretString"]
+
+
 if __name__ == '__main__':
     new_version = "v26.18.0"
+
+    api_key = get_github_api_key()
+    print(api_key[:4])
 
     for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
