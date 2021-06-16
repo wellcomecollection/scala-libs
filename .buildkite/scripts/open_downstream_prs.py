@@ -61,11 +61,35 @@ def get_github_api_key():
     return secret_value["SecretString"]
 
 
+def get_changelog_entry():
+    with open("CHANGELOG.md") as f:
+        changelog = f.read()
+
+    # This gets us something like:
+    #
+    #     '## v26.18.0 - 2021-06-16\n\nAdd an HTTP typesafe builder for the SierraOauthHttpClient.\n\n'
+    #
+    last_entry = changelog.split("## ")[1]
+
+    # Then remove that first header
+    lines = last_entry.splitlines()[1:]
+
+    return "\n".join(lines).strip()
+
+
 if __name__ == '__main__':
     new_version = "v26.18.0"
 
     api_key = get_github_api_key()
     print(api_key[:4])
+
+    client = httpx.Client(auth=("weco-bot", api_key))
+
+    changelog = get_changelog_entry()
+
+    pr_body = "\n".join([
+        "Changelog entry:\n"
+    ] + ["> {line}" for line in changelog.splitlines()])
 
     for repo in ("catalogue-api", "catalogue-pipeline", "storage-service"):
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
@@ -80,5 +104,19 @@ if __name__ == '__main__':
             git("add", "project/Dependencies.scala")
             git("commit", "-m", f"Bump scala-libs to {new_version}")
             git("push", "origin", branch_name)
+
+            r = client.post(
+                f"https://api.github.com/repos/wellcomecollection/{repo}/pulls",
+                headers={"Accept": "application/vnd.github.v3+json"},
+                data={
+                    "head": branch_name,
+                    "base": "main",
+                    "title": "Bump scala-libs to {new_version}",
+                    "maintainer_can_modify": True,
+                    "body": pr_body,
+                }
+            )
+
+            r.raise_for_status()
 
         break
