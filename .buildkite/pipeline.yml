@@ -297,6 +297,9 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
+
+  - wait
+
   - label: "open downstream PRs"
     if: build.branch == "main"
     commands:
