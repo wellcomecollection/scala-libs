@@ -80,6 +80,14 @@ def get_github_api_key():
 
 
 def get_changelog_entry():
+    # BuildKite checks out the commit before it's done the changelog bump
+    # and pushed to GitHub.  The RELEASE file still exists, so we can use
+    # that to get the release note.
+    try:
+        return open("RELEASE.md").read()
+    except FileNotFoundError:
+        pass
+
     with open("CHANGELOG.md") as f:
         changelog = f.read()
 
@@ -154,7 +162,7 @@ def create_downstream_pull_requests(new_version):
             r = client.post(
                 f"https://api.github.com/repos/wellcomecollection/{repo}/pulls/{new_pr_number}/requested_reviewers",
                 headers={"Accept": "application/vnd.github.v3+json"},
-                json={"reviewers": ["scala-devs"]}
+                json={"team_reviewers": ["scala-devs"]}
             )
 
             print(r.json())
