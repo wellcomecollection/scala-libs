@@ -7,8 +7,8 @@ import scala.concurrent.duration.FiniteDuration
 
 sealed trait RefreshInterval {
   def toEsValue: String = this match {
-    case RefreshInterval.Default => null
-    case RefreshInterval.Off => "-1"
+    case RefreshInterval.Default      => null
+    case RefreshInterval.Off          => "-1"
     case RefreshInterval.On(duration) => s"${duration.toMillis}ms"
   }
 }
