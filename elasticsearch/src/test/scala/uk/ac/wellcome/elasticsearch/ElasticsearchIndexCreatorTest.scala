@@ -58,7 +58,6 @@ class ElasticsearchIndexCreatorTest
         booleanField("visible")
       )).dynamic(DynamicMapping.Strict)
     val analysis = Analysis(Nil)
-    val queries = Nil
   }
 
   object CompatibleTestIndexConfig extends IndexConfig {
@@ -70,7 +69,6 @@ class ElasticsearchIndexCreatorTest
         intField("count")
       )).dynamic(DynamicMapping.Strict)
     val analysis = Analysis(Nil)
-    val queries = Nil
   }
 
   it("creates an index into which doc of the expected type can be put") {
@@ -111,7 +109,7 @@ class ElasticsearchIndexCreatorTest
     }
   }}
 
-  it("updates metadata when creating an index"){
+  it("merges metadata when updating an index"){
     val customMeta1 = Map("versions.1" -> 1)
     val customMeta2 = Map("versions.2" -> 2)
 
@@ -192,6 +190,32 @@ class ElasticsearchIndexCreatorTest
             }
           }
       }
+    }
+  }
+
+  object RefreshIntervalIndexConfig extends IndexConfig {
+    val analysis: Analysis = Analysis(analyzers = List())
+    val mapping = properties()
+    override val refreshInterval = RefreshInterval.Off
+  }
+
+  it("sets initial refresh_interval on a non-existing index") {
+    withLocalElasticsearchIndex(RefreshIntervalIndexConfig) { index =>
+      val resp = elasticClient.execute {
+        getSettings(index.name)
+      }.await
+
+      resp.result.settings(index.name).get("index.refresh_interval") shouldBe Some("-1")
+    }
+  }
+
+  it("updates the refresh_interval on an already existing index") {
+    withLocalElasticsearchIndex(RefreshIntervalIndexConfig) { index =>
+      val resp = elasticClient.execute {
+        getSettings(index.name)
+      }.await
+
+      resp.result.settings(index.name).get("index.refresh_interval") shouldBe Some("-1")
     }
   }
 }
