@@ -10,8 +10,6 @@ import weco.http.json.CirceMarshalling
 import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpClient {
-  implicit val ec: ExecutionContext
-
   def singleRequest(request: HttpRequest): Future[HttpResponse]
 }
 
@@ -41,6 +39,8 @@ trait HttpGet extends HttpClientWithBaseUri {
 
 trait HttpPost extends HttpClientWithBaseUri {
   val baseUri: Uri
+
+  implicit val ec: ExecutionContext
 
   def post[In](path: Path,
                body: Option[In] = None,
