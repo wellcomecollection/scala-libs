@@ -52,7 +52,11 @@ steps:
       - docker#v3.5.0:
           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
           mount-ssh-agent: true
-          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          volumes: [
+            "$HOME/.aws:/root/.aws",
+            "$HOME/.docker:/root/.docker",
+            "/var/run/docker.sock:/var/run/docker.sock",
+          ]
           network: "host"
           always-pull: true
           command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
@@ -92,10 +96,7 @@ steps:
       - docker#v3.5.0:
           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
           mount-ssh-agent: true
-          volumes: [
-            "$HOME/.aws:/root/.aws",
-            "/var/run/docker.sock:/var/run/docker.sock",
-          ]
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
           network: "host"
           always-pull: true
           command: ["project elasticsearch", "dockerComposeUp", "test", "dockerComposeStop"]
