@@ -80,6 +80,14 @@ def get_github_api_key():
 
 
 def get_changelog_entry():
+    # BuildKite checks out the commit before it's done the changelog bump
+    # and pushed to GitHub.  The RELEASE file still exists, so we can use
+    # that to get the release note.
+    try:
+        return open("RELEASE.md").read()
+    except FileNotFoundError:
+        pass
+
     with open("CHANGELOG.md") as f:
         changelog = f.read()
 
