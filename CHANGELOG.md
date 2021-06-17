@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.19.0 - 2021-06-17
+
+Add ElasticFieldOps, a set of helpers for working with `ElasticField` in the newest versions of elastic4s.
+
 ## v26.18.4 - 2021-06-17
 
 Tidy up the constructor for AkkaHttpClient.
