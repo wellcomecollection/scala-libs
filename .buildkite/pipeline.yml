@@ -97,7 +97,7 @@ steps:
           ]
           network: "host"
           always-pull: true
-          command: ["project messaging", "dockerComposeUp", "test", "dockerComposeStop"]
+          command: ["project elasticsearch", "dockerComposeUp", "test", "dockerComposeStop"]
   - label: test elasticsearch_typesafe
     plugins:
       - docker#v3.5.0:
