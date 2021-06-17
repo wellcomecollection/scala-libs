@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v26.18.4 - 2021-06-17
+
+Tidy up the constructor for AkkaHttpClient.
+
 ## v26.18.3 - 2021-06-17
 
 Another no-op change to trigger a release and test the auto-bumping.
