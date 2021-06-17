@@ -157,7 +157,12 @@ def create_downstream_pull_requests(new_version):
                 json={"reviewers": ["scala-devs"]}
             )
 
-            r.raise_for_status()
+            print(r.json())
+
+            try:
+                r.raise_for_status()
+            except Exception:
+                raise
 
 
 if __name__ == '__main__':
