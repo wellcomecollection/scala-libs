@@ -7,7 +7,11 @@ import scala.concurrent.duration.FiniteDuration
 
 sealed trait RefreshInterval {
   def toEsValue: String = this match {
-    case RefreshInterval.Default => null
+    // the default value is taken from the docs
+    // ideally we would use `null` but I can't find a way in which elastic4s supports this
+    // I'll try add a patch to allow for this, but this gets us closer to reindexing performantly
+    // see: https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-refresh-interval-setting
+    case RefreshInterval.Default => "1s"
     case RefreshInterval.Off => "-1"
     case RefreshInterval.On(duration) => s"${duration.toMillis}ms"
   }

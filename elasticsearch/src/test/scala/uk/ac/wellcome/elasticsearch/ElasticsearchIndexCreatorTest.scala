@@ -16,6 +16,7 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 
 case class TestObject(
   id: String,
@@ -96,7 +97,7 @@ class ElasticsearchIndexCreatorTest
     }
   }
 
-  it("creates metadata when creating an index"){
+  it("creates metadata when creating an index") {
     val customMeta = Map("bleurgh" -> "blargh")
 
     object IndexConfigWithMetadata extends IndexConfig {
@@ -104,12 +105,13 @@ class ElasticsearchIndexCreatorTest
       val analysis = Analysis(Nil)
     }
     withLocalElasticsearchIndex(IndexConfigWithMetadata) { index =>
-    whenReady(elasticClient.execute(getMapping(index.name))){mapping =>
-      mapping.result.head.meta shouldBe customMeta
+      whenReady(elasticClient.execute(getMapping(index.name))) { mapping =>
+        mapping.result.head.meta shouldBe customMeta
+      }
     }
-  }}
+  }
 
-  it("merges metadata when updating an index"){
+  it("merges metadata when updating an index") {
     val customMeta1 = Map("versions.1" -> 1)
     val customMeta2 = Map("versions.2" -> 2)
 
@@ -122,13 +124,16 @@ class ElasticsearchIndexCreatorTest
       val analysis = Analysis(Nil)
     }
     withLocalElasticsearchIndex(IndexConfigWithMetadata1) { index =>
-      withLocalElasticsearchIndex(IndexConfigWithMetadata2, index = index) { _ =>
-        whenReady(elasticClient.execute(getMapping(index.name))){mapping =>
-          mapping.result.head.meta shouldBe Map("versions.1" -> 1, "versions.2" -> 2)
-        }
+      withLocalElasticsearchIndex(IndexConfigWithMetadata2, index = index) {
+        _ =>
+          whenReady(elasticClient.execute(getMapping(index.name))) { mapping =>
+            mapping.result.head.meta shouldBe Map(
+              "versions.1" -> 1,
+              "versions.2" -> 2)
+          }
       }
-    }}
-
+    }
+  }
 
   it("create an index where inserting a doc of an unexpected type fails") {
     withLocalElasticsearchIndex(TestIndexConfig) { index =>
@@ -193,29 +198,57 @@ class ElasticsearchIndexCreatorTest
     }
   }
 
-  object RefreshIntervalIndexConfig extends IndexConfig {
+  case class RefreshIntervalIndexConfig(
+    override val refreshInterval: RefreshInterval = RefreshInterval.Off)
+      extends IndexConfig {
     val analysis: Analysis = Analysis(analyzers = List())
     val mapping = properties()
-    override val refreshInterval = RefreshInterval.Off
   }
 
   it("sets initial refresh_interval on a non-existing index") {
-    withLocalElasticsearchIndex(RefreshIntervalIndexConfig) { index =>
+    withLocalElasticsearchIndex(RefreshIntervalIndexConfig()) { index =>
       val resp = elasticClient.execute {
         getSettings(index.name)
       }.await
 
-      resp.result.settings(index.name).get("index.refresh_interval") shouldBe Some("-1")
+      resp.result
+        .settings(index.name)
+        .get("index.refresh_interval") shouldBe Some("-1")
     }
   }
 
+
   it("updates the refresh_interval on an already existing index") {
-    withLocalElasticsearchIndex(RefreshIntervalIndexConfig) { index =>
+    withLocalElasticsearchIndex(RefreshIntervalIndexConfig()) { index =>
       val resp = elasticClient.execute {
         getSettings(index.name)
       }.await
 
-      resp.result.settings(index.name).get("index.refresh_interval") shouldBe Some("-1")
+      resp.result
+        .settings(index.name)
+        .get("index.refresh_interval") shouldBe Some("-1")
+
+      withLocalElasticsearchIndex(
+        RefreshIntervalIndexConfig(RefreshInterval.On(30.seconds))) { index =>
+        val resp = elasticClient.execute {
+          getSettings(index.name)
+        }.await
+
+        resp.result
+          .settings(index.name)
+          .get("index.refresh_interval") shouldBe Some("30000ms")
+
+        withLocalElasticsearchIndex(
+          RefreshIntervalIndexConfig(RefreshInterval.Default)) { index =>
+          val resp = elasticClient.execute {
+            getSettings(index.name)
+          }.await
+
+          resp.result
+            .settings(index.name)
+            .get("index.refresh_interval") shouldBe Some("1s")
+        }
+      }
     }
   }
 }
