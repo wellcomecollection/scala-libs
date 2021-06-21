@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v26.19.1 - 2021-06-21
+
+### Libraries affected
+
+`elasticsearch`
+
+### Description
+
+Adds a `refreshInterval` setting `IndexConfig`.
+
 ## v26.19.0 - 2021-06-17
 
 Add ElasticFieldOps, a set of helpers for working with `ElasticField` in the newest versions of elastic4s.
