@@ -39,8 +39,7 @@ class ElasticsearchIndexCreator(
           // Elasticsearch has a default maximum number of fields of 1000.
           // Because images have all of the WorkData fields defined twice in the mapping,
           // they end up having more than 1000 fields, so we increase them to 2000
-          .settings(
-            Map("mapping.total_fields.limit" -> 2000))
+          .settings(Map("mapping.total_fields.limit" -> 2000))
           .refreshInterval(config.refreshInterval.toEsValue)
       }
 
@@ -66,7 +65,9 @@ class ElasticsearchIndexCreator(
     for {
       resp <- elasticClient
         .execute(
-          updateSettings(index.name, Map("index.refresh_interval" -> config.refreshInterval.toEsValue))
+          updateSettings(
+            index.name,
+            Map("index.refresh_interval" -> config.refreshInterval.toEsValue))
         )
     } yield { handleEsError(resp) }
   }
