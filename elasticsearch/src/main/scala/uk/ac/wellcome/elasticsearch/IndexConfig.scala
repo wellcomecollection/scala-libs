@@ -11,8 +11,8 @@ sealed trait RefreshInterval {
     // ideally we would use `null` but I can't find a way in which elastic4s supports this
     // I'll try add a patch to allow for this, but this gets us closer to reindexing performantly
     // see: https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-refresh-interval-setting
-    case RefreshInterval.Default => "1s"
-    case RefreshInterval.Off => "-1"
+    case RefreshInterval.Default      => "1s"
+    case RefreshInterval.Off          => "-1"
     case RefreshInterval.On(duration) => s"${duration.toMillis}ms"
   }
 }
