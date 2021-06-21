@@ -20,5 +20,3 @@ id_rsa.pub
 .bloop
 .vscode
 .metals
-metals.sbt
-.bsp
