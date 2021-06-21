@@ -40,14 +40,17 @@ class ElasticsearchIndexCreator(
           // Because images have all of the WorkData fields defined twice in the mapping,
           // they end up having more than 1000 fields, so we increase them to 2000
           .settings(Map("mapping.total_fields.limit" -> 2000))
+          .refreshInterval(config.refreshInterval.toEsValue)
       }
 
-  private def update =
+  private def update = {
+    // As this doesn't need to run synchronously, we kick it off here
+    val settingsUpdateResp = settingsUpdate
     for {
       originalMapping <- elasticClient.execute(getMapping(index.name))
       originalMeta = originalMapping.result.head.meta
       mergedMeta = originalMeta ++ mapping.meta
-
+      _ <- settingsUpdateResp
       resp <- elasticClient
         .execute(
           putMapping(index.name)
@@ -56,6 +59,18 @@ class ElasticsearchIndexCreator(
             .as(mapping.properties)
         )
     } yield resp
+  }
+
+  private def settingsUpdate = {
+    for {
+      resp <- elasticClient
+        .execute(
+          updateSettings(
+            index.name,
+            Map("index.refresh_interval" -> config.refreshInterval.toEsValue))
+        )
+    } yield { handleEsError(resp) }
+  }
 
   private def handleEsError[T](resp: Response[T]) =
     if (resp.isError) {
