@@ -11,6 +11,7 @@ import io.circe.Json
 import io.circe.parser.parse
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 class MemoryHttpClient(
   responses: Seq[(HttpRequest, HttpResponse)]
@@ -22,7 +23,13 @@ class MemoryHttpClient(
 
   override def singleRequest(request: HttpRequest): Future[HttpResponse] =
     Future {
-      val (nextReq, nextResp) = iterator.next()
+      val (nextReq, nextResp) = Try { iterator.next() } match {
+        case Success((req, resp)) => (req, resp)
+        case Failure(err) =>
+          throw new RuntimeException(
+            s"No more requests expected, but got $request ($err)"
+          )
+      }
 
       // These checks all amount to "nextReq != request", but the specific
       // checks are meant to make it easier to debug particular issues.

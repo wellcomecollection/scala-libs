@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## v26.19.0 - 2021-06-17
+
+Add ElasticFieldOps, a set of helpers for working with `ElasticField` in the newest versions of elastic4s.
+
+## v26.18.4 - 2021-06-17
+
+Tidy up the constructor for AkkaHttpClient.
+
+## v26.18.3 - 2021-06-17
+
+Another no-op change to trigger a release and test the auto-bumping.
+
+## v26.18.2 - 2021-06-16
+
+Provide a better error message when MemoryHttpClient runs out of prepared responses.
+
+## v26.18.1 - 2021-06-16
+
+A no-op change to trigger a release and test the auto-bumping.
+
+## v26.18.0 - 2021-06-16
+
+Add an HTTP typesafe builder for the SierraOauthHttpClient.
+
 ## v26.17.7 - 2021-06-14
 
 Be a bit more tolerant of equality when comparing JSON entities in MemoryHttpClient.
