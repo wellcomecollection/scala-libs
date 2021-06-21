@@ -6,4 +6,4 @@ RELEASE_TYPE: patch
 
 ### Description
 
-Adds a `settings` property to be able to extend elasticsearch settings.   
+Adds a `refreshInterval` setting `IndexConfig`.   
