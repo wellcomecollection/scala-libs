@@ -37,7 +37,7 @@ object IndexConfig {
 
   implicit class IndexConfigOps(indexConfig: IndexConfig) {
     def withRefreshIntervalFromConfig(config: Config): IndexConfig = {
-      val isReindexing = config.getBoolean(s"es.is_reindexing")
+      val isReindexing = config.getBoolean("es.is_reindexing")
       val interval =
         if (isReindexing) RefreshInterval.Off else indexConfig.refreshInterval
 
