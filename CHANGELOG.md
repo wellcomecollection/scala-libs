@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v27.0.0 - 2021-06-22
+
+### Libraries affected
+
+`elasticsearch`
+
+### Description
+
+Converts IndexConfig from an `object` to a `case class`.
+
+This is to better reflect the way IndexConfig is used across the code base
+i.e. as immutable data structures.
+
+Add some creation ops from type config to IndexConfig.
+
 ## v26.19.1 - 2021-06-21
 
 ### Libraries affected
