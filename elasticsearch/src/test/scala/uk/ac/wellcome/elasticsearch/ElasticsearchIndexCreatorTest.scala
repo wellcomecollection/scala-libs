@@ -51,29 +51,29 @@ class ElasticsearchIndexCreatorTest
     booleanField("visible")
   )
 
-  object TestIndexConfig extends IndexConfig {
-    val mapping = properties(
+  val testIndexConfig = IndexConfig(
+    mapping = properties(
       Seq(
         keywordField("id"),
         textField("description"),
         booleanField("visible")
-      )).dynamic(DynamicMapping.Strict)
-    val analysis = Analysis(Nil)
-  }
+      )).dynamic(DynamicMapping.Strict),
+    analysis = Analysis(Nil)
+  )
 
-  object CompatibleTestIndexConfig extends IndexConfig {
-    val mapping = properties(
+  val compatibleTestIndexConfig = IndexConfig(
+    mapping = properties(
       Seq(
         keywordField("id"),
         textField("description"),
         booleanField("visible"),
         intField("count")
-      )).dynamic(DynamicMapping.Strict)
-    val analysis = Analysis(Nil)
-  }
+      )).dynamic(DynamicMapping.Strict),
+    analysis = Analysis(Nil)
+  )
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndexConfig) { index =>
+    withLocalElasticsearchIndex(testIndexConfig) { index =>
       val testObject = TestObject("id", "description", visible = true)
       val testObjectJson = toJson(testObject).get
 
@@ -99,12 +99,11 @@ class ElasticsearchIndexCreatorTest
 
   it("creates metadata when creating an index") {
     val customMeta = Map("bleurgh" -> "blargh")
+    val indexConfigWithMetadata = IndexConfig(
+      mapping = properties().meta(customMeta),
+      analysis = Analysis(Nil))
 
-    object IndexConfigWithMetadata extends IndexConfig {
-      val mapping = properties().meta(customMeta)
-      val analysis = Analysis(Nil)
-    }
-    withLocalElasticsearchIndex(IndexConfigWithMetadata) { index =>
+    withLocalElasticsearchIndex(indexConfigWithMetadata) { index =>
       whenReady(elasticClient.execute(getMapping(index.name))) { mapping =>
         mapping.result.head.meta shouldBe customMeta
       }
@@ -115,16 +114,15 @@ class ElasticsearchIndexCreatorTest
     val customMeta1 = Map("versions.1" -> 1)
     val customMeta2 = Map("versions.2" -> 2)
 
-    object IndexConfigWithMetadata1 extends IndexConfig {
-      val mapping = properties().meta(customMeta1)
-      val analysis = Analysis(Nil)
-    }
-    object IndexConfigWithMetadata2 extends IndexConfig {
-      val mapping = properties().meta(customMeta2)
-      val analysis = Analysis(Nil)
-    }
-    withLocalElasticsearchIndex(IndexConfigWithMetadata1) { index =>
-      withLocalElasticsearchIndex(IndexConfigWithMetadata2, index = index) {
+    val indexConfigWithMetadata1 = IndexConfig(
+      mapping = properties().meta(customMeta1),
+      analysis = Analysis(Nil))
+    val indexConfigWithMetadata2 = IndexConfig(
+      mapping = properties().meta(customMeta2),
+      analysis = Analysis(Nil))
+
+    withLocalElasticsearchIndex(indexConfigWithMetadata1) { index =>
+      withLocalElasticsearchIndex(indexConfigWithMetadata2, index = index) {
         _ =>
           whenReady(elasticClient.execute(getMapping(index.name))) { mapping =>
             mapping.result.head.meta shouldBe Map(
@@ -136,7 +134,7 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndexConfig) { index =>
+    withLocalElasticsearchIndex(testIndexConfig) { index =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
@@ -155,8 +153,8 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndexConfig) { index =>
-      withLocalElasticsearchIndex(CompatibleTestIndexConfig, index = index) {
+    withLocalElasticsearchIndex(testIndexConfig) { index =>
+      withLocalElasticsearchIndex(compatibleTestIndexConfig, index = index) {
         _ =>
           val compatibleTestObject = CompatibleTestObject(
             id = "id",
@@ -198,15 +196,14 @@ class ElasticsearchIndexCreatorTest
     }
   }
 
-  case class RefreshIntervalIndexConfig(
-    override val refreshInterval: RefreshInterval = RefreshInterval.Off)
-      extends IndexConfig {
-    val analysis: Analysis = Analysis(analyzers = List())
-    val mapping = properties()
-  }
+  val refreshIntervalConfig = IndexConfig(
+    analysis = Analysis(analyzers = List()),
+    mapping = properties(),
+    refreshInterval = RefreshInterval.Off
+  )
 
   it("sets initial refresh_interval on a non-existing index") {
-    withLocalElasticsearchIndex(RefreshIntervalIndexConfig()) { index =>
+    withLocalElasticsearchIndex(refreshIntervalConfig) { index =>
       val resp = elasticClient.execute {
         getSettings(index.name)
       }.await
@@ -217,9 +214,8 @@ class ElasticsearchIndexCreatorTest
     }
   }
 
-
   it("updates the refresh_interval on an already existing index") {
-    withLocalElasticsearchIndex(RefreshIntervalIndexConfig()) { index =>
+    withLocalElasticsearchIndex(refreshIntervalConfig) { index =>
       val resp = elasticClient.execute {
         getSettings(index.name)
       }.await
@@ -229,7 +225,8 @@ class ElasticsearchIndexCreatorTest
         .get("index.refresh_interval") shouldBe Some("-1")
 
       withLocalElasticsearchIndex(
-        RefreshIntervalIndexConfig(RefreshInterval.On(30.seconds))) { index =>
+        refreshIntervalConfig.copy(
+          refreshInterval = RefreshInterval.On(30.seconds))) { index =>
         val resp = elasticClient.execute {
           getSettings(index.name)
         }.await
@@ -238,8 +235,8 @@ class ElasticsearchIndexCreatorTest
           .settings(index.name)
           .get("index.refresh_interval") shouldBe Some("30000ms")
 
-        withLocalElasticsearchIndex(
-          RefreshIntervalIndexConfig(RefreshInterval.Default)) { index =>
+        withLocalElasticsearchIndex(refreshIntervalConfig.copy(
+          refreshInterval = RefreshInterval.Default)) { index =>
           val resp = elasticClient.execute {
             getSettings(index.name)
           }.await
