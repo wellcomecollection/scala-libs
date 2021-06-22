@@ -22,14 +22,21 @@ object RefreshInterval {
   final case class On(duration: FiniteDuration) extends RefreshInterval
 }
 
-trait IndexConfig {
+trait IndexConfigTrait {
   def mapping: MappingDefinition
   def analysis: Analysis
   def shards: Int = 1
   def refreshInterval: RefreshInterval = RefreshInterval.Default
 }
 
-object NoStrictMapping extends IndexConfig {
+case class IndexConfig(mapping: MappingDefinition,
+                       analysis: Analysis,
+                       override val shards: Int = 1,
+                       override val refreshInterval: RefreshInterval =
+                         RefreshInterval.Default)
+    extends IndexConfigTrait
+
+object NoStrictMapping extends IndexConfigTrait {
   val analysis: Analysis = Analysis(analyzers = List())
   val mapping: MappingDefinition = MappingDefinition()
 }
