@@ -6,7 +6,7 @@ RELEASE_TYPE: major
 
 ### Description
 
-Converts IndexConfig from an `object` to a `case class`
+Converts IndexConfig from an `object` to a `case class`.
 
 This is to better reflect the way IndexConfig is used across the code base
 i.e. as immutable data structures.
