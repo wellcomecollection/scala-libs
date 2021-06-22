@@ -2,6 +2,7 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.analysis.Analysis
 import com.sksamuel.elastic4s.requests.mappings.MappingDefinition
+import com.typesafe.config.Config
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -22,21 +23,25 @@ object RefreshInterval {
   final case class On(duration: FiniteDuration) extends RefreshInterval
 }
 
-trait IndexConfigTrait {
-  def mapping: MappingDefinition
-  def analysis: Analysis
-  def shards: Int = 1
-  def refreshInterval: RefreshInterval = RefreshInterval.Default
-}
-
 case class IndexConfig(mapping: MappingDefinition,
                        analysis: Analysis,
-                       override val shards: Int = 1,
-                       override val refreshInterval: RefreshInterval =
+                       shards: Int = 1,
+                       refreshInterval: RefreshInterval =
                          RefreshInterval.Default)
-    extends IndexConfigTrait
 
-object NoStrictMapping extends IndexConfigTrait {
-  val analysis: Analysis = Analysis(analyzers = List())
-  val mapping: MappingDefinition = MappingDefinition()
+object IndexConfig {
+  def empty =
+    IndexConfig(
+      analysis = Analysis(analyzers = List()),
+      mapping = MappingDefinition())
+
+  implicit class IndexConfigOps(indexConfig: IndexConfig) {
+    def withRefreshIntervalFromConfig(config: Config): IndexConfig = {
+      val isReindexing = config.getBoolean(s"es.is_reindexing")
+      val interval =
+        if (isReindexing) RefreshInterval.Off else indexConfig.refreshInterval
+
+      indexConfig.copy(refreshInterval = interval)
+    }
+  }
 }
