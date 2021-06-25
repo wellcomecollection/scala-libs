@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v28.0.0 - 2021-06-25
+
+Rename all uses of the `uk.ac.wellcome` namespace to `weco`.
+
 ## v27.1.0 - 2021-06-25
 
 *   EnrichConfig now has helpers for getDurationOption and requireDuration
