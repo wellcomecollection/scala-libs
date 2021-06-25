@@ -1,38 +1,16 @@
 package uk.ac.wellcome.storage.typesafe
 
-import java.time.Duration
-
 import com.typesafe.config.Config
-import uk.ac.wellcome.storage.locking.dynamo.{
-  DynamoLockDao,
-  DynamoLockDaoConfig,
-  DynamoLockingService
-}
-import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
+import uk.ac.wellcome.storage.locking.dynamo.{DynamoLockDao, DynamoLockingService}
 
 import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 
 object LockingBuilder {
-  def buildDynamoLockDao(config: Config)(
-    implicit ec: ExecutionContext): DynamoLockDao =
-    new DynamoLockDao(
-      client = DynamoBuilder.buildDynamoClient(config),
-      config = DynamoLockDaoConfig(
-        dynamoConfig =
-          DynamoBuilder.buildDynamoConfig(config, namespace = "locking"),
-        expiryTime = Duration.ofSeconds(
-          config
-            .getIntOption("locking.expiryTime")
-            .getOrElse(180)
-            .toLong
-        )
-      )
-    )
-
-  def buildDynamoLockingService[Out, OutMonad[_]](config: Config)(
+  def buildDynamoLockingService[Out, OutMonad[_]](config: Config, namespace: String = "")(
     implicit ec: ExecutionContext): DynamoLockingService[Out, OutMonad] = {
-    implicit val dynamoLockDao: DynamoLockDao = buildDynamoLockDao(config)
+    implicit val dynamoLockDao: DynamoLockDao =
+      DynamoLockDaoBuilder.buildDynamoLockDao(config, namespace = namespace)
 
     new DynamoLockingService()
   }
