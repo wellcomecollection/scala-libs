@@ -14,9 +14,7 @@ case class ExpiringLock(id: String,
     extends Lock[String, UUID]
 
 object ExpiringLock {
-  def create(id: String,
-             contextId: UUID,
-             duration: Duration): ExpiringLock = {
+  def create(id: String, contextId: UUID, duration: Duration): ExpiringLock = {
     val created = Instant.now()
 
     ExpiringLock(

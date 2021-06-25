@@ -17,12 +17,11 @@ object DynamoLockDaoBuilder extends AWSClientConfigBuilder {
     ec: ExecutionContext,
   ) = new DynamoLockDao(
     client = DynamoBuilder.buildDynamoClient(config),
-    config =
-      DynamoLockDaoConfig(
-        dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace),
-        expiryTime = config
-          .getDurationOption(s"aws.$namespace.dynamo.lockExpiryTime")
-          .getOrElse(3.minutes)
-      )
+    config = DynamoLockDaoConfig(
+      dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace),
+      expiryTime = config
+        .getDurationOption(s"aws.$namespace.dynamo.lockExpiryTime")
+        .getOrElse(3.minutes)
+    )
   )
 }
