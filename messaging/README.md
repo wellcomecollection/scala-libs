@@ -17,7 +17,7 @@ These libraries are used as part of the [Wellcome Digital Platform][platform].
 
 ```scala
 libraryDependencies ++= Seq(
-  "uk.ac.wellcome" %% "messaging" % "<LATEST_VERSION>"
+  "weco" %% "messaging" % "<LATEST_VERSION>"
 )
 ```
 

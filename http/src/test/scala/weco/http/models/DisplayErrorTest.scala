@@ -3,7 +3,7 @@ package weco.http.models
 import akka.http.scaladsl.model.StatusCodes
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.json.utils.JsonAssertions
+import weco.json.utils.JsonAssertions
 import weco.http.json.DisplayJsonUtil._
 
 class DisplayErrorTest extends AnyFunSpec with Matchers with JsonAssertions {

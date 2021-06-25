@@ -27,11 +27,11 @@ Read [the changelog](CHANGELOG.md) to find the latest version.
 
 ```scala
 libraryDependencies ++= Seq(
-  "uk.ac.wellcome" %% "json" % "10.0.2",
-  "uk.ac.wellcome" %% "messaging" % "10.0.2",
-  "uk.ac.wellcome" %% "monitoring" % "10.0.2"
-  "uk.ac.wellcome" %% "storage" % "10.0.2"
-  "uk.ac.wellcome" %% "typesafe_app" % "10.0.2"
+  "weco" %% "json" % "10.0.2",
+  "weco" %% "messaging" % "10.0.2",
+  "weco" %% "monitoring" % "10.0.2"
+  "weco" %% "storage" % "10.0.2"
+  "weco" %% "typesafe_app" % "10.0.2"
 )
 ```
 

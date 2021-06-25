@@ -4,22 +4,22 @@ import java.net.URL
 
 import akka.actor.ActorSystem
 import org.scalatest.Assertion
-import uk.ac.wellcome.monitoring.memory.MemoryMetrics
-import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{GET, POST}
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse, RequestEntity, StatusCode}
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Sink
 import io.circe.parser._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.akka.fixtures.Akka
-import uk.ac.wellcome.fixtures.TestWith
-import uk.ac.wellcome.json.JsonUtil.toJson
-import uk.ac.wellcome.json.utils.JsonAssertions
+import weco.akka.fixtures.Akka
+import weco.fixtures.TestWith
+import weco.json.JsonUtil.toJson
+import weco.json.utils.JsonAssertions
 import weco.http.WellcomeHttpApp
 import weco.http.models.HTTPServerConfig
+import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
+import weco.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

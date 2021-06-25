@@ -30,7 +30,7 @@ class SierraOauthHttpClient(
     with HttpPost
     with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
 
-  import uk.ac.wellcome.json.JsonUtil._
+  import weco.json.JsonUtil._
 
   implicit val um: FromEntityUnmarshaller[SierraAccessToken] =
     CirceMarshalling.fromDecoder[SierraAccessToken]
