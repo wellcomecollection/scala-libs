@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v27.1.0 - 2021-06-25
+
+*   EnrichConfig now has helpers for getDurationOption and requireDuration
+*   The Dynamo locking config now uses a `scala.concurrent.Duration` for the expiryTime rather than a `java.time.Duration`, and the expiry time is configurable in the typesafe builder with the `aws.dynamo.lockExpiryTime` config flag.
+
 ## v27.0.0 - 2021-06-22
 
 ### Libraries affected
