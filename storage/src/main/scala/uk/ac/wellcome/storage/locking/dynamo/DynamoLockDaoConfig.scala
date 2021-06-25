@@ -1,10 +1,10 @@
 package uk.ac.wellcome.storage.locking.dynamo
 
-import java.time.Duration
-
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
+
+import scala.concurrent.duration.Duration
 
 case class DynamoLockDaoConfig(
   dynamoConfig: DynamoConfig,
-  expiryTime: Duration = Duration.ofSeconds(180)
+  expiryTime: Duration
 )

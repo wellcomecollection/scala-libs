@@ -5,6 +5,8 @@ import org.scalatest.OptionValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.concurrent.duration._
+
 class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
 
   import EnrichConfig._
@@ -15,6 +17,7 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
       |  config {
       |    string = "somevalue"
       |    int = 1
+      |    duration = "2 second"
       |  }
       |  tooManyDots {
       |   config = "tooManyDots"
@@ -70,6 +73,20 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
 
     it("returns None for a missing value") {
       config.getBooleanOption("islander3.alwaysTellsTruth") shouldBe None
+    }
+  }
+
+  describe("getDurationOption") {
+    it("returns the value when a path is available") {
+      val myConfig = ConfigFactory.parseString(configString)
+
+      myConfig.getDurationOption("example.config.duration") shouldBe Some(2.seconds)
+    }
+
+    it("returns None when a path is unavailable") {
+      val myConfig = ConfigFactory.parseString(configString)
+
+      myConfig.getDurationOption("example.config.nopath") shouldBe None
     }
   }
 

@@ -21,6 +21,7 @@ import uk.ac.wellcome.storage.locking.{
   UnlockFailure
 }
 
+import scala.concurrent.duration._
 import scala.language.higherKinds
 
 class DynamoLockDaoTest
@@ -77,7 +78,7 @@ class DynamoLockDaoTest
     it(
       "creates a new lock in a different context when the existing lock expires") {
       withLocalDynamoDbTable { lockTable =>
-        withLockDao(lockTable, seconds = 1) { lockDao =>
+        withLockDao(lockTable, expiryTime = 1.second) { lockDao =>
           val contextId = createContextId
 
           lockDao
@@ -101,7 +102,7 @@ class DynamoLockDaoTest
 
     it("removes a lock from DynamoDB after unlocking") {
       withLocalDynamoDbTable { lockTable =>
-        withLockDao(lockTable, seconds = 1) { lockDao =>
+        withLockDao(lockTable, expiryTime = 1.second) { lockDao =>
           lockDao.lock(staticId, staticContextId).value
           lockDao.unlock(staticContextId)
           assertNoLocks(lockTable)
@@ -113,7 +114,7 @@ class DynamoLockDaoTest
       // 25 is more than the BatchSize supported for a single BatchWriteItem
       // operation in DynamoDB.
       withLocalDynamoDbTable { lockTable =>
-        withLockDao(lockTable, seconds = 1) { lockDao =>
+        withLockDao(lockTable, expiryTime = 1.second) { lockDao =>
           (1 to 50).map { id =>
             lockDao.lock(id.toString, staticContextId).value
           }

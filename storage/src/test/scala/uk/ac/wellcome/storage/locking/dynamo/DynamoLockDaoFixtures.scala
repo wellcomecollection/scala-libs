@@ -1,6 +1,5 @@
 package uk.ac.wellcome.storage.locking.dynamo
 
-import java.time.Duration
 import java.util.UUID
 import org.scalatest.Assertion
 import org.scanamo.generic.auto._
@@ -22,6 +21,7 @@ import uk.ac.wellcome.storage.locking.{LockDao, LockDaoFixtures}
 import uk.ac.wellcome.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.language.higherKinds
 
 trait DynamoLockDaoFixtures
@@ -50,10 +50,10 @@ trait DynamoLockDaoFixtures
   def withLockDao[R](
     dynamoClient: DynamoDbClient,
     lockTable: Table,
-    seconds: Int = 180)(testWith: TestWith[DynamoLockDao, R]): R = {
+    expiryTime: Duration = 180.seconds)(testWith: TestWith[DynamoLockDao, R]): R = {
     val rowLockDaoConfig = DynamoLockDaoConfig(
       dynamoConfig = createDynamoConfigWith(lockTable),
-      expiryTime = Duration.ofSeconds(seconds)
+      expiryTime = expiryTime
     )
 
     val dynamoLockDao = new DynamoLockDao(
@@ -72,9 +72,9 @@ trait DynamoLockDaoFixtures
       }
     }
 
-  def withLockDao[R](lockTable: Table, seconds: Int)(
+  def withLockDao[R](lockTable: Table, expiryTime: Duration)(
     testWith: TestWith[DynamoLockDao, R]): R =
-    withLockDao(dynamoClient, lockTable = lockTable, seconds = seconds) {
+    withLockDao(dynamoClient, lockTable = lockTable, expiryTime = expiryTime) {
       lockDao =>
         testWith(lockDao)
     }
