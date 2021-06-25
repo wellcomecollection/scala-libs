@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
-import uk.ac.wellcome.json.JsonUtil._
+import weco.json.JsonUtil._
 
 import scala.concurrent.Future
 

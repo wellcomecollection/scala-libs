@@ -3,8 +3,8 @@ package weco.http.monitoring
 import akka.http.scaladsl.model.StatusCodes
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import uk.ac.wellcome.fixtures.RandomGenerators
-import uk.ac.wellcome.monitoring.memory.MemoryMetrics
+import weco.fixtures.RandomGenerators
+import weco.monitoring.memory.MemoryMetrics
 
 class HttpMetricsTest extends AnyFunSpec with Matchers with RandomGenerators {
   it("records a success") {

@@ -9,7 +9,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.DebuggingDirectives
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.typesafe.Runnable
+import weco.typesafe.Runnable
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.HttpMetrics
 
