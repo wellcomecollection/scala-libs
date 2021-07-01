@@ -116,7 +116,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         setQueueAttribute(
           queueUrl = queue.url,
           attributeName = QueueAttributeName.VISIBILITY_TIMEOUT,
-          attributeValue = visibilityTimeout.toString
+          attributeValue = visibilityTimeout.toSeconds.toString
         )
 
         queue
