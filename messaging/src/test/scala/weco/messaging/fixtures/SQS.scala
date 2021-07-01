@@ -16,6 +16,7 @@ import weco.monitoring.memory.MemoryMetrics
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 object SQS {
   case class Queue(url: String, arn: String, visibilityTimeout: Int) {
@@ -91,7 +92,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   def withLocalSqsQueue[R](
     client: SqsClient = sqsClient,
     queueName: String = createQueueName,
-    visibilityTimeout: Int = 1
+    visibilityTimeout: Duration = 5.seconds
   ): Fixture[Queue, R] =
     fixture[Queue, R](
       create = {
@@ -109,7 +110,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         val queue = Queue(
           url = response.queueUrl(),
           arn = arn,
-          visibilityTimeout = visibilityTimeout
+          visibilityTimeout = visibilityTimeout.toSeconds.toInt
         )
 
         setQueueAttribute(
