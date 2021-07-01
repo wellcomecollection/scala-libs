@@ -131,7 +131,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       }
     )
 
-  def withLocalSqsQueuePair[R](visibilityTimeout: Int = 1)(
+  def withLocalSqsQueuePair[R](visibilityTimeout: Duration = 5.seconds)(
     testWith: TestWith[QueuePair, R]): R = {
     val queueName = createQueueName
 
