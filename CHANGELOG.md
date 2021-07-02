@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v29.0.0 - 2021-07-02
+
+The `withLocalSqsQueue` fixture now takes an instance of a Scala Duration instead of an Int, and increases the default timeout from 1 second to 5 seconds.
+
 ## v28.0.0 - 2021-06-25
 
 Rename all uses of the `uk.ac.wellcome` namespace to `weco`.
