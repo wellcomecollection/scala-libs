@@ -7,6 +7,7 @@ import akka.http.scaladsl.model.headers.{
   OAuth2BearerToken
 }
 import akka.http.scaladsl.model._
+import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
@@ -16,7 +17,7 @@ import weco.http.fixtures.HttpFixtures
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with HttpFixtures {
+class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with HttpFixtures with IntegrationPatience {
   val credentials = BasicHttpCredentials("username", "password")
 
   val itemJson: String =
