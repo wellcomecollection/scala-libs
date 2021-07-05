@@ -1,23 +1,21 @@
 package weco.http
 
 import akka.http.scaladsl.marshalling.Marshal
-import akka.http.scaladsl.model.StatusCodes.BadRequest
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{
   MalformedRequestContentRejection,
   RejectionHandler,
-  StandardRoute
+  Route
 }
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import io.circe.CursorOp
-import weco.http.models.{ContextResponse, DisplayError}
+import weco.http.models.DisplayError
 import weco.http.monitoring.HttpMetrics
 
 import scala.concurrent.ExecutionContext
 
-trait WellcomeRejectionHandler extends HasContextUrl {
-  import akka.http.scaladsl.server.Directives._
+trait WellcomeRejectionHandler extends ErrorDirectives {
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 
   val httpMetrics: HttpMetrics
@@ -51,7 +49,7 @@ trait WellcomeRejectionHandler extends HasContextUrl {
 
   private def handleDecodingFailures(
     causes: DecodingFailures
-  ): StandardRoute = {
+  ): Route = {
     val message = causes.failures.map { cause =>
       val path = CursorOp.opsToPath(cause.history)
 
@@ -74,15 +72,7 @@ trait WellcomeRejectionHandler extends HasContextUrl {
       s"Invalid value at $path: $reason"
     }
 
-    complete(
-      BadRequest -> ContextResponse(
-        contextUrl = contextUrl,
-        DisplayError(
-          statusCode = BadRequest,
-          description = message.toList.mkString("\n")
-        )
-      )
-    )
+    invalidRequest(description = message.toList.mkString("\n"))
   }
 
   private def transformToJsonErrorResponse(
@@ -94,19 +84,14 @@ trait WellcomeRejectionHandler extends HasContextUrl {
       .mapAsync(parallelism = 1)(data => {
         val description = data.utf8String
         if (statusCode.intValue() >= 500) {
-          val response = ContextResponse(
-            contextUrl = contextUrl,
-            DisplayError(statusCode = statusCode)
-          )
+          val response = DisplayError(statusCode = statusCode)
           Marshal(response).to[MessageEntity]
         } else {
-          val response = ContextResponse(
-            contextUrl = contextUrl,
+          val response =
             DisplayError(
               statusCode = statusCode,
               description = description
             )
-          )
           Marshal(response).to[MessageEntity]
         }
       })

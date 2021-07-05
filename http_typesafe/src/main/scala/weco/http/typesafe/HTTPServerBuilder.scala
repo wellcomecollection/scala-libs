@@ -1,7 +1,5 @@
 package weco.http.typesafe
 
-import java.net.URL
-
 import com.typesafe.config.Config
 import weco.typesafe.config.builders.EnrichConfig._
 import weco.http.models.HTTPServerConfig
@@ -18,7 +16,4 @@ object HTTPServerBuilder {
       externalBaseURL = externalBaseURL
     )
   }
-
-  def buildContextURL(config: Config): URL =
-    new URL(config.requireString("contextURL"))
 }

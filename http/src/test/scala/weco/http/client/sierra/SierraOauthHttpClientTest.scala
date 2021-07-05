@@ -1,19 +1,23 @@
 package weco.http.client.sierra
 
 import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, OAuth2BearerToken}
+import akka.http.scaladsl.model.headers.{
+  Authorization,
+  BasicHttpCredentials,
+  OAuth2BearerToken
+}
 import akka.http.scaladsl.model._
+import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.http.fixtures.HttpFixtures
 
-import java.net.URL
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with HttpFixtures {
+class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with HttpFixtures with IntegrationPatience {
   val credentials = BasicHttpCredentials("username", "password")
 
   val itemJson: String =
@@ -191,6 +195,4 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       }
     }
   }
-
-  override def contextUrl: URL = new URL("http://example.net/context.json")
 }
