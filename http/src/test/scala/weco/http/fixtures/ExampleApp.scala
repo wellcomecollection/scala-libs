@@ -4,13 +4,10 @@ import akka.http.scaladsl.model.StatusCodes.Accepted
 import akka.http.scaladsl.server.Route
 import weco.http.FutureDirectives
 
-import java.net.URL
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ExampleApp {
-  val contextUrl = new URL("http://api.wellcomecollection.org/example/v1/context.json")
-
   case class ExampleResource(name: String)
 
   trait ExampleApi extends FutureDirectives {
@@ -32,8 +29,6 @@ object ExampleApp {
         }
       }
     )
-
-    override def contextUrl: URL = ExampleApp.contextUrl
   }
 
   val exampleApi = new ExampleApi {

@@ -5,15 +5,13 @@ import akka.http.scaladsl.server.{Directives, Route}
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil
-import weco.http.models.{ContextResponse, DisplayError}
+import weco.http.models.DisplayError
 
 trait ErrorDirectives
     extends Directives
     with ErrorAccumulatingCirceSupport
     with Logging
-    with DisplayJsonUtil
-    with HasContextUrl {
-  import weco.http.models.ContextResponse._
+    with DisplayJsonUtil {
 
   def gone(description: String): Route =
     error(
@@ -33,9 +31,7 @@ trait ErrorDirectives
     )
 
   private def error(err: DisplayError): Route =
-    complete(
-      err.httpStatus -> ContextResponse(contextUrl = contextUrl, result = err)
-    )
+    complete(err.httpStatus -> err)
 
   def internalError(err: Throwable): Route = {
     logger.error(s"Sending HTTP 500: $err", err)

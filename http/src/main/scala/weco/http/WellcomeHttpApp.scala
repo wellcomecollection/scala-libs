@@ -1,6 +1,5 @@
 package weco.http
 
-import java.net.URL
 import java.util.UUID
 
 import akka.actor.ActorSystem
@@ -19,7 +18,6 @@ class WellcomeHttpApp(
   routes: Route,
   httpServerConfig: HTTPServerConfig,
   val httpMetrics: HttpMetrics,
-  val contextUrl: URL,
   val appName: String
 )(
   implicit
@@ -32,8 +30,6 @@ class WellcomeHttpApp(
 
   private val appId = UUID.randomUUID()
   val appTag = s"$appName/$appId"
-
-  import akka.http.scaladsl.server.Directives._
 
   def run(): Future[_] = {
     val handler = mapResponse { response =>
