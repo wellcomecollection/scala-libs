@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v29.1.0 - 2021-07-05
+
+This patch removes the use of context URLs throughout our HTTP libraries.
+
 ## v29.0.0 - 2021-07-02
 
 The `withLocalSqsQueue` fixture now takes an instance of a Scala Duration instead of an Int, and increases the default timeout from 1 second to 5 seconds.
