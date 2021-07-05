@@ -253,7 +253,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   private def waitVisibilityTimeoutExpiry(queue: Queue): Unit = {
     // Wait slightly longer than the visibility timeout to ensure that messages
     // that fail processing become visible again before asserting.
-    val millisecondsToWait = queue.visibilityTimeout.toMillis * 1500
+    val millisecondsToWait = (queue.visibilityTimeout.toMillis * 1.5).toInt
     Thread.sleep(millisecondsToWait)
   }
 
