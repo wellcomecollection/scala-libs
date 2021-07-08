@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v29.2.0 - 2021-07-08
+
+The SQS.Queue fixture now takes a Duration instead of an Int, to match the withLocalSqsQueue helper methods.
+
 ## v29.1.1 - 2021-07-08
 
 This release removes the unused type WellcomeApp and ensures that errors starting & configuring a service result in a service exiting.
