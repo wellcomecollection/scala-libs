@@ -19,37 +19,62 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
     }
   }
 
-  object DummyWellcomeTypesafeApp extends WellcomeTypesafeApp {
+  trait DummyWellcomeTypesafeApp extends WellcomeTypesafeApp {
+    var exitStatus: Option[Int] = None
+
+    override protected def exit(statusCode: Int = 0): Unit = {
+      info(statusCode)
+      exitStatus = Some(statusCode)
+    }
+  }
+
+  object NormalDummyWellcomeTypesafeApp extends DummyWellcomeTypesafeApp {
     runWithConfig { config: Config =>
       info("parting is such sweet sorrow")
 
       new DummyRunnable(config)
     }
-
-    override protected def exit(): Unit = ()
   }
 
-  describe("when main is called") {
-    DummyWellcomeTypesafeApp.main(Array.empty)
+  object ExplodingDummyWellcomeTypesafeApp extends DummyWellcomeTypesafeApp {
+    runWithConfig { config: Config =>
+      throw new Exception("O happy dagger!")
 
-    val config = calledWith.get
+      new DummyRunnable(config)
+    }
+  }
+
+  describe("when a service starts") {
+    NormalDummyWellcomeTypesafeApp.main(Array.empty)
 
     it("calls run() in the set Runnable") {
       calledWith shouldBe a[Some[_]]
     }
 
     it("sets the expected logging config") {
-      val loggers = config.getList("akka.loggers")
+      val loggers = calledWith.get.getList("akka.loggers")
       loggers.size() shouldBe 1
       loggers.get(0).unwrapped() shouldBe "akka.event.slf4j.Slf4jLogger"
 
-      val loggingFilter = config.getString("akka.logging-filter")
+      val loggingFilter = calledWith.get.getString("akka.logging-filter")
       loggingFilter shouldBe "akka.event.slf4j.Slf4jLoggingFilter"
     }
 
     it("sets the expected overridden config") {
-      val overriddenConfig = config.getString("overridden.config")
+      val overriddenConfig = calledWith.get.getString("overridden.config")
       overriddenConfig shouldBe "value"
+    }
+
+    it("calls exit with status 0") {
+      NormalDummyWellcomeTypesafeApp.exitStatus shouldBe Some(0)
+    }
+  }
+
+  describe("when a service fails to start") {
+    ExplodingDummyWellcomeTypesafeApp.main(Array.empty)
+
+    it("calls exit with status 1") {
+      ExplodingDummyWellcomeTypesafeApp.exitStatus shouldBe Some(1)
     }
   }
 }
