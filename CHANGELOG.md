@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v29.1.1 - 2021-07-08
+
+This release removes the unused type WellcomeApp and ensures that errors starting & configuring a service result in a service exiting.
+
 ## v29.1.0 - 2021-07-05
 
 This patch removes the use of context URLs throughout our HTTP libraries.
