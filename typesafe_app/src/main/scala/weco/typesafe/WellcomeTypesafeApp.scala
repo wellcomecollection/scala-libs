@@ -15,7 +15,7 @@ trait WellcomeTypesafeApp extends App with Logging {
 
   def runWithConfig(builder: Config => Runnable) =
     try {
-      info(s"Starting service")
+      info("Starting service")
 
       run {
         builder(ConfigFactory.load)
