@@ -19,7 +19,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object SQS {
-  case class Queue(url: String, arn: String, visibilityTimeout: Int) {
+  case class Queue(url: String, arn: String, visibilityTimeout: Duration) {
     override def toString = s"SQS.Queue(url = $url, name = $name)"
     def name: String = url.split("/").toList.last
   }
@@ -110,7 +110,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         val queue = Queue(
           url = response.queueUrl(),
           arn = arn,
-          visibilityTimeout = visibilityTimeout.toSeconds.toInt
+          visibilityTimeout = visibilityTimeout
         )
 
         setQueueAttribute(
@@ -253,7 +253,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   private def waitVisibilityTimeoutExpiry(queue: Queue): Unit = {
     // Wait slightly longer than the visibility timeout to ensure that messages
     // that fail processing become visible again before asserting.
-    val millisecondsToWait = queue.visibilityTimeout * 1500
+    val millisecondsToWait = (queue.visibilityTimeout.toMillis * 1.5).toInt
     Thread.sleep(millisecondsToWait)
   }
 
