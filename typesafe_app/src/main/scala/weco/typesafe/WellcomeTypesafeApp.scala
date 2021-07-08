@@ -21,7 +21,7 @@ trait WellcomeTypesafeApp extends App with Logging {
         builder(ConfigFactory.load)
       }
 
-      info(s"Shutting down service")
+      info("Shutting down service")
       exit(0)
     } catch {
       case e: Throwable =>
