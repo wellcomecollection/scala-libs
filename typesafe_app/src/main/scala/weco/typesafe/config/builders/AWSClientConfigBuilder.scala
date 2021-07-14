@@ -7,12 +7,12 @@ import EnrichConfig._
 trait AWSClientConfigBuilder {
   protected def buildAWSClientConfig(config: Config,
                                      namespace: String): AWSClientConfig = {
-    val accessKey = config.getString("key", namespace = namespace)
-    val secretKey = config.getString("secret", namespace = namespace)
-    val endpoint = config.getString("endpoint", namespace = namespace)
-    val maxConnections = config.getString("max-connections", namespace = namespace)
+    val accessKey = config.getAwsString("key", namespace = namespace)
+    val secretKey = config.getAwsString("secret", namespace = namespace)
+    val endpoint = config.getAwsString("endpoint", namespace = namespace)
+    val maxConnections = config.getAwsString("max-connections", namespace = namespace)
     val region = config
-      .getString("region", namespace = namespace)
+      .getAwsString("region", namespace = namespace)
       .getOrElse("eu-west-1")
 
     AWSClientConfig(
@@ -25,7 +25,7 @@ trait AWSClientConfigBuilder {
   }
 
   implicit class AwsConfigOps(config: Config) {
-    def getString(key: String, namespace: String): Option[String] =
+    def getAwsString(key: String, namespace: String): Option[String] =
       config.getStringOption(s"aws.$namespace.$key") match {
         case Some(value) => Some(value)
         case None        => config.getStringOption(s"aws.$key")
