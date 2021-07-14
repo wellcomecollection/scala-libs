@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v29.3.0 - 2021-07-14
+
+Allow specifying global options for AWS client config, e.g. you can configure a default AWS region with
+
+```
+aws.region=${?aws_region
+```
+
+rather than having to specify it for every namespace/AWS service that you're using.
+
 ## v29.2.0 - 2021-07-08
 
 The SQS.Queue fixture now takes a Duration instead of an Int, to match the withLocalSqsQueue helper methods.
