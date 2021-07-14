@@ -2,7 +2,7 @@ package weco.messaging.typesafe
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import software.amazon.awssdk.services.sqs.{SqsAsyncClient, SqsClient}
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import weco.messaging.sqs.{SQSConfig, SQSStream}
 import weco.monitoring.typesafe.CloudWatchBuilder
 import weco.typesafe.config.builders.EnrichConfig._
@@ -22,9 +22,6 @@ object SQSBuilder {
       parallelism = parallelism
     )
   }
-
-  def buildSQSClient: SqsClient =
-    SqsClient.builder().build()
 
   def buildSQSAsyncClient: SqsAsyncClient =
     SqsAsyncClient.builder().build()

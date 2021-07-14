@@ -11,7 +11,7 @@ import software.amazon.awssdk.auth.credentials.{
 }
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.model._
-import software.amazon.awssdk.services.sqs.{SqsAsyncClient, SqsClient}
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.messaging.sns.NotificationMessage
@@ -41,15 +41,6 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
 
-  implicit val sqsClient: SqsClient =
-    SqsClient.builder()
-      .region(Region.of("localhost"))
-      .credentialsProvider(
-        StaticCredentialsProvider.create(
-          AwsBasicCredentials.create("access", "key")))
-      .endpointOverride(new URI("http://localhost:9324"))
-      .build()
-
   implicit val asyncSqsClient: SqsAsyncClient =
     SqsAsyncClient.builder()
       .region(Region.of("localhost"))
@@ -60,54 +51,56 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       .build()
 
   private def setQueueAttribute(
-    queueUrl: String,
+    queue: Queue,
     attributeName: QueueAttributeName,
     attributeValue: String): SetQueueAttributesResponse =
-    sqsClient
+    asyncSqsClient
       .setQueueAttributes { builder: SetQueueAttributesRequest.Builder =>
         builder
-          .queueUrl(queueUrl)
+          .queueUrl(queue.url)
           .attributes(Map(attributeName -> attributeValue).asJava)
       }
+      .get()
 
   private def getQueueAttribute(queueUrl: String,
-                                attributeName: QueueAttributeName,
-                                client: SqsClient): String =
-    client
+                                attributeName: QueueAttributeName): String =
+    asyncSqsClient
       .getQueueAttributes { builder: GetQueueAttributesRequest.Builder =>
         builder
           .queueUrl(queueUrl)
           .attributeNames(attributeName)
       }
+      .get()
       .attributes()
       .get(attributeName)
 
-  def getQueueAttribute(queue: Queue,
-                        attributeName: QueueAttributeName,
-                        client: SqsClient = sqsClient): String =
-    getQueueAttribute(queueUrl = queue.url,
-                      attributeName = attributeName,
-                      client = client)
+  def getQueueAttribute(
+    queue: Queue,
+    attributeName: QueueAttributeName): String =
+    getQueueAttribute(
+      queueUrl = queue.url,
+      attributeName = attributeName
+    )
 
   def createQueueName: String =
     randomAlphanumeric()
 
   def withLocalSqsQueue[R](
-    client: SqsClient = sqsClient,
     queueName: String = createQueueName,
     visibilityTimeout: Duration = 5.seconds
   ): Fixture[Queue, R] =
     fixture[Queue, R](
       create = {
-        val response = client.createQueue {
-          builder: CreateQueueRequest.Builder =>
-            builder.queueName(queueName)
-        }
+        val response = asyncSqsClient
+          .createQueue {
+            builder: CreateQueueRequest.Builder =>
+              builder.queueName(queueName)
+          }
+          .get()
 
         val arn = getQueueAttribute(
           queueUrl = response.queueUrl(),
-          attributeName = QueueAttributeName.QUEUE_ARN,
-          client = client
+          attributeName = QueueAttributeName.QUEUE_ARN
         )
 
         val queue = Queue(
@@ -117,7 +110,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         )
 
         setQueueAttribute(
-          queueUrl = queue.url,
+          queue = queue,
           attributeName = QueueAttributeName.VISIBILITY_TIMEOUT,
           attributeValue = visibilityTimeout.toSeconds.toString
         )
@@ -125,12 +118,16 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         queue
       },
       destroy = { queue =>
-        client.purgeQueue { builder: PurgeQueueRequest.Builder =>
-          builder.queueUrl(queue.url)
-        }
-        client.deleteQueue { builder: DeleteQueueRequest.Builder =>
-          builder.queueUrl(queue.url)
-        }
+        asyncSqsClient
+          .purgeQueue { builder: PurgeQueueRequest.Builder =>
+            builder.queueUrl(queue.url)
+          }
+          .get
+        asyncSqsClient
+          .deleteQueue { builder: DeleteQueueRequest.Builder =>
+            builder.queueUrl(queue.url)
+          }
+          .get
       }
     )
 
@@ -138,13 +135,12 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     testWith: TestWith[QueuePair, R]): R = {
     val queueName = createQueueName
 
-    withLocalSqsQueue(sqsClient, queueName = s"$queueName-dlq") { dlq =>
+    withLocalSqsQueue(queueName = s"$queueName-dlq") { dlq =>
       withLocalSqsQueue(
-        sqsClient,
         queueName = queueName,
         visibilityTimeout = visibilityTimeout) { queue =>
         setQueueAttribute(
-          queueUrl = queue.url,
+          queue = queue,
           attributeName = QueueAttributeName.REDRIVE_POLICY,
           attributeValue =
             s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}"""
@@ -201,9 +197,11 @@ trait SQS extends Matchers with Logging with RandomGenerators {
                                      body: String): SendMessageResponse = {
     debug(s"Sending message to ${queue.url}: $body")
 
-    sqsClient.sendMessage { builder: SendMessageRequest.Builder =>
-      builder.queueUrl(queue.url).messageBody(body)
-    }
+    asyncSqsClient
+      .sendMessage { builder: SendMessageRequest.Builder =>
+        builder.queueUrl(queue.url).messageBody(body)
+      }
+      .get
   }
 
   def noMessagesAreWaitingIn(queue: Queue): Assertion = {
@@ -261,10 +259,11 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   }
 
   def getMessages(queue: Queue): Seq[Message] =
-    sqsClient
+    asyncSqsClient
       .receiveMessage { builder: ReceiveMessageRequest.Builder =>
         builder.queueUrl(queue.url).maxNumberOfMessages(10)
       }
+      .get
       .messages()
       .asScala
 
