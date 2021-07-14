@@ -10,7 +10,8 @@ trait AWSClientConfigBuilder {
     val accessKey = config.getAwsString("key", namespace = namespace)
     val secretKey = config.getAwsString("secret", namespace = namespace)
     val endpoint = config.getAwsString("endpoint", namespace = namespace)
-    val maxConnections = config.getAwsString("max-connections", namespace = namespace)
+    val maxConnections =
+      config.getAwsString("max-connections", namespace = namespace)
     val region = config
       .getAwsString("region", namespace = namespace)
       .getOrElse("eu-west-1")
