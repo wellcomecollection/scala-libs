@@ -7,12 +7,12 @@ import weco.typesafe.config.builders.EnrichConfig._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-object DynamoLockDaoBuilder extends AWSClientConfigBuilder {
+object DynamoLockDaoBuilder {
   def buildDynamoLockDao(config: Config, namespace: String = "locking")(
     implicit
     ec: ExecutionContext,
   ) = new DynamoLockDao(
-    client = DynamoBuilder.buildDynamoClient(config),
+    client = DynamoBuilder.buildDynamoClient,
     config = DynamoLockDaoConfig(
       dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace),
       expiryTime = config
