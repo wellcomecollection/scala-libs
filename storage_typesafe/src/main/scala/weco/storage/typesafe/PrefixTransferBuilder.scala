@@ -32,11 +32,10 @@ object PrefixTransferBuilder {
       .getOrElse(AWS)
 
     (srcCloudProvider, dstCloudProvider) match {
-      case (AWS, AWS) => {
-        implicit val s3Client: AmazonS3 = S3Builder.buildS3Client(config)
+      case (AWS, AWS) =>
+        implicit val s3Client: AmazonS3 = S3Builder.buildS3Client
 
         S3PrefixTransfer()
-      }
 
       case _ =>
         throw new Exception(
