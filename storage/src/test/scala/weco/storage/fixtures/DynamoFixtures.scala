@@ -1,23 +1,20 @@
 package weco.storage.fixtures
 
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.matchers.should.Matchers
 import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, DynamoReadError, Scanamo, Table => ScanamoTable}
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
-import software.amazon.awssdk.services.dynamodb.model.{
-  AttributeDefinition,
-  CreateTableRequest,
-  DeleteTableRequest,
-  KeySchemaElement,
-  KeyType,
-  ProvisionedThroughput,
-  ScalarAttributeType
+import software.amazon.awssdk.auth.credentials.{
+  AwsBasicCredentials,
+  StaticCredentialsProvider
 }
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.model._
 import weco.fixtures._
-import weco.storage.dynamo.{DynamoClientFactory, DynamoConfig}
+import weco.storage.dynamo.DynamoConfig
 
+import java.net.URI
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 
@@ -32,18 +29,13 @@ trait DynamoFixtures
     with RandomGenerators {
   import DynamoFixtures._
 
-  private val port = 45678
-  private val dynamoDBEndPoint = "http://localhost:" + port
-  private val regionName = "localhost"
-  private val accessKey = "access"
-  private val secretKey = "secret"
-
-  implicit val dynamoClient: DynamoDbClient = DynamoClientFactory.create(
-    region = regionName,
-    endpoint = dynamoDBEndPoint,
-    accessKey = accessKey,
-    secretKey = secretKey
-  )
+  implicit val dynamoClient: DynamoDbClient =
+    DynamoDbClient.builder()
+      .credentialsProvider(
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create("access", "secret")))
+      .endpointOverride(new URI("http://localhost:45678"))
+      .build()
 
   implicit val scanamo = Scanamo(dynamoClient)
 

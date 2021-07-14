@@ -1,8 +1,13 @@
 package weco.messaging.fixtures
 
 import grizzled.slf4j.Logging
-import io.circe.{yaml, Decoder, Json, ParsingFailure}
+import io.circe.{Decoder, Json, ParsingFailure, yaml}
 import org.scalatest.matchers.should.Matchers
+import software.amazon.awssdk.auth.credentials.{
+  AwsBasicCredentials,
+  StaticCredentialsProvider
+}
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.{
   CreateTopicRequest,
@@ -10,8 +15,9 @@ import software.amazon.awssdk.services.sns.model.{
 }
 import weco.fixtures._
 import weco.json.JsonUtil._
-import weco.messaging.sns.{SNSClientFactory, SNSConfig}
+import weco.messaging.sns.SNSConfig
 
+import java.net.URI
 import scala.collection.immutable.Seq
 
 object SNS {
@@ -30,17 +36,14 @@ trait SNS extends Matchers with Logging with RandomGenerators {
 
   private val localSNSEndpointUrl = "http://localhost:9292"
 
-  private val regionName = "localhost"
-
-  private val accessKey = "access"
-  private val secretKey = "secret"
-
-  implicit val snsClient: SnsClient = SNSClientFactory.create(
-    region = regionName,
-    endpoint = localSNSEndpointUrl,
-    accessKey = accessKey,
-    secretKey = secretKey
-  )
+  implicit val snsClient: SnsClient =
+    SnsClient.builder()
+      .region(Region.of("localhost"))
+      .credentialsProvider(
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create("access", "secret")))
+      .endpointOverride(new URI(localSNSEndpointUrl))
+      .build()
 
   def createTopicName: String =
     randomAlphanumeric()
@@ -57,30 +60,6 @@ trait SNS extends Matchers with Logging with RandomGenerators {
     },
     destroy = { topic =>
       snsClient.deleteTopic { builder: DeleteTopicRequest.Builder =>
-        builder.topicArn(topic.arn)
-      }
-    }
-  )
-
-  val localStackSnsClient: SnsClient = SNSClientFactory.create(
-    region = "eu-west-2",
-    endpoint = "http://localhost:4575",
-    accessKey = accessKey,
-    secretKey = secretKey
-  )
-
-  def withLocalStackSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
-    create = {
-      val topicName = createTopicName
-      val arn = localStackSnsClient
-        .createTopic { builder: CreateTopicRequest.Builder =>
-          builder.name(topicName)
-        }
-        .topicArn()
-      Topic(arn)
-    },
-    destroy = { topic =>
-      localStackSnsClient.deleteTopic { builder: DeleteTopicRequest.Builder =>
         builder.topicArn(topic.arn)
       }
     }

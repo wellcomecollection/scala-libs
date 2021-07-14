@@ -1,12 +1,14 @@
 package weco.storage.fixtures
 
-import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.iterable.S3Objects
 import com.amazonaws.services.s3.model.{
   ObjectMetadata,
   PutObjectRequest,
   S3ObjectSummary
 }
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import grizzled.slf4j.Logging
 import io.circe.parser.parse
 import io.circe.{Decoder, Json}
@@ -16,10 +18,9 @@ import org.scalatest.{Assertion, EitherValues}
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}
-import weco.storage.s3.{S3ClientFactory, S3Config, S3ObjectLocation}
+import weco.storage.s3.{S3Config, S3ObjectLocation}
 import weco.storage.streaming.Codec._
 import weco.storage.streaming.InputStreamWithLength
-import weco.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}
 
 import scala.collection.JavaConverters._
 
@@ -44,25 +45,21 @@ trait S3Fixtures
 
   import S3Fixtures._
 
-  protected val localS3EndpointUrl = "http://localhost:33333"
-  private val regionName = "localhost"
+  implicit val s3Client: AmazonS3 =
+    AmazonS3ClientBuilder.standard()
+      .withCredentials(new AWSStaticCredentialsProvider(
+        new BasicAWSCredentials("accessKey1", "verySecretKey1")))
+      .withPathStyleAccessEnabled(true)
+      .withEndpointConfiguration(new EndpointConfiguration("http://localhost:33333", "localhost"))
+      .build()
 
-  protected val accessKey = "accessKey1"
-  protected val secretKey = "verySecretKey1"
-
-  implicit val s3Client: AmazonS3 = S3ClientFactory.create(
-    region = regionName,
-    endpoint = localS3EndpointUrl,
-    accessKey = accessKey,
-    secretKey = secretKey
-  )
-
-  val brokenS3Client: AmazonS3 = S3ClientFactory.create(
-    region = "nuh-uh",
-    endpoint = "http://nope.nope",
-    accessKey = randomAlphanumeric(),
-    secretKey = randomAlphanumeric()
-  )
+  val brokenS3Client: AmazonS3 =
+    AmazonS3ClientBuilder.standard()
+      .withCredentials(new AWSStaticCredentialsProvider(
+        new BasicAWSCredentials("nope", "nope")))
+      .withPathStyleAccessEnabled(true)
+      .withEndpointConfiguration(new EndpointConfiguration("http://nope.nope", "nope"))
+      .build()
 
   def withLocalS3Bucket[R]: Fixture[Bucket, R] =
     fixture[Bucket, R](

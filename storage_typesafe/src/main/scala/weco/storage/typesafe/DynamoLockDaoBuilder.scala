@@ -2,7 +2,6 @@ package weco.storage.typesafe
 
 import com.typesafe.config.Config
 import weco.storage.locking.dynamo.{DynamoLockDao, DynamoLockDaoConfig}
-import weco.typesafe.config.builders.AWSClientConfigBuilder
 import weco.typesafe.config.builders.EnrichConfig._
 
 import scala.concurrent.ExecutionContext

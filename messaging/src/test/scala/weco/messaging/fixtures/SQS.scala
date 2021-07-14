@@ -5,6 +5,11 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
+import software.amazon.awssdk.auth.credentials.{
+  AwsBasicCredentials,
+  StaticCredentialsProvider
+}
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.model._
 import software.amazon.awssdk.services.sqs.{SqsAsyncClient, SqsClient}
 import weco.fixtures._
@@ -14,6 +19,7 @@ import weco.messaging.sqs._
 import weco.monitoring.Metrics
 import weco.monitoring.memory.MemoryMetrics
 
+import java.net.URI
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -31,30 +37,27 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   import SQS._
 
   private val sqsInternalEndpointUrl = "http://sqs:9324"
-  private val sqsEndpointUrl = "http://localhost:9324"
-
-  private val regionName = "localhost"
-
-  private val sqsAccessKey = "access"
-  private val sqsSecretKey = "secret"
 
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
 
-  implicit val sqsClient: SqsClient = SQSClientFactory.createSyncClient(
-    region = regionName,
-    endpoint = sqsEndpointUrl,
-    accessKey = sqsAccessKey,
-    secretKey = sqsSecretKey
-  )
+  implicit val sqsClient: SqsClient =
+    SqsClient.builder()
+      .region(Region.of("localhost"))
+      .credentialsProvider(
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create("access", "key")))
+      .endpointOverride(new URI("http://localhost:9324"))
+      .build()
 
   implicit val asyncSqsClient: SqsAsyncClient =
-    SQSClientFactory.createAsyncClient(
-      region = regionName,
-      endpoint = sqsEndpointUrl,
-      accessKey = sqsAccessKey,
-      secretKey = sqsSecretKey
-    )
+    SqsAsyncClient.builder()
+      .region(Region.of("localhost"))
+      .credentialsProvider(
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create("access", "key")))
+      .endpointOverride(new URI("http://localhost:9324"))
+      .build()
 
   private def setQueueAttribute(
     queueUrl: String,
