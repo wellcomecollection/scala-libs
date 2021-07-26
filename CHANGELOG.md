@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.1.0 - 2021-07-26
+
+This release removes all the use of `SqsClient`, because everywhere else in our projects we've switched exclusively to `SqsAsyncClient`.
+
 ## v30.0.0 - 2021-07-14
 
 This release removes all the typesafe config for AWS-related config, in particular:
