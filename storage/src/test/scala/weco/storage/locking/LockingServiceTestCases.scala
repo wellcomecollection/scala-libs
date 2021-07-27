@@ -8,7 +8,7 @@ import weco.storage.fixtures.LockingServiceFixtures
 import weco.storage.locking.memory.PermanentLock
 import weco.storage.fixtures.LockingServiceFixtures
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
     extends AnyFunSpec
@@ -183,6 +183,48 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
             }
 
             result.get.left.value shouldBe a[FailedProcess[_]]
+            getCurrentLocks(lockDao, lockDaoContext) shouldBe empty
+          }
+        }
+      }
+    }
+
+    // This is mimicing a failure in the bag versioner in the storage service.
+    //
+    // The bag versioner locks around two IDs: the ingest ID and the external ID.
+    // Each process has a different ingest ID, but different processes may have
+    // the same external ID.
+    //
+    // We'd see the following steps:
+    //
+    //    proc1: lock(ingestId=proc1)              -> success
+    //    proc1: lock(externalId=testing/test_bag) -> success
+    //    proc2: lock(ingestId=proc2)              -> success
+    //    proc2: lock(externalId=testing/test_bag) -> fail
+    //
+    // and then the lock for `ingestId=proc2` would never be rolled back, which
+    // prevented proc2 from proceeding when it was retried.
+    //
+    it("releases any already-acquired locks if one of the IDs fails to lock") {
+      val commonId = createIdent
+
+      val lockSet1 = Set(commonId, createIdent, createIdent)
+      val lockSet2 = Set(createIdent, commonId, createIdent)
+
+      println(s"lockSet1 = $lockSet1")
+      println(s"lockSet2 = $lockSet2")
+
+      withLockDaoContext { lockDaoContext =>
+        withLockDao(lockDaoContext) { lockDao =>
+          withLockingService(lockDao) { service =>
+            service.withLocks(lockSet1) {
+              service.withLocks(lockSet2) {
+                Success("OK!")
+              }
+
+              Success("OK!")
+            }
+
             getCurrentLocks(lockDao, lockDaoContext) shouldBe empty
           }
         }

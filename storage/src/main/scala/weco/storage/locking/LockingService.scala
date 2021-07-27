@@ -74,6 +74,11 @@ trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
     } else {
       lockDao.lock(ids.head, contextId) match {
         case Left(failure) =>
+
+          // Remember to unlock any locks we've already acquired!  Otherwise retrying
+          // this operation later is doomed to fail.
+          unlock(contextId)
+
           Left(FailedLock(contextId, ids.tail.map(skipped) + failure))
         case Right(_) => getLocks(ids.tail, contextId)
       }
