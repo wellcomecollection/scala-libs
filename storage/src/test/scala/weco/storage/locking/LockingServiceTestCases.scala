@@ -25,7 +25,7 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
   val overlappingLockIds: Set[Ident] = commonLockIds ++ nonOverlappingLockIds
   val differentLockIds = Set(createIdent, createIdent, createIdent)
 
-  def withLockingService[R](testWith: TestWith[LockingServiceStub, R]): R =
+  def withLockingServiceImpl[R](testWith: TestWith[LockingServiceStub, R]): R =
     withLockDaoContext { lockDaoContext =>
       withLockDao(lockDaoContext) { lockDao =>
         withLockingService(lockDao) { service =>
@@ -106,7 +106,7 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
     }
 
     it("allows multiple, nested locks on different identifiers") {
-      withLockingService { service =>
+      withLockingServiceImpl { service =>
         assertLockSuccess(service.withLocks(lockIds) {
           assertLockSuccess(service.withLocks(differentLockIds)(f))
 
@@ -116,21 +116,21 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
     }
 
     it("unlocks a context set when done, and allows you to re-lock them") {
-      withLockingService { service =>
+      withLockingServiceImpl { service =>
         assertLockSuccess(service.withLocks(lockIds)(f))
         assertLockSuccess(service.withLocks(lockIds)(f))
       }
     }
 
     it("unlocks a context set when a result throws a Throwable") {
-      withLockingService { service =>
+      withLockingServiceImpl { service =>
         assertFailedProcess(service.withLocks(lockIds)(fError), expectedError)
         assertLockSuccess(service.withLocks(lockIds)(f))
       }
     }
 
     it("unlocks a context set when a partial lock is acquired") {
-      withLockingService { service =>
+      withLockingServiceImpl { service =>
         assertLockSuccess(service.withLocks(lockIds) {
 
           assertFailedLock(
@@ -149,7 +149,7 @@ trait LockingServiceTestCases[Ident, ContextId, LockDaoContext]
     }
 
     it("calls the callback if asked to lock an empty set") {
-      withLockingService { service =>
+      withLockingServiceImpl { service =>
         assertLockSuccess(
           service.withLocks(Set.empty)(f)
         )
