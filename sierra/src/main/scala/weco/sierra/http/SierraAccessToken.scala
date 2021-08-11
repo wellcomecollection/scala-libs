@@ -1,4 +1,4 @@
-package weco.http.client.sierra
+package weco.sierra.http
 
 import io.circe.generic.extras.JsonKey
 

@@ -101,7 +101,7 @@ lazy val sierra = Common.setupProject(
   project,
   folder = "sierra",
   projectVersion = projectVersion,
-  localDependencies = Seq(json, fixtures)
+  localDependencies = Seq(fixtures, http, json)
 )
 
 /**

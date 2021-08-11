@@ -1,4 +1,4 @@
-package weco.http.client.sierra
+package weco.sierra.http
 
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{
@@ -111,12 +111,12 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
           entity = HttpEntity(
             contentType = ContentTypes.`application/json`,
             s"""
-              |{
-              |  "access_token": "${token1.token}",
-              |  "token_type": "bearer",
-              |  "expires_in": 3
-              |}
-              |""".stripMargin
+               |{
+               |  "access_token": "${token1.token}",
+               |  "token_type": "bearer",
+               |  "expires_in": 3
+               |}
+               |""".stripMargin
           )
         )
       ),

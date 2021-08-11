@@ -1,4 +1,4 @@
-package weco.http.client.sierra
+package weco.sierra.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri.Path

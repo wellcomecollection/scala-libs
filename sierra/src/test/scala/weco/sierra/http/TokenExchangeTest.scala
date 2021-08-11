@@ -1,4 +1,4 @@
-package weco.http.client.sierra
+package weco.sierra.http
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funspec.AnyFunSpec
@@ -15,8 +15,8 @@ class TokenExchangeTest extends AnyFunSpec with Matchers with ScalaFutures {
   type Token = String
 
   class MemoryTokenExchange(
-    tokens: Seq[(Credentials, Instant)]
-  )(implicit val ec: ExecutionContext)
+                             tokens: Seq[(Credentials, Instant)]
+                           )(implicit val ec: ExecutionContext)
     extends TokenExchange[Credentials, Token] {
     var calls = 0
     override val expiryGracePeriod: Duration = 0.seconds
