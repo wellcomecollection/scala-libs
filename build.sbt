@@ -104,6 +104,13 @@ lazy val sierra = Common.setupProject(
   localDependencies = Seq(fixtures, http, json)
 )
 
+lazy val sierra_typesafe = Common.setupProject(
+  project,
+  folder = "sierra_typesafe",
+  projectVersion = projectVersion,
+  localDependencies = Seq(sierra, typesafe_app)
+)
+
 /**
  * To release to the Wellcome maven repo in S3 locally, uncomment this:
  **/
