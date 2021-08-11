@@ -109,6 +109,15 @@ steps:
           network: "host"
           always-pull: true
           command: ["project elasticsearch_typesafe", "test"]
+  - label: test sierra
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          command: ["project sierra", "test"]
   - wait
   - label: cut release
     if: build.branch == "main"
@@ -305,6 +314,35 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish sierra
+    if: build.branch == "main"
+    env:
+      PROJECT: sierra
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+  - label: publish sierra_typesafe
+    if: build.branch == "main"
+    env:
+      PROJECT: sierra_typesafe
+    plugins:
+      - docker#v3.5.0:
+          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
+          mount-ssh-agent: true
+          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+          network: "host"
+          always-pull: true
+          propagate-environment: true
+          entrypoint: "/usr/bin/python3"
+    command: "/workdir/.buildkite/scripts/publish.py"
+
 
   - wait
 

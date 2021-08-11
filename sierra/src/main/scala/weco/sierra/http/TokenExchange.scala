@@ -1,7 +1,7 @@
-package weco.http.client.sierra
+package weco.sierra.http
 
 import java.time.Instant
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenExchange[C, T] {

@@ -1,12 +1,12 @@
-package weco.http.typesafe
+package weco.sierra.typesafe
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.BasicHttpCredentials
 import com.typesafe.config.Config
-import weco.typesafe.config.builders.EnrichConfig._
-import weco.http.client.sierra.SierraOauthHttpClient
 import weco.http.client.{AkkaHttpClient, HttpGet, HttpPost}
+import weco.sierra.http.SierraOauthHttpClient
+import weco.typesafe.config.builders.EnrichConfig._
 
 import scala.concurrent.ExecutionContext
 
