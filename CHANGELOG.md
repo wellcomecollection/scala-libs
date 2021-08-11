@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.2.0 - 2021-08-11
+
+This release adds the `sierra` and `sierra_typesafe` libraries, which now contain all the shared Sierra-related functionality.
+
 ## v30.1.1 - 2021-07-27
 
 Fix a bug in the LockingService where locks weren't being released correctly if there was a partial locking failure.
