@@ -83,15 +83,15 @@ sealed trait TypedSierraRecordNumber extends SierraRecordNumber {
 // classes will force us to supply our special decoder.
 
 class UntypedSierraRecordNumber(val recordNumber: String)
-  extends SierraRecordNumber
+    extends SierraRecordNumber
 
 object UntypedSierraRecordNumber
-  extends SierraRecordNumberOps[UntypedSierraRecordNumber] {
+    extends SierraRecordNumberOps[UntypedSierraRecordNumber] {
   def apply(number: String) = new UntypedSierraRecordNumber(number)
 }
 
 class SierraBibNumber(val recordNumber: String)
-  extends TypedSierraRecordNumber {
+    extends TypedSierraRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.bibs
 }
 
@@ -100,7 +100,7 @@ object SierraBibNumber extends SierraRecordNumberOps[SierraBibNumber] {
 }
 
 class SierraItemNumber(val recordNumber: String)
-  extends TypedSierraRecordNumber {
+    extends TypedSierraRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.items
 }
 
@@ -116,17 +116,17 @@ object SierraItemNumber extends SierraRecordNumberOps[SierraItemNumber] {
 }
 
 class SierraHoldingsNumber(val recordNumber: String)
-  extends TypedSierraRecordNumber {
+    extends TypedSierraRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.holdings
 }
 
 object SierraHoldingsNumber
-  extends SierraRecordNumberOps[SierraHoldingsNumber] {
+    extends SierraRecordNumberOps[SierraHoldingsNumber] {
   def apply(number: String) = new SierraHoldingsNumber(number)
 }
 
 class SierraOrderNumber(val recordNumber: String)
-  extends TypedSierraRecordNumber {
+    extends TypedSierraRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.orders
 }
 
@@ -135,7 +135,7 @@ object SierraOrderNumber extends SierraRecordNumberOps[SierraOrderNumber] {
 }
 
 class SierraPatronNumber(val recordNumber: String)
-  extends TypedSierraRecordNumber {
+    extends TypedSierraRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.patrons
 }
 

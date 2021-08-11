@@ -1,6 +1,11 @@
 package weco.sierra.models.data
 
-import weco.sierra.models.fields.{SierraCountry, SierraLanguage, SierraLocation, SierraMaterialType}
+import weco.sierra.models.fields.{
+  SierraCountry,
+  SierraLanguage,
+  SierraLocation,
+  SierraMaterialType
+}
 import weco.sierra.models.marc.{FixedField, VarField}
 
 // https://techdocs.iii.com/sierraapi/Content/zReference/objects/bibObjectDescription.htm
