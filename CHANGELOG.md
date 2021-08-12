@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.3.0 - 2021-08-12
+
+Add a missing SierraRecordTypeBuilder config builder to sierra_typesafe.
+
 ## v30.2.0 - 2021-08-11
 
 This release adds the `sierra` and `sierra_typesafe` libraries, which now contain all the shared Sierra-related functionality.
