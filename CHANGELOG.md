@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.4.0 - 2021-08-12
+
+Move TokenExchange back into the weco.http.client namespace.
+
 ## v30.3.0 - 2021-08-12
 
 Add a missing SierraRecordTypeBuilder config builder to sierra_typesafe.
