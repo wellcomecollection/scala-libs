@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.headers.{
   OAuth2BearerToken
 }
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal}
-import weco.http.client.{HttpClient, HttpGet, HttpPost}
+import weco.http.client.{HttpClient, HttpGet, HttpPost, TokenExchange}
 import weco.http.json.CirceMarshalling
 
 import java.time.Instant
