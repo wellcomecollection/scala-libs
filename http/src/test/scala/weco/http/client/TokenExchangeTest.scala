@@ -1,13 +1,13 @@
-package weco.sierra.http
+package weco.http.client
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.time.Instant
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 class TokenExchangeTest extends AnyFunSpec with Matchers with ScalaFutures {

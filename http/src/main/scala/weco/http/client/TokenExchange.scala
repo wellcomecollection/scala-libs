@@ -1,4 +1,4 @@
-package weco.sierra.http
+package weco.http.client
 
 import java.time.Instant
 import scala.concurrent.duration.Duration
