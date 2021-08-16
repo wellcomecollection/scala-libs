@@ -41,4 +41,7 @@ case object VarField {
       fieldTag = Some(fieldTag),
       content = Some(content)
     )
+
+  def apply(marcTag: String, subfields: List[Subfield]): VarField =
+    VarField(marcTag = Some(marcTag), subfields = subfields)
 }
