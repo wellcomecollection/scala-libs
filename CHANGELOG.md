@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.4.1 - 2021-08-16
+
+Add another apply() method for VarField that lets you pass a MARC tag and a list of subfields, which is a common combination.
+
 ## v30.4.0 - 2021-08-12
 
 Move TokenExchange back into the weco.http.client namespace.
