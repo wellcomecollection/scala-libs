@@ -14,7 +14,11 @@ import java.time.format.DateTimeFormatter
 
 import weco.http.client.{HttpClient, HttpGet, HttpPost}
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
-import weco.sierra.models.fields.{SierraHoldRequest, SierraHoldsList, SierraItemDataEntries}
+import weco.sierra.models.fields.{
+  SierraHoldRequest,
+  SierraHoldsList,
+  SierraItemDataEntries
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 
