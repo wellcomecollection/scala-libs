@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v30.5.0 - 2021-08-20
+
+### Libraries affected
+
+`sierra`
+
+### Description
+
+Adds SierraSource service for interacting with Sierra to retrieve and create holds.
+
 ## v30.4.1 - 2021-08-16
 
 Add another apply() method for VarField that lets you pass a MARC tag and a list of subfields, which is a common combination.
