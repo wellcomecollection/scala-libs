@@ -14,6 +14,7 @@ import weco.messaging.fixtures.SQS
 import weco.messaging.fixtures.SQS.{Queue, QueuePair}
 import weco.monitoring.memory.MemoryMetrics
 
+import scala.concurrent.duration._
 import scala.concurrent.Future
 
 class SQSStreamTest
@@ -251,12 +252,13 @@ class SQSStreamTest
           messageStream.runGraph(streamName) { (source, sink) =>
             source.zipWithIndex
               .divertTo(
-                sink.contramap[((Message, NamedObject), Long)] {
+                that = sink.contramap[((Message, NamedObject), Long)] {
                   case ((msg, namedObject), _) =>
                     received.add(
                       namedObject.copy(name = "Diverted " + namedObject.name))
                     msg
-                }, {
+                },
+                when = {
                   case (_, i) => i >= 3
                 }
               )
@@ -338,7 +340,7 @@ class SQSStreamTest
     testWith: TestWith[(SQSStream[NamedObject], QueuePair, MemoryMetrics), R])
     : R =
     withActorSystem { implicit actorSystem =>
-      withLocalSqsQueuePair() {
+      withLocalSqsQueuePair(visibilityTimeout = 2.seconds) {
         case queuePair @ QueuePair(queue, _) =>
           val metrics = new MemoryMetrics()
           withSQSStream[NamedObject, R](queue, metrics) { stream =>

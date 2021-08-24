@@ -62,25 +62,22 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       }
       .get()
 
-  private def getQueueAttribute(queueUrl: String,
-                                attributeName: QueueAttributeName): String =
-    asyncSqsClient
-      .getQueueAttributes { builder: GetQueueAttributesRequest.Builder =>
-        builder
-          .queueUrl(queueUrl)
-          .attributeNames(attributeName)
-      }
-      .get()
-      .attributes()
-      .get(attributeName)
+  private def getQueueAttributes(queueUrl: String,
+                                 attributeNames: QueueAttributeName*): Map[QueueAttributeName, String] = {
+    val attributeValues =
+      asyncSqsClient
+        .getQueueAttributes { builder: GetQueueAttributesRequest.Builder =>
+          builder
+            .queueUrl(queueUrl)
+            .attributeNames(attributeNames: _*)
+        }
+        .get()
+        .attributes()
 
-  def getQueueAttribute(
-    queue: Queue,
-    attributeName: QueueAttributeName): String =
-    getQueueAttribute(
-      queueUrl = queue.url,
-      attributeName = attributeName
-    )
+    attributeNames
+      .map { name => name -> attributeValues.get(name)}
+      .toMap
+  }
 
   def createQueueName: String =
     randomAlphanumeric()
@@ -98,10 +95,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
           }
           .get()
 
-        val arn = getQueueAttribute(
-          queueUrl = response.queueUrl(),
-          attributeName = QueueAttributeName.QUEUE_ARN
-        )
+        val arn = getQueueAttributes(response.queueUrl(), QueueAttributeName.QUEUE_ARN)(QueueAttributeName.QUEUE_ARN)
 
         val queue = Queue(
           url = response.queueUrl(),
@@ -167,15 +161,12 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     testWith(stream)
   }
 
-  def createNotificationMessageWith(body: String): NotificationMessage =
-    NotificationMessage(body = body)
-
   def createNotificationMessageWith[T](message: T)(
     implicit encoder: Encoder[T]): NotificationMessage =
-    createNotificationMessageWith(body = toJson(message).get)
+    NotificationMessage(body = toJson(message).get)
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResponse = {
-    val message = createNotificationMessageWith(body = body)
+    val message = NotificationMessage(body = body)
 
     sendSqsMessage(queue = queue, obj = message)
   }
@@ -204,58 +195,49 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       .get
   }
 
-  def noMessagesAreWaitingIn(queue: Queue): Assertion = {
-    val messagesInFlight = getQueueAttribute(
-      queue,
-      attributeName =
-        QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE
+  /** Returns a rough count of all the messages on a queue. */
+  private def countMessagesOnQueue(queue: Queue): Map[QueueAttributeName, Int] = {
+    val attributeNames = Seq(
+      // Messages available for retrieval
+      QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES,
+
+      // Messages in the queue and not available for reading immediately
+      QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_DELAYED,
+
+      // Messages currently in flight
+      QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE,
     )
 
-    assert(
-      messagesInFlight == "0",
-      s"Expected messages in flight on ${queue.url} to be 0, actually $messagesInFlight"
-    )
-
-    val messagesWaiting = getQueueAttribute(
-      queue,
-      attributeName = QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES
-    )
-
-    assert(
-      messagesWaiting == "0",
-      s"Expected messages waiting on ${queue.url} to be 0, actually $messagesWaiting"
-    )
+    getQueueAttributes(queue.url, attributeNames: _*)
+      .map { case (name, count) => name -> count.toInt }
   }
 
-  def assertQueueEmpty(queue: Queue): Assertion = {
-    waitVisibilityTimeoutExpiry(queue)
-
-    val messages = getMessages(queue)
-
-    assert(
-      messages.isEmpty,
-      s"Expected not to get any messages from ${queue.url}, actually got $messages")
-
-    noMessagesAreWaitingIn(queue)
+  def assertQueueEmpty(queue: Queue): Unit = {
+    countMessagesOnQueue(queue).foreach { case (name, count) =>
+      assert(
+        count == 0,
+        s"Expected ${queue.url} to have $name == 0, got $name == $count"
+      )
+    }
   }
 
   def assertQueueHasSize(queue: Queue, size: Int): Assertion = {
-    waitVisibilityTimeoutExpiry(queue)
-
-    val messages = getMessages(queue)
-    val messagesSize = messages.size
+    val counts = countMessagesOnQueue(queue)
 
     assert(
-      messagesSize == size,
-      s"Expected queue ${queue.url} to have size $size, actually had size $messagesSize"
+      counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES) == size,
+      s"Expected queue ${queue.url} to have $size messages available, actually has ${counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES)}"
     )
-  }
 
-  private def waitVisibilityTimeoutExpiry(queue: Queue): Unit = {
-    // Wait slightly longer than the visibility timeout to ensure that messages
-    // that fail processing become visible again before asserting.
-    val millisecondsToWait = (queue.visibilityTimeout.toMillis * 1.5).toInt
-    Thread.sleep(millisecondsToWait)
+    assert(
+      counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_DELAYED) == 0,
+      s"Expected queue ${queue.url} to have $size messages delayed, actually has ${counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES)}"
+    )
+
+    assert(
+      counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE) == 0,
+      s"Expected queue ${queue.url} to have $size messages in flight, actually has ${counts(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES)}"
+    )
   }
 
   def getMessages(queue: Queue): Seq[Message] =
