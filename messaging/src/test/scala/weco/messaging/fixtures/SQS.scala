@@ -166,15 +166,12 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     testWith(stream)
   }
 
-  def createNotificationMessageWith(body: String): NotificationMessage =
-    NotificationMessage(body = body)
-
   def createNotificationMessageWith[T](message: T)(
     implicit encoder: Encoder[T]): NotificationMessage =
-    createNotificationMessageWith(body = toJson(message).get)
+    NotificationMessage(body = toJson(message).get)
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResponse = {
-    val message = createNotificationMessageWith(body = body)
+    val message = NotificationMessage(body = body)
 
     sendSqsMessage(queue = queue, obj = message)
   }
