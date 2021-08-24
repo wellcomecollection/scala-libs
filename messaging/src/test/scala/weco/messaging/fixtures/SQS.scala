@@ -79,11 +79,6 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       .toMap
   }
 
-  private def getQueueAttribute(
-    queue: Queue,
-    attributeName: QueueAttributeName): String =
-    getQueueAttributes(queue.url, attributeName)(attributeName)
-
   def createQueueName: String =
     randomAlphanumeric()
 
