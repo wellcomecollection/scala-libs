@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.6.1 - 2021-09-06
+
+Tidy up some unused methods on ElasticsearchFixtures.
+
 ## v30.6.0 - 2021-08-24
 
 This changes the way we inspect queue sizes in the SQS fixture: rather than waiting for the visibility timeout to expire, we inspect the queue metrics for all messages (visible, in-flight, delayed), and compare those to the expected size.
