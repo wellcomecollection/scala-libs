@@ -3,13 +3,11 @@ package weco.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.cluster.ClusterHealthResponse
 import com.sksamuel.elastic4s.requests.get.GetResponse
-import com.sksamuel.elastic4s.requests.indexes.IndexResponse
 import com.sksamuel.elastic4s.requests.indexes.admin.IndexExistsResponse
 import com.sksamuel.elastic4s.requests.searches.SearchResponse
 import com.sksamuel.elastic4s.{ElasticClient, Index, Response}
-import grizzled.slf4j.Logging
 import io.circe.parser.parse
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.{Encoder, Json}
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
@@ -18,19 +16,15 @@ import org.scalatest.{Assertion, Suite}
 import weco.elasticsearch._
 import weco.elasticsearch.model.IndexId
 import weco.fixtures._
-import weco.json.JsonUtil.{fromJson, toJson}
-import weco.json.utils.JsonAssertions
+import weco.json.JsonUtil.toJson
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 trait ElasticsearchFixtures
     extends Eventually
     with ScalaFutures
     with Matchers
-    with JsonAssertions
     with IntegrationPatience
-    with Logging
     with RandomGenerators { this: Suite =>
 
   private val esHost = "localhost"
@@ -79,9 +73,7 @@ trait ElasticsearchFixtures
 
       index
     },
-    destroy = { index =>
-      elasticClient.execute(deleteIndex(index.name))
-    }
+    destroy = eventuallyDeleteIndex
   )
 
   def eventuallyIndexExists(index: Index): Assertion =
@@ -94,7 +86,7 @@ trait ElasticsearchFixtures
       response.result.isExists shouldBe true
     }
 
-  def eventuallyDeleteIndex(index: Index): Assertion = {
+  private def eventuallyDeleteIndex(index: Index): Assertion = {
     elasticClient.execute(deleteIndex(index.name))
 
     eventually {
@@ -128,21 +120,6 @@ trait ElasticsearchFixtures
       }
     }
 
-  def assertObjectIndexed[T](index: Index, t: T)(
-    implicit decoder: Decoder[T]): Assertion =
-    // Elasticsearch is eventually consistent so, when the future completes,
-    // the documents won't appear in the search until after a refresh
-    eventually {
-      val response: Response[SearchResponse] = elasticClient.execute {
-        search(index).matchAllQuery()
-      }.await
-
-      val hits = response.result.hits.hits
-
-      hits should have size 1
-      fromJson[T](hits.head.sourceAsString).get shouldEqual t
-    }
-
   def assertElasticsearchEmpty[T](index: Index): Assertion =
     // Elasticsearch is eventually consistent so, when the future completes,
     // the documents won't appear in the search until after a refresh
@@ -169,38 +146,6 @@ trait ElasticsearchFixtures
 
       response.result.found shouldBe false
     }
-  }
-
-  def indexObject[T](index: Index, t: T)(
-    implicit encoder: Encoder[T]): Future[Response[IndexResponse]] = {
-    val doc = toJson(t).get
-    debug(s"ingesting: $doc")
-    elasticClient
-      .execute {
-        indexInto(index.name).doc(doc)
-      }
-      .map { r =>
-        if (r.isError) {
-          error(s"Error from Elasticsearch: $r")
-        }
-        r
-      }
-  }
-
-  def indexObjectCompressed[T](index: Index, t: T)(
-    implicit encoder: Encoder[T]): Future[Response[IndexResponse]] = {
-    val doc = toJson(t).get
-    debug(s"ingesting: $doc")
-    elasticClientWithCompression
-      .execute {
-        indexInto(index.name).doc(doc)
-      }
-      .map { r =>
-        if (r.isError) {
-          error(s"Error from Elasticsearch: $r")
-        }
-        r
-      }
   }
 
   def createIndex: Index =
