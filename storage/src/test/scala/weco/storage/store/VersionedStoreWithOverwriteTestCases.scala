@@ -187,18 +187,35 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
         }
       }
 
-      it("refuses to overwrite an existing id/version") {
+      it("allows writing the same value twice to a given id/version") {
         val id = createIdent
-
         val t = createT
 
-        withVersionedStoreImpl(
-          initialEntries = Map(Version(id, 0) -> t)
-        ) { store =>
-          store
-            .put(Version(id, 0))(t)
-            .left
-            .value shouldBe a[VersionAlreadyExistsError]
+        withVersionedStoreImpl() { store =>
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+        }
+      }
+
+      it("allows writing the same value twice to a given id/version, even if a higher version exists") {
+        val id = createIdent
+        val t = createT
+
+        withVersionedStoreImpl() { store =>
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+          store.put(Version(id, 1))(t) shouldBe Right(Identified(Version(id, 1), t))
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+        }
+      }
+
+      it("refuses to overwrite an existing id/version with a different value") {
+        val id = createIdent
+
+        withVersionedStoreImpl() { store =>
+          store.put(Version(id, 0))(createT) shouldBe a[Right[_, _]]
+          store.put(Version(id, 0))(createT).left.value shouldBe a[VersionAlreadyExistsError]
         }
       }
     }
