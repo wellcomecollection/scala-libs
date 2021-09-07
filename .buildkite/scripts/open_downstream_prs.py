@@ -58,6 +58,10 @@ def cloned_repo(git_url):
         shutil.rmtree(repo_dir)
 
 
+class AlreadyAtLatestVersionException(Exception):
+    pass
+
+
 def update_scala_libs_version(new_version):
     old_lines = list(open("project/Dependencies.scala"))
 
@@ -65,7 +69,12 @@ def update_scala_libs_version(new_version):
         for line in old_lines:
             if line.startswith("  val defaultVersion"):
                 version_string = new_version.strip('v')
-                out_file.write(f'  val defaultVersion = "{version_string}" // This is automatically bumped by the scala-libs release process, do not edit this line manually\n')
+                new_line = f'  val defaultVersion = "{version_string}" // This is automatically bumped by the scala-libs release process, do not edit this line manually\n'
+
+                if new_line == line:
+                    raise AlreadyAtLatestVersionException()
+
+                out_file.write(new_line)
             else:
                 out_file.write(line)
 
@@ -128,7 +137,10 @@ def create_downstream_pull_requests(new_version):
 
     for repo in DOWNSTREAM_REPOS:
         with cloned_repo(f"git@github.com:wellcomecollection/{repo}.git"):
-            update_scala_libs_version(new_version)
+            try:
+                update_scala_libs_version(new_version)
+            except AlreadyAtLatestVersionException:
+                continue
 
             branch_name = f"bump-scala-libs-to-{new_version}"
 
