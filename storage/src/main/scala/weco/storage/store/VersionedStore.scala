@@ -95,7 +95,8 @@ class VersionedStore[Id, V, T](
   def put(id: Version[Id, V])(t: T): WriteEither =
     store.max(id.id) match {
       // If you try to write a value that's already stored, that's fine.
-      case Right(latest) if O.gteq(latest.id.version, id.version) && isAlreadyStored(id, t) =>
+      case Right(latest)
+          if O.gteq(latest.id.version, id.version) && isAlreadyStored(id, t) =>
         Right(Identified(id, t))
 
       case Right(latest) if O.gt(latest.id.version, id.version) =>
