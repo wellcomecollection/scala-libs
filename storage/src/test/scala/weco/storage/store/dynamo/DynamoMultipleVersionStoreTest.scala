@@ -3,7 +3,7 @@ package weco.storage.store.dynamo
 import org.scanamo.generic.auto._
 import org.scanamo.{Table => ScanamoTable}
 import weco.fixtures.TestWith
-import weco.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
+import weco.storage.{Identified, MaximaReadError, StoreReadError, StoreWriteError, Version}
 import weco.storage.dynamo.DynamoHashRangeEntry
 import weco.storage.fixtures.DynamoFixtures
 import weco.storage.fixtures.DynamoFixtures.Table
@@ -131,4 +131,15 @@ class DynamoMultipleVersionStoreTest
     storeContext: Table)(testWith: TestWith[StoreImpl, R]): R =
     withVersionedStoreImpl(initialEntries, storeContext)(testWith)
 
+  it("allows writing the same value twice to a given id/version, even if a higher version exists") {
+    val id = createIdent
+    val t = createT
+
+    withVersionedStoreImpl(initialEntries = Map()) { store =>
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+      store.put(Version(id, 1))(t) shouldBe Right(Identified(Version(id, 1), t))
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+    }
+  }
 }

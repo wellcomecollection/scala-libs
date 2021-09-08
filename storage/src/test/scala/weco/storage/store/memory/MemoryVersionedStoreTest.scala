@@ -89,4 +89,16 @@ class MemoryVersionedStoreTest
       String,
       Record])(testWith: TestWith[StoreImpl, R]): R =
     withVersionedStoreImpl(initialEntries, storeContext)(testWith)
+  
+  it("allows writing the same value twice to a given id/version, even if a higher version exists") {
+    val id = createIdent
+    val t = createT
+
+    withVersionedStoreImpl(initialEntries = Map()) { store =>
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+      store.put(Version(id, 1))(t) shouldBe Right(Identified(Version(id, 1), t))
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+      store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+    }
+  }
 }
