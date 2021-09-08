@@ -76,7 +76,7 @@ class S3PrefixTransferTest
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
         override def list(prefix: S3ObjectLocationPrefix): ListingResult =
-          Left(ListingFailure(prefix, error = new Throwable("BOOM!")))
+          Left(ListingFailure(prefix, e = new Throwable("BOOM!")))
       }
 
     implicit val transfer: S3Transfer = S3Transfer.apply

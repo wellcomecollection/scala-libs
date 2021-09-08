@@ -115,7 +115,7 @@ class MemoryPrefixTransferTest
   ): R = {
     val prefixTransfer = new MemoryMemoryLocationPrefixTransfer(initialEntries = srcStore.entries ++ dstStore.entries) {
       override def list(prefix: MemoryLocationPrefix): ListingResult =
-        Left(ListingFailure(prefix, error = new Throwable("BOOM!")))
+        Left(ListingFailure(prefix, e = new Throwable("BOOM!")))
     }
 
     testWith(prefixTransfer)
