@@ -174,7 +174,7 @@ def create_downstream_pull_requests(new_version):
             r = client.post(
                 f"https://api.github.com/repos/wellcomecollection/{repo}/pulls/{new_pr_number}/requested_reviewers",
                 headers={"Accept": "application/vnd.github.v3+json"},
-                json={"team_reviewers": ["scala-devs"]}
+                json={"team_reviewers": ["scala-reviewers"]}
             )
 
             print(r.json())
