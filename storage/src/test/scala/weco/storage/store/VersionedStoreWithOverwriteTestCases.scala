@@ -198,18 +198,6 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
         }
       }
 
-      it("allows writing the same value twice to a given id/version, even if a higher version exists") {
-        val id = createIdent
-        val t = createT
-
-        withVersionedStoreImpl() { store =>
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
-          store.put(Version(id, 1))(t) shouldBe Right(Identified(Version(id, 1), t))
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
-        }
-      }
-
       it("refuses to overwrite an existing id/version with a different value") {
         val id = createIdent
 
