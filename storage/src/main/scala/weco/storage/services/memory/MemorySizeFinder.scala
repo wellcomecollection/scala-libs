@@ -10,6 +10,7 @@ class MemorySizeFinder[Ident](
   override def get(id: Ident): ReadEither =
     memoryStore.entries.get(id) match {
       case Some(entry) => Right(Identified(id, entry.length))
-      case None        => Left(DoesNotExistError(new Throwable(s"There is no entry for id=$id")))
+      case None =>
+        Left(DoesNotExistError(new Throwable(s"There is no entry for id=$id")))
     }
 }

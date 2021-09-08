@@ -88,8 +88,9 @@ class VersionedStore[Id, V, T](
 
   def getLatest(id: Id): ReadEither =
     store.max(id).left.map {
-      case NoMaximaValueError(_) => NoVersionExistsError(s"There are no entries with id=$id")
-      case err                   => err
+      case NoMaximaValueError(_) =>
+        NoVersionExistsError(s"There are no entries with id=$id")
+      case err => err
     }
 
   def put(id: Version[Id, V])(t: T): WriteEither =
@@ -104,9 +105,10 @@ class VersionedStore[Id, V, T](
           s"Tried to store ${id.id} at version ${id.version}, but version ${latest.id.version} already exists"
         ))
       case Right(latest) if latest.id.version == id.version =>
-        Left(VersionAlreadyExistsError(
-          s"Tried to store ${id.id} at version ${id.version}, but that version already exists"
-        ))
+        Left(
+          VersionAlreadyExistsError(
+            s"Tried to store ${id.id} at version ${id.version}, but that version already exists"
+          ))
       case _ =>
         store.put(id)(t)
     }

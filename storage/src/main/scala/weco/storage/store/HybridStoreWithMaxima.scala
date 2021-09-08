@@ -30,7 +30,7 @@ trait HybridStoreWithMaxima[Id, V, TypedStoreId, T]
             case Left(_: DoesNotExistError) =>
               val error = new Throwable(s"Could not find maxima for id=$id")
               Left(NoMaximaValueError(error))
-            case Left(err: ReadError)       => Left(MaximaReadError(err.e))
+            case Left(err: ReadError) => Left(MaximaReadError(err.e))
           }
       }
 }

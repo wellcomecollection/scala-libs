@@ -39,9 +39,10 @@ class DynamoHashStore[HashKey, V, T](val config: DynamoConfig)(
       case Right(value) =>
         Right(Identified(Version(value.hashKey, value.version), value.payload))
       case Left(_: DoesNotExistError) =>
-        val error = new Error(s"There are no Dynamo items with hash key id=$hashKey")
+        val error = new Error(
+          s"There are no Dynamo items with hash key id=$hashKey")
         Left(NoMaximaValueError(error))
-      case Left(err: ReadError)       => Left(MaximaReadError(err.e))
+      case Left(err: ReadError) => Left(MaximaReadError(err.e))
     }
 
   override protected val table =

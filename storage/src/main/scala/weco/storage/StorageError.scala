@@ -67,8 +67,7 @@ case class VersionAlreadyExistsError(message: String)
   val e: Throwable = new Throwable(message)
 }
 
-case class InvalidIdentifierFailure(e: Throwable)
-    extends WriteError
+case class InvalidIdentifierFailure(e: Throwable) extends WriteError
 
 case class DoesNotExistError(e: Throwable)
     extends NotFoundError
@@ -90,9 +89,7 @@ case class JsonDecodingError(e: Throwable) extends DecoderError
 
 sealed trait MaximaError extends ReadError with BackendError
 
-case class MaximaReadError(e: Throwable)
-    extends MaximaError
-    with StorageError
+case class MaximaReadError(e: Throwable) extends MaximaError with StorageError
 case class NoMaximaValueError(e: Throwable)
     extends MaximaError
     with StorageError
