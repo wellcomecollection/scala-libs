@@ -39,7 +39,7 @@ case class StoreWriteError(e: Throwable) extends WriteError with BackendError
 
 case class OverwriteError(e: Throwable) extends WriteError with BackendError
 
-case class IncorrectStreamLengthError(e: Throwable = new Error())
+case class IncorrectStreamLengthError(e: Throwable)
     extends DecoderError
     with EncoderError
 
@@ -49,33 +49,29 @@ sealed trait ReadError extends StorageError
 sealed trait NotFoundError extends ReadError
 sealed trait VersionError extends StorageError
 
-case class NoVersionExistsError(e: Throwable = new Error())
+case class NoVersionExistsError(message: String)
     extends VersionError
-    with NotFoundError
-case class HigherVersionExistsError(e: Throwable = new Error())
+    with NotFoundError {
+  val e: Throwable = new Throwable(message)
+}
+
+case class HigherVersionExistsError(message: String)
     extends VersionError
-    with WriteError
-case class VersionAlreadyExistsError(e: Throwable = new Error())
+    with WriteError {
+  val e: Throwable = new Throwable(message)
+}
+
+case class VersionAlreadyExistsError(message: String)
     extends VersionError
-    with WriteError
+    with WriteError {
+  val e: Throwable = new Throwable(message)
+}
 
-sealed trait DecoderError extends ReadError
-
-case class MetadataCoercionFailure(
-  failure: List[CodecError],
-  success: List[(String, String)],
-  e: Throwable = new Error()
-) extends WriteError
-
-case class InvalidIdentifierFailure(e: Throwable = new Error())
+case class InvalidIdentifierFailure(e: Throwable)
     extends WriteError
 
-case class DoesNotExistError(e: Throwable = new Error())
+case class DoesNotExistError(e: Throwable)
     extends NotFoundError
-    with BackendError
-
-case class MultipleRecordsError(e: Throwable = new Error())
-    extends ReadError
     with BackendError
 
 case class StoreReadError(e: Throwable) extends ReadError with BackendError
@@ -84,9 +80,7 @@ case class DanglingHybridStorePointerError(e: Throwable) extends ReadError
 
 case class CannotCloseStreamError(e: Throwable) extends ReadError
 
-case class CharsetDecodingError(e: Throwable = new Error())
-    extends CodecError
-    with DecoderError
+sealed trait DecoderError extends ReadError
 
 case class ByteDecodingError(e: Throwable) extends DecoderError
 
@@ -96,13 +90,12 @@ case class JsonDecodingError(e: Throwable) extends DecoderError
 
 sealed trait MaximaError extends ReadError with BackendError
 
-case class MaximaReadError(e: Throwable = new Error())
+case class MaximaReadError(e: Throwable)
     extends MaximaError
     with StorageError
-case class NoMaximaValueError(e: Throwable = new Error())
+case class NoMaximaValueError(e: Throwable)
     extends MaximaError
     with StorageError
 
-case class ListingFailure[SrcLocation](source: SrcLocation,
-                                       e: Throwable = new Error())
+case class ListingFailure[SrcLocation](source: SrcLocation, e: Throwable)
     extends ReadError

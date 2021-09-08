@@ -50,7 +50,9 @@ sealed trait DynamoReadable[Ident, DynamoIdent, EntryType, T]
         val daoReadError = new Error(s"DynamoReadError: ${err.toString}")
         Left(StoreReadError(daoReadError))
 
-      case Success(None) => Left(DoesNotExistError())
+      case Success(None) =>
+        val error = new Throwable(s"There is no Dynamo item with id=$id")
+        Left(DoesNotExistError(error))
 
       case Failure(err) => Left(StoreReadError(err))
     }
@@ -75,7 +77,7 @@ trait DynamoHashReadable[HashKey, V, T]
       if (entry.version == id.version) {
         Right(Identified(id, entry.payload))
       } else {
-        Left(NoVersionExistsError())
+        Left(NoVersionExistsError(s"There is no Dynamo item with id=$id"))
       }
     }
   }

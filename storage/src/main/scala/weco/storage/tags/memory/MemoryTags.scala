@@ -11,7 +11,9 @@ class MemoryTags[Ident](initialTags: Map[Ident, Map[String, String]])
     synchronized {
       underlying.get(id) match {
         case Some(tags) => Right(Identified(id, tags))
-        case None       => Left(DoesNotExistError())
+        case None       => Left(DoesNotExistError(
+          new Throwable(s"There is no entry for id=$id")
+        ))
       }
     }
 

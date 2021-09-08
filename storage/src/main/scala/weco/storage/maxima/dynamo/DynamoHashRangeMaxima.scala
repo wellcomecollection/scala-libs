@@ -33,7 +33,9 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
       case Success(List(Left(err))) =>
         val error = new Error(s"DynamoReadError: ${err.toString}")
         Left(MaximaReadError(error))
-      case Success(Nil) => Left(NoMaximaValueError())
+      case Success(Nil) =>
+        val error = new Error(s"There are no Dynamo items with hash key id=$hashKey")
+        Left(NoMaximaValueError(error))
       case Failure(err) => Left(MaximaReadError(err))
 
       // This case should be impossible to hit in practice -- limit(1)

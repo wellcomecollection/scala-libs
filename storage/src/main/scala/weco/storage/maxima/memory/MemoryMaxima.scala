@@ -14,7 +14,8 @@ trait MemoryMaxima[Id, T]
         .filter { case (ident, _) => ident.id == id }
 
     if (matchingEntries.isEmpty) {
-      Left(NoMaximaValueError())
+      val error = new Throwable(s"Could not find maxima for id=$id")
+      Left(NoMaximaValueError(error))
     } else {
       val (maxIdent, maxT) =
         matchingEntries.maxBy { case (ident, _) => ident.version }
