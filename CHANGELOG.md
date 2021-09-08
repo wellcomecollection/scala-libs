@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.6.3 - 2021-09-08
+
+Remove a couple of unused imports from tests.
+This should have now downstream impact.
+
 ## v30.6.2 - 2021-09-08
 
 VersionedStore.put is now idempotent.
