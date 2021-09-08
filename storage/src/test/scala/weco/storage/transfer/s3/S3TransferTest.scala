@@ -10,16 +10,12 @@ import org.mockito.Mockito.{times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.scalatestplus.mockito.MockitoSugar
 import weco.fixtures.TestWith
-import weco.storage.fixtures.S3Fixtures.Bucket
-import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.s3.S3ObjectLocation
 import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
 import weco.storage.tags.s3.S3Tags
 import weco.storage.transfer._
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.s3.S3ObjectLocation
-import weco.storage.store.s3.S3TypedStore
 import weco.storage.transfer.{
   Transfer,
   TransferSourceFailure,
