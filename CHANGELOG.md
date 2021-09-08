@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.6.2 - 2021-09-08
+
+VersionedStore.put is now idempotent.
+That is, if you call `put(id, t)` with the same values repeatedly, it will succeed – previously it would through VersionAlreadyExistsError or HigherVersionExists on subsequent calls.
+
 ## v30.6.1 - 2021-09-06
 
 Tidy up some unused methods on ElasticsearchFixtures.
