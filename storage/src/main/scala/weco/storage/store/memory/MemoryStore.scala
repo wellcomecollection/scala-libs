@@ -29,7 +29,11 @@ class MemoryStore[Ident, T](initialEntries: Map[Ident, T])
 
     val result = entries.get(id) match {
       case Some(t) => Right(Identified(id, t))
-      case None    => Left(DoesNotExistError())
+      case None =>
+        Left(
+          DoesNotExistError(
+            new Throwable(s"There is no entry for id=$id")
+          ))
     }
 
     debug(s"Got $result")
