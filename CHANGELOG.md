@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.6.4 - 2021-09-09
+
+All instances of StorageError now include a custom exception message.
+This should be easier to debug than seeing `java.lang.Error: null` in the logs.
+
 ## v30.6.3 - 2021-09-08
 
 Remove a couple of unused imports from tests.
