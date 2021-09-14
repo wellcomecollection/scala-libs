@@ -1,13 +1,13 @@
 package weco.messaging.worker.monitoring.metrics
 
 import java.time.Instant
-
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import weco.messaging.fixtures.worker.WorkerFixtures
+import weco.messaging.worker.models.{MonitoringProcessorFailure, Successful}
 
 import scala.concurrent.ExecutionContext.Implicits._
 
@@ -25,18 +25,18 @@ class MetricsMonitoringProcessorTest
       case (namespace, metrics, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
-        whenReady(recorded) { action =>
-          shouldBeSuccessful(action)
-
-          assertMetricCount(
-            metrics = metrics,
-            metricName = s"$namespace/Successful",
-            expectedCount = 1)
-          assertMetricDurations(
-            metrics = metrics,
-            metricName = s"$namespace/Duration",
-            expectedNumberDurations = 1)
+        whenReady(recorded) {
+          _ shouldBe a[Successful[_]]
         }
+
+        assertMetricCount(
+          metrics = metrics,
+          metricName = s"$namespace/Successful",
+          expectedCount = 1)
+        assertMetricDurations(
+          metrics = metrics,
+          metricName = s"$namespace/Duration",
+          expectedNumberDurations = 1)
     }
   }
 
@@ -45,12 +45,12 @@ class MetricsMonitoringProcessorTest
       case (_, metrics, processor) =>
         val recorded = processor.recordEnd(Right(Instant.now), successful(work))
 
-        whenReady(recorded) { action =>
-          shouldBeMonitoringProcessorFailure(action)
-
-          metrics.incrementedCounts shouldBe empty
-          metrics.recordedValues shouldBe empty
+        whenReady(recorded) {
+          _ shouldBe a[MonitoringProcessorFailure[_]]
         }
+
+        metrics.incrementedCounts shouldBe empty
+        metrics.recordedValues shouldBe empty
     }
   }
 
@@ -60,18 +60,18 @@ class MetricsMonitoringProcessorTest
         val recorded =
           processor.recordEnd(Right(Instant.now), deterministicFailure(work))
 
-        whenReady(recorded) { action =>
-          shouldBeSuccessful(action)
-
-          assertMetricCount(
-            metrics = metrics,
-            metricName = s"$namespace/DeterministicFailure",
-            expectedCount = 1)
-          assertMetricDurations(
-            metrics = metrics,
-            metricName = s"$namespace/Duration",
-            expectedNumberDurations = 1)
+        whenReady(recorded) {
+          _ shouldBe a[Successful[_]]
         }
+
+        assertMetricCount(
+          metrics = metrics,
+          metricName = s"$namespace/DeterministicFailure",
+          expectedCount = 1)
+        assertMetricDurations(
+          metrics = metrics,
+          metricName = s"$namespace/Duration",
+          expectedNumberDurations = 1)
     }
   }
 
@@ -81,18 +81,18 @@ class MetricsMonitoringProcessorTest
         val recorded =
           processor.recordEnd(Right(Instant.now), nonDeterministicFailure(work))
 
-        whenReady(recorded) { action =>
-          shouldBeSuccessful(action)
-
-          assertMetricCount(
-            metrics = metrics,
-            metricName = s"$namespace/NonDeterministicFailure",
-            expectedCount = 1)
-          assertMetricDurations(
-            metrics = metrics,
-            metricName = s"$namespace/Duration",
-            expectedNumberDurations = 1)
+        whenReady(recorded) {
+          _ shouldBe a[Successful[_]]
         }
+
+        assertMetricCount(
+          metrics = metrics,
+          metricName = s"$namespace/NonDeterministicFailure",
+          expectedCount = 1)
+        assertMetricDurations(
+          metrics = metrics,
+          metricName = s"$namespace/Duration",
+          expectedNumberDurations = 1)
     }
   }
 }

@@ -1,7 +1,6 @@
 package weco.messaging.fixtures.worker
 
 import akka.actor.ActorSystem
-import org.scalatest.matchers.should.Matchers
 import weco.fixtures.TestWith
 import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS
@@ -17,10 +16,7 @@ import weco.monitoring.memory.MemoryMetrics
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-trait AlpakkaSQSWorkerFixtures
-    extends WorkerFixtures
-    with Matchers
-    with SQS {
+trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
 
   def createAlpakkaSQSWorkerConfig(queue: Queue,
                                    namespace: String = randomAlphanumeric())
