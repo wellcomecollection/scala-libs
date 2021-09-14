@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.6.5 - 2021-09-14
+
+Remove some unused or now-defunct code from the messaging tests.
+This should have no user-visible effect.
+
 ## v30.6.4 - 2021-09-09
 
 All instances of StorageError now include a custom exception message.
