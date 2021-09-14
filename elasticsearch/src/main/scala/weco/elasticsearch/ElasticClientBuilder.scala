@@ -26,12 +26,11 @@ object ElasticClientBuilder {
              port: Int,
              protocol: String,
              username: String,
-             password: String,
-             compressionEnabled: Boolean = false): ElasticClient = {
+             password: String): ElasticClient = {
     val restClient = RestClient
       .builder(new HttpHost(hostname, port, protocol))
       .setHttpClientConfigCallback(new ElasticCredentials(username, password))
-      .setCompressionEnabled(compressionEnabled)
+      .setCompressionEnabled(true)
       .build()
 
     ElasticClient(JavaClient.fromRestClient(restClient))
