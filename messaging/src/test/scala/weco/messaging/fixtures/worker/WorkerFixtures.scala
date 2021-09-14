@@ -2,8 +2,6 @@ package weco.messaging.fixtures.worker
 
 import java.time.Instant
 
-import org.scalatest.Assertion
-import org.scalatest.matchers.should.Matchers
 import weco.messaging.worker._
 import weco.messaging.worker.models._
 import weco.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
@@ -11,7 +9,7 @@ import weco.messaging.worker.steps.MessageProcessor
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait WorkerFixtures extends Matchers {
+trait WorkerFixtures {
   type MySummary = String
   type MyContext = Instant
   type TestResult = Result[MySummary]
@@ -129,18 +127,4 @@ trait WorkerFixtures extends Matchers {
 
     Successful[MySummary](Some("exceptionState"))
   }
-
-  val shouldBeSuccessful: Result[_] => Assertion =
-    (r: Result[_]) => r shouldBe a[Successful[_]]
-  val shouldBeDeterministicFailure: Result[_] => Assertion =
-    (r: Result[_]) => r shouldBe a[DeterministicFailure[_]]
-  val shouldBeNonDeterministicFailure: Result[_] => Assertion =
-    (r: Result[_]) => r shouldBe a[NonDeterministicFailure[_]]
-  val shouldBeMonitoringProcessorFailure: Result[_] => Assertion =
-    (r: Result[_]) => r shouldBe a[MonitoringProcessorFailure[_]]
-
-  val shouldBeCompleted: Result[_] => Assertion = (r: Result[_]) =>
-    r shouldBe a[Completed]
-  val shouldBeRetry: Result[_] => Assertion = (r: Result[_]) =>
-    r shouldBe a[Retry]
 }

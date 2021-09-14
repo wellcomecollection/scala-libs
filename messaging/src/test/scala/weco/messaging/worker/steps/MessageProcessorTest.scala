@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import weco.messaging.fixtures.worker.WorkerFixtures
+import weco.messaging.worker.models.{DeterministicFailure, NonDeterministicFailure, Successful}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 class MessageProcessorTest
@@ -23,7 +24,9 @@ class MessageProcessorTest
       new MyMessageProcessor(createResult(successful, new CallCounter))
     val futureResult = processor.process(Right(work))
 
-    whenReady(futureResult)(shouldBeSuccessful)
+    whenReady(futureResult) {
+      _ shouldBe a[Successful[_]]
+    }
   }
 
   it("returns deterministic failure if transformation fails") {
@@ -31,7 +34,9 @@ class MessageProcessorTest
       new MyMessageProcessor(createResult(successful, new CallCounter))
     val futureResult = processor.process(Left(new RuntimeException()))
 
-    whenReady(futureResult)(shouldBeDeterministicFailure)
+    whenReady(futureResult) {
+      _ shouldBe a[DeterministicFailure[_]]
+    }
   }
 
   it(
@@ -41,7 +46,9 @@ class MessageProcessorTest
         createResult(deterministicFailure, new CallCounter))
     val futureResult = processor.process(Right(work))
 
-    whenReady(futureResult)(shouldBeDeterministicFailure)
+    whenReady(futureResult) {
+      _ shouldBe a[DeterministicFailure[_]]
+    }
   }
 
   it(
@@ -51,7 +58,9 @@ class MessageProcessorTest
         createResult(nonDeterministicFailure, new CallCounter))
     val futureResult = processor.process(Right(work))
 
-    whenReady(futureResult)(shouldBeNonDeterministicFailure)
+    whenReady(futureResult) {
+      _ shouldBe a[NonDeterministicFailure[_]]
+    }
   }
 
   it(
@@ -60,6 +69,8 @@ class MessageProcessorTest
       new MyMessageProcessor(createResult(exceptionState, new CallCounter))
     val futureResult = processor.process(Right(work))
 
-    whenReady(futureResult)(shouldBeDeterministicFailure)
+    whenReady(futureResult) {
+      _ shouldBe a[DeterministicFailure[_]]
+    }
   }
 }

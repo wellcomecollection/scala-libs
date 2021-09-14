@@ -42,8 +42,8 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
     metrics.recordedValues should have size expectedNumberDurations
 
     metrics.recordedValues.foreach { value =>
-      val (metricName, recordedDuration) = value
-      metricName shouldBe metricName
+      val (recordedName, recordedDuration) = value
+      recordedName shouldBe metricName
       recordedDuration should be >= 0.0
     }
   }

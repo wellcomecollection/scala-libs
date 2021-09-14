@@ -10,12 +10,6 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.maxima.MaximaTestCases
 import weco.storage.store.StoreWithoutOverwritesTestCases
-import weco.storage.dynamo.DynamoHashEntry
-import weco.storage.fixtures.DynamoFixtures
-import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.maxima.MaximaTestCases
-import weco.storage.store.StoreWithoutOverwritesTestCases
 
 import scala.language.higherKinds
 
