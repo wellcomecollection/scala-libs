@@ -13,7 +13,7 @@ object Dependencies {
     val azure = "12.7.0"
 
     val akkaHttpCirce = "1.32.0"
-    val circe = "0.14.1"
+    val circe = "0.13.0"
     val typesafe = "1.3.2"
     val jackson = "2.12.3"
     val javaxWebServicesRestful = "2.1.1"
@@ -22,7 +22,7 @@ object Dependencies {
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0.0-M15"
+    val scanamo = "1.0-M13"
     val swagger = "2.1.9"
     val apacheCommons = "2.6"
 
