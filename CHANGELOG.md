@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.7.0 - 2021-09-15
+
+Bump to the latest version of Circe and Scanamo.
+Really I'm hoping to get the latest version of Shapeless, which might come with compiler performance improvements.
+
 ## v30.6.5 - 2021-09-14
 
 Remove some unused or now-defunct code from the messaging tests.
