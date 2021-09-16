@@ -76,26 +76,29 @@ trait ElasticsearchFixtures
     destroy = eventuallyDeleteIndex
   )
 
+  private def indexDoesExist(index: Index): Boolean = {
+    val response: Response[IndexExistsResponse] =
+      elasticClient
+        .execute(indexExists(index.name))
+        .await
+
+    response.result.exists
+  }
+
   def eventuallyIndexExists(index: Index): Assertion =
     eventually {
-      val response: Response[IndexExistsResponse] =
-        elasticClient
-          .execute(indexExists(index.name))
-          .await
-
-      response.result.isExists shouldBe true
+      assert(
+        indexDoesExist(index), s"Index $index does not exist"
+      )
     }
 
   private def eventuallyDeleteIndex(index: Index): Assertion = {
     elasticClient.execute(deleteIndex(index.name))
 
     eventually {
-      val response: Response[IndexExistsResponse] =
-        elasticClient
-          .execute(indexExists(index.name))
-          .await
-
-      response.result.isExists shouldBe false
+      assert(
+        !indexDoesExist(index), s"Index $index has not been deleted"
+      )
     }
   }
 
@@ -112,7 +115,10 @@ trait ElasticsearchFixtures
 
         val getResponse = response.result
 
-        getResponse.exists shouldBe true
+        assert(
+          getResponse.exists,
+          s"Document ${id.indexId(document)} does not exist in the GET response"
+        )
 
         assertJsonStringsAreEqualIgnoringNulls(
           getResponse.sourceAsString,
@@ -144,7 +150,10 @@ trait ElasticsearchFixtures
         .execute(get(index, id.indexId(document)))
         .await
 
-      response.result.found shouldBe false
+      assert(
+        !response.result.found,
+        s"Document ${id.indexId(document)} was unexpectedly present in the GET response"
+      )
     }
   }
 
@@ -164,9 +173,8 @@ trait ElasticsearchFixtures
   private def parseOrElse(jsonString: String): Json =
     parse(jsonString) match {
       case Right(json) => json.deepDropNullValues
-      case Left(err) => {
+      case Left(err) =>
         println(s"Error trying to parse string <<$jsonString>>")
         throw err
-      }
     }
 }
