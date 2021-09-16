@@ -27,6 +27,8 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
   ec: ExecutionContext,
   mat: Materializer
 ) {
+  import SierraSource._
+
   private implicit val umItemEntriesStub
     : Unmarshaller[HttpEntity, SierraItemDataEntries] =
     CirceMarshalling.fromDecoder[SierraItemDataEntries]
@@ -44,12 +46,15 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
       .map(_.withoutCheckDigit)
       .mkString(",")
 
+    val fieldList = requiredItemFields
+      .mkString(",")
+
     for {
       response <- client.get(
         path = Path("v5/items"),
         params = Map(
           "id" -> idList,
-          "fields" -> "deleted,fixedFields,holdCount,suppressed"
+          "fields" -> fieldList
         )
       )
 
@@ -156,4 +161,17 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
         case _                     => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
       }
     } yield result
+}
+
+object SierraSource {
+  // These fields are required to retrieve the same data
+  // received via the catalogue-pipeline.
+  val requiredItemFields = List(
+    "deleted",
+    "fixedFields",
+    "holdCount",
+    "suppressed",
+    "status",
+    "varFields"
+  )
 }
