@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.9.0 - 2021-09-16
+
+Adds status,varFields fields in requests to the Sierra items API endpoint
+
 ## v30.8.1 - 2021-09-16
 
 Get slightly better error messages from the assertions in ElasticsearchFixtures.
