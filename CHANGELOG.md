@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.8.1 - 2021-09-16
+
+Get slightly better error messages from the assertions in ElasticsearchFixtures.
+
 ## v30.8.0 - 2021-09-15
 
 This rolls back the version bump in v30.7.0.
