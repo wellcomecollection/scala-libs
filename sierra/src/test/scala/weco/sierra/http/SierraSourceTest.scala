@@ -38,6 +38,19 @@ class SierraSourceTest
       testWith(source)
     }
 
+  def sierraItemsUri(itemNumbers: Seq[SierraItemNumber]): Uri = {
+    val fieldList = SierraSource
+      .requiredItemFields.mkString(",")
+
+    val idList = itemNumbers
+      .map(_.withoutCheckDigit)
+      .mkString(",")
+
+    Uri(
+      s"http://sierra:1234/v5/items?id=${idList}&fields=${fieldList}"
+    )
+  }
+
   describe("lookupItemEntries") {
     it("looks up multiple items") {
       val itemNumbers = List(
@@ -47,11 +60,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1146055,1234567&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(itemNumbers)),
           HttpResponse(
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
@@ -133,11 +142,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1146055,1234567&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(itemNumbers)),
           HttpResponse(
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
@@ -197,11 +202,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1146055,1234567&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(itemNumbers)),
           HttpResponse(
             status = StatusCodes.NotFound,
             entity = HttpEntity(
@@ -240,11 +241,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1146055&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(List(itemNumber))),
           HttpResponse(
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
@@ -306,11 +303,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1000000&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(List(itemNumber))),
           HttpResponse(
             status = StatusCodes.NotFound,
             entity = HttpEntity(
@@ -342,11 +335,7 @@ class SierraSourceTest
 
       val responses = Seq(
         (
-          HttpRequest(
-            uri = Uri(
-              "http://sierra:1234/v5/items?id=1000001&fields=deleted,fixedFields,holdCount,suppressed"
-            )
-          ),
+          HttpRequest(uri = sierraItemsUri(List(itemNumber))),
           HttpResponse(
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
