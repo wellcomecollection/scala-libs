@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.10.0 - 2021-09-17
+
+Add a new helper trait for read files from the "resources" folder in the fixtures library.
+
 ## v30.9.0 - 2021-09-16
 
 Adds status,varFields fields in requests to the Sierra items API endpoint
