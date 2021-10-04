@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v30.11.0 - 2021-10-04
+
+This release changes our Elasticsearch client to always use compression.
+
+This should have no user-visible effect, but it should reduce our data-transfer bill.
+
 ## v30.10.0 - 2021-09-17
 
 Add a new helper trait for read files from the "resources" folder in the fixtures library.
