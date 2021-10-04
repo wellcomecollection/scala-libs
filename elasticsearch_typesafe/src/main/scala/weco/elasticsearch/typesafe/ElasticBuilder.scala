@@ -18,17 +18,13 @@ object ElasticBuilder {
     val protocol = config
       .getStringOption(s"es.$namespace.protocol")
       .getOrElse("http")
-    val compressionEnabled = config
-      .getBooleanOption(s"es.$namespace.compressionEnabled")
-      .getOrElse(false)
 
     ElasticClientBuilder.create(
       hostname = hostname,
       port = port,
       protocol = protocol,
       username = username,
-      password = password,
-      compressionEnabled = compressionEnabled
+      password = password
     )
   }
 }
