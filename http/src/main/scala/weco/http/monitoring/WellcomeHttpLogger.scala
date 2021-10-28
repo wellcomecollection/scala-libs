@@ -1,6 +1,12 @@
 package weco.http.monitoring
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpHeader, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{
+  ContentTypes,
+  HttpEntity,
+  HttpHeader,
+  HttpRequest,
+  HttpResponse
+}
 import akka.http.scaladsl.server.RouteResult.Complete
 
 /** Constructs the log entries for every HTTP request/response pair.
@@ -36,13 +42,19 @@ class WellcomeHttpLogger(
   ): String = {
     val loggedHeaders =
       headers
-        .filter { h => allowedHeaderNames.contains(h.name) }
-        .map { h => s"; ${h.name}=${h.value}"}
+        .filter { h =>
+          allowedHeaderNames.contains(h.name)
+        }
+        .map { h =>
+          s"; ${h.name}=${h.value}"
+        }
 
     // We only log the entity ("body") if it contains anything interesting.  If the entity
     // is empty (say, on GET requests), it's just noise in the logs.
     val entityLog = entity match {
-      case h: HttpEntity.Strict if h.contentType == ContentTypes.NoContentType && h.contentLength == 0 => ""
+      case h: HttpEntity.Strict
+          if h.contentType == ContentTypes.NoContentType && h.contentLength == 0 =>
+        ""
       case _ => s"; $entity"
     }
 

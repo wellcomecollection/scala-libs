@@ -5,7 +5,11 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry, LoggingMagnet}
+import akka.http.scaladsl.server.directives.{
+  DebuggingDirectives,
+  LogEntry,
+  LoggingMagnet
+}
 import grizzled.slf4j.Logging
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.{HttpMetrics, WellcomeHttpLogger}
@@ -32,7 +36,8 @@ class WellcomeHttpApp(
   private val appId = UUID.randomUUID()
   private val appTag = s"$appName/$appId"
 
-  private def createLogLine(logger: LoggingAdapter)(req: HttpRequest)(response: Any): Unit = {
+  private def createLogLine(logger: LoggingAdapter)(req: HttpRequest)(
+    response: Any): Unit = {
     val logLine = httpLogger.createLogLine(req, response)
 
     LogEntry(s"$appTag - $logLine", Logging.InfoLevel).logTo(logger)
