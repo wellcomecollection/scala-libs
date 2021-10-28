@@ -14,8 +14,8 @@ import akka.http.scaladsl.server.RouteResult.Complete
   *
   */
 class WellcomeHttpLogger(
-  requestHeaders: Set[String],
-  responseHeaders: Set[String]
+  requestHeaders: Set[String] = Set(),
+  responseHeaders: Set[String] = Set()
 ) {
   def createLogLine(request: HttpRequest, response: Any): String = {
     val requestLog = createLogHalf(

@@ -1,6 +1,5 @@
 package weco.http.fixtures
 
-import akka.actor.ActorSystem
 import org.scalatest.Assertion
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{GET, POST}
@@ -154,21 +153,21 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
     }
   }
 
-  def withApp[R](routes: Route, httpMetrics: Option[HttpMetrics] = None, actorSystem: Option[ActorSystem] = None)(testWith: TestWith[WellcomeHttpApp, R]): R =
-    withActorSystem { implicit defaultActorSystem =>
+  def withApp[R](routes: Route)(testWith: TestWith[WellcomeHttpApp, R]): R =
+    withActorSystem { implicit actorSystem =>
       val metricsName = "example.app"
 
-      val defaultHttpMetrics: HttpMetrics = new HttpMetrics(
+      val httpMetrics: HttpMetrics = new HttpMetrics(
         name = metricsName,
         metrics = new MemoryMetrics
       )
 
       val app = new WellcomeHttpApp(
         routes = routes,
-        httpMetrics = httpMetrics.getOrElse(defaultHttpMetrics),
+        httpMetrics = httpMetrics,
         httpServerConfig = httpServerConfigTest,
         appName = metricsName
-      )(actorSystem.getOrElse(defaultActorSystem), global)
+      )
 
       app.run()
 
