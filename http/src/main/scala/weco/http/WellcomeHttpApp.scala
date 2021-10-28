@@ -1,24 +1,29 @@
 package weco.http
 
-import java.util.UUID
-
 import akka.actor.ActorSystem
-import akka.event.Logging
+import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.DebuggingDirectives
+import akka.http.scaladsl.server.directives.{
+  DebuggingDirectives,
+  LogEntry,
+  LoggingMagnet
+}
 import grizzled.slf4j.Logging
-import weco.typesafe.Runnable
 import weco.http.models.HTTPServerConfig
-import weco.http.monitoring.HttpMetrics
+import weco.http.monitoring.{HttpMetrics, WellcomeHttpLogger}
+import weco.typesafe.Runnable
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class WellcomeHttpApp(
   routes: Route,
   httpServerConfig: HTTPServerConfig,
   val httpMetrics: HttpMetrics,
-  val appName: String
+  val appName: String,
+  httpLogger: WellcomeHttpLogger = new WellcomeHttpLogger()
 )(
   implicit
   val as: ActorSystem,
@@ -29,19 +34,25 @@ class WellcomeHttpApp(
     with Logging {
 
   private val appId = UUID.randomUUID()
-  val appTag = s"$appName/$appId"
+  private val appTag = s"$appName/$appId"
+
+  private def createLogLine(logger: LoggingAdapter)(req: HttpRequest)(
+    response: Any): Unit = {
+    val logLine = httpLogger.createLogLine(req, response)
+
+    LogEntry(s"$appTag - $logLine", Logging.InfoLevel).logTo(logger)
+  }
 
   def run(): Future[_] = {
-    val handler = mapResponse { response =>
+    val handler: Route = mapResponse { response =>
       httpMetrics.sendMetric(response)
 
       response
     }(routes)
 
-    val logLevel = (appTag, Logging.InfoLevel)
-
-    val loggedHandler = DebuggingDirectives
-      .logRequestResult(logLevel)(handler)
+    val loggedHandler =
+      DebuggingDirectives
+        .logRequestResult(LoggingMagnet(createLogLine))(handler)
 
     val binding = Http()
       .bindAndHandle(
