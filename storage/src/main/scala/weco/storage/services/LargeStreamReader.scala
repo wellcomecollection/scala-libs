@@ -88,7 +88,10 @@ trait LargeStreamReader[Ident] extends Readable[Ident, InputStreamWithLength] {
     inner.retry(maxAttempts = retries)((ident, range)) match {
       case Right(bytes) => bytes
       case Left(err) =>
-        throw new LargeStreamReaderCannotReadRange(ident = ident, range = range, err = err)
+        throw new LargeStreamReaderCannotReadRange(
+          ident = ident,
+          range = range,
+          err = err)
     }
   }
 }
