@@ -9,7 +9,7 @@ import weco.storage.{Identified, ReadError}
 
 import scala.collection.JavaConverters._
 
-class LargeStreamReaderCannotReadRange[Ident](
+case class LargeStreamReaderCannotReadRange[Ident](
   ident: Ident,
   range: ByteRange,
   err: ReadError
