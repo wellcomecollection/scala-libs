@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.11.3 - 2021-11-04
+
+Make `LargeStreamReaderCannotReadRange` a case class so you can actually extract the values.
+
 ## v30.11.2 - 2021-11-04
 
 This patch adds a dedicated exception `LargeStreamReaderCannotReadRange` to the LargeStreamReader.
