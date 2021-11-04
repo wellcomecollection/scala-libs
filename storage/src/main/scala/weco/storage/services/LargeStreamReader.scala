@@ -9,6 +9,12 @@ import weco.storage.{Identified, ReadError}
 
 import scala.collection.JavaConverters._
 
+class LargeStreamReaderCannotReadRange[Ident](
+  ident: Ident,
+  range: ByteRange,
+  err: ReadError
+) extends Throwable(s"Unable to read range $range from $ident: ${err.e}")
+
 /** If you hold open an InputStream for a long time, eventually the network times out
   * and you get an error.
   *
@@ -82,10 +88,7 @@ trait LargeStreamReader[Ident] extends Readable[Ident, InputStreamWithLength] {
     inner.retry(maxAttempts = retries)((ident, range)) match {
       case Right(bytes) => bytes
       case Left(err) =>
-        throw new RuntimeException(
-          s"Unable to read range $range from $ident: $err",
-          err.e
-        )
+        throw new LargeStreamReaderCannotReadRange(ident = ident, range = range, err = err)
     }
   }
 }

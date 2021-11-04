@@ -6,12 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.storage.models.ByteRange
 import weco.storage.streaming.Codec
-import weco.storage.{
-  DoesNotExistError,
-  ReadError,
-  RetryableError,
-  StoreReadError
-}
+import weco.storage.{DoesNotExistError, ReadError, RetryableError, StoreReadError}
 
 trait LargeStreamReaderTestCases[Ident, Namespace]
     extends AnyFunSpec
@@ -110,7 +105,7 @@ trait LargeStreamReaderTestCases[Ident, Namespace]
         }
       }
 
-      intercept[RuntimeException] {
+      intercept[LargeStreamReaderCannotReadRange[Ident]] {
         withLargeStreamReader(bufferSize = 500, rangedReader = brokenReader) {
           _.get(ident)
         }
