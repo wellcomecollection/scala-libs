@@ -10,7 +10,7 @@ import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.Message
-import weco.json.JsonUtil._
+import weco.json.JsonUtil.fromJson
 import weco.json.exceptions.JsonDecodingError
 import weco.monitoring.Metrics
 

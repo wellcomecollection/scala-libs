@@ -13,7 +13,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.model._
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import weco.fixtures._
-import weco.json.JsonUtil._
+import weco.json.JsonUtil.toJson
 import weco.messaging.sns.NotificationMessage
 import weco.messaging.sqs._
 import weco.monitoring.Metrics

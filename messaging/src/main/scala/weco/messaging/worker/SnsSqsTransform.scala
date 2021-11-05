@@ -2,7 +2,7 @@ package weco.messaging.worker
 
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import io.circe.Decoder
-import weco.json.JsonUtil._
+import weco.json.JsonUtil.fromJson
 import weco.messaging.sns.NotificationMessage
 import weco.messaging.worker.steps.MessageTransform
 

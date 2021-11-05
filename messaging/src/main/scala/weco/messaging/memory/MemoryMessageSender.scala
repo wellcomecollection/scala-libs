@@ -1,7 +1,7 @@
 package weco.messaging.memory
 
 import io.circe.Decoder
-import weco.json.JsonUtil._
+import weco.json.JsonUtil.fromJson
 import weco.messaging.{IndividualMessageSender, MessageSender}
 
 import scala.util.{Random, Try}
