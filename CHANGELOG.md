@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v30.11.4 - 2021-11-05
+
+Add implicit JSON decoders/encoders for `NotificationMessage`.
+This should make compilation a little faster but otherwise have no user-visible effect.
+
 ## v30.11.3 - 2021-11-04
 
 Make `LargeStreamReaderCannotReadRange` a case class so you can actually extract the values.
