@@ -3,6 +3,7 @@ package weco.messaging.sns
 import io.circe.generic.extras.JsonKey
 import io.circe.generic.extras.semiauto._
 import io.circe._
+import weco.json.JsonUtil._
 
 case class NotificationMessage(
   @JsonKey("Message") body: String
