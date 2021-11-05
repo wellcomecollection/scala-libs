@@ -1,8 +1,8 @@
 package weco.messaging.sns
 
-import io.circe.{Decoder, Encoder}
 import io.circe.generic.extras.JsonKey
-import io.circe.generic.extras.semiauto.{deriveConfiguredDecoder, deriveConfiguredEncoder}
+import io.circe.generic.extras.semiauto._
+import io.circe._
 
 case class NotificationMessage(
   @JsonKey("Message") body: String
