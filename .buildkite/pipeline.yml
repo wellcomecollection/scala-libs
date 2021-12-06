@@ -54,7 +54,7 @@ steps:
           mount-ssh-agent: true
           volumes: [
             "$HOME/.aws:/root/.aws",
-            "$HOME/.docker:/root/.docker",
+            "$DOCKER_CONFIG:/root/.docker",
             "/var/run/docker.sock:/var/run/docker.sock",
           ]
           network: "host"
@@ -76,7 +76,7 @@ steps:
           mount-ssh-agent: true
           volumes: [
             "$HOME/.aws:/root/.aws",
-            "$HOME/.docker:/root/.docker",
+            "$DOCKER_CONFIG:/root/.docker",
             "/var/run/docker.sock:/var/run/docker.sock",
           ]
           network: "host"
