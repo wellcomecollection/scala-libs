@@ -68,10 +68,11 @@ class TypedStringTest extends AnyFunSpec with Matchers with JsonAssertions {
     it("serialises to a string") {
       val triangle = Shape("triangle")
 
-      assertJsonStringsAreEqual(toJson(triangle).get,
+      toJson(triangle).get shouldBe equivalentJsonTo(
         """
           |"triangle"
-          |""".stripMargin)
+          |""".stripMargin
+      )
     }
 
     it("deserialises from a string") {

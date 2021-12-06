@@ -72,7 +72,7 @@ class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
           |}
         """.stripMargin
 
-      assertJsonStringsAreEqual(triedString.get, expectedString)
+      triedString.get shouldBe equivalentJsonTo(expectedString)
     }
   }
 
@@ -85,8 +85,7 @@ class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
         uri = new URI("https://wellcomecollection.org/")
       )
 
-      assertJsonStringsAreEqual(
-        toJson(website).get,
+      toJson(website).get shouldBe equivalentJsonTo(
         """
           |{
           |  "title": "Wellcome Collection",
@@ -120,13 +119,12 @@ class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
         id = uuid
       )
 
-      assertJsonStringsAreEqual(
-        toJson(shipment).get,
+      toJson(shipment).get shouldBe equivalentJsonTo(
         s"""
-          |{
-          |  "name": "Red cars and yellow cars",
-          |  "id": "${uuid.toString}"
-          |}
+           |{
+           |  "name": "Red cars and yellow cars",
+           |  "id": "${uuid.toString}"
+           |}
         """.stripMargin
       )
     }
@@ -156,8 +154,7 @@ class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
       val now = Instant.parse("2019-06-21T15:51:41.256Z")
       val event = Event(name = "this test", time = now)
 
-      assertJsonStringsAreEqual(
-        toJson(event).get,
+      toJson(event).get shouldBe equivalentJsonTo(
         s"""
            |{
            |  "name": "this test",
