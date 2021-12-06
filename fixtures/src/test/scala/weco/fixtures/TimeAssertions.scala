@@ -1,16 +1,34 @@
 package weco.fixtures
 
-import org.scalatest.Assertion
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.{BeMatcher, MatchResult}
 
-import java.time.{Duration, Instant}
+import java.time.Instant
+import scala.concurrent.duration._
 
 trait TimeAssertions extends Matchers {
-  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
-    Duration
-      .between(instant, Instant.now)
-      .getSeconds should be <= recentSeconds.toLong
+  class InstantMatcher(within: Duration) extends BeMatcher[Instant] {
+    override def apply(t: Instant): MatchResult = {
+      val interval = Instant.now().toEpochMilli - t.toEpochMilli
+      MatchResult(
+        interval < within.toMillis,
+        s"$t is not recent",
+        s"$t is recent"
+      )
+    }
+  }
 
-  def assertAllRecent(instants: Seq[Instant], recentSeconds: Int = 1): Unit =
-    instants.foreach(i => assertRecent(i, recentSeconds))
+  def recent(within: Duration = 3 seconds): InstantMatcher =
+    new InstantMatcher(within)
+}
+
+class TimeAssertionsTest extends AnyFunSpec with Matchers with TimeAssertions {
+  it("finds times that are recent") {
+    Instant.now() shouldBe recent()
+  }
+
+  it("finds times that aren't recent") {
+    Instant.now().minusSeconds(5L) should not be recent()
+  }
 }
