@@ -90,7 +90,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
 
       whenReady(future) { resp =>
         withStringEntity(resp.entity) {
-          assertJsonStringsAreEqual(_, itemJson)
+          _ shouldBe equivalentJsonTo(itemJson)
         }
       }
     }
@@ -180,7 +180,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
 
       whenReady(future1) { resp1 =>
         withStringEntity(resp1.entity) {
-          assertJsonStringsAreEqual(_, itemJson)
+          _ shouldBe equivalentJsonTo(itemJson)
         }
       }
 
@@ -190,7 +190,7 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
 
       whenReady(future2) { resp2 =>
         withStringEntity(resp2.entity) {
-          assertJsonStringsAreEqual(_, itemJson)
+          _ shouldBe equivalentJsonTo(itemJson)
         }
       }
     }

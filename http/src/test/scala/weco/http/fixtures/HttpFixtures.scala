@@ -149,7 +149,7 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
          |""".stripMargin
 
     withStringEntity(response.entity) {
-      assertJsonStringsAreEqual(_, expectedJson)
+      _ shouldBe equivalentJsonTo(expectedJson)
     }
   }
 

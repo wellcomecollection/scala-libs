@@ -88,10 +88,7 @@ class ElasticsearchIndexCreatorTest
           val hits = response.result.hits.hits
           hits should have size 1
 
-          assertJsonStringsAreEqual(
-            hits.head.sourceAsString,
-            testObjectJson
-          )
+          hits.head.sourceAsString shouldBe equivalentJsonTo(testObjectJson)
         }
       }
     }
@@ -186,10 +183,7 @@ class ElasticsearchIndexCreatorTest
 
               hits should have size 1
 
-              assertJsonStringsAreEqual(
-                hits.head.sourceAsString,
-                compatibleTestObjectJson
-              )
+              hits.head.sourceAsString shouldBe equivalentJsonTo(compatibleTestObjectJson)
             }
           }
       }

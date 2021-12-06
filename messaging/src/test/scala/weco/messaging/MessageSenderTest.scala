@@ -79,7 +79,7 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions wit
 
     Seq(dog, octopus, snake).zip(sender.messages).map {
       case (animal, message) =>
-        assertJsonStringsAreEqual(toJson(animal).get, message.body)
+        toJson(animal).get shouldBe equivalentJsonTo(message.body)
     }
   }
 

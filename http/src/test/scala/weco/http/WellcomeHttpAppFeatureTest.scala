@@ -40,7 +40,7 @@ class WellcomeHttpAppFeatureTest
                |}""".stripMargin
 
           withStringEntity(response.entity) {
-            assertJsonStringsAreEqual(_, expectedJson)
+            _ shouldBe equivalentJsonTo(expectedJson)
           }
         }
       }
