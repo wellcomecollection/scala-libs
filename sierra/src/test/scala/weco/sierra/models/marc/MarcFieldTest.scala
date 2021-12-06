@@ -3,9 +3,8 @@ package weco.sierra.models.marc
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.json.JsonUtil._
-import weco.json.utils.JsonAssertions
 
-class MarcFieldTest extends AnyFunSpec with Matchers with JsonAssertions {
+class MarcFieldTest extends AnyFunSpec with Matchers {
 
   it("reads a JSON string as a long-form VarField") {
     val jsonString = s"""{
