@@ -8,9 +8,9 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.json.JsonUtil._
 import weco.json.exceptions.JsonDecodingError
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 
-class JsonUtilTest extends AnyFunSpec with Matchers with JsonAssertions {
+class JsonUtilTest extends AnyFunSpec with Matchers with JsonMatchers {
   case class A(id: String, b: B)
   case class B(id: String, c: C)
   case class C(ints: List[Int])

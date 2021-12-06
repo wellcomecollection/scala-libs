@@ -7,7 +7,7 @@ import org.scalatest.matchers.{BeMatcher, MatchResult}
 import java.time.Instant
 import scala.concurrent.duration._
 
-trait TimeAssertions extends Matchers {
+trait TimeMatchers {
   class InstantMatcher(within: Duration) extends BeMatcher[Instant] {
     override def apply(t: Instant): MatchResult = {
       val interval = Instant.now().toEpochMilli - t.toEpochMilli
@@ -23,7 +23,7 @@ trait TimeAssertions extends Matchers {
     new InstantMatcher(within)
 }
 
-class TimeAssertionsTest extends AnyFunSpec with Matchers with TimeAssertions {
+class TimeMatchersTest extends AnyFunSpec with Matchers with TimeMatchers {
   it("finds times that are recent") {
     Instant.now() shouldBe recent()
   }

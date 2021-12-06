@@ -3,9 +3,9 @@ package weco.json
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.json.JsonUtil._
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 
-class TypedStringTest extends AnyFunSpec with Matchers with JsonAssertions {
+class TypedStringTest extends AnyFunSpec with Matchers with JsonMatchers {
   class Shape(val underlying: String) extends TypedString[Shape]
 
   object Shape extends TypedStringOps[Shape] {

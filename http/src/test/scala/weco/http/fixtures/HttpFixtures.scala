@@ -12,7 +12,7 @@ import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
 import weco.json.JsonUtil.toJson
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 import weco.http.WellcomeHttpApp
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
@@ -21,7 +21,7 @@ import weco.monitoring.memory.MemoryMetrics
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait HttpFixtures extends Akka with ScalaFutures with Matchers
-  with JsonAssertions {
+  with JsonMatchers {
 
   private def whenRequestReady[R](
     r: HttpRequest

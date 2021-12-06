@@ -3,10 +3,10 @@ package weco.http.models
 import akka.http.scaladsl.model.StatusCodes
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 import weco.http.json.DisplayJsonUtil._
 
-class DisplayErrorTest extends AnyFunSpec with Matchers with JsonAssertions {
+class DisplayErrorTest extends AnyFunSpec with Matchers with JsonMatchers {
   import DisplayError._
 
   it("serialises to JSON without a description") {

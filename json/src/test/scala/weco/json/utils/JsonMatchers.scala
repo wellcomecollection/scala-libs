@@ -6,7 +6,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.matchers.{BeMatcher, MatchResult}
 
-trait JsonAssertions extends Matchers {
+trait JsonMatchers {
   class JsonMatcher(jsonString1: String) extends BeMatcher[String] {
     override def apply(jsonString2: String): MatchResult = {
       val json1 = parseOrElse(jsonString1)
@@ -32,7 +32,7 @@ trait JsonAssertions extends Matchers {
     new JsonMatcher(jsonString)
 }
 
-class JsonAssertionsTest extends AnyFunSpec with Matchers with JsonAssertions {
+class JsonMatchersTest extends AnyFunSpec with Matchers with JsonMatchers {
   val pentagon1 =
     s"""
        |{

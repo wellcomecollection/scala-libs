@@ -12,7 +12,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.elasticsearch.test.fixtures.ElasticsearchFixtures
 import weco.json.JsonUtil._
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,7 +42,7 @@ class ElasticsearchIndexCreatorTest
     with ScalaFutures
     with Eventually
     with Matchers
-    with JsonAssertions
+    with JsonMatchers
     with BeforeAndAfterEach {
 
   val indexFields = Seq(

@@ -5,7 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.fixtures.RandomGenerators
 import weco.json.JsonUtil._
-import weco.json.utils.JsonAssertions
+import weco.json.utils.JsonMatchers
 import weco.messaging.memory.{
   MemoryIndividualMessageSender,
   MemoryMessageSender
@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Success, Try}
 
-class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions with ScalaFutures with RandomGenerators {
+class MessageSenderTest extends AnyFunSpec with Matchers with JsonMatchers with ScalaFutures with RandomGenerators {
   it("sends individual messages") {
     val sender = new MemoryIndividualMessageSender()
 
