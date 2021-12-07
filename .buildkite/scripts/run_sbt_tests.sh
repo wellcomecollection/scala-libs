@@ -9,7 +9,7 @@ PROJECT="$1"
 PROJECT_DIRECTORY=$(jq -r .folder ".sbt_metadata/$PROJECT.json")
 
 ROOT=$(git rev-parse --show-toplevel)
-BUILDS_DIR="$ROOT/builds"
+BUILDS_DIR="$ROOT/.buildkite/scripts"
 
 if [[ -f "$PROJECT_DIRECTORY/docker-compose.yml" ]]
 then
