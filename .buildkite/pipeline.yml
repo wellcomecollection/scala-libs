@@ -10,7 +10,6 @@ steps:
           propagate-environment: true
           entrypoint: "/usr/bin/python3"
     command: "/workdir/.buildkite/scripts/format.py"
-  - wait
   - label: test fixtures
     plugins:
       - docker#v3.5.0:
