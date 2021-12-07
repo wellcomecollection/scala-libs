@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.11.5 - 2021-12-07
+
+This fixes the scala-libs build process for the new version of the Buildkite stack, but should have no user-visible changes.
+
 ## v30.11.4 - 2021-11-05
 
 Add implicit JSON decoders/encoders for `NotificationMessage`.
