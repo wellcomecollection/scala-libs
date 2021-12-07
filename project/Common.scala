@@ -33,12 +33,13 @@ object Common {
   )
 
   def setupProject(
-                    project: Project,
-                    folder: String,
-                    projectVersion: String,
-                    localDependencies: Seq[Project] = Seq(),
-                    externalDependencies: Seq[ModuleID] = Seq()
-                  ): Project = {
+    project: Project,
+    folder: String,
+    projectVersion: String,
+    localDependencies: Seq[Project] = Seq(),
+    externalDependencies: Seq[ModuleID] = Seq()
+  ): Project = {
+    Metadata.write(project, folder, localDependencies)
 
     val dependsOn = localDependencies
       .map { project: Project =>
