@@ -1,3 +1,11 @@
+val circeVersion = "0.8.0"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
 addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.34")
 addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.19.0")
 addSbtPlugin("com.lucidchart" % "sbt-scalafmt-coursier" % "1.15")
