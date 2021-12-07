@@ -1,6 +1,6 @@
 import sys
 
-from commands import sbt, git, run_build_script
+from commands import git, run_build_script
 from git_utils import remote_default_branch
 from release import has_release
 
