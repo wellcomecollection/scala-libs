@@ -49,6 +49,10 @@ steps:
           command: ["project typesafe_app", "test"]
   - label: test messaging
     plugins:
+      - wellcomecollection/aws-assume-role#v0.2.2:
+          role: "arn:aws:iam::760097843905:role/platform-ci"
+      - ecr#v2.1.1:
+          login: true
       - docker#v3.5.0:
           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
           mount-ssh-agent: true
@@ -71,6 +75,10 @@ steps:
           command: ["project messaging_typesafe", "test"]
   - label: test storage
     plugins:
+      - wellcomecollection/aws-assume-role#v0.2.2:
+          role: "arn:aws:iam::760097843905:role/platform-ci"
+      - ecr#v2.1.1:
+          login: true
       - docker#v3.5.0:
           image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
           mount-ssh-agent: true
