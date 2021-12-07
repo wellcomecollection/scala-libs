@@ -46,19 +46,23 @@ trait S3Fixtures
   import S3Fixtures._
 
   implicit val s3Client: AmazonS3 =
-    AmazonS3ClientBuilder.standard()
+    AmazonS3ClientBuilder
+      .standard()
       .withCredentials(new AWSStaticCredentialsProvider(
         new BasicAWSCredentials("accessKey1", "verySecretKey1")))
       .withPathStyleAccessEnabled(true)
-      .withEndpointConfiguration(new EndpointConfiguration("http://localhost:33333", "localhost"))
+      .withEndpointConfiguration(
+        new EndpointConfiguration("http://localhost:33333", "localhost"))
       .build()
 
   val brokenS3Client: AmazonS3 =
-    AmazonS3ClientBuilder.standard()
+    AmazonS3ClientBuilder
+      .standard()
       .withCredentials(new AWSStaticCredentialsProvider(
         new BasicAWSCredentials("nope", "nope")))
       .withPathStyleAccessEnabled(true)
-      .withEndpointConfiguration(new EndpointConfiguration("http://nope.nope", "nope"))
+      .withEndpointConfiguration(
+        new EndpointConfiguration("http://nope.nope", "nope"))
       .build()
 
   def withLocalS3Bucket[R]: Fixture[Bucket, R] =

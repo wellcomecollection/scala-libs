@@ -24,19 +24,22 @@ import weco.storage.transfer.{
 
 class S3TransferTest
     extends TransferTestCases[
-      S3ObjectLocation, S3ObjectLocation,
-      Record, Bucket,
+      S3ObjectLocation,
+      S3ObjectLocation,
+      Record,
       Bucket,
-      S3TypedStore[Record], S3TypedStore[Record],
+      Bucket,
+      S3TypedStore[Record],
+      S3TypedStore[Record],
       Unit
-      ]
+    ]
     with S3TransferFixtures[Record]
-    with RecordGenerators with MockitoSugar{
+    with RecordGenerators
+    with MockitoSugar {
 
-  override def withTransfer[R](
-    srcStore: S3TypedStore[Record],
-    dstStore: S3TypedStore[Record])(testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R]
-  ): R =
+  override def withTransfer[R](srcStore: S3TypedStore[Record],
+                               dstStore: S3TypedStore[Record])(
+    testWith: TestWith[Transfer[S3ObjectLocation, S3ObjectLocation], R]): R =
     testWith(S3Transfer.apply)
 
   override def createT: Record = createRecord
@@ -44,7 +47,8 @@ class S3TransferTest
   override def withContext[R](testWith: TestWith[Unit, R]): R =
     testWith(())
   def s3ServerException = {
-    val exception = new AmazonS3Exception("We encountered an internal error. Please try again.")
+    val exception = new AmazonS3Exception(
+      "We encountered an internal error. Please try again.")
     exception.setStatusCode(500)
     exception
   }
@@ -115,8 +119,9 @@ class S3TransferTest
     }
   }
 
-  it("retries 500 errors from S3 when calling copy on TransferManager"){
-      withNamespacePair { case (srcNamespace, dstNamespace) =>
+  it("retries 500 errors from S3 when calling copy on TransferManager") {
+    withNamespacePair {
+      case (srcNamespace, dstNamespace) =>
         val src = createSrcLocation(srcNamespace)
         val dst = createDstLocation(dstNamespace)
 
@@ -125,17 +130,17 @@ class S3TransferTest
         withContext { implicit context =>
           withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
             withDstStore(initialEntries = Map.empty) { dstStore =>
-
               val failingOnceTransfer = mock[TransferManager]
               when(failingOnceTransfer.copy(any[CopyObjectRequest]))
                 .thenThrow(s3ServerException)
                 .thenAnswer((invocation: InvocationOnMock) => {
-                transferManager.copy(invocation.getArguments.toList.head.asInstanceOf[CopyObjectRequest])
-              })
-            val transfer = new S3Transfer(failingOnceTransfer, new S3StreamStore())
+                  transferManager.copy(invocation.getArguments.toList.head
+                    .asInstanceOf[CopyObjectRequest])
+                })
+              val transfer =
+                new S3Transfer(failingOnceTransfer, new S3StreamStore())
 
               val result = transfer.transfer(src, dst)
-
 
               result.value shouldBe TransferPerformed(src, dst)
 
@@ -144,33 +149,34 @@ class S3TransferTest
             }
           }
         }
-      }
     }
+  }
 
-  it("stops retrying if TransferManager fails more than 3 times"){
-    withNamespacePair { case (srcNamespace, dstNamespace) =>
-      val src = createSrcLocation(srcNamespace)
-      val dst = createDstLocation(dstNamespace)
+  it("stops retrying if TransferManager fails more than 3 times") {
+    withNamespacePair {
+      case (srcNamespace, dstNamespace) =>
+        val src = createSrcLocation(srcNamespace)
+        val dst = createDstLocation(dstNamespace)
 
-      val t = createT
+        val t = createT
 
-      withContext { implicit context =>
-        withSrcStore(initialEntries = Map(src -> t)) { _ =>
-          withDstStore(initialEntries = Map.empty) { _ =>
+        withContext { implicit context =>
+          withSrcStore(initialEntries = Map(src -> t)) { _ =>
+            withDstStore(initialEntries = Map.empty) { _ =>
+              val alwaysFailingTransfer = mock[TransferManager]
+              when(alwaysFailingTransfer.copy(any[CopyObjectRequest]))
+                .thenThrow(s3ServerException)
+              val transfer =
+                new S3Transfer(alwaysFailingTransfer, new S3StreamStore())
 
-            val alwaysFailingTransfer = mock[TransferManager]
-            when(alwaysFailingTransfer.copy(any[CopyObjectRequest]))
-              .thenThrow(s3ServerException)
-            val transfer = new S3Transfer(alwaysFailingTransfer, new S3StreamStore())
+              val result = transfer.transfer(src, dst)
 
-            val result = transfer.transfer(src, dst)
-
-
-            result.left.value shouldBe a[TransferSourceFailure[_,_]]
-            verify(alwaysFailingTransfer, times(3)).copy(any[CopyObjectRequest])
+              result.left.value shouldBe a[TransferSourceFailure[_, _]]
+              verify(alwaysFailingTransfer, times(3))
+                .copy(any[CopyObjectRequest])
+            }
           }
         }
-      }
     }
   }
 }

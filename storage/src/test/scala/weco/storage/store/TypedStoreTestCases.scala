@@ -17,14 +17,17 @@ import weco.storage.{
 import weco.storage.store.fixtures.TypedStoreFixtures
 import weco.storage.streaming.{Codec, InputStreamWithLength}
 
-trait TypedStoreTestCases[
-  Ident,
-  T,
-  Namespace,
-  StreamStoreImpl <: StreamStore[Ident],
-  TypedStoreImpl <: TypedStore[Ident, T],
-  StreamStoreContext]
-    extends StoreWithOverwritesTestCases[Ident, T, Namespace, StreamStoreContext]
+trait TypedStoreTestCases[Ident,
+                          T,
+                          Namespace,
+                          StreamStoreImpl <: StreamStore[Ident],
+                          TypedStoreImpl <: TypedStore[Ident, T],
+                          StreamStoreContext]
+    extends StoreWithOverwritesTestCases[
+      Ident,
+      T,
+      Namespace,
+      StreamStoreContext]
     with TypedStoreFixtures[
       Ident,
       T,

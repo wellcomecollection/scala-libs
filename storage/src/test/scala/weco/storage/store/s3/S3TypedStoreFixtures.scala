@@ -13,9 +13,8 @@ trait S3TypedStoreFixtures[T]
       S3TypedStore[T],
       Unit]
     with S3StreamStoreFixtures {
-  override def withTypedStore[R](
-    streamStore: S3StreamStore,
-    initialEntries: Map[S3ObjectLocation, T])(
+  override def withTypedStore[R](streamStore: S3StreamStore,
+                                 initialEntries: Map[S3ObjectLocation, T])(
     testWith: TestWith[S3TypedStore[T], R])(implicit codec: Codec[T]): R = {
     implicit val s3StreamStore: S3StreamStore = streamStore
 

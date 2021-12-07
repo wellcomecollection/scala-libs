@@ -1,7 +1,18 @@
 package weco.http.monitoring
 
-import akka.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, ETag}
-import akka.http.scaladsl.model.{HttpEntity, HttpMethods, HttpRequest, HttpResponse, StatusCodes, Uri}
+import akka.http.scaladsl.model.headers.{
+  Authorization,
+  BasicHttpCredentials,
+  ETag
+}
+import akka.http.scaladsl.model.{
+  HttpEntity,
+  HttpMethods,
+  HttpRequest,
+  HttpResponse,
+  StatusCodes,
+  Uri
+}
 import akka.http.scaladsl.server.RouteResult.Complete
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -85,13 +96,14 @@ class WellcomeHttpLoggerTest extends AnyFunSpec with Matchers {
           method = HttpMethods.GET,
           uri = Uri("http://example.net/api/v1/shapes"),
         ),
-        response = Complete(HttpResponse(
-          status = StatusCodes.OK,
-          headers = List(
-            ETag("123456789"),
-            Authorization(BasicHttpCredentials("secretValue")),
-          )
-        ))
+        response = Complete(
+          HttpResponse(
+            status = StatusCodes.OK,
+            headers = List(
+              ETag("123456789"),
+              Authorization(BasicHttpCredentials("secretValue")),
+            )
+          ))
       )
 
       log shouldBe """Request: GET /api/v1/shapes / Response: HTTP 200 OK"""
@@ -108,13 +120,14 @@ class WellcomeHttpLoggerTest extends AnyFunSpec with Matchers {
           method = HttpMethods.GET,
           uri = Uri("http://example.net/api/v1/shapes"),
         ),
-        response = Complete(HttpResponse(
-          status = StatusCodes.OK,
-          headers = List(
-            ETag("123456789"),
-            Authorization(BasicHttpCredentials("secretValue")),
-          )
-        ))
+        response = Complete(
+          HttpResponse(
+            status = StatusCodes.OK,
+            headers = List(
+              ETag("123456789"),
+              Authorization(BasicHttpCredentials("secretValue")),
+            )
+          ))
       )
 
       log shouldBe """Request: GET /api/v1/shapes / Response: HTTP 200 OK; ETag="123456789""""
@@ -131,14 +144,15 @@ class WellcomeHttpLoggerTest extends AnyFunSpec with Matchers {
           method = HttpMethods.GET,
           uri = Uri("http://example.net/api/v1/shapes"),
         ),
-        response = Complete(HttpResponse(
-          status = StatusCodes.OK,
-          headers = List(
-            ETag("123456789"),
-            Authorization(BasicHttpCredentials("secretValue")),
-          ),
-          entity = HttpEntity("this is the response body")
-        ))
+        response = Complete(
+          HttpResponse(
+            status = StatusCodes.OK,
+            headers = List(
+              ETag("123456789"),
+              Authorization(BasicHttpCredentials("secretValue")),
+            ),
+            entity = HttpEntity("this is the response body")
+          ))
       )
 
       log shouldBe """Request: GET /api/v1/shapes / Response: HTTP 200 OK; ETag="123456789"; HttpEntity.Strict(text/plain; charset=UTF-8,25 bytes total)"""

@@ -14,8 +14,7 @@ trait S3ObjectLocationGenerators extends RandomGenerators {
     //  - do not contain uppercase characters or underscores,
     //  - between 3 and 63 characters in length.
     // [https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html#bucketnamingrules]
-    randomAlphanumeric(length = randomInt(from = 3, to = 63))
-      .toLowerCase
+    randomAlphanumeric(length = randomInt(from = 3, to = 63)).toLowerCase
 
   def createBucket: Bucket = Bucket(createBucketName)
 
@@ -39,7 +38,8 @@ trait S3ObjectLocationGenerators extends RandomGenerators {
       key = randomAlphanumeric()
     )
 
-  def createS3ObjectLocation: S3ObjectLocation = createS3ObjectLocationWith(bucket = createBucket)
+  def createS3ObjectLocation: S3ObjectLocation =
+    createS3ObjectLocationWith(bucket = createBucket)
 
   def createS3ObjectLocationPrefixWith(bucket: Bucket): S3ObjectLocationPrefix =
     S3ObjectLocationPrefix(

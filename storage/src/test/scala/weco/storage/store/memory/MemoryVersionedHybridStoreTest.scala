@@ -15,9 +15,11 @@ class MemoryVersionedHybridStoreTest
 
   override def withFailingGetVersionedStore[R](initialEntries: Entries)(
     testWith: TestWith[VersionedStoreImpl, R]): R = {
-    implicit val indexedStore: MemoryStore[Version[String, Int], String] with MemoryMaxima[String, String] =
+    implicit val indexedStore
+      : MemoryStore[Version[String, Int], String] with MemoryMaxima[String,
+                                                                    String] =
       new MemoryStore[Version[String, Int], String](Map.empty)
-        with MemoryMaxima[String, String]
+      with MemoryMaxima[String, String]
 
     implicit val typedStore: MemoryTypedStore[String, Record] =
       MemoryTypedStore[String, Record](initialEntries = Map.empty)
@@ -76,11 +78,12 @@ class MemoryVersionedHybridStoreTest
   }
 
   override def withVersionedStoreContext[R](
-    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R])
-    : R = {
-    implicit val indexedStore: MemoryStore[Version[String, Int], String] with MemoryMaxima[String, String] =
+    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R]): R = {
+    implicit val indexedStore
+      : MemoryStore[Version[String, Int], String] with MemoryMaxima[String,
+                                                                    String] =
       new MemoryStore[Version[String, Int], String](Map.empty)
-        with MemoryMaxima[String, String]
+      with MemoryMaxima[String, String]
 
     implicit val typedStore: MemoryTypedStore[String, Record] =
       MemoryTypedStore[String, Record](initialEntries = Map.empty)
@@ -97,8 +100,7 @@ class MemoryVersionedHybridStoreTest
     withVersionedStoreImpl(initialEntries, storeContext)(testWith)
 
   override def withStoreContext[R](
-    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R])
-    : R =
+    testWith: TestWith[MemoryHybridStoreWithMaxima[String, Record], R]): R =
     withVersionedStoreContext(testWith)
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =

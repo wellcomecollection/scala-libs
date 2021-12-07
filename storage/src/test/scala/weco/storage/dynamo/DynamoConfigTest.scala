@@ -4,7 +4,6 @@ import javax.naming.ConfigurationException
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class DynamoConfigTest extends AnyFunSpec with Matchers {
   it("allows looking up the index") {
     val index = "myindex"

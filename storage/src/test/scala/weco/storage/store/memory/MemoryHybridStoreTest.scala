@@ -4,10 +4,7 @@ import java.util.UUID
 
 import weco.fixtures.TestWith
 import weco.storage._
-import weco.storage.generators.{
-  Record,
-  RecordGenerators
-}
+import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.store._
 
 class MemoryHybridStoreTest
@@ -31,10 +28,7 @@ class MemoryHybridStoreTest
                                       indexedStore: MemoryIndexedStoreImpl)(
     testWith: TestWith[HybridStoreImpl, R])(implicit context: Context): R =
     testWith(
-      new MemoryHybridStore[UUID, Record]()(
-        typedStore,
-        indexedStore,
-        codec)
+      new MemoryHybridStore[UUID, Record]()(typedStore, indexedStore, codec)
     )
 
   override def withTypedStoreImpl[R](
@@ -68,7 +62,7 @@ class MemoryHybridStoreTest
   }
 
   override def createT: Record = createRecord
-    
+
   override def withNamespace[R](testWith: TestWith[String, R]): R =
     testWith(randomAlphanumeric())
 
@@ -107,9 +101,8 @@ class MemoryHybridStoreTest
     implicit context: Context): R = {
     testWith(
       new MemoryIndexedStoreImpl(initialEntries = Map.empty) {
-        override def put(id: UUID)(t: String): Either[
-          WriteError,
-          Identified[UUID, String]] =
+        override def put(id: UUID)(
+          t: String): Either[WriteError, Identified[UUID, String]] =
           Left(StoreWriteError(new Error("BOOM!")))
       }
     )
@@ -120,9 +113,8 @@ class MemoryHybridStoreTest
     implicit context: Context): R = {
     testWith(
       new MemoryIndexedStoreImpl(initialEntries = Map.empty) {
-        override def get(id: UUID): Either[
-          ReadError,
-          Identified[UUID, String]] =
+        override def get(
+          id: UUID): Either[ReadError, Identified[UUID, String]] =
           Left(StoreReadError(new Error("BOOM!")))
       }
     )

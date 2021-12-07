@@ -16,8 +16,7 @@ trait AzureBlobLocationGenerators extends RandomGenerators {
     *
     */
   def createContainerName: String =
-    randomAlphanumeric(length = randomInt(from = 3, to = 63))
-      .toLowerCase
+    randomAlphanumeric(length = randomInt(from = 3, to = 63)).toLowerCase
 
   def createContainer: Container =
     Container(createContainerName)
@@ -28,7 +27,8 @@ trait AzureBlobLocationGenerators extends RandomGenerators {
       name = randomAlphanumeric()
     )
 
-  def createAzureBlobLocationPrefixWith(container: Container): AzureBlobLocationPrefix =
+  def createAzureBlobLocationPrefixWith(
+    container: Container): AzureBlobLocationPrefix =
     AzureBlobLocationPrefix(
       container = container.name,
       namePrefix = randomAlphanumeric()

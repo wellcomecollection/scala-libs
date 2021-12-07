@@ -5,7 +5,10 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.messaging.fixtures.worker.WorkerFixtures
 
-class MessageTransformTest extends AnyFunSpec with Matchers with WorkerFixtures {
+class MessageTransformTest
+    extends AnyFunSpec
+    with Matchers
+    with WorkerFixtures {
   it("calls transform function and returns result") {
     val now = Instant.now
     val messageTransform = new MessageTransform[MyMessage, MyWork, MyContext] {

@@ -29,7 +29,8 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
     it("returns the value when a path is available") {
       val myConfig = ConfigFactory.parseString(configString)
 
-      myConfig.getStringOption("example.config.string") shouldBe Some("somevalue")
+      myConfig.getStringOption("example.config.string") shouldBe Some(
+        "somevalue")
     }
 
     it("returns None when a path is unavailable") {
@@ -43,7 +44,7 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
     it("returns the value when a path is available") {
       val myConfig = ConfigFactory.parseString(configString)
 
-      myConfig.getIntOption("example.config.int")shouldBe Some(1)
+      myConfig.getIntOption("example.config.int") shouldBe Some(1)
     }
 
     it("returns None when a path is unavailable") {
@@ -80,7 +81,8 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
     it("returns the value when a path is available") {
       val myConfig = ConfigFactory.parseString(configString)
 
-      myConfig.getDurationOption("example.config.duration") shouldBe Some(2.seconds)
+      myConfig.getDurationOption("example.config.duration") shouldBe Some(
+        2.seconds)
     }
 
     it("returns None when a path is unavailable") {
@@ -93,6 +95,7 @@ class EnrichConfigTest extends AnyFunSpec with Matchers with OptionValues {
   it("elides .. to . when reading config paths") {
     val myConfig: Config = ConfigFactory.parseString(configString)
 
-    myConfig.getStringOption("example.tooManyDots..config") shouldBe Some("tooManyDots")
+    myConfig.getStringOption("example.tooManyDots..config") shouldBe Some(
+      "tooManyDots")
   }
 }

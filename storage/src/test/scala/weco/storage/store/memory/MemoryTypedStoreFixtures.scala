@@ -23,8 +23,7 @@ trait MemoryTypedStoreFixtures[Ident, T]
     }
   }
 
-  def withMemoryTypedStoreImpl[R](
-    initialEntries: Map[Ident, T])(
+  def withMemoryTypedStoreImpl[R](initialEntries: Map[Ident, T])(
     testWith: TestWith[MemoryTypedStore[Ident, T], R])(
     implicit streamStore: MemoryStreamStore[Ident],
     codec: Codec[T]): R =

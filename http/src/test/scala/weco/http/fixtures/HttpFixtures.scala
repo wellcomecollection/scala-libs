@@ -20,8 +20,11 @@ import weco.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait HttpFixtures extends Akka with ScalaFutures with Matchers
-  with JsonAssertions {
+trait HttpFixtures
+    extends Akka
+    with ScalaFutures
+    with Matchers
+    with JsonAssertions {
 
   private def whenRequestReady[R](
     r: HttpRequest
@@ -51,15 +54,16 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
         HttpEntity(ContentTypes.`application/json`, json.noSpaces)
 
       case Left(err) =>
-        throw new IllegalArgumentException(s"Unable to parse JSON ($err):\n$jsonString")
+        throw new IllegalArgumentException(
+          s"Unable to parse JSON ($err):\n$jsonString")
     }
 
   def whenPostRequestReady[R](
-                               path: String,
-                               entity: RequestEntity
-                             )(
-                               testWith: TestWith[HttpResponse, R]
-                             ): R = {
+    path: String,
+    entity: RequestEntity
+  )(
+    testWith: TestWith[HttpResponse, R]
+  ): R = {
     val request = HttpRequest(
       method = POST,
       uri = s"$externalBaseURL$path",
@@ -93,18 +97,18 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
     HTTPServerConfig(host, port, externalBaseURL)
 
   def assertMetricSent(
-                        name: String = "unset",
-                        metrics: MemoryMetrics,
-                        result: HttpMetricResults.Value
-                      ): Assertion =
+    name: String = "unset",
+    metrics: MemoryMetrics,
+    result: HttpMetricResults.Value
+  ): Assertion =
     metrics.incrementedCounts should contain(
       s"${name}_HttpResponse_$result"
     )
 
   def assertIsDisplayError(
-                            response: HttpResponse,
-                            statusCode: StatusCode
-                          ): Assertion = {
+    response: HttpResponse,
+    statusCode: StatusCode
+  ): Assertion = {
     assertIsDisplayError(
       response = response,
       description = None,
@@ -113,10 +117,10 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
   }
 
   def assertIsDisplayError(
-                            response: HttpResponse,
-                            description: String,
-                            statusCode: StatusCode
-                          ): Assertion = {
+    response: HttpResponse,
+    description: String,
+    statusCode: StatusCode
+  ): Assertion = {
     assertIsDisplayError(
       response = response,
       description = Some(description),
@@ -125,16 +129,16 @@ trait HttpFixtures extends Akka with ScalaFutures with Matchers
   }
 
   def assertIsDisplayError(
-                            response: HttpResponse,
-                            description: Option[String],
-                            statusCode: StatusCode
-                          ): Assertion = {
+    response: HttpResponse,
+    description: Option[String],
+    statusCode: StatusCode
+  ): Assertion = {
     response.status shouldBe statusCode
     response.entity.contentType shouldBe ContentTypes.`application/json`
 
     val jsonDescription = description match {
       case Some(desc) => s""" "description": ${toJson(desc).get}, """
-      case _ => ""
+      case _          => ""
     }
 
     val expectedJson =

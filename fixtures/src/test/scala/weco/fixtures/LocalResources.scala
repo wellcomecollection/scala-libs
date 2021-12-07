@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.io.Source
 
 trait LocalResources {
+
   /** Returns the contents of a file in the "resources" folder. */
   def readResource(name: String): String =
     Source.fromResource(name).getLines.mkString("\n")

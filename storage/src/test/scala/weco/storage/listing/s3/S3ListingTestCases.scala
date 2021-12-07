@@ -19,7 +19,9 @@ trait S3ListingTestCases[ListingResult]
   def withListing[R](bucket: Bucket, initialEntries: Seq[S3ObjectLocation])(
     testWith: TestWith[S3Listing[ListingResult], R]): R = {
     initialEntries
-      .foreach { loc => putStream(loc) }
+      .foreach { loc =>
+        putStream(loc)
+      }
 
     testWith(createS3Listing())
   }
@@ -77,7 +79,9 @@ trait S3ListingTestCases[ListingResult]
         val locations = (1 to 10).map { i =>
           location.join(s"file_$i.txt")
         }
-        locations.foreach { loc => putStream(loc) }
+        locations.foreach { loc =>
+          putStream(loc)
+        }
 
         val smallBatchListing = createS3Listing(batchSize = 5)
         assertResultCorrect(

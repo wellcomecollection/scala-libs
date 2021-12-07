@@ -18,7 +18,12 @@ import weco.storage.UpdateWriteError
 
 import scala.collection.JavaConverters._
 
-class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLocation, Bucket] with S3Fixtures with MockitoSugar {
+class S3TagsTest
+    extends AnyFunSpec
+    with Matchers
+    with TagsTestCases[S3ObjectLocation, Bucket]
+    with S3Fixtures
+    with MockitoSugar {
   // We can associate with at most 10 tags on an object; see
   // https://docs.aws.amazon.com/AmazonS3/latest/dev/object-tagging.html
   override val maxTags: Int = 10
@@ -27,21 +32,22 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     initialTags: Map[S3ObjectLocation, Map[String, String]])(
     testWith: TestWith[Tags[S3ObjectLocation], R]): R = {
     initialTags
-      .foreach { case (location, tags) =>
-        putStream(location)
+      .foreach {
+        case (location, tags) =>
+          putStream(location)
 
-        val tagSet = tags
-          .map { case (k, v) => new Tag(k, v) }
-          .toSeq
-          .asJava
+          val tagSet = tags
+            .map { case (k, v) => new Tag(k, v) }
+            .toSeq
+            .asJava
 
-        s3Client.setObjectTagging(
-          new SetObjectTaggingRequest(
-            location.bucket,
-            location.key,
-            new ObjectTagging(tagSet)
+          s3Client.setObjectTagging(
+            new SetObjectTaggingRequest(
+              location.bucket,
+              location.key,
+              new ObjectTagging(tagSet)
+            )
           )
-        )
       }
 
     testWith(new S3Tags())
@@ -61,9 +67,9 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     // We can associate with at most 10 tags on an object; see
     // https://docs.aws.amazon.com/AmazonS3/latest/dev/object-tagging.html
     it("if you send more than 10 tags") {
-      val newTags = (1 to 11)
-        .map { i => s"key-$i" -> s"value-$i" }
-        .toMap
+      val newTags = (1 to 11).map { i =>
+        s"key-$i" -> s"value-$i"
+      }.toMap
 
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
@@ -108,7 +114,9 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val result =
           s3Tags
             .update(location) { existingTags: Map[String, String] =>
-              Right(existingTags ++ Map(randomAlphanumeric(length = 129) -> "value"))
+              Right(
+                existingTags ++ Map(
+                  randomAlphanumeric(length = 129) -> "value"))
             }
 
         assertIsS3Exception(result) {
@@ -127,7 +135,8 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         val result: s3Tags.UpdateEither =
           s3Tags
             .update(location) { existingTags: Map[String, String] =>
-              Right(existingTags ++ Map("key" -> randomAlphanumeric(length = 257)))
+              Right(
+                existingTags ++ Map("key" -> randomAlphanumeric(length = 257)))
             }
 
         assertIsS3Exception(result) {
@@ -137,7 +146,8 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
     }
   }
 
-  val s3ServerException = new AmazonS3Exception("We encountered an internal error. Please try again.")
+  val s3ServerException = new AmazonS3Exception(
+    "We encountered an internal error. Please try again.")
   s3ServerException.setStatusCode(500)
 
   describe("retries flaky errors from the SetObjectTagging API") {
@@ -157,9 +167,12 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
           .thenThrow(new AmazonS3Exception("The specified key does not exist"))
 
         val tags = new S3Tags()(s3Client = mockClient)
-        tags.update(location) { _ => Right(Map("colour" -> "red")) } shouldBe a[Left[_, _]]
+        tags.update(location) { _ =>
+          Right(Map("colour" -> "red"))
+        } shouldBe a[Left[_, _]]
 
-        verify(mockClient, times(1)).setObjectTagging(any[SetObjectTaggingRequest])
+        verify(mockClient, times(1))
+          .setObjectTagging(any[SetObjectTaggingRequest])
       }
     }
 
@@ -185,13 +198,17 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
           )
 
         val tags = new S3Tags()(s3Client = mockClient)
-        tags.update(location) { _ => Right(Map("colour" -> "red")) } shouldBe a[Right[_, _]]
+        tags.update(location) { _ =>
+          Right(Map("colour" -> "red"))
+        } shouldBe a[Right[_, _]]
 
-        verify(mockClient, times(2)).setObjectTagging(any[SetObjectTaggingRequest])
+        verify(mockClient, times(2))
+          .setObjectTagging(any[SetObjectTaggingRequest])
 
         // Use a fresh instance of S3Tags so we use the unmocked client,
         // and not one with a mocked return value for getObjectTagging.
-        new S3Tags().get(location).value.identifiedT shouldBe Map("colour" -> "red")
+        new S3Tags().get(location).value.identifiedT shouldBe Map(
+          "colour" -> "red")
       }
     }
 
@@ -211,13 +228,18 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
           .thenThrow(s3ServerException)
 
         val tags = new S3Tags(maxRetries = 4)(s3Client = mockClient)
-        tags.update(location) { _ => Right(Map("colour" -> "blue")) } shouldBe a[Left[_, _]]
+        tags.update(location) { _ =>
+          Right(Map("colour" -> "blue"))
+        } shouldBe a[Left[_, _]]
 
-        verify(mockClient, times(4)).setObjectTagging(any[SetObjectTaggingRequest])
+        verify(mockClient, times(4))
+          .setObjectTagging(any[SetObjectTaggingRequest])
       }
     }
 
-    def createGetObjectTaggingMock(mockClient: AmazonS3, location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResult] =
+    def createGetObjectTaggingMock(
+      mockClient: AmazonS3,
+      location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResult] =
       when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
         .thenReturn(
           s3Client
@@ -227,7 +249,8 @@ class S3TagsTest extends AnyFunSpec with Matchers with TagsTestCases[S3ObjectLoc
         )
   }
 
-  private def assertIsS3Exception(result: s3Tags.UpdateEither)(assert: String => Assertion): Assertion = {
+  private def assertIsS3Exception(result: s3Tags.UpdateEither)(
+    assert: String => Assertion): Assertion = {
     val err = result.left.value
 
     err shouldBe a[UpdateWriteError]

@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class VersionedStoreRaceConditionsTest
-  extends AnyFunSpec
+    extends AnyFunSpec
     with Matchers
     with ScalaFutures
     with EitherValues
@@ -22,7 +22,8 @@ class VersionedStoreRaceConditionsTest
     with Logging {
 
   class StepControlledStore() {
-    private val workingStore = new MemoryStore[Version[String, Int], String](initialEntries = Map.empty)
+    private val workingStore =
+      new MemoryStore[Version[String, Int], String](initialEntries = Map.empty)
       with MemoryMaxima[String, String]
 
     private var actualMaxCalls = 0
@@ -33,10 +34,11 @@ class VersionedStoreRaceConditionsTest
     // to max() in this store.
     // TODO: Don't use string as the value in this store.
     private val stoppingStore = new Store[Version[String, Int], String]
-        with Maxima[String, Version[String, Int], String] {
+    with Maxima[String, Version[String, Int], String] {
       override def max(id: String): MaxEither = {
         debug(s"Calling max(id = $id)")
-        debug(s"max: actualMaxCalls = $actualMaxCalls, allowedMaxCalls = $allowedMaxCalls")
+        debug(
+          s"max: actualMaxCalls = $actualMaxCalls, allowedMaxCalls = $allowedMaxCalls")
         while (allowedMaxCalls <= actualMaxCalls) {
           debug(s"Waiting for max() to be available")
           Thread.sleep(10)
@@ -46,7 +48,8 @@ class VersionedStoreRaceConditionsTest
         workingStore.max(id)
       }
 
-      override def get(id: Version[String, Int]): Either[ReadError, Identified[Version[String, Int], String]] = {
+      override def get(id: Version[String, Int])
+        : Either[ReadError, Identified[Version[String, Int], String]] = {
         debug(s"Calling get(id = $id)")
         workingStore.get(id)
       }
@@ -116,7 +119,9 @@ class VersionedStoreRaceConditionsTest
       val stoppingVersionedStore = stores.getStoppingStore
 
       // Call putLatest() in the stopping store.  This will get stuck waiting max().
-      val future = Future { stoppingVersionedStore.putLatest(id = "1")(t = "trouble") }
+      val future = Future {
+        stoppingVersionedStore.putLatest(id = "1")(t = "trouble")
+      }
 
       // Wait for a bit, so it gets stuck.
       Thread.sleep(250)
@@ -163,7 +168,9 @@ class VersionedStoreRaceConditionsTest
       val stoppingVersionedStore = stores.getStoppingStore
 
       // Call putLatest() in the stopping store.  This will get stuck waiting max().
-      val future = Future { stoppingVersionedStore.putLatest(id = "1")(t = "tapir") }
+      val future = Future {
+        stoppingVersionedStore.putLatest(id = "1")(t = "tapir")
+      }
 
       // Wait for a bit, so it gets stuck.
       Thread.sleep(250)
@@ -237,7 +244,8 @@ class VersionedStoreRaceConditionsTest
         Thread.sleep(250)
 
         // Now call update() in the working store, so incrementing the version.
-        workingVersionedStore.update(id = "1")(t => Right(t.toUpperCase)) shouldBe a[Right[_, _]]
+        workingVersionedStore.update(id = "1")(t => Right(t.toUpperCase)) shouldBe a[
+          Right[_, _]]
 
         // Once those both succeed, we can allow the second max() call to proceed.
         stores.allowedMaxCalls += 1
@@ -247,7 +255,9 @@ class VersionedStoreRaceConditionsTest
 
           val updateError = result.left.value
           updateError shouldBe a[UpdateWriteError]
-          updateError.asInstanceOf[UpdateWriteError].err shouldBe a[VersionAlreadyExistsError]
+          updateError
+            .asInstanceOf[UpdateWriteError]
+            .err shouldBe a[VersionAlreadyExistsError]
           updateError shouldBe a[RetryableError]
         }
       }
@@ -261,13 +271,15 @@ class VersionedStoreRaceConditionsTest
 
         // Call upsert() in the stopping store.  This will get stuck waiting for max().
         val future = Future {
-          stoppingVersionedStore.upsert(id = "1")(t = "Tarantula")(t => Right(t.toLowerCase))
+          stoppingVersionedStore.upsert(id = "1")(t = "Tarantula")(t =>
+            Right(t.toLowerCase))
         }
 
         Thread.sleep(250)
 
         // Now call upsert() in the working store, so incrementing the version.
-        workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t => Right(t.toUpperCase)) shouldBe a[Right[_, _]]
+        workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t =>
+          Right(t.toUpperCase)) shouldBe a[Right[_, _]]
 
         // Once those both succeed, we can allow the second max() call to proceed.
         stores.allowedMaxCalls += 1
@@ -277,7 +289,9 @@ class VersionedStoreRaceConditionsTest
 
           val updateError = result.left.value
           updateError shouldBe a[UpdateWriteError]
-          updateError.asInstanceOf[UpdateWriteError].err shouldBe a[VersionAlreadyExistsError]
+          updateError
+            .asInstanceOf[UpdateWriteError]
+            .err shouldBe a[VersionAlreadyExistsError]
           updateError shouldBe a[RetryableError]
         }
       }
@@ -301,8 +315,10 @@ class VersionedStoreRaceConditionsTest
 
       Thread.sleep(250)
 
-      workingVersionedStore.update(id = "1")(t => Right(t.toUpperCase)) shouldBe a[Right[_, _]]
-      workingVersionedStore.update(id = "1")(t => Right(t + t)) shouldBe a[Right[_, _]]
+      workingVersionedStore.update(id = "1")(t => Right(t.toUpperCase)) shouldBe a[
+        Right[_, _]]
+      workingVersionedStore.update(id = "1")(t => Right(t + t)) shouldBe a[
+        Right[_, _]]
 
       // Once those both succeed, we can allow the second max() call to proceed.
       stores.allowedMaxCalls += 1
@@ -312,7 +328,9 @@ class VersionedStoreRaceConditionsTest
 
         val updateError = result.left.value
         updateError shouldBe a[UpdateWriteError]
-        updateError.asInstanceOf[UpdateWriteError].err shouldBe a[HigherVersionExistsError]
+        updateError
+          .asInstanceOf[UpdateWriteError]
+          .err shouldBe a[HigherVersionExistsError]
         updateError shouldBe a[RetryableError]
       }
     }
@@ -326,14 +344,17 @@ class VersionedStoreRaceConditionsTest
 
       // Call upsert() in the stopping store.  This will get stuck waiting for max().
       val future = Future {
-        stoppingVersionedStore.upsert(id = "1")(t = "Tarantula")(t => Right(t.toLowerCase))
+        stoppingVersionedStore.upsert(id = "1")(t = "Tarantula")(t =>
+          Right(t.toLowerCase))
       }
 
       Thread.sleep(250)
 
       // Now call upsert() in the working store, so incrementing the version.
-      workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t => Right(t.toUpperCase)) shouldBe a[Right[_, _]]
-      workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t => Right(t + t)) shouldBe a[Right[_, _]]
+      workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t =>
+        Right(t.toUpperCase)) shouldBe a[Right[_, _]]
+      workingVersionedStore.upsert(id = "1")(t = "Terrapin")(t => Right(t + t)) shouldBe a[
+        Right[_, _]]
 
       // Once those both succeed, we can allow the second max() call to proceed.
       stores.allowedMaxCalls += 1
@@ -343,7 +364,9 @@ class VersionedStoreRaceConditionsTest
 
         val updateError = result.left.value
         updateError shouldBe a[UpdateWriteError]
-        updateError.asInstanceOf[UpdateWriteError].err shouldBe a[HigherVersionExistsError]
+        updateError
+          .asInstanceOf[UpdateWriteError]
+          .err shouldBe a[HigherVersionExistsError]
         updateError shouldBe a[RetryableError]
       }
     }

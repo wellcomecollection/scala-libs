@@ -15,14 +15,14 @@ class TokenExchangeTest extends AnyFunSpec with Matchers with ScalaFutures {
   type Token = String
 
   class MemoryTokenExchange(
-                             tokens: Seq[(Credentials, Instant)]
-                           )(implicit val ec: ExecutionContext)
-    extends TokenExchange[Credentials, Token] {
+    tokens: Seq[(Credentials, Instant)]
+  )(implicit val ec: ExecutionContext)
+      extends TokenExchange[Credentials, Token] {
     var calls = 0
     override val expiryGracePeriod: Duration = 0.seconds
 
     override protected def getNewToken(
-                                        credentials: Credentials): Future[(Token, Instant)] =
+      credentials: Credentials): Future[(Token, Instant)] =
       synchronized {
         val index = calls
         calls += 1
@@ -89,4 +89,3 @@ class TokenExchangeTest extends AnyFunSpec with Matchers with ScalaFutures {
     }
   }
 }
-

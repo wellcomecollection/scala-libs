@@ -43,7 +43,8 @@ trait DynamoHybridStoreTestCases[
   type S3TypedStoreImpl = S3TypedStore[Record]
   type DynamoIndexedStoreImpl = DynamoStoreImpl
 
-  def createPrefix(implicit context: (Bucket, Table)): S3ObjectLocationPrefix = {
+  def createPrefix(
+    implicit context: (Bucket, Table)): S3ObjectLocationPrefix = {
     val (bucket, _) = context
     createS3ObjectLocationPrefixWith(bucket)
   }
@@ -134,17 +135,16 @@ trait DynamoHybridStoreTestCases[
             withNamespace { implicit namespace =>
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
-                      val hybridStoreEntry = createT
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
+                    val hybridStoreEntry = createT
 
-                      val result = hybridStore.put(id)(hybridStoreEntry)
-                      val value = result.left.value
+                    val result = hybridStore.put(id)(hybridStoreEntry)
+                    val value = result.left.value
 
-                      value shouldBe a[StoreWriteError]
-                      value.e.getMessage should startWith(
-                        "The specified bucket does not exist")
+                    value shouldBe a[StoreWriteError]
+                    value.e.getMessage should startWith(
+                      "The specified bucket does not exist")
                   }
                 }
               }
@@ -162,17 +162,16 @@ trait DynamoHybridStoreTestCases[
             withNamespace { implicit namespace =>
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
-                      val hybridStoreEntry = createT
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
+                    val hybridStoreEntry = createT
 
-                      val result = hybridStore.put(id)(hybridStoreEntry)
-                      val value = result.left.value
+                    val result = hybridStore.put(id)(hybridStoreEntry)
+                    val value = result.left.value
 
-                      value shouldBe a[StoreWriteError]
-                      value.e.getMessage should startWith(
-                        "The specified bucket is not valid")
+                    value shouldBe a[StoreWriteError]
+                    value.e.getMessage should startWith(
+                      "The specified bucket is not valid")
                   }
                 }
               }
@@ -225,17 +224,16 @@ trait DynamoHybridStoreTestCases[
             withNamespace { implicit namespace =>
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
-                      val hybridStoreEntry = createT
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
+                    val hybridStoreEntry = createT
 
-                      val result = hybridStore.put(id)(hybridStoreEntry)
-                      val value = result.left.value
+                    val result = hybridStore.put(id)(hybridStoreEntry)
+                    val value = result.left.value
 
-                      value shouldBe a[StoreWriteError]
-                      value.e.getMessage should startWith(
-                        "Cannot do operations on a non-existent table")
+                    value shouldBe a[StoreWriteError]
+                    value.e.getMessage should startWith(
+                      "Cannot do operations on a non-existent table")
                   }
                 }
               }
@@ -252,22 +250,21 @@ trait DynamoHybridStoreTestCases[
 
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
-                      val hybridStoreEntry = createT
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
+                    val hybridStoreEntry = createT
 
-                      hybridStore.put(id)(hybridStoreEntry) shouldBe a[
-                        Right[_, _]]
+                    hybridStore.put(id)(hybridStoreEntry) shouldBe a[Right[_,
+                                                                           _]]
 
-                      val indexedEntry = indexedStore.get(id).value
-                      val s3Location = indexedEntry.identifiedT
+                    val indexedEntry = indexedStore.get(id).value
+                    val s3Location = indexedEntry.identifiedT
 
-                      s3Client.deleteObject(s3Location.bucket, s3Location.key)
+                    s3Client.deleteObject(s3Location.bucket, s3Location.key)
 
-                      val value = hybridStore.get(id).left.value
+                    val value = hybridStore.get(id).left.value
 
-                      value shouldBe a[DanglingHybridStorePointerError]
+                    value shouldBe a[DanglingHybridStorePointerError]
                   }
                 }
               }
@@ -283,25 +280,24 @@ trait DynamoHybridStoreTestCases[
 
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
-                      val hybridStoreEntry = createT
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
+                    val hybridStoreEntry = createT
 
-                      hybridStore.put(id)(hybridStoreEntry) shouldBe a[
-                        Right[_, _]]
+                    hybridStore.put(id)(hybridStoreEntry) shouldBe a[Right[_,
+                                                                           _]]
 
-                      val indexedEntry = indexedStore.get(id).value
-                      val s3Location = indexedEntry.identifiedT
+                    val indexedEntry = indexedStore.get(id).value
+                    val s3Location = indexedEntry.identifiedT
 
-                      s3Client.deleteObject(s3Location.bucket, s3Location.key)
-                      s3Client.deleteBucket(s3Location.bucket)
+                    s3Client.deleteObject(s3Location.bucket, s3Location.key)
+                    s3Client.deleteBucket(s3Location.bucket)
 
-                      val value = hybridStore.get(id).left.value
+                    val value = hybridStore.get(id).left.value
 
-                      value shouldBe a[DanglingHybridStorePointerError]
-                      value.e.getMessage should startWith(
-                        "The specified bucket does not exist")
+                    value shouldBe a[DanglingHybridStorePointerError]
+                    value.e.getMessage should startWith(
+                      "The specified bucket does not exist")
                   }
                 }
               }
@@ -317,23 +313,22 @@ trait DynamoHybridStoreTestCases[
 
               withTypedStoreImpl { typedStore =>
                 withIndexedStoreImpl { indexedStore =>
-                  withHybridStoreImpl(typedStore, indexedStore) {
-                    hybridStore =>
-                      val id = createId
+                  withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                    val id = createId
 
-                      case class BadRow(id: String,
-                                        version: Int,
-                                        contents: String)
+                    case class BadRow(id: String,
+                                      version: Int,
+                                      contents: String)
 
-                      putTableItem(
-                        item = BadRow(id.id, id.version, randomAlphanumeric()),
-                        table = table
-                      )
+                    putTableItem(
+                      item = BadRow(id.id, id.version, randomAlphanumeric()),
+                      table = table
+                    )
 
-                      val value = hybridStore.get(id).left.value
+                    val value = hybridStore.get(id).left.value
 
-                      value shouldBe a[StoreReadError]
-                      value.e.getMessage should startWith("DynamoReadError")
+                    value shouldBe a[StoreReadError]
+                    value.e.getMessage should startWith("DynamoReadError")
                   }
                 }
               }

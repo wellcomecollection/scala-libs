@@ -1,7 +1,7 @@
 package weco.messaging.fixtures
 
 import grizzled.slf4j.Logging
-import io.circe.{Decoder, Json, ParsingFailure, yaml}
+import io.circe.{yaml, Decoder, Json, ParsingFailure}
 import org.scalatest.matchers.should.Matchers
 import software.amazon.awssdk.auth.credentials.{
   AwsBasicCredentials,
@@ -37,11 +37,11 @@ trait SNS extends Matchers with Logging with RandomGenerators {
   private val localSNSEndpointUrl = "http://localhost:9292"
 
   implicit val snsClient: SnsClient =
-    SnsClient.builder()
+    SnsClient
+      .builder()
       .region(Region.of("localhost"))
-      .credentialsProvider(
-        StaticCredentialsProvider.create(
-          AwsBasicCredentials.create("access", "secret")))
+      .credentialsProvider(StaticCredentialsProvider.create(
+        AwsBasicCredentials.create("access", "secret")))
       .endpointOverride(new URI(localSNSEndpointUrl))
       .build()
 

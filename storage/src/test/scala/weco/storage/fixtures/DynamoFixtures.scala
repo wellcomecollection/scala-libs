@@ -4,7 +4,12 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.matchers.should.Matchers
 import org.scanamo.query.UniqueKey
 import org.scanamo.syntax._
-import org.scanamo.{DynamoFormat, DynamoReadError, Scanamo, Table => ScanamoTable}
+import org.scanamo.{
+  DynamoFormat,
+  DynamoReadError,
+  Scanamo,
+  Table => ScanamoTable
+}
 import software.amazon.awssdk.auth.credentials.{
   AwsBasicCredentials,
   StaticCredentialsProvider
@@ -30,10 +35,10 @@ trait DynamoFixtures
   import DynamoFixtures._
 
   implicit val dynamoClient: DynamoDbClient =
-    DynamoDbClient.builder()
-      .credentialsProvider(
-        StaticCredentialsProvider.create(
-          AwsBasicCredentials.create("access", "secret")))
+    DynamoDbClient
+      .builder()
+      .credentialsProvider(StaticCredentialsProvider.create(
+        AwsBasicCredentials.create("access", "secret")))
       .endpointOverride(new URI("http://localhost:45678"))
       .build()
 
@@ -119,12 +124,14 @@ trait DynamoFixtures
       maybeIndexName = Some(table.index)
     )
 
-  def createTableFromRequest(table: Table,
-                             requestBuilder: CreateTableRequest.Builder): Table = {
+  def createTableFromRequest(
+    table: Table,
+    requestBuilder: CreateTableRequest.Builder): Table = {
     val request =
       requestBuilder
         .provisionedThroughput(
-          ProvisionedThroughput.builder()
+          ProvisionedThroughput
+            .builder()
             .readCapacityUnits(1L)
             .writeCapacityUnits(1L)
             .build()
@@ -147,15 +154,18 @@ trait DynamoFixtures
   ): Table =
     createTableFromRequest(
       table = table,
-      CreateTableRequest.builder()
+      CreateTableRequest
+        .builder()
         .tableName(table.name)
         .keySchema(
-          KeySchemaElement.builder()
+          KeySchemaElement
+            .builder()
             .attributeName(keyName)
             .keyType(KeyType.HASH)
             .build())
         .attributeDefinitions(
-          AttributeDefinition.builder()
+          AttributeDefinition
+            .builder()
             .attributeName(keyName)
             .attributeType(keyType)
             .build()
@@ -170,24 +180,29 @@ trait DynamoFixtures
     rangeKeyType: ScalarAttributeType = ScalarAttributeType.N): Table =
     createTableFromRequest(
       table = table,
-      CreateTableRequest.builder()
+      CreateTableRequest
+        .builder()
         .tableName(table.name)
         .keySchema(
-          KeySchemaElement.builder()
+          KeySchemaElement
+            .builder()
             .attributeName(hashKeyName)
             .keyType(KeyType.HASH)
             .build(),
-          KeySchemaElement.builder()
+          KeySchemaElement
+            .builder()
             .attributeName(rangeKeyName)
             .keyType(KeyType.RANGE)
             .build()
         )
         .attributeDefinitions(
-          AttributeDefinition.builder()
+          AttributeDefinition
+            .builder()
             .attributeName(hashKeyName)
             .attributeType(hashKeyType)
             .build(),
-          AttributeDefinition.builder()
+          AttributeDefinition
+            .builder()
             .attributeName(rangeKeyName)
             .attributeType(rangeKeyType)
             .build()

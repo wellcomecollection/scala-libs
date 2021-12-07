@@ -2,7 +2,7 @@ package weco.storage.fixtures
 
 import com.azure.storage.blob.{BlobServiceClient, BlobServiceClientBuilder}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import weco.fixtures.{Fixture, fixture}
+import weco.fixtures.{fixture, Fixture}
 import weco.storage.generators.AzureBlobLocationGenerators
 
 object AzureFixtures {
@@ -15,7 +15,10 @@ object AzureFixtures {
   }
 }
 
-trait AzureFixtures extends Eventually with IntegrationPatience with AzureBlobLocationGenerators {
+trait AzureFixtures
+    extends Eventually
+    with IntegrationPatience
+    with AzureBlobLocationGenerators {
   import AzureFixtures._
 
   implicit val azureClient: BlobServiceClient =

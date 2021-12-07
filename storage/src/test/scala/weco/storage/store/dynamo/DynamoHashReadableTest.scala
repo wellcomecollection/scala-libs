@@ -45,9 +45,7 @@ class DynamoHashReadableTest
 
   override def createTable(table: Table): Table = createTableWithHashKey(table)
 
-  override def createEntry(hashKey: String,
-                           v: Int,
-                           record: Record): HashEntry =
+  override def createEntry(hashKey: String, v: Int, record: Record): HashEntry =
     DynamoHashEntry(hashKey, v, record)
 
   describe("DynamoHashReadable") {
@@ -105,7 +103,8 @@ class DynamoHashReadableTest
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
-          mockClient, ScanamoTable[HashEntry](table.name)
+          mockClient,
+          ScanamoTable[HashEntry](table.name)
         )
 
         readable.consistencyMode shouldBe EventuallyConsistent
@@ -121,7 +120,8 @@ class DynamoHashReadableTest
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
-          mockClient, ScanamoTable[HashEntry](table.name)
+          mockClient,
+          ScanamoTable[HashEntry](table.name)
         ) {
           override val consistencyMode: ConsistencyMode = EventuallyConsistent
         }
@@ -137,7 +137,8 @@ class DynamoHashReadableTest
 
       withLocalDynamoDbTable { table =>
         val readable = new DynamoHashReadableImpl(
-          mockClient, ScanamoTable[HashEntry](table.name)
+          mockClient,
+          ScanamoTable[HashEntry](table.name)
         ) {
           override val consistencyMode: ConsistencyMode = StronglyConsistent
         }

@@ -24,21 +24,22 @@ class MemoryTypedStoreTest
 
   override def withBrokenStreamStore[R](
     testWith: TestWith[MemoryStreamStore[String], R]): R = {
-    val brokenMemoryStore = new MemoryStore[String, Array[Byte]](
-      initialEntries = Map.empty) {
-      override def get(id: String)
-        : Either[ReadError, Identified[String, Array[Byte]]] = Left(
-        StoreReadError(new Throwable("get: BOOM!"))
-      )
-
-      override def put(id: String)(bytes: Array[Byte])
-        : Either[WriteError, Identified[String, Array[Byte]]] =
-        Left(
-          StoreWriteError(
-            new Throwable("put: BOOM!")
+    val brokenMemoryStore =
+      new MemoryStore[String, Array[Byte]](initialEntries = Map.empty) {
+        override def get(
+          id: String): Either[ReadError, Identified[String, Array[Byte]]] =
+          Left(
+            StoreReadError(new Throwable("get: BOOM!"))
           )
-        )
-    }
+
+        override def put(id: String)(bytes: Array[Byte])
+          : Either[WriteError, Identified[String, Array[Byte]]] =
+          Left(
+            StoreWriteError(
+              new Throwable("put: BOOM!")
+            )
+          )
+      }
 
     testWith(
       new MemoryStreamStore[String](brokenMemoryStore)
@@ -47,8 +48,8 @@ class MemoryTypedStoreTest
 
   override def withSingleValueStreamStore[R](rawStream: InputStream)(
     testWith: TestWith[MemoryStreamStore[String], R]): R = {
-    val memoryStore = new MemoryStore[String, Array[Byte]](
-      initialEntries = Map.empty)
+    val memoryStore =
+      new MemoryStore[String, Array[Byte]](initialEntries = Map.empty)
 
     testWith(
       new MemoryStreamStore[String](memoryStore) {

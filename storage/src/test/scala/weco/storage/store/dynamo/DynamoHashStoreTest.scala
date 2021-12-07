@@ -63,8 +63,7 @@ class DynamoHashStoreTest
 
   override def createTable(table: Table): Table = createTableWithHashKey(table)
 
-  override def createId(
-    implicit namespace: String): Version[IdentityKey, Int] =
+  override def createId(implicit namespace: String): Version[IdentityKey, Int] =
     Version(id = IdentityKey(randomAlphanumeric()), version = 1)
 
   override def withMaxima[R](
