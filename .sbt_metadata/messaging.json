@@ -1,0 +1,10 @@
+{
+  "id" : "messaging",
+  "folder" : "messaging",
+  "dependencyIds" : [
+    "typesafe_app",
+    "fixtures",
+    "json",
+    "monitoring"
+  ]
+}

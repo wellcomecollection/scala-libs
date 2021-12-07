@@ -1,0 +1,9 @@
+{
+  "id" : "sierra",
+  "folder" : "sierra",
+  "dependencyIds" : [
+    "fixtures",
+    "http",
+    "json"
+  ]
+}

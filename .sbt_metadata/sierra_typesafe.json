@@ -1,0 +1,8 @@
+{
+  "id" : "sierra_typesafe",
+  "folder" : "sierra_typesafe",
+  "dependencyIds" : [
+    "sierra",
+    "typesafe_app"
+  ]
+}
