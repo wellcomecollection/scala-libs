@@ -1,0 +1,9 @@
+{
+  "id" : "storage",
+  "folder" : "storage",
+  "dependencyIds" : [
+    "typesafe_app",
+    "fixtures",
+    "json"
+  ]
+}

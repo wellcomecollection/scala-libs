@@ -47,7 +47,9 @@ trait LockingServiceFixtures[Ident, ContextId, LockDaoContext]
     successfulRightOf(result) shouldBe expectedResult
   }
 
-  def assertFailedLock(result: ResultF, lockIds: Set[Ident], expectedFailures: Set[Ident]): Assertion = {
+  def assertFailedLock(result: ResultF,
+                       lockIds: Set[Ident],
+                       expectedFailures: Set[Ident]): Assertion = {
     debug(s"Got $result, with $lockIds")
     val failedLock = successfulLeftOf(result)
       .asInstanceOf[FailedLock[ContextId, Ident]]

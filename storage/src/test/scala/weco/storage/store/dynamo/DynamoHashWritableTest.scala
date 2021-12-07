@@ -56,9 +56,7 @@ class DynamoHashWritableTest
       .value
       .payload
 
-  override def createEntry(hashKey: String,
-                           v: Int,
-                           record: Record): HashEntry =
+  override def createEntry(hashKey: String, v: Int, record: Record): HashEntry =
     DynamoHashEntry(hashKey, v, record)
 
   override def createTable(table: Table): Table =

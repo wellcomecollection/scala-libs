@@ -14,7 +14,8 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
       override def incrementCount(metricName: String): Future[Unit] =
         Future.failed(new RuntimeException("BOOM!"))
 
-      override def recordValue(metricName: String, value: Double): Future[Unit] =
+      override def recordValue(metricName: String,
+                               value: Double): Future[Unit] =
         Future.failed(new RuntimeException("BOOM!"))
     }
 
@@ -22,7 +23,9 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
     namespace: String = s"ns-${randomAlphanumeric()}",
     metrics: MemoryMetrics = new MemoryMetrics
   )(
-    testWith: TestWith[(String, MemoryMetrics, MetricsMonitoringProcessor[Work]), R]
+    testWith: TestWith[
+      (String, MemoryMetrics, MetricsMonitoringProcessor[Work]),
+      R]
   )(
     implicit ec: ExecutionContext
   ): R = {
@@ -34,7 +37,9 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
   protected def assertMetricCount(metrics: MemoryMetrics,
                                   metricName: String,
                                   expectedCount: Int): Assertion =
-    metrics.incrementedCounts shouldBe (1 to expectedCount).map { _ => metricName}
+    metrics.incrementedCounts shouldBe (1 to expectedCount).map { _ =>
+      metricName
+    }
 
   protected def assertMetricDurations(metrics: MemoryMetrics,
                                       metricName: String,

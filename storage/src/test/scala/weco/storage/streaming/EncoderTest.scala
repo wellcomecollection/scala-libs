@@ -27,9 +27,7 @@ class EncoderTest
         val bytes = randomBytes()
         val stream = bytesEncoder.toStream(bytes)
 
-        IOUtils.contentEquals(
-          stream.value,
-          new ByteArrayInputStream(bytes)) shouldBe true
+        IOUtils.contentEquals(stream.value, new ByteArrayInputStream(bytes)) shouldBe true
       }
 
       it("a string") {

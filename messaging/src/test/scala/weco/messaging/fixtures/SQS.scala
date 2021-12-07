@@ -42,11 +42,11 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
 
   implicit val asyncSqsClient: SqsAsyncClient =
-    SqsAsyncClient.builder()
+    SqsAsyncClient
+      .builder()
       .region(Region.of("localhost"))
-      .credentialsProvider(
-        StaticCredentialsProvider.create(
-          AwsBasicCredentials.create("access", "key")))
+      .credentialsProvider(StaticCredentialsProvider.create(
+        AwsBasicCredentials.create("access", "key")))
       .endpointOverride(new URI("http://localhost:9324"))
       .build()
 
@@ -62,8 +62,9 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       }
       .get()
 
-  private def getQueueAttributes(queueUrl: String,
-                                 attributeNames: QueueAttributeName*): Map[QueueAttributeName, String] = {
+  private def getQueueAttributes(
+    queueUrl: String,
+    attributeNames: QueueAttributeName*): Map[QueueAttributeName, String] = {
     val attributeValues =
       asyncSqsClient
         .getQueueAttributes { builder: GetQueueAttributesRequest.Builder =>
@@ -74,9 +75,9 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         .get()
         .attributes()
 
-    attributeNames
-      .map { name => name -> attributeValues.get(name)}
-      .toMap
+    attributeNames.map { name =>
+      name -> attributeValues.get(name)
+    }.toMap
   }
 
   def createQueueName: String =
@@ -89,13 +90,14 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     fixture[Queue, R](
       create = {
         val response = asyncSqsClient
-          .createQueue {
-            builder: CreateQueueRequest.Builder =>
-              builder.queueName(queueName)
+          .createQueue { builder: CreateQueueRequest.Builder =>
+            builder.queueName(queueName)
           }
           .get()
 
-        val arn = getQueueAttributes(response.queueUrl(), QueueAttributeName.QUEUE_ARN)(QueueAttributeName.QUEUE_ARN)
+        val arn =
+          getQueueAttributes(response.queueUrl(), QueueAttributeName.QUEUE_ARN)(
+            QueueAttributeName.QUEUE_ARN)
 
         val queue = Queue(
           url = response.queueUrl(),
@@ -112,16 +114,12 @@ trait SQS extends Matchers with Logging with RandomGenerators {
         queue
       },
       destroy = { queue =>
-        asyncSqsClient
-          .purgeQueue { builder: PurgeQueueRequest.Builder =>
-            builder.queueUrl(queue.url)
-          }
-          .get
-        asyncSqsClient
-          .deleteQueue { builder: DeleteQueueRequest.Builder =>
-            builder.queueUrl(queue.url)
-          }
-          .get
+        asyncSqsClient.purgeQueue { builder: PurgeQueueRequest.Builder =>
+          builder.queueUrl(queue.url)
+        }.get
+        asyncSqsClient.deleteQueue { builder: DeleteQueueRequest.Builder =>
+          builder.queueUrl(queue.url)
+        }.get
       }
     )
 
@@ -180,30 +178,25 @@ trait SQS extends Matchers with Logging with RandomGenerators {
     sendMessageToSqsClient(queue = queue, body = toJson[T](obj).get)
 
   def sendInvalidJSONto(queue: Queue): SendMessageResponse =
-    sendMessageToSqsClient(
-      queue = queue,
-      body = randomAlphanumeric())
+    sendMessageToSqsClient(queue = queue, body = randomAlphanumeric())
 
   private def sendMessageToSqsClient(queue: Queue,
                                      body: String): SendMessageResponse = {
     debug(s"Sending message to ${queue.url}: $body")
 
-    asyncSqsClient
-      .sendMessage { builder: SendMessageRequest.Builder =>
-        builder.queueUrl(queue.url).messageBody(body)
-      }
-      .get
+    asyncSqsClient.sendMessage { builder: SendMessageRequest.Builder =>
+      builder.queueUrl(queue.url).messageBody(body)
+    }.get
   }
 
   /** Returns a rough count of all the messages on a queue. */
-  private def countMessagesOnQueue(queue: Queue): Map[QueueAttributeName, Int] = {
+  private def countMessagesOnQueue(
+    queue: Queue): Map[QueueAttributeName, Int] = {
     val attributeNames = Seq(
       // Messages available for retrieval
       QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES,
-
       // Messages in the queue and not available for reading immediately
       QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_DELAYED,
-
       // Messages currently in flight
       QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE,
     )
@@ -213,11 +206,12 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   }
 
   def assertQueueEmpty(queue: Queue): Unit = {
-    countMessagesOnQueue(queue).foreach { case (name, count) =>
-      assert(
-        count == 0,
-        s"Expected ${queue.url} to have $name == 0, got $name == $count"
-      )
+    countMessagesOnQueue(queue).foreach {
+      case (name, count) =>
+        assert(
+          count == 0,
+          s"Expected ${queue.url} to have $name == 0, got $name == $count"
+        )
     }
   }
 

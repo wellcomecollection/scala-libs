@@ -16,19 +16,16 @@ import weco.storage.{
 }
 import weco.storage.generators.StreamGenerators
 
-trait HybridStoreTestCases[IndexedStoreId,
-                           TypedStoreId,
-                           T,
-                           Namespace,
-                           TypedStoreImpl <: TypedStore[TypedStoreId, T],
-                           IndexedStoreImpl <: Store[IndexedStoreId, TypedStoreId],
-                           HybridStoreContext]
+trait HybridStoreTestCases[
+  IndexedStoreId,
+  TypedStoreId,
+  T,
+  Namespace,
+  TypedStoreImpl <: TypedStore[TypedStoreId, T],
+  IndexedStoreImpl <: Store[IndexedStoreId, TypedStoreId],
+  HybridStoreContext]
     extends AnyFunSpec
-    with StoreTestCases[
-      IndexedStoreId,
-      T,
-      Namespace,
-      HybridStoreContext]
+    with StoreTestCases[IndexedStoreId, T, Namespace, HybridStoreContext]
     with Matchers
     with StreamGenerators
     with EitherValues {
@@ -57,12 +54,10 @@ trait HybridStoreTestCases[IndexedStoreId,
   def withBrokenGetTypedStoreImpl[R](testWith: TestWith[TypedStoreImpl, R])(
     implicit context: HybridStoreContext): R
 
-  def withBrokenPutIndexedStoreImpl[R](
-    testWith: TestWith[IndexedStoreImpl, R])(
+  def withBrokenPutIndexedStoreImpl[R](testWith: TestWith[IndexedStoreImpl, R])(
     implicit context: HybridStoreContext): R
 
-  def withBrokenGetIndexedStoreImpl[R](
-    testWith: TestWith[IndexedStoreImpl, R])(
+  def withBrokenGetIndexedStoreImpl[R](testWith: TestWith[IndexedStoreImpl, R])(
     implicit context: HybridStoreContext): R
 
   override def withStoreImpl[R](
@@ -220,8 +215,8 @@ trait HybridStoreTestCases[IndexedStoreId,
                       length = byteLength
                     )
 
-                    typedStore.streamStore.put(typeStoreId)(
-                      inputStream) shouldBe a[Right[_, _]]
+                    typedStore.streamStore.put(typeStoreId)(inputStream) shouldBe a[
+                      Right[_, _]]
 
                     val value = hybridStoreImpl.get(id).left.value
 

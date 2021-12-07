@@ -22,7 +22,8 @@ class AzurePutBlockFromURLTransferTest
     with S3Fixtures
     with AzureFixtures
     with AzureTransferFixtures
-    with TableDrivenPropertyChecks with MockitoSugar {
+    with TableDrivenPropertyChecks
+    with MockitoSugar {
   val srcStore: S3TypedStore[String] = S3TypedStore[String]
   val dstStore: AzureTypedStore[String] = AzureTypedStore[String]
 
@@ -118,26 +119,29 @@ class AzurePutBlockFromURLTransferTest
     }
   }
 
-  it("passes the expiry flag to the S3Uploader"){
+  it("passes the expiry flag to the S3Uploader") {
     val s3Uploader = spy(new S3Uploader())
     val urlValidity = 1 minute
-    val transfer = new AzurePutBlockFromUrlTransfer(s3Uploader, new AzureSizeFinder(), new AzurePutBlockTransfer())(urlValidity, 10L)
+    val transfer = new AzurePutBlockFromUrlTransfer(
+      s3Uploader,
+      new AzureSizeFinder(),
+      new AzurePutBlockTransfer())(urlValidity, 10L)
 
     withLocalS3Bucket { bucket =>
       withAzureContainer { container =>
-          val src = createS3ObjectLocationWith(bucket)
+        val src = createS3ObjectLocationWith(bucket)
         val dst = createAzureBlobLocationWith(container)
 
-          srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
+        srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
 
-          transfer.transfer(
-            src = createS3ObjectSummaryFrom(src),
-            dst = dst,
-            checkForExisting = true
-          )
+        transfer.transfer(
+          src = createS3ObjectSummaryFrom(src),
+          dst = dst,
+          checkForExisting = true
+        )
 
         verify(s3Uploader).getPresignedGetURL(src, urlValidity)
-        }
       }
+    }
   }
 }

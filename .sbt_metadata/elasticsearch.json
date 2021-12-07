@@ -1,0 +1,8 @@
+{
+  "id" : "elasticsearch",
+  "folder" : "elasticsearch",
+  "dependencyIds" : [
+    "fixtures",
+    "json"
+  ]
+}

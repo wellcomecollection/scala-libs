@@ -5,7 +5,9 @@ import org.scalatest.matchers.should.Matchers
 
 class AzureBlobLocationTest extends AnyFunSpec with Matchers {
   describe("AzureBlobLocation") {
-    val loc = AzureBlobLocation(container = "my-azure-container", name = "path/to/pictures")
+    val loc = AzureBlobLocation(
+      container = "my-azure-container",
+      name = "path/to/pictures")
 
     it("joins paths") {
       loc.join("cats", "devon-rex.jpg") shouldBe AzureBlobLocation(
@@ -34,13 +36,17 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("blocks the . and .. characters in the blob name") {
       val err1 = intercept[IllegalArgumentException] {
-        AzureBlobLocation(container = "my-azure-container", name = "path/./to/pictures")
+        AzureBlobLocation(
+          container = "my-azure-container",
+          name = "path/./to/pictures")
       }
 
       err1.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/./to/pictures"
 
       val err2 = intercept[IllegalArgumentException] {
-        AzureBlobLocation(container = "my-azure-container", name = "path/../to/pictures")
+        AzureBlobLocation(
+          container = "my-azure-container",
+          name = "path/../to/pictures")
       }
 
       err2.getMessage shouldBe "requirement failed: Azure blob name cannot contain '.' or '..' entries: path/../to/pictures"
@@ -48,7 +54,9 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("blocks multiple consecutive slashes") {
       val err = intercept[IllegalArgumentException] {
-        AzureBlobLocation(container = "my-azure-container", name = "path//to/pictures")
+        AzureBlobLocation(
+          container = "my-azure-container",
+          name = "path//to/pictures")
       }
 
       err.getMessage shouldBe "requirement failed: Azure blob name cannot include multiple consecutive slashes: path//to/pictures"
@@ -56,7 +64,9 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("blocks a trailing slash") {
       val err = intercept[IllegalArgumentException] {
-        AzureBlobLocation(container = "my-azure-container", name = "path/to/cat.jpg/")
+        AzureBlobLocation(
+          container = "my-azure-container",
+          name = "path/to/cat.jpg/")
       }
 
       err.getMessage shouldBe "requirement failed: Azure blob name cannot end with a slash: path/to/cat.jpg/"
@@ -93,13 +103,17 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("blocks the . and .. characters in the blob name") {
       val err1 = intercept[IllegalArgumentException] {
-        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/./to/pictures")
+        AzureBlobLocationPrefix(
+          container = "my-azure-container",
+          namePrefix = "path/./to/pictures")
       }
 
       err1.getMessage shouldBe "requirement failed: Azure blob name prefix cannot contain '.' or '..' entries: path/./to/pictures"
 
       val err2 = intercept[IllegalArgumentException] {
-        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/../to/pictures")
+        AzureBlobLocationPrefix(
+          container = "my-azure-container",
+          namePrefix = "path/../to/pictures")
       }
 
       err2.getMessage shouldBe "requirement failed: Azure blob name prefix cannot contain '.' or '..' entries: path/../to/pictures"
@@ -107,20 +121,26 @@ class AzureBlobLocationTest extends AnyFunSpec with Matchers {
 
     it("blocks multiple consecutive slashes") {
       val err1 = intercept[IllegalArgumentException] {
-        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/to/pictures//")
+        AzureBlobLocationPrefix(
+          container = "my-azure-container",
+          namePrefix = "path/to/pictures//")
       }
 
       err1.getMessage shouldBe "requirement failed: Azure blob name prefix cannot include multiple consecutive slashes: path/to/pictures//"
 
       val err2 = intercept[IllegalArgumentException] {
-        AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path//to/pictures")
+        AzureBlobLocationPrefix(
+          container = "my-azure-container",
+          namePrefix = "path//to/pictures")
       }
 
       err2.getMessage shouldBe "requirement failed: Azure blob name prefix cannot include multiple consecutive slashes: path//to/pictures"
     }
 
     it("allows a trailing slash") {
-      AzureBlobLocationPrefix(container = "my-azure-container", namePrefix = "path/to/pictures/")
+      AzureBlobLocationPrefix(
+        container = "my-azure-container",
+        namePrefix = "path/to/pictures/")
     }
   }
 }

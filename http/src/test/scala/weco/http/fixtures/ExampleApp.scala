@@ -18,11 +18,10 @@ object ExampleApp {
     val routes: Route = concat(
       pathPrefix("example") {
         post {
-          entity(as[ExampleResource]) {
-            exampleResource: ExampleResource =>
-              withFuture {
-                Future(complete(Accepted -> postTransform(exampleResource)))
-              }
+          entity(as[ExampleResource]) { exampleResource: ExampleResource =>
+            withFuture {
+              Future(complete(Accepted -> postTransform(exampleResource)))
+            }
           }
         } ~ get {
           complete(getTransform())
@@ -32,13 +31,15 @@ object ExampleApp {
   }
 
   val exampleApi = new ExampleApi {
-    override def getTransform(): ExampleResource = ExampleResource("hello world")
+    override def getTransform(): ExampleResource =
+      ExampleResource("hello world")
 
     override def postTransform(exampleResource: ExampleResource): String = "ok"
   }
 
   val brokenExampleApi = new ExampleApi {
-    override def getTransform(): ExampleResource = throw new Exception("BOOM!!!")
+    override def getTransform(): ExampleResource =
+      throw new Exception("BOOM!!!")
 
     override def postTransform(exampleResource: ExampleResource): String =
       throw new Exception("BOOM!!!")

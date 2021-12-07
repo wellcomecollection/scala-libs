@@ -70,11 +70,9 @@ class MemoryVersionedStoreTest
     testWith(new MemoryVersionedStore(store))
   }
 
-  override def withStoreContext[R](
-    testWith: TestWith[
-      MemoryStore[Version[String, Int], Record] with MemoryMaxima[String,
-                                                                  Record],
-      R]): R =
+  override def withStoreContext[R](testWith: TestWith[
+    MemoryStore[Version[String, Int], Record] with MemoryMaxima[String, Record],
+    R]): R =
     withVersionedStoreContext(testWith)
 
   override def withNamespace[R](testWith: TestWith[String, R]): R =
@@ -90,7 +88,8 @@ class MemoryVersionedStoreTest
       Record])(testWith: TestWith[StoreImpl, R]): R =
     withVersionedStoreImpl(initialEntries, storeContext)(testWith)
 
-  it("allows writing the same value twice to a given id/version, even if a higher version exists") {
+  it(
+    "allows writing the same value twice to a given id/version, even if a higher version exists") {
     val id = createIdent
     val t = createT
 

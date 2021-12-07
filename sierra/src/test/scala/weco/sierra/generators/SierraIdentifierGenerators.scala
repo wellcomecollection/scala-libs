@@ -1,7 +1,13 @@
 package weco.sierra.generators
 
 import weco.fixtures.RandomGenerators
-import weco.sierra.models.identifiers.{SierraBibNumber, SierraHoldingsNumber, SierraItemNumber, SierraOrderNumber, SierraPatronNumber}
+import weco.sierra.models.identifiers.{
+  SierraBibNumber,
+  SierraHoldingsNumber,
+  SierraItemNumber,
+  SierraOrderNumber,
+  SierraPatronNumber
+}
 
 import scala.util.Random
 

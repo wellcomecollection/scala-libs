@@ -8,7 +8,7 @@ import weco.storage.generators.S3ObjectLocationGenerators
 import org.scalatest.EitherValues
 
 class S3ObjectLocationTest
-  extends AnyFunSpec
+    extends AnyFunSpec
     with Matchers
     with EitherValues
     with S3ObjectLocationGenerators {
@@ -27,7 +27,8 @@ class S3ObjectLocationTest
       }
 
       it("can serialise an old-style ObjectLocation from Json") {
-        val jsonString = """{"namespace": "my-bukkit", "path": "path/to/my/key.txt"}"""
+        val jsonString =
+          """{"namespace": "my-bukkit", "path": "path/to/my/key.txt"}"""
 
         val location = fromJson[S3ObjectLocation](jsonString).get
 
@@ -39,7 +40,8 @@ class S3ObjectLocationTest
     }
 
     describe("behaves as a Location") {
-      val loc = S3ObjectLocation(bucket = "my-s3-bucket", key = "path/to/pictures")
+      val loc =
+        S3ObjectLocation(bucket = "my-s3-bucket", key = "path/to/pictures")
 
       it("joins paths") {
         loc.join("cats", "devon-rex.jpg") shouldBe S3ObjectLocation(
@@ -104,7 +106,7 @@ class S3ObjectLocationTest
       val summary = new S3ObjectSummary()
       summary.setBucketName(bucket)
       summary.setKey(key)
-      
+
       S3ObjectLocation(summary) shouldBe S3ObjectLocation(bucket, key)
     }
   }
@@ -120,7 +122,8 @@ class S3ObjectLocationTest
       }
 
       it("can serialise an old-style ObjectLocationPrefix from Json") {
-        val jsonString = """{"namespace": "my-bukkit", "path": "path/to/my/directory"}"""
+        val jsonString =
+          """{"namespace": "my-bukkit", "path": "path/to/my/directory"}"""
 
         val prefix = fromJson[S3ObjectLocationPrefix](jsonString).get
 
@@ -161,13 +164,17 @@ class S3ObjectLocationTest
 
       it("blocks the . and .. characters in the key prefix") {
         val err1 = intercept[IllegalArgumentException] {
-          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/./to/pictures")
+          S3ObjectLocationPrefix(
+            bucket = "my-s3-bucket",
+            keyPrefix = "path/./to/pictures")
         }
 
         err1.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/./to/pictures"
 
         val err2 = intercept[IllegalArgumentException] {
-          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/../to/pictures")
+          S3ObjectLocationPrefix(
+            bucket = "my-s3-bucket",
+            keyPrefix = "path/../to/pictures")
         }
 
         err2.getMessage shouldBe "requirement failed: S3 key prefix cannot contain '.' or '..' entries: path/../to/pictures"
@@ -175,20 +182,26 @@ class S3ObjectLocationTest
 
       it("blocks multiple consecutive slashes") {
         val err1 = intercept[IllegalArgumentException] {
-          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures//")
+          S3ObjectLocationPrefix(
+            bucket = "my-s3-bucket",
+            keyPrefix = "path/to/pictures//")
         }
 
         err1.getMessage shouldBe "requirement failed: S3 key prefix cannot include multiple consecutive slashes: path/to/pictures//"
 
         val err2 = intercept[IllegalArgumentException] {
-          S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path//to/pictures")
+          S3ObjectLocationPrefix(
+            bucket = "my-s3-bucket",
+            keyPrefix = "path//to/pictures")
         }
 
         err2.getMessage shouldBe "requirement failed: S3 key prefix cannot include multiple consecutive slashes: path//to/pictures"
       }
 
       it("allows a trailing slash") {
-        S3ObjectLocationPrefix(bucket = "my-s3-bucket", keyPrefix = "path/to/pictures/")
+        S3ObjectLocationPrefix(
+          bucket = "my-s3-bucket",
+          keyPrefix = "path/to/pictures/")
       }
     }
   }

@@ -6,7 +6,8 @@ import weco.storage.tags.{Tags, TagsTestCases}
 import weco.storage.tags.TagsTestCases
 
 class MemoryTagsTest extends TagsTestCases[UUID, Unit] {
-  override def withTags[R](initialTags: Map[UUID, Map[String, String]])(testWith: TestWith[Tags[UUID], R]): R =
+  override def withTags[R](initialTags: Map[UUID, Map[String, String]])(
+    testWith: TestWith[Tags[UUID], R]): R =
     testWith(
       new MemoryTags(initialTags)
     )

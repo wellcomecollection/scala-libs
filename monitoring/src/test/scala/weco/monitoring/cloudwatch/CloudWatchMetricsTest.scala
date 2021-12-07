@@ -43,7 +43,10 @@ class CloudWatchMetricsTest
       val future = metricsSender.incrementCount(metricName)
 
       whenReady(future) { _ =>
-        assertSingleDataPoint(amazonCloudWatch, metricName, maybeExpectedUnit = Some(StandardUnit.COUNT))
+        assertSingleDataPoint(
+          amazonCloudWatch,
+          metricName,
+          maybeExpectedUnit = Some(StandardUnit.COUNT))
       }
     }
   }
@@ -69,7 +72,9 @@ class CloudWatchMetricsTest
       val metricName = createMetricName
 
       val futures =
-        (1 to 40).map { _ => metricsSender.incrementCount(metricName) }
+        (1 to 40).map { _ =>
+          metricsSender.incrementCount(metricName)
+        }
 
       whenReady(Future.sequence(futures)) { _ =>
         eventually {
@@ -79,7 +84,8 @@ class CloudWatchMetricsTest
           putMetricDataRequests should have size 2
 
           putMetricDataRequests.asScala.head.metricData() should have size 20
-          putMetricDataRequests.asScala.tail.head.metricData() should have size 20
+          putMetricDataRequests.asScala.tail.head
+            .metricData() should have size 20
         }
       }
     }
@@ -98,7 +104,9 @@ class CloudWatchMetricsTest
       // Each PutMetricRequest is made of 20 MetricDatum so we need
       // 20 * 150 = 3000 calls to incrementCount to get 150 PutMetricData calls
       val futures =
-        (1 to 3000).map { i => metricsSender.incrementCount(s"${i}_$metricName") }
+        (1 to 3000).map { i =>
+          metricsSender.incrementCount(s"${i}_$metricName")
+        }
 
       val promisedInstant = Promise[Instant]
 
@@ -126,8 +134,7 @@ class CloudWatchMetricsTest
   private def createMetricName: String =
     randomAlphanumeric().toLowerCase()
 
-  private def withMetricsSender[R](
-    cloudWatchClient: CloudWatchClient)(
+  private def withMetricsSender[R](cloudWatchClient: CloudWatchClient)(
     testWith: TestWith[CloudWatchMetrics, R]): R =
     withMaterializer { implicit materializer =>
       val metricsSender = new CloudWatchMetrics(
@@ -144,7 +151,8 @@ class CloudWatchMetricsTest
   private def assertSingleDataPoint(amazonCloudWatch: CloudWatchClient,
                                     metricName: String,
                                     expectedValue: Double = 1.0,
-                                    maybeExpectedUnit: Option[StandardUnit] = None): Assertion = {
+                                    maybeExpectedUnit: Option[StandardUnit] =
+                                      None): Assertion = {
     val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
     eventually {
       verify(amazonCloudWatch, times(1)).putMetricData(capture.capture())

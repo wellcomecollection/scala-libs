@@ -6,10 +6,13 @@ import org.scalatest.Assertion
 import weco.storage.s3.S3ObjectLocation
 
 class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
-  override def assertResultCorrect(result: Iterable[S3ObjectSummary],
-                                   entries: Seq[S3ObjectLocation]): Assertion = {
+  override def assertResultCorrect(
+    result: Iterable[S3ObjectSummary],
+    entries: Seq[S3ObjectLocation]): Assertion = {
     val actualLocations =
-      result.toSeq.map { summary => S3ObjectLocation(summary) }
+      result.toSeq.map { summary =>
+        S3ObjectLocation(summary)
+      }
 
     actualLocations should contain theSameElementsAs entries
   }

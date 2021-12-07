@@ -5,7 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 class MemoryLocationTest extends AnyFunSpec with Matchers {
   describe("MemoryLocation") {
-    val loc = MemoryLocation(namespace = "my-memory-bukkit", path = "path/to/pictures")
+    val loc =
+      MemoryLocation(namespace = "my-memory-bukkit", path = "path/to/pictures")
 
     it("joins paths") {
       loc.join("cats", "devon-rex.jpg") shouldBe MemoryLocation(

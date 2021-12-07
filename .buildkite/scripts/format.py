@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8
+#!/usr/bin/env python3
 
 import sys
 
-from commands import git, sbt
+from commands import git, run_build_script
 from git_utils import (
     get_changed_paths,
     remote_default_branch,
@@ -29,7 +28,7 @@ def autoformat():
     print(f"On default branch: {is_default_branch()}")
     print(f"Commit range: {commit_range}")
 
-    sbt('scalafmt')
+    run_build_script('run_formatting.sh')
 
     check_release_file(commit_range)
 

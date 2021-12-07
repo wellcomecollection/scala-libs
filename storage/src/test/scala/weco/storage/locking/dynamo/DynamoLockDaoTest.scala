@@ -15,11 +15,7 @@ import software.amazon.awssdk.services.dynamodb.model.{
 }
 import weco.storage.dynamo.DynamoTimeFormat._
 import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.locking.{
-  LockDaoTestCases,
-  LockFailure,
-  UnlockFailure
-}
+import weco.storage.locking.{LockDaoTestCases, LockFailure, UnlockFailure}
 
 import scala.concurrent.duration._
 import scala.language.higherKinds

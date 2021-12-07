@@ -107,7 +107,8 @@ class WorkerTest
   }
 
   it("doesn't increment metrics if monitoring fails") {
-    withMetricsMonitoringProcessor[MyWork, Assertion](metrics = brokenMemoryMetrics) {
+    withMetricsMonitoringProcessor[MyWork, Assertion](
+      metrics = brokenMemoryMetrics) {
       case (_, metrics, monitoringProcessor) =>
         val worker = new MyWorker(
           monitoringProcessor,

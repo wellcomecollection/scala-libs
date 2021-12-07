@@ -78,7 +78,8 @@ trait ElasticsearchFixtures
   def eventuallyIndexExists(index: Index): Assertion =
     eventually {
       assert(
-        indexDoesExist(index), s"Index $index does not exist"
+        indexDoesExist(index),
+        s"Index $index does not exist"
       )
     }
 
@@ -87,7 +88,8 @@ trait ElasticsearchFixtures
 
     eventually {
       assert(
-        !indexDoesExist(index), s"Index $index has not been deleted"
+        !indexDoesExist(index),
+        s"Index $index has not been deleted"
       )
     }
   }

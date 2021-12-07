@@ -4,12 +4,11 @@ import weco.fixtures.TestWith
 import weco.storage.store.{StreamStore, TypedStore}
 import weco.storage.streaming.Codec
 
-trait TypedStoreFixtures[
-  Ident,
-  T,
-  StreamStoreImpl <: StreamStore[Ident],
-  TypedStoreImpl <: TypedStore[Ident, T],
-  StreamStoreContext]
+trait TypedStoreFixtures[Ident,
+                         T,
+                         StreamStoreImpl <: StreamStore[Ident],
+                         TypedStoreImpl <: TypedStore[Ident, T],
+                         StreamStoreContext]
     extends StreamStoreFixtures[Ident, StreamStoreImpl, StreamStoreContext] {
   implicit val codec: Codec[T]
 

@@ -1,7 +1,11 @@
 package weco.sierra.generators
 
 import weco.sierra.models.data.{SierraBibData, SierraItemData, SierraOrderData}
-import weco.sierra.models.fields.{SierraLanguage, SierraLocation, SierraMaterialType}
+import weco.sierra.models.fields.{
+  SierraLanguage,
+  SierraLocation,
+  SierraMaterialType
+}
 import weco.sierra.models.identifiers.SierraItemNumber
 import weco.sierra.models.marc.{FixedField, VarField}
 

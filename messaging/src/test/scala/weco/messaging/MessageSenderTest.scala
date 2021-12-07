@@ -16,7 +16,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Success, Try}
 
-class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions with ScalaFutures with RandomGenerators {
+class MessageSenderTest
+    extends AnyFunSpec
+    with Matchers
+    with JsonAssertions
+    with ScalaFutures
+    with RandomGenerators {
   it("sends individual messages") {
     val sender = new MemoryIndividualMessageSender()
 
@@ -42,7 +47,9 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions wit
   it("can send many messages in parallel") {
     val sender = new MemoryIndividualMessageSender()
 
-    def send(body: String, subject: String, destination: String): Future[Try[Unit]] =
+    def send(body: String,
+             subject: String,
+             destination: String): Future[Try[Unit]] =
       Future(sender.send(body)(subject, destination))
 
     val toSend = Function.tupled(send _)
@@ -52,9 +59,11 @@ class MessageSenderTest extends AnyFunSpec with Matchers with JsonAssertions wit
     }
 
     val eventuallyResults = Future.sequence(messages.map(toSend))
-    val expectedResults = messages.map(
-      Function.tupled(sender.MemoryMessage.apply)
-    ).toSet
+    val expectedResults = messages
+      .map(
+        Function.tupled(sender.MemoryMessage.apply)
+      )
+      .toSet
 
     whenReady(eventuallyResults) { results =>
       sender.messages.size shouldBe messages.size

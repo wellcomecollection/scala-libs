@@ -8,13 +8,9 @@ import weco.storage.transfer.Transfer
 import weco.storage.transfer.fixtures.TransferFixtures
 
 trait S3TransferFixtures[T]
-    extends TransferFixtures[
-      S3ObjectLocation,
-      T,
-      S3TypedStore[T]]
+    extends TransferFixtures[S3ObjectLocation, T, S3TypedStore[T]]
     with S3TypedStoreFixtures[T] {
-  override def withTransferStore[R](
-    initialEntries: Map[S3ObjectLocation, T])(
+  override def withTransferStore[R](initialEntries: Map[S3ObjectLocation, T])(
     testWith: TestWith[S3TypedStore[T], R]): R =
     withTypedStoreImpl(storeContext = (), initialEntries = initialEntries) {
       typedStore =>
@@ -42,12 +38,14 @@ trait S3TransferFixtures[T]
   def createDstLocation(dstBucket: Bucket): S3ObjectLocation =
     createS3ObjectLocationWith(dstBucket)
 
-  def withSrcStore[R](initialEntries: Map[S3ObjectLocation, T])(testWith: TestWith[S3TypedStore[T], R])(implicit context: Unit): R =
+  def withSrcStore[R](initialEntries: Map[S3ObjectLocation, T])(
+    testWith: TestWith[S3TypedStore[T], R])(implicit context: Unit): R =
     withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
       testWith(typedStore)
     }
 
-  def withDstStore[R](initialEntries: Map[S3ObjectLocation, T])(testWith: TestWith[S3TypedStore[T], R])(implicit context: Unit): R =
+  def withDstStore[R](initialEntries: Map[S3ObjectLocation, T])(
+    testWith: TestWith[S3TypedStore[T], R])(implicit context: Unit): R =
     withTypedStoreImpl(context, initialEntries = initialEntries) { typedStore =>
       testWith(typedStore)
     }

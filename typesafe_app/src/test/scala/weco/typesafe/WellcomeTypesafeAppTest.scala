@@ -7,7 +7,6 @@ import org.scalatest.matchers.should.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
   var calledWith: Option[Config] = None
 

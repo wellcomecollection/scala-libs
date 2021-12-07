@@ -137,7 +137,8 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
     }
 
     describe("put") {
-      it("puts to a version if specified and that version represents an increase") {
+      it(
+        "puts to a version if specified and that version represents an increase") {
         val id = createIdent
 
         val t1 = createT
@@ -192,9 +193,12 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
         val t = createT
 
         withVersionedStoreImpl() { store =>
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
-          store.put(Version(id, 0))(t) shouldBe Right(Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(
+            Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(
+            Identified(Version(id, 0), t))
+          store.put(Version(id, 0))(t) shouldBe Right(
+            Identified(Version(id, 0), t))
         }
       }
 
@@ -203,7 +207,10 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
 
         withVersionedStoreImpl() { store =>
           store.put(Version(id, 0))(createT) shouldBe a[Right[_, _]]
-          store.put(Version(id, 0))(createT).left.value shouldBe a[VersionAlreadyExistsError]
+          store
+            .put(Version(id, 0))(createT)
+            .left
+            .value shouldBe a[VersionAlreadyExistsError]
         }
       }
     }
@@ -230,9 +237,7 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
         withVersionedStoreImpl(
           initialEntries = Map(Version(id, 0) -> t)
         ) { store =>
-          store.get(Version(id, 0)).value shouldBe Identified(
-            Version(id, 0),
-            t)
+          store.get(Version(id, 0)).value shouldBe Identified(Version(id, 0), t)
           store.get(Version(id, 1)).left.value shouldBe a[NoVersionExistsError]
         }
       }
@@ -276,9 +281,7 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
 
           val upsertResult = store.upsert(id)(t)(f)
 
-          upsertResult.value shouldBe Identified(
-            Version(id, 1),
-            updatedT)
+          upsertResult.value shouldBe Identified(Version(id, 1), updatedT)
           store.get(Version(id, 1)).value shouldBe Identified(
             Version(id, 1),
             updatedT)
@@ -296,9 +299,7 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
           val upsertResult = store.upsert(id)(t)(f)
 
           upsertResult.value shouldBe Identified(Version(id, 0), t)
-          store.get(Version(id, 0)).value shouldBe Identified(
-            Version(id, 0),
-            t)
+          store.get(Version(id, 0)).value shouldBe Identified(Version(id, 0), t)
         }
       }
     }
@@ -425,9 +426,7 @@ trait VersionedStoreWithOverwriteTestCases[Id, T, VersionedStoreContext]
       withVersionedStoreImpl() { store =>
         store.init(id)(t0) shouldBe a[Right[_, _]]
         store.getLatest(id).value shouldBe Identified(Version(id, 0), t0)
-        store.get(Version(id, 0)).value shouldBe Identified(
-          Version(id, 0),
-          t0)
+        store.get(Version(id, 0)).value shouldBe Identified(Version(id, 0), t0)
 
         store.putLatest(id)(t1) shouldBe a[Right[_, _]]
         store.getLatest(id).value shouldBe Identified(Version(id, 1), t1)

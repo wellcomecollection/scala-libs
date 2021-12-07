@@ -59,8 +59,7 @@ trait DynamoWritableTestCases[Ident, T, EntryType <: DynamoEntry[Ident, T]]
               createEntry(hashKey, 1, olderT)
             ))
 
-          writable.put(id = Version(hashKey, 2))(newerT) shouldBe a[Right[_,
-                                                                          _]]
+          writable.put(id = Version(hashKey, 2))(newerT) shouldBe a[Right[_, _]]
 
           getT(table)(hashKey, 2) shouldBe newerT
         }

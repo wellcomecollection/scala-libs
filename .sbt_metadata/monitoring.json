@@ -1,0 +1,8 @@
+{
+  "id" : "monitoring",
+  "folder" : "monitoring",
+  "dependencyIds" : [
+    "typesafe_app",
+    "fixtures"
+  ]
+}

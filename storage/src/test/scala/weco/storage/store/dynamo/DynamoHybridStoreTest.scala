@@ -12,10 +12,7 @@ import scala.language.higherKinds
 
 class DynamoHybridStoreTest
     extends DynamoHybridStoreTestCases[
-      DynamoHashStore[
-        String,
-        Int,
-        S3ObjectLocation]
+      DynamoHashStore[String, Int, S3ObjectLocation]
     ] {
   override def createTable(table: Table): Table =
     createTableWithHashKey(table)
@@ -51,8 +48,8 @@ class DynamoHybridStoreTest
 
     testWith(
       new DynamoIndexedStoreImpl(config = createDynamoConfigWith(table)) {
-        override def put(id: Version[String, Int])(loc: S3ObjectLocation)
-          : WriteEither =
+        override def put(id: Version[String, Int])(
+          loc: S3ObjectLocation): WriteEither =
           Left(StoreWriteError(new Error("BOOM!")))
       }
     )

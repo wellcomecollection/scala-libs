@@ -11,8 +11,13 @@ import weco.storage.{
   UpdateNotApplied
 }
 
-trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with EitherValues with RandomGenerators {
-  def withTags[R](initialTags: Map[Ident, Map[String, String]])(testWith: TestWith[Tags[Ident], R]): R
+trait TagsTestCases[Ident, Context]
+    extends AnyFunSpec
+    with Matchers
+    with EitherValues
+    with RandomGenerators {
+  def withTags[R](initialTags: Map[Ident, Map[String, String]])(
+    testWith: TestWith[Tags[Ident], R]): R
 
   def createIdent(context: Context): Ident
 
@@ -20,7 +25,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
 
   // One less than maxTags so we can append to the tags further down
   def createTags: Map[String, String] =
-    collectionOf(min = 0, max = maxTags - 1) { randomAlphanumeric() -> randomAlphanumeric() }.toMap
+    collectionOf(min = 0, max = maxTags - 1) {
+      randomAlphanumeric() -> randomAlphanumeric()
+    }.toMap
 
   def withContext[R](testWith: TestWith[Context, R]): R
 
@@ -32,7 +39,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
           val objectTags = createTags
 
           withTags(initialTags = Map(objectIdent -> objectTags)) { tags =>
-            tags.get(id = objectIdent).value shouldBe Identified(objectIdent, objectTags)
+            tags.get(id = objectIdent).value shouldBe Identified(
+              objectIdent,
+              objectTags)
           }
         }
       }
@@ -40,7 +49,10 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
       it("returns a DoesNotExistError if the ident does not exist") {
         withContext { context =>
           withTags(initialTags = Map.empty) { tags =>
-            tags.get(id = createIdent(context)).left.value shouldBe a[DoesNotExistError]
+            tags
+              .get(id = createIdent(context))
+              .left
+              .value shouldBe a[DoesNotExistError]
           }
         }
       }
@@ -61,7 +73,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               }
               .value shouldBe Identified(objectIdent, objectTags ++ newTag)
 
-            tags.get(id = objectIdent).value shouldBe Identified(objectIdent, objectTags ++ newTag)
+            tags.get(id = objectIdent).value shouldBe Identified(
+              objectIdent,
+              objectTags ++ newTag)
           }
         }
       }
@@ -78,7 +92,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               }
               .value shouldBe Identified(objectIdent, Map.empty)
 
-            tags.get(id = objectIdent).value shouldBe Identified(objectIdent, Map.empty)
+            tags.get(id = objectIdent).value shouldBe Identified(
+              objectIdent,
+              Map.empty)
           }
         }
       }
@@ -93,9 +109,12 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               .update(id = objectIdent) { _ =>
                 Left(UpdateNotApplied(new Throwable("BOOM!")))
               }
-              .left.value shouldBe a[UpdateNotApplied]
+              .left
+              .value shouldBe a[UpdateNotApplied]
 
-            tags.get(id = objectIdent).value shouldBe Identified(objectIdent, objectTags)
+            tags.get(id = objectIdent).value shouldBe Identified(
+              objectIdent,
+              objectTags)
           }
         }
       }
@@ -112,7 +131,9 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               }
               .value shouldBe Identified(objectIdent, objectTags)
 
-            tags.get(id = objectIdent).value shouldBe Identified(objectIdent, objectTags)
+            tags.get(id = objectIdent).value shouldBe Identified(
+              objectIdent,
+              objectTags)
           }
         }
       }
@@ -126,7 +147,8 @@ trait TagsTestCases[Ident, Context] extends AnyFunSpec with Matchers with Either
               .update(id = objectIdent) {
                 Right(_)
               }
-              .left.value shouldBe a[UpdateNoSourceError]
+              .left
+              .value shouldBe a[UpdateNoSourceError]
 
             tags.get(id = objectIdent).left.value shouldBe a[DoesNotExistError]
           }

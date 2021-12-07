@@ -6,7 +6,11 @@ import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import weco.messaging.fixtures.worker.WorkerFixtures
-import weco.messaging.worker.models.{DeterministicFailure, NonDeterministicFailure, Successful}
+import weco.messaging.worker.models.{
+  DeterministicFailure,
+  NonDeterministicFailure,
+  Successful
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 class MessageProcessorTest

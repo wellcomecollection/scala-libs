@@ -1,0 +1,8 @@
+{
+  "id" : "messaging_typesafe",
+  "folder" : "messaging_typesafe",
+  "dependencyIds" : [
+    "messaging",
+    "monitoring_typesafe"
+  ]
+}

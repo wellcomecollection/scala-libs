@@ -26,7 +26,9 @@ class DisplayErrorTest extends AnyFunSpec with Matchers with JsonAssertions {
   }
 
   it("serialises to JSON with a description") {
-    val error = DisplayError(statusCode = StatusCodes.NotFound, description = "I couldn't find that!")
+    val error = DisplayError(
+      statusCode = StatusCodes.NotFound,
+      description = "I couldn't find that!")
 
     assertJsonStringsAreEqual(
       toJson(error),

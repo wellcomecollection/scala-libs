@@ -18,9 +18,9 @@ import scala.concurrent.duration._
 
 trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
 
-  def createAlpakkaSQSWorkerConfig(queue: Queue,
-                                   namespace: String = randomAlphanumeric())
-    : AlpakkaSQSWorkerConfig =
+  def createAlpakkaSQSWorkerConfig(
+    queue: Queue,
+    namespace: String = randomAlphanumeric()): AlpakkaSQSWorkerConfig =
     AlpakkaSQSWorkerConfig(
       metricsConfig = MetricsConfig(namespace, flushInterval = 1.second),
       sqsConfig = createSQSConfigWith(queue)
@@ -38,22 +38,23 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
       R])(implicit
           as: ActorSystem,
           ec: ExecutionContext): R = {
-      implicit val metrics: MemoryMetrics = new MemoryMetrics()
+    implicit val metrics: MemoryMetrics = new MemoryMetrics()
 
-      val metricsProcessorBuilder
-        : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
-        new MetricsMonitoringProcessor[MyWork](namespace)(metrics, _)
+    val metricsProcessorBuilder
+      : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
+      new MetricsMonitoringProcessor[MyWork](namespace)(metrics, _)
 
-      val config = createAlpakkaSQSWorkerConfig(queue, namespace)
+    val config = createAlpakkaSQSWorkerConfig(queue, namespace)
 
-      val callCounter = new CallCounter()
-      val testProcess = (work: MyWork) => createResult(process, callCounter)(ec)(work)
+    val callCounter = new CallCounter()
+    val testProcess = (work: MyWork) =>
+      createResult(process, callCounter)(ec)(work)
 
-      val worker =
-        new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](
-          config,
-          metricsProcessorBuilder)(testProcess)
+    val worker =
+      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](
+        config,
+        metricsProcessorBuilder)(testProcess)
 
-      testWith((worker, config, metrics, callCounter))
-    }
+    testWith((worker, config, metrics, callCounter))
+  }
 }

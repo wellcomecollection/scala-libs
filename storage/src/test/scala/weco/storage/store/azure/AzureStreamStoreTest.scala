@@ -35,7 +35,8 @@ class AzureStreamStoreTest
     context: AzureStreamStoreContext,
     initialEntries: Map[AzureBlobLocation, InputStreamWithLength])(
     testWith: TestWith[AzureStreamStore, R]): R = {
-    initialEntries.foreach { case (location, data) =>
+    initialEntries.foreach {
+      case (location, data) =>
         azureClient
           .getBlobContainerClient(location.container)
           .getBlobClient(location.name)
@@ -43,8 +44,9 @@ class AzureStreamStoreTest
     }
 
     val store = context.allowOverwrite match {
-      case Some(allowOverwrites) => new AzureStreamStore(allowOverwrites = allowOverwrites)
-      case None                  => new AzureStreamStore()
+      case Some(allowOverwrites) =>
+        new AzureStreamStore(allowOverwrites = allowOverwrites)
+      case None => new AzureStreamStore()
     }
 
     testWith(store)

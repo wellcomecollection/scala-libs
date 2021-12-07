@@ -1,5 +1,3 @@
-# -*- encoding: utf-8
-
 import subprocess
 import sys
 
@@ -27,19 +25,13 @@ def _subprocess_run(cmd, exit_on_error=True):
     return "".join(output).strip()
 
 
-def make(*args):
-    """Run a Make command, and check it completes successfully."""
-    _subprocess_run(["make"] + list(args))
-
-
-def sbt(*args):
-    """Run a Make command, and check it completes successfully."""
-    _subprocess_run(["sbt"] + list(args))
-
-
 def git(*args, exit_on_error=True):
     """Run a Git command and return its output."""
     cmd = ["git"] + list(args)
 
     return _subprocess_run(cmd, exit_on_error=exit_on_error)
 
+
+def run_build_script(name, *args):
+    """Run a build script, and check it completes successfully."""
+    _subprocess_run([f".buildkite/scripts/{name}"] + list(args))

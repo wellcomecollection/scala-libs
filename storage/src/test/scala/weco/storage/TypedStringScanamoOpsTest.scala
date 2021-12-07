@@ -7,7 +7,10 @@ import org.scanamo.{DynamoFormat, DynamoValue}
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import weco.json.TypedString
 
-class TypedStringScanamoOpsTest extends AnyFunSpec with Matchers with EitherValues {
+class TypedStringScanamoOpsTest
+    extends AnyFunSpec
+    with Matchers
+    with EitherValues {
   class Shape(val underlying: String) extends TypedString[Shape]
 
   object Shape extends TypedStringScanamoOps[Shape] {
@@ -25,7 +28,8 @@ class TypedStringScanamoOpsTest extends AnyFunSpec with Matchers with EitherValu
     it("serialises to a string") {
       val triangle = Shape("triangle")
 
-      DynamoFormat[Shape].write(triangle) shouldBe DynamoValue.fromString("triangle")
+      DynamoFormat[Shape].write(triangle) shouldBe DynamoValue.fromString(
+        "triangle")
     }
 
     it("deserialises from a string") {

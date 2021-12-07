@@ -17,7 +17,12 @@ import weco.http.fixtures.HttpFixtures
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with HttpFixtures with IntegrationPatience {
+class SierraOauthHttpClientTest
+    extends AnyFunSpec
+    with Matchers
+    with Akka
+    with HttpFixtures
+    with IntegrationPatience {
   val credentials = BasicHttpCredentials("username", "password")
 
   val itemJson: String =
@@ -79,12 +84,14 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       )
     )
 
-    val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
+    val underlying = new MemoryHttpClient(responses) with HttpGet
+    with HttpPost {
       override val baseUri: Uri = Uri("http://sierra:1234/v5")
     }
 
     withActorSystem { implicit actorSystem =>
-      val authClient = new SierraOauthHttpClient(underlying, credentials = credentials)
+      val authClient =
+        new SierraOauthHttpClient(underlying, credentials = credentials)
 
       val future = authClient.get(path = Path("items/1601017"))
 
@@ -165,7 +172,8 @@ class SierraOauthHttpClientTest extends AnyFunSpec with Matchers with Akka with 
       )
     )
 
-    val underlying = new MemoryHttpClient(responses) with HttpGet with HttpPost {
+    val underlying = new MemoryHttpClient(responses) with HttpGet
+    with HttpPost {
       override val baseUri: Uri = Uri("http://sierra:1234/v5")
     }
 

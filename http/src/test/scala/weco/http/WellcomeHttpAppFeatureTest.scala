@@ -12,7 +12,7 @@ import org.scalatest.matchers.should.Matchers
 import weco.http.fixtures.HttpFixtures
 
 class WellcomeHttpAppFeatureTest
-  extends AnyFunSpec
+    extends AnyFunSpec
     with Matchers
     with HttpFixtures
     with IntegrationPatience {
@@ -74,11 +74,9 @@ class WellcomeHttpAppFeatureTest
   describe("POST") {
     it("responds to a request") {
       withApp(exampleApi.routes) { _ =>
-
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
-          string =
-            """
+          string = """
               |{
               | "name": "The Count"
               |}
@@ -97,8 +95,7 @@ class WellcomeHttpAppFeatureTest
       withApp(exampleApi.routes) { _ =>
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
-          string =
-            """
+          string = """
               |{
               | "name": "The Count"
               |}
@@ -117,12 +114,12 @@ class WellcomeHttpAppFeatureTest
       }
     }
 
-    it("returns a BadRequest with readable error with valid (but incorrect) json") {
+    it(
+      "returns a BadRequest with readable error with valid (but incorrect) json") {
       withApp(exampleApi.routes) { _ =>
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
-          string =
-            """
+          string = """
               |{
               | "age": 48
               |}
@@ -134,7 +131,8 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description = "Invalid value at .name: required property not supplied.",
+            description =
+              "Invalid value at .name: required property not supplied.",
             statusCode = BadRequest
           )
         }
@@ -145,8 +143,7 @@ class WellcomeHttpAppFeatureTest
       withApp(exampleApi.routes) { _ =>
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
-          string =
-            """
+          string = """
               |this.isnt.json: is_it?
               |""".stripMargin
         )
@@ -156,7 +153,8 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description = "The request content was malformed:\nexpected true got 'this.i...' (line 2, column 1)",
+            description =
+              "The request content was malformed:\nexpected true got 'this.i...' (line 2, column 1)",
             statusCode = BadRequest
           )
         }
@@ -165,11 +163,9 @@ class WellcomeHttpAppFeatureTest
 
     it("returns an InternalServerError if an exception is thrown") {
       withApp(brokenExampleApi.routes) { _ =>
-
         val entity = HttpEntity(
           contentType = ContentTypes.`application/json`,
-          string =
-            """
+          string = """
               |{
               | "name": "gary"
               |}

@@ -58,8 +58,7 @@ class S3StreamStoreTest
           err shouldBe a[StoreReadError]
 
           err.e shouldBe a[AmazonS3Exception]
-          err.e.getMessage should startWith(
-            "The specified bucket is not valid")
+          err.e.getMessage should startWith("The specified bucket is not valid")
         }
       }
     }
@@ -90,7 +89,10 @@ class S3StreamStoreTest
 
       it("errors if the bucket name is invalid") {
         withStoreImpl(initialEntries = Map.empty) { store =>
-          val result = store.put(createS3ObjectLocationWith(createInvalidBucket))(createT).left.value
+          val result = store
+            .put(createS3ObjectLocationWith(createInvalidBucket))(createT)
+            .left
+            .value
 
           result shouldBe a[StoreWriteError]
 

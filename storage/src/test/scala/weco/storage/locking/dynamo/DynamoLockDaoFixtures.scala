@@ -47,10 +47,10 @@ trait DynamoLockDaoFixtures
   def assertNoLocks(lockTable: Table): Assertion =
     scanTable[ExpiringLock](lockTable) shouldBe empty
 
-  def withLockDao[R](
-    dynamoClient: DynamoDbClient,
-    lockTable: Table,
-    expiryTime: Duration = 180.seconds)(testWith: TestWith[DynamoLockDao, R]): R = {
+  def withLockDao[R](dynamoClient: DynamoDbClient,
+                     lockTable: Table,
+                     expiryTime: Duration = 180.seconds)(
+    testWith: TestWith[DynamoLockDao, R]): R = {
     val rowLockDaoConfig = DynamoLockDaoConfig(
       dynamoConfig = createDynamoConfigWith(lockTable),
       expiryTime = expiryTime
@@ -82,38 +82,45 @@ trait DynamoLockDaoFixtures
   def createLockTable(table: Table): Table =
     createTableFromRequest(
       table,
-      CreateTableRequest.builder()
+      CreateTableRequest
+        .builder()
         .tableName(table.name)
         .keySchema(
-          KeySchemaElement.builder()
+          KeySchemaElement
+            .builder()
             .attributeName("id")
             .keyType(KeyType.HASH)
             .build()
         )
         .attributeDefinitions(
-          AttributeDefinition.builder()
+          AttributeDefinition
+            .builder()
             .attributeName("id")
             .attributeType("S")
             .build(),
-          AttributeDefinition.builder()
+          AttributeDefinition
+            .builder()
             .attributeName("contextId")
             .attributeType("S")
             .build()
         )
         .globalSecondaryIndexes(
-          GlobalSecondaryIndex.builder()
+          GlobalSecondaryIndex
+            .builder()
             .indexName(table.index)
             .projection(
               Projection.builder().projectionType(ProjectionType.ALL).build()
             )
             .keySchema(
-              KeySchemaElement.builder()
+              KeySchemaElement
+                .builder()
                 .attributeName("contextId")
                 .keyType(KeyType.HASH)
                 .build()
             )
             .provisionedThroughput(
-              ProvisionedThroughput.builder()
+              ProvisionedThroughput
+                .builder()
                 .readCapacityUnits(1L)
                 .writeCapacityUnits(1L)
                 .build()

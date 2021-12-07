@@ -30,8 +30,7 @@ trait MemoryListingFixtures[T]
           (id, createT)
         }.toMap
 
-        override protected def startsWith(id: String,
-                                          prefix: String): Boolean =
+        override protected def startsWith(id: String, prefix: String): Boolean =
           id.startsWith(prefix)
       }
     )
