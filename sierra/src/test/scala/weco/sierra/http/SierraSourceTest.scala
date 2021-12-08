@@ -7,7 +7,13 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
-import weco.sierra.models.fields.{SierraHold, SierraHoldStatus, SierraHoldsList, SierraItemDataEntries, SierraLocation}
+import weco.sierra.models.fields.{
+  SierraHold,
+  SierraHoldStatus,
+  SierraHoldsList,
+  SierraItemDataEntries,
+  SierraLocation
+}
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.sierra.generators.SierraIdentifierGenerators
 import weco.sierra.models.data.SierraItemData
@@ -42,8 +48,7 @@ class SierraSourceTest
     }
 
   def sierraItemsUri(itemNumbers: Seq[SierraItemNumber]): Uri = {
-    val fieldList = SierraSource
-      .requiredItemFields.mkString(",")
+    val fieldList = SierraSource.requiredItemFields.mkString(",")
 
     val idList = itemNumbers
       .map(_.withoutCheckDigit)
@@ -608,7 +613,8 @@ class SierraSourceTest
         (
           HttpRequest(
             method = HttpMethods.GET,
-            uri = Uri(s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
           ),
           HttpResponse(
             status = StatusCodes.OK,
@@ -641,7 +647,8 @@ class SierraSourceTest
         (
           HttpRequest(
             method = HttpMethods.GET,
-            uri = Uri(s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
           ),
           HttpResponse(
             status = StatusCodes.OK,
@@ -673,7 +680,8 @@ class SierraSourceTest
         (
           HttpRequest(
             method = HttpMethods.GET,
-            uri = Uri(s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
           ),
           HttpResponse(
             status = StatusCodes.NotFound,

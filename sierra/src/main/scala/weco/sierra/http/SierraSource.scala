@@ -9,7 +9,11 @@ import weco.http.json.CirceMarshalling
 import weco.json.JsonUtil._
 import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
-import weco.sierra.models.fields.{SierraHoldRequest, SierraHoldsList, SierraItemDataEntries}
+import weco.sierra.models.fields.{
+  SierraHoldRequest,
+  SierraHoldsList,
+  SierraItemDataEntries
+}
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
 
 import java.time.LocalDate
@@ -164,7 +168,8 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
     * method return a failed Future.
     *
     */
-  def lookupPatronExpirationDate(patron: SierraPatronNumber): Future[Either[SierraErrorCode, Option[LocalDate]]] =
+  def lookupPatronExpirationDate(patron: SierraPatronNumber)
+    : Future[Either[SierraErrorCode, Option[LocalDate]]] =
     for {
       resp <- client.get(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}"),
@@ -173,15 +178,18 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
 
       result <- resp.status match {
         case StatusCodes.OK =>
-          Unmarshal(resp).to[PatronRecord]
+          Unmarshal(resp)
+            .to[PatronRecord]
             .map { _.expirationDate }
             .map {
-              case Some(d) => Some(LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-              case None    => None
+              case Some(d) =>
+                Some(
+                  LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+              case None => None
             }
             .map(Right(_))
 
-        case _              => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
+        case _ => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
       }
     } yield result
 
