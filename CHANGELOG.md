@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.12.1 - 2021-12-08
+
+Fix a typo that meant the "elasticsearch" library wasn't being published.
+
 ## v30.12.0 - 2021-12-08
 
 Add a method for looking up the expiration date of a patron's Sierra record.
