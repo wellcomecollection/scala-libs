@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 
 from commands import git, run_build_script
