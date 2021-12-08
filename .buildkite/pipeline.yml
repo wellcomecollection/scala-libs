@@ -75,7 +75,7 @@ steps:
     command: .buildkite/scripts/publish.py storage_typesafe
     if: build.branch == "main"
   - label: publish elasticseach
-    command: .buildkite/scripts/publish.py elasticseach
+    command: .buildkite/scripts/publish.py elasticsearch
     if: build.branch == "main"
   - label: publish elasticsearch_typesafe
     command: .buildkite/scripts/publish.py elasticsearch_typesafe
