@@ -1,25 +1,23 @@
 package weco.sierra.http
 
-import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.model.Uri.Path
+import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.stream.Materializer
-import io.circe.Encoder
-import weco.json.JsonUtil._
-import weco.http.json.CirceMarshalling
-import weco.sierra.models.data.SierraItemData
-import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
-import java.time.{Instant, ZoneId}
-import java.time.format.DateTimeFormatter
-
 import weco.http.client.{HttpClient, HttpGet, HttpPost}
+import weco.http.json.CirceMarshalling
+import weco.json.JsonUtil._
+import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
 import weco.sierra.models.fields.{
   SierraHoldRequest,
   SierraHoldsList,
   SierraItemDataEntries
 }
+import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraSource(client: HttpClient with HttpGet with HttpPost)(
@@ -139,13 +137,6 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
       }
     } yield result
 
-  private val dateTimeFormatter = DateTimeFormatter
-    .ofPattern("yyyy-MM-dd")
-    .withZone(ZoneId.systemDefault())
-
-  implicit val encodeInstant: Encoder[Instant] =
-    Encoder.encodeString.contramap[Instant](dateTimeFormatter.format)
-
   def createHold(
     patron: SierraPatronNumber,
     item: SierraItemNumber
@@ -161,6 +152,51 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
         case _                     => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
       }
     } yield result
+
+  /** Looks up the expiration date for a Sierra patron.
+    *
+    * The complicated return type is because:
+    *
+    *   - We might get an error from Sierra, e.g. if we try to look up
+    *     a patron who doesn't exist
+    *   - The user might not have an expiration date on their record, e.g. if they're
+    *     a self-registered patron
+    *
+    * We don't have special handling for the case where Sierra returns a string which
+    * isn't a YYYY-MM-DD date string, because that isn't the case for any of our existing
+    * records and it would complicate the return type even further.  We'll just let this
+    * method return a failed Future.
+    *
+    */
+  def lookupPatronExpirationDate(patron: SierraPatronNumber)
+    : Future[Either[SierraErrorCode, Option[LocalDate]]] =
+    for {
+      resp <- client.get(
+        path = Path(s"v5/patrons/${patron.withoutCheckDigit}"),
+        params = Map("fields" -> "expirationDate")
+      )
+
+      result <- resp.status match {
+        case StatusCodes.OK =>
+          Unmarshal(resp)
+            .to[PatronRecord]
+            .map { _.expirationDate }
+            .map {
+              case Some(d) =>
+                Some(
+                  LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+              case None => None
+            }
+            .map(Right(_))
+
+        case _ => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
+      }
+    } yield result
+
+  private case class PatronRecord(expirationDate: Option[String])
+
+  private implicit val umPatronRecord: Unmarshaller[HttpEntity, PatronRecord] =
+    CirceMarshalling.fromDecoder[PatronRecord]
 }
 
 object SierraSource {

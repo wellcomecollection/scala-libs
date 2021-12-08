@@ -15,12 +15,14 @@ import weco.sierra.models.fields.{
   SierraLocation
 }
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
+import weco.sierra.generators.SierraIdentifierGenerators
 import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
-import java.net.URI
 
+import java.net.URI
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraSourceTest
@@ -29,7 +31,8 @@ class SierraSourceTest
     with EitherValues
     with Akka
     with ScalaFutures
-    with IntegrationPatience {
+    with IntegrationPatience
+    with SierraIdentifierGenerators {
   def withSource[R](
     responses: Seq[(HttpRequest, HttpResponse)]
   )(testWith: TestWith[SierraSource, R]): R =
@@ -596,6 +599,116 @@ class SierraSourceTest
             httpStatus = 500,
             name = "XCirc error",
             description = Some("XCirc error : This record is not available")
+          )
+        }
+      }
+    }
+  }
+
+  describe("lookupPatronExpiryDate") {
+    it("finds the expiration date of a patron") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit},
+                 |  "expirationDate": "2001-02-03"
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronExpirationDate(patron)
+
+        whenReady(future) {
+          _.value shouldBe Some(LocalDate.of(2001, 2, 3))
+        }
+      }
+    }
+
+    it("finds a patron without an expiration date") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit}
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronExpirationDate(patron)
+
+        whenReady(future) {
+          _.value shouldBe None
+        }
+      }
+    }
+
+    it("fails if we look up a non-existent patron") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=expirationDate")
+          ),
+          HttpResponse(
+            status = StatusCodes.NotFound,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "code": 107,
+                 |  "specificCode": 0,
+                 |  "httpStatus": 404,
+                 |  "name": "Record not found"
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronExpirationDate(patron)
+
+        whenReady(future) {
+          _.left.value shouldBe SierraErrorCode(
+            code = 107,
+            specificCode = 0,
+            httpStatus = 404,
+            name = "Record not found"
           )
         }
       }
