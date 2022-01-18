@@ -1,8 +1,5 @@
 package weco.messaging.fixtures
 
-import grizzled.slf4j.Logging
-import io.circe.{yaml, Decoder, Json, ParsingFailure}
-import org.scalatest.matchers.should.Matchers
 import software.amazon.awssdk.auth.credentials.{
   AwsBasicCredentials,
   StaticCredentialsProvider
@@ -11,115 +8,79 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.{
   CreateTopicRequest,
-  DeleteTopicRequest
+  DeleteTopicRequest,
+  SubscribeRequest
 }
 import weco.fixtures._
 import weco.json.JsonUtil._
-import weco.messaging.sns.SNSConfig
+import weco.messaging.fixtures.SQS.Queue
+import weco.messaging.sns.NotificationMessage
 
 import java.net.URI
-import scala.collection.immutable.Seq
 
 object SNS {
-  class Topic(val arn: String) extends AnyVal {
+  case class Topic(arn: String, destinationQueue: Queue) {
     override def toString = s"SNS.Topic($arn)"
-  }
-
-  object Topic {
-    def apply(arn: String): Topic = new Topic(arn)
   }
 }
 
-trait SNS extends Matchers with Logging with RandomGenerators {
+trait SNS extends SQS {
 
   import SNS._
 
-  private val localSNSEndpointUrl = "http://localhost:9292"
+  private val localSNSEndpointUrl = "http://localhost:4566"
 
   implicit val snsClient: SnsClient =
     SnsClient
       .builder()
       .region(Region.of("localhost"))
       .credentialsProvider(StaticCredentialsProvider.create(
-        AwsBasicCredentials.create("access", "secret")))
+        AwsBasicCredentials.create("access", "key")))
       .endpointOverride(new URI(localSNSEndpointUrl))
       .build()
 
   def createTopicName: String =
     randomAlphanumeric()
 
-  def withLocalSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
-    create = {
-      val topicName = createTopicName
-      val arn = snsClient
-        .createTopic { builder: CreateTopicRequest.Builder =>
-          builder.name(topicName)
+  private def withTopic[R](destinationQueue: Queue): Fixture[Topic, R] =
+    fixture[Topic, R](
+      create = {
+        val topicName = createTopicName
+
+        // Create the SNS topic
+        val arn = snsClient
+          .createTopic { builder: CreateTopicRequest.Builder =>
+            builder.name(topicName)
+          }
+          .topicArn()
+
+        // Subscribe the SQS queue to the newly-created topic
+        snsClient
+          .subscribe { builder: SubscribeRequest.Builder =>
+            builder
+              .topicArn(arn)
+              .protocol("sqs")
+              .endpoint(destinationQueue.arn)
+          }
+
+        Topic(arn, destinationQueue)
+      },
+      destroy = { topic =>
+        snsClient.deleteTopic { builder: DeleteTopicRequest.Builder =>
+          builder.topicArn(topic.arn)
         }
-        .topicArn()
-      Topic(arn)
-    },
-    destroy = { topic =>
-      snsClient.deleteTopic { builder: DeleteTopicRequest.Builder =>
-        builder.topicArn(topic.arn)
+      }
+    )
+
+  def withLocalSnsTopic[R](testWith: TestWith[Topic, R]): R =
+    withLocalSqsQueue() { destinationQueue =>
+      withTopic(destinationQueue) { topic =>
+        testWith(topic)
       }
     }
-  )
 
-  // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
-  // to annotate the fields, and I don't care enough to work out why right now.
-  implicit val messageInfoDecoder: Decoder[MessageInfo] =
-    Decoder.forProduct4(":id", ":message", ":subject", ":topic_arn")(
-      MessageInfo.apply)
-
-  def listMessagesReceivedFromSNS(topic: Topic): Seq[MessageInfo] = {
-    /*
-    This is a sample returned by the fake-sns implementation:
-    ---
-    topics:
-    - arn: arn:aws:sns:us-east-1:123456789012:es_ingest
-      name: es_ingest
-    - arn: arn:aws:sns:us-east-1:123456789012:id_minter
-      name: id_minter
-    messages:
-    - :id: acbca1e1-e3c5-4c74-86af-06a9418e8fe4
-      :subject: Foo
-      :message: '{"identifiers":[{"source":"Miro","sourceId":"MiroID","value":"1234"}],"title":"some
-        image title","accessStatus":null}'
-      :topic_arn: arn:aws:sns:us-east-1:123456789012:id_minter
-      :structure:
-      :target_arn:
-      :received_at: 2017-04-18 13:20:45.289912607 +00:00
-     */
-    val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-
-    val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
-
-    val snsResponse: SNSResponse = json.right.get
-      .as[SNSResponse]
-      .right
-      .get
-
-    snsResponse.messages
-      .filter { _.topicArn == topic.arn }
-  }
-
-  def createSNSConfigWith(topic: Topic): SNSConfig =
-    SNSConfig(topicArn = topic.arn)
+  def listMessagesReceivedFromSns(topic: Topic): Seq[String] =
+    getMessages(topic.destinationQueue)
+      .map(msg => fromJson[NotificationMessage](msg.body()).get)
+      .map(_.body)
 }
-
-case class SNSResponse(
-  topics: List[TopicInfo],
-  messages: List[MessageInfo] = Nil
-)
-
-case class TopicInfo(
-  arn: String,
-  name: String
-)
-
-case class MessageInfo(
-  messageId: String,
-  message: String,
-  subject: String,
-  topicArn: String
-)

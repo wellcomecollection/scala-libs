@@ -36,7 +36,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
 
   import SQS._
 
-  private val sqsInternalEndpointUrl = "http://sqs:9324"
+  private val sqsInternalEndpointUrl = "http://sqs:4566"
 
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
@@ -47,7 +47,7 @@ trait SQS extends Matchers with Logging with RandomGenerators {
       .region(Region.of("localhost"))
       .credentialsProvider(StaticCredentialsProvider.create(
         AwsBasicCredentials.create("access", "key")))
-      .endpointOverride(new URI("http://localhost:9324"))
+      .endpointOverride(new URI("http://localhost:4566"))
       .build()
 
   private def setQueueAttribute(
