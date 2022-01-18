@@ -26,7 +26,11 @@ object SQS {
   case class QueuePair(queue: Queue, dlq: Queue)
 }
 
-trait SQS extends Matchers with Logging with RandomGenerators with LocalStackFixtures {
+trait SQS
+    extends Matchers
+    with Logging
+    with RandomGenerators
+    with LocalStackFixtures {
 
   import SQS._
 

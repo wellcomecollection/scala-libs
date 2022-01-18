@@ -8,7 +8,12 @@ import weco.messaging.fixtures.SNS
 
 import scala.util.{Failure, Success}
 
-class SNSMessageSenderTest extends AnyFunSpec with Matchers with SNS with Eventually with IntegrationPatience {
+class SNSMessageSenderTest
+    extends AnyFunSpec
+    with Matchers
+    with SNS
+    with Eventually
+    with IntegrationPatience {
   it("sends messages to SNS") {
     withLocalSnsTopic { topic =>
       val sender = new SNSIndividualMessageSender(snsClient)
