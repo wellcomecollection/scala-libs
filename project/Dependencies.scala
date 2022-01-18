@@ -155,6 +155,11 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson
   )
 
+  val localstackDependencies = Seq(
+    "software.amazon.awssdk" % "auth" % versions.aws2,
+    "software.amazon.awssdk" % "regions" % versions.aws2
+  )
+
   val monitoringDependencies = Seq(
     "software.amazon.awssdk" % "cloudwatch" % versions.aws2
   ) ++
@@ -179,7 +184,8 @@ object Dependencies {
 
   val fixturesDependencies: Seq[ModuleID] =
     sl4jDependencies ++
-      scalatestDependencies
+      scalatestDependencies ++
+      localstackDependencies
 
   val typesafeAppDependencies =
     akkaDependencies ++

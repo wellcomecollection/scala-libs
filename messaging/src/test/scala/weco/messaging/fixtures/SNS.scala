@@ -1,10 +1,5 @@
 package weco.messaging.fixtures
 
-import software.amazon.awssdk.auth.credentials.{
-  AwsBasicCredentials,
-  StaticCredentialsProvider
-}
-import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.{
   CreateTopicRequest,
@@ -16,8 +11,6 @@ import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS.Queue
 import weco.messaging.sns.NotificationMessage
 
-import java.net.URI
-
 object SNS {
   case class Topic(arn: String, destinationQueue: Queue) {
     override def toString = s"SNS.Topic($arn)"
@@ -28,15 +21,12 @@ trait SNS extends SQS {
 
   import SNS._
 
-  private val localSNSEndpointUrl = "http://localhost:4566"
-
   implicit val snsClient: SnsClient =
     SnsClient
       .builder()
-      .region(Region.of("localhost"))
-      .credentialsProvider(StaticCredentialsProvider.create(
-        AwsBasicCredentials.create("access", "key")))
-      .endpointOverride(new URI(localSNSEndpointUrl))
+      .region(region)
+      .credentialsProvider(credentials)
+      .endpointOverride(endpoint)
       .build()
 
   def createTopicName: String =
