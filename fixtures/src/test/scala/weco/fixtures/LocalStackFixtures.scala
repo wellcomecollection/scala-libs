@@ -14,7 +14,7 @@ trait LocalStackFixtures {
   val port = 4566
   val endpoint = new URI(s"http://localhost:$port")
 
-  // The LocalStack container divides resources by credentials, i.e. if you connect
+  // The LocalStack container divides resources by credentials, e.g. if you connect
   // with key1/secret1, you'll see a different set of resources to key2/secret2.
   //
   // This means it's important for us to use a consistent set of credentials across
