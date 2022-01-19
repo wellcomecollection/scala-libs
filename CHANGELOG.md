@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v30.13.0 - 2022-01-19
+
+Change our SNS and SQS fixture to use a LocalStack container to mock cloud services, instead of the `fake-sns` and `elasticmq` containers we were using previously.
+The `fake-sns` image is no longer maintained, and prevents us from using newer SNS APIs in our libraries.
+
+Downstream users will need to replace `elasticmq` with `localstack` in their Docker Compose files.
+
 ## v30.12.1 - 2021-12-08
 
 Fix a typo that meant the "elasticsearch" library wasn't being published.
