@@ -5,13 +5,8 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
-import software.amazon.awssdk.auth.credentials.{
-  AwsBasicCredentials,
-  StaticCredentialsProvider
-}
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.sqs.model._
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
+import software.amazon.awssdk.services.sqs.model._
 import weco.fixtures._
 import weco.json.JsonUtil.toJson
 import weco.messaging.sns.NotificationMessage
@@ -19,7 +14,6 @@ import weco.messaging.sqs._
 import weco.monitoring.Metrics
 import weco.monitoring.memory.MemoryMetrics
 
-import java.net.URI
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -32,11 +26,15 @@ object SQS {
   case class QueuePair(queue: Queue, dlq: Queue)
 }
 
-trait SQS extends Matchers with Logging with RandomGenerators {
+trait SQS
+    extends Matchers
+    with Logging
+    with RandomGenerators
+    with LocalStackFixtures {
 
   import SQS._
 
-  private val sqsInternalEndpointUrl = "http://sqs:9324"
+  private val sqsInternalEndpointUrl = s"http://sqs:$port"
 
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
@@ -44,10 +42,9 @@ trait SQS extends Matchers with Logging with RandomGenerators {
   implicit val asyncSqsClient: SqsAsyncClient =
     SqsAsyncClient
       .builder()
-      .region(Region.of("localhost"))
-      .credentialsProvider(StaticCredentialsProvider.create(
-        AwsBasicCredentials.create("access", "key")))
-      .endpointOverride(new URI("http://localhost:9324"))
+      .region(region)
+      .credentialsProvider(credentials)
+      .endpointOverride(endpoint)
       .build()
 
   private def setQueueAttribute(

@@ -155,6 +155,11 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson
   )
 
+  val localstackDependencies = Seq(
+    "software.amazon.awssdk" % "auth" % versions.aws2,
+    "software.amazon.awssdk" % "regions" % versions.aws2
+  )
+
   val monitoringDependencies = Seq(
     "software.amazon.awssdk" % "cloudwatch" % versions.aws2
   ) ++
@@ -166,8 +171,7 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
     // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
-      exclude ("com.github.matsluni", "aws-spi-akka-http_2.12"),
-    "io.circe" %% "circe-yaml" % versions.circe
+      exclude ("com.github.matsluni", "aws-spi-akka-http_2.12")
   ) ++
     openTracingDependencies ++
     elasticApmBridgeDependencies ++
@@ -180,7 +184,8 @@ object Dependencies {
 
   val fixturesDependencies: Seq[ModuleID] =
     sl4jDependencies ++
-      scalatestDependencies
+      scalatestDependencies ++
+      localstackDependencies
 
   val typesafeAppDependencies =
     akkaDependencies ++
