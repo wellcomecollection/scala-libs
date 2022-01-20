@@ -138,5 +138,5 @@ trait DynamoReadableTestCases[
   def assertErrorsOnBadKeyType(createWrongTable: Table => Table): Assertion =
     assertErrorsOnWrongTableDefinition(
       createWrongTable,
-      message = "Type mismatch for attribute to update")
+      message = "One or more parameter values were invalid: Type mismatch for key")
 }
