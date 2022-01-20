@@ -26,7 +26,7 @@ trait SNS extends SQS {
       .builder()
       .region(region)
       .credentialsProvider(credentials)
-      .endpointOverride(localStackEndpoint)
+      .endpointOverride(endpoint)
       .build()
 
   def createTopicName: String =
