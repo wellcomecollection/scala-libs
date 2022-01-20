@@ -10,11 +10,16 @@ import org.scanamo.{
   Scanamo,
   Table => ScanamoTable
 }
+import software.amazon.awssdk.auth.credentials.{
+  AwsBasicCredentials,
+  StaticCredentialsProvider
+}
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model._
 import weco.fixtures._
 import weco.storage.dynamo.DynamoConfig
 
+import java.net.URI
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 
@@ -26,16 +31,15 @@ trait DynamoFixtures
     extends Eventually
     with Matchers
     with IntegrationPatience
-    with RandomGenerators
-    with LocalStackFixtures {
+    with RandomGenerators {
   import DynamoFixtures._
 
   implicit val dynamoClient: DynamoDbClient =
     DynamoDbClient
       .builder()
-      .region(region)
-      .credentialsProvider(credentials)
-      .endpointOverride(localStackEndpoint)
+      .credentialsProvider(StaticCredentialsProvider.create(
+        AwsBasicCredentials.create("access", "secret")))
+      .endpointOverride(new URI("http://localhost:45678"))
       .build()
 
   implicit val scanamo = Scanamo(dynamoClient)
