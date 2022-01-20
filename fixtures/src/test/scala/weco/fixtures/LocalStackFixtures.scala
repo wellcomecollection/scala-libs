@@ -11,8 +11,8 @@ import java.net.URI
 trait LocalStackFixtures {
   val region: Region = Region.of("localhost")
 
-  val port = 4566
-  val endpoint = new URI(s"http://localhost:$port")
+  val localStackPort = 4566
+  val localStackEndpoint = new URI(s"http://localhost:$localStackPort")
 
   // The LocalStack container divides resources by credentials, e.g. if you connect
   // with key1/secret1, you'll see a different set of resources to key2/secret2.
