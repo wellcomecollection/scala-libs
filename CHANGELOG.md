@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v30.14.0 - 2022-01-20
+
+Change our DynamoDB fixture to use a LocalStack container to mock cloud services, instead of the `peopleperhour/dynamodb` container we were using previously.
+The `peopleperhour` image is no longer maintained, and prevents us from using newer SNS APIs in our libraries.
+
+Downstream users will need to replace `peopleperhour/dynamodb` with `localstack` in their Docker Compose files.
+
 ## v30.13.0 - 2022-01-19
 
 Change our SNS and SQS fixture to use a LocalStack container to mock cloud services, instead of the `fake-sns` and `elasticmq` containers we were using previously.
