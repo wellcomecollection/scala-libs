@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v30.15.0 - 2022-01-20
+
+Switch to using the officially provided DynamoDB Local image from AWS.
+
 ## v30.14.0 - 2022-01-20
 
 Change our DynamoDB fixture to use a LocalStack container to mock cloud services, instead of the `peopleperhour/dynamodb` container we were using previously.
