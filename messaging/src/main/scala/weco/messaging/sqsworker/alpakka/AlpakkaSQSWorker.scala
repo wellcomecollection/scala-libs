@@ -26,10 +26,7 @@ class AlpakkaSQSWorker[Work,
                        InterServiceMonitoringContext,
                        Summary](
   config: AlpakkaSQSWorkerConfig,
-  val monitoringProcessorBuilder: (
-    ExecutionContext) => MonitoringProcessor[Work,
-                                             InfraServiceMonitoringContext,
-                                             InterServiceMonitoringContext]
+  val monitoringProcessorBuilder: ExecutionContext => MonitoringProcessor
 )(
   val doWork: Work => Future[Result[Summary]]
 )(implicit
@@ -66,10 +63,7 @@ object AlpakkaSQSWorker {
             InterServiceMonitoringContext,
             Summary](
     config: AlpakkaSQSWorkerConfig,
-    monitoringProcessorBuilder: (
-      ExecutionContext) => MonitoringProcessor[Work,
-                                               InfraServiceMonitoringContext,
-                                               InterServiceMonitoringContext])(
+    monitoringProcessorBuilder: ExecutionContext => MonitoringProcessor)(
     process: Work => Future[Result[Summary]]
   )(implicit
     sc: SqsAsyncClient,

@@ -23,7 +23,10 @@ class MetricsMonitoringProcessorTest
   it("records a success metric") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, processor) =>
-        val recorded = processor.recordEnd(Right(Instant.now), successful(work))
+        val recorded = processor.recordEnd(
+          startTime = Instant.now(),
+          result = successful(work)
+        )
 
         whenReady(recorded) {
           _ shouldBe a[Successful[_]]
@@ -43,7 +46,10 @@ class MetricsMonitoringProcessorTest
   it("reports monitoring failure if recording fails") {
     withMetricsMonitoringProcessor[MyWork, Unit](metrics = brokenMemoryMetrics) {
       case (_, metrics, processor) =>
-        val recorded = processor.recordEnd(Right(Instant.now), successful(work))
+        val recorded = processor.recordEnd(
+          startTime = Instant.now(),
+          result = successful(work)
+        )
 
         whenReady(recorded) {
           _ shouldBe a[MonitoringProcessorFailure[_]]
@@ -57,8 +63,10 @@ class MetricsMonitoringProcessorTest
   it("records a deterministic failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, processor) =>
-        val recorded =
-          processor.recordEnd(Right(Instant.now), deterministicFailure(work))
+        val recorded = processor.recordEnd(
+          startTime = Instant.now(),
+          result = deterministicFailure(work)
+        )
 
         whenReady(recorded) {
           _ shouldBe a[Successful[_]]
@@ -78,8 +86,10 @@ class MetricsMonitoringProcessorTest
   it("records a non deterministic failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, processor) =>
-        val recorded =
-          processor.recordEnd(Right(Instant.now), nonDeterministicFailure(work))
+        val recorded = processor.recordEnd(
+          startTime = Instant.now(),
+          result = nonDeterministicFailure(work)
+        )
 
         whenReady(recorded) {
           _ shouldBe a[Successful[_]]

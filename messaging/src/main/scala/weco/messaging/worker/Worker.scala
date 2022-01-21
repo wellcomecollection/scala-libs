@@ -1,19 +1,14 @@
 package weco.messaging.worker
 
 import weco.messaging.worker.models.{Completed, Retry, WorkCompletion}
-import weco.messaging.worker.steps.{
-  Logger,
-  MessageProcessor,
-  MessageTransform,
-  MonitoringProcessor
-}
+import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform, MonitoringProcessor}
 
-import scala.concurrent.Future
+import java.time.Instant
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * A Worker receives a `Message` and performs a series of steps. These steps are
   *    - [[weco.messaging.worker.steps.MessageTransform]]: deserialises the payload of the message into a `Work`
-  *    - [[weco.messaging.worker.steps.MonitoringProcessor#recordStart]]: starts monitoring
   *    - [[weco.messaging.worker.steps.MessageProcessor#process]]: performs an operation on the `Work`
   *    - [[weco.messaging.worker.steps.Logger#log]]: logs the result of the processing
   *    - [[weco.messaging.worker.steps.MonitoringProcessor#recordEnd]]: ends monitoring
@@ -42,29 +37,23 @@ trait Worker[Message,
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
-  protected val monitoringProcessor: MonitoringProcessor[
-    Work,
-    InfraServiceMonitoringContext,
-    InterServiceMonitoringContext]
+  protected val monitoringProcessor: MonitoringProcessor
 
-  final def processMessage(message: Message): Processed = {
-    implicit val e = (monitoringProcessor.ec)
+  implicit val ec: ExecutionContext
+
+  final def processMessage(message: Message): Processed =
     work(message).map(completion)
-  }
 
   private def work(message: Message): Future[Completion] = {
-    implicit val e = (monitoringProcessor.ec)
+    val startTime = Instant.now()
+
     for {
-      (workEither, rootContext) <- Future.successful(callTransform(message))
-      localContext <- monitoringProcessor.recordStart(workEither, rootContext)
-      summary <- process(workEither)
-      _ <- log(summary)
-      _ <- monitoringProcessor.recordEnd(localContext, summary)
+      (workEither, _) <- Future.successful(callTransform(message))
+      result <- process(workEither)
+      _ <- log(result)
+      _ <- monitoringProcessor.recordEnd(startTime = startTime, result = result)
     } yield
-      WorkCompletion(
-        message,
-        summary
-      )
+      WorkCompletion(message, result)
   }
 
   private def completion(done: Completion) =
