@@ -1,24 +1,13 @@
 package weco.messaging.worker
 
-import weco.messaging.worker.models.{Completed, Retry, WorkCompletion}
-import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform, MonitoringProcessor}
+import weco.messaging.worker.models.{Completed, MonitoringProcessorFailure, Result, Retry, Successful, WorkCompletion}
+import weco.messaging.worker.monitoring.metrics.MetricsProcessor
+import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform}
+import weco.monitoring.Metrics
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * A Worker receives a `Message` and performs a series of steps. These steps are
-  *    - [[weco.messaging.worker.steps.MessageTransform]]: deserialises the payload of the message into a `Work`
-  *    - [[weco.messaging.worker.steps.MessageProcessor#process]]: performs an operation on the `Work`
-  *    - [[weco.messaging.worker.steps.Logger#log]]: logs the result of the processing
-  *    - [[weco.messaging.worker.steps.MonitoringProcessor#recordEnd]]: ends monitoring
-  * @tparam Message: the message received by the Worker
-  * @tparam Work: the payload in the message
-  * @tparam InfraServiceMonitoringContext: the monitoring context to be passed around between different services
-  * @tparam InterServiceMonitoringContext: the monitoring context to be passed around within the current service
-  * @tparam Summary: description of the result of the process function
-  * @tparam Action: either [[Retry]] or [[Completed]]
-  */
 trait Worker[Message,
              Work,
              InfraServiceMonitoringContext,
@@ -37,7 +26,8 @@ trait Worker[Message,
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
-  protected val monitoringProcessor: MonitoringProcessor
+  implicit val metrics: Metrics[Future]
+  protected val metricsProcessor: MetricsProcessor
 
   implicit val ec: ExecutionContext
 
@@ -51,7 +41,7 @@ trait Worker[Message,
       (workEither, _) <- Future.successful(callTransform(message))
       result <- process(workEither)
       _ <- log(result)
-      _ <- monitoringProcessor.recordEnd(startTime = startTime, result = result)
+      _ <- recordEnd(startTime = startTime, result = result)
     } yield
       WorkCompletion(message, result)
   }
@@ -65,4 +55,12 @@ trait Worker[Message,
         }
     }
 
+  /** Records metrics about the work that's just been completed; in particular the
+    * outcome and the duration.
+    */
+  private def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] =
+    metricsProcessor
+      .recordResult(result, startTime)
+      .map(_ => Successful[Unit]())
+      .recover { case e => MonitoringProcessorFailure[Unit](e) }
 }

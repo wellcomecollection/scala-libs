@@ -3,9 +3,8 @@ package weco.messaging.worker
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.{Done, NotUsed}
-import weco.messaging.worker.steps.MonitoringProcessor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 /**
   * Implementation of [[weco.messaging.worker.Worker]] based on akka streams
@@ -26,10 +25,7 @@ trait AkkaWorker[Message,
 
   implicit val as: ActorSystem
   override implicit val ec = as.dispatcher
-  protected val monitoringProcessorBuilder:
-    ExecutionContext => MonitoringProcessor
 
-  override final val monitoringProcessor = monitoringProcessorBuilder(ec)
   type MessageSource = Source[Message, NotUsed]
   type MessageSink = Sink[Action, Future[Done]]
 

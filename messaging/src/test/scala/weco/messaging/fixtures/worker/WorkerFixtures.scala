@@ -1,11 +1,11 @@
 package weco.messaging.fixtures.worker
 
 import java.time.Instant
-
 import weco.messaging.worker._
 import weco.messaging.worker.models._
-import weco.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
+import weco.messaging.worker.monitoring.metrics.MetricsProcessor
 import weco.messaging.worker.steps.MessageProcessor
+import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,19 +44,20 @@ trait WorkerFixtures {
   case class MyExternalMessageAction(action: Action)
 
   class MyWorker(
-    val monitoringProcessor: MetricsMonitoringProcessor[MyWork],
+    namespace: String,
     testProcess: TestInnerProcess,
     val transform: MyMessage => (Either[Throwable, MyWork],
-                                 Either[Throwable, Option[MyContext]])
-  )(implicit val ec: ExecutionContext)
-      extends Worker[
-        MyMessage,
-        MyWork,
-        MyContext,
-        MyContext,
-        MySummary,
-        MyExternalMessageAction
-      ] {
+      Either[Throwable, Option[MyContext]])
+  )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
+    extends Worker[
+      MyMessage,
+      MyWork,
+      MyContext,
+      MyContext,
+      MySummary,
+      MyExternalMessageAction
+    ] {
+    override val metricsProcessor: MetricsProcessor = new MetricsProcessor(namespace)
 
     val callCounter = new CallCounter()
 
