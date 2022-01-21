@@ -2,24 +2,13 @@ package weco.messaging.worker.steps
 
 import weco.messaging.worker.models._
 
+import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * Records the start and end of an operation to monitor.
-  * @tparam Work: the payload in the message
-  * @tparam InfraServiceMonitoringContext: the monitoring context to be passed around between different services
-  * @tparam InterServiceMonitoringContext: the monitoring context to be passed around within the current service
-  */
-trait MonitoringProcessor[
-  Work, InfraServiceMonitoringContext, InterServiceMonitoringContext] {
+trait MonitoringProcessor {
   implicit val ec: ExecutionContext
 
-  def recordStart(
-    work: Either[Throwable, Work],
-    context: Either[Throwable, Option[InfraServiceMonitoringContext]])
-    : Future[Either[Throwable, InterServiceMonitoringContext]]
-
   def recordEnd[Recorded](
-    context: Either[Throwable, InterServiceMonitoringContext],
+    startTime: Instant,
     result: Result[Recorded]): Future[Result[Unit]]
 }

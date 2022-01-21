@@ -41,8 +41,8 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
     implicit val metrics: MemoryMetrics = new MemoryMetrics()
 
     val metricsProcessorBuilder
-      : ExecutionContext => MetricsMonitoringProcessor[MyWork] =
-      new MetricsMonitoringProcessor[MyWork](namespace)(metrics, _)
+      : ExecutionContext => MetricsMonitoringProcessor =
+      new MetricsMonitoringProcessor(namespace)(metrics, _)
 
     val config = createAlpakkaSQSWorkerConfig(queue, namespace)
 

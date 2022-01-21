@@ -27,9 +27,7 @@ trait AkkaWorker[Message,
   implicit val as: ActorSystem
   private val ec = as.dispatcher
   protected val monitoringProcessorBuilder: (
-    ExecutionContext) => MonitoringProcessor[Work,
-                                             InfraServiceMonitoringContext,
-                                             InterServiceMonitoringContext]
+    ExecutionContext) => MonitoringProcessor
 
   override final val monitoringProcessor = monitoringProcessorBuilder(ec)
   type MessageSource = Source[Message, NotUsed]

@@ -24,12 +24,12 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
     metrics: MemoryMetrics = new MemoryMetrics
   )(
     testWith: TestWith[
-      (String, MemoryMetrics, MetricsMonitoringProcessor[Work]),
+      (String, MemoryMetrics, MetricsMonitoringProcessor),
       R]
   )(
     implicit ec: ExecutionContext
   ): R = {
-    val processor = new MetricsMonitoringProcessor[Work](namespace)(metrics, ec)
+    val processor = new MetricsMonitoringProcessor(namespace)(metrics, ec)
 
     testWith((namespace, metrics, processor))
   }

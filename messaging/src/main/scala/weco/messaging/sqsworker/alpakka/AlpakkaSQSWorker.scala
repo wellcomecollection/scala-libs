@@ -4,16 +4,13 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
-import weco.messaging.worker._
-import weco.messaging.worker.models._
-import weco.messaging.worker.steps.MonitoringProcessor
-import weco.messaging.worker.{AkkaWorker, SnsSqsTransform}
+import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import weco.messaging.worker.models.Result
 import weco.messaging.worker.steps.MonitoringProcessor
+import weco.messaging.worker.{AkkaWorker, SnsSqsTransform}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,10 +23,7 @@ class AlpakkaSQSWorker[Work,
                        InterServiceMonitoringContext,
                        Summary](
   config: AlpakkaSQSWorkerConfig,
-  val monitoringProcessorBuilder: (
-    ExecutionContext) => MonitoringProcessor[Work,
-                                             InfraServiceMonitoringContext,
-                                             InterServiceMonitoringContext]
+  val monitoringProcessorBuilder: ExecutionContext => MonitoringProcessor
 )(
   val doWork: Work => Future[Result[Summary]]
 )(implicit
@@ -66,10 +60,7 @@ object AlpakkaSQSWorker {
             InterServiceMonitoringContext,
             Summary](
     config: AlpakkaSQSWorkerConfig,
-    monitoringProcessorBuilder: (
-      ExecutionContext) => MonitoringProcessor[Work,
-                                               InfraServiceMonitoringContext,
-                                               InterServiceMonitoringContext])(
+    monitoringProcessorBuilder: ExecutionContext => MonitoringProcessor)(
     process: Work => Future[Result[Summary]]
   )(implicit
     sc: SqsAsyncClient,

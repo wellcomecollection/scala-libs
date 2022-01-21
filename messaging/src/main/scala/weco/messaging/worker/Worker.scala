@@ -1,13 +1,9 @@
 package weco.messaging.worker
 
 import weco.messaging.worker.models.{Completed, Retry, WorkCompletion}
-import weco.messaging.worker.steps.{
-  Logger,
-  MessageProcessor,
-  MessageTransform,
-  MonitoringProcessor
-}
+import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform, MonitoringProcessor}
 
+import java.time.Instant
 import scala.concurrent.Future
 
 /**
@@ -42,10 +38,7 @@ trait Worker[Message,
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
-  protected val monitoringProcessor: MonitoringProcessor[
-    Work,
-    InfraServiceMonitoringContext,
-    InterServiceMonitoringContext]
+  protected val monitoringProcessor: MonitoringProcessor
 
   final def processMessage(message: Message): Processed = {
     implicit val e = (monitoringProcessor.ec)
@@ -56,10 +49,12 @@ trait Worker[Message,
     implicit val e = (monitoringProcessor.ec)
     for {
       (workEither, rootContext) <- Future.successful(callTransform(message))
-      localContext <- monitoringProcessor.recordStart(workEither, rootContext)
+
+      startTime = Instant.now()
+
       summary <- process(workEither)
       _ <- log(summary)
-      _ <- monitoringProcessor.recordEnd(localContext, summary)
+      _ <- monitoringProcessor.recordEnd(startTime, summary)
     } yield
       WorkCompletion(
         message,
