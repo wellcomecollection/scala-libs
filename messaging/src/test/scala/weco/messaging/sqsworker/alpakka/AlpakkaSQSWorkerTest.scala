@@ -157,7 +157,7 @@ class AlpakkaSQSWorkerTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/NonDeterministicFailure",
+                    metricName = s"$namespace/RetryableFailure",
                     expectedCount = 3
                   )
                   assertMetricDurations(
@@ -192,7 +192,7 @@ class AlpakkaSQSWorkerTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
@@ -226,7 +226,7 @@ class AlpakkaSQSWorkerTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
