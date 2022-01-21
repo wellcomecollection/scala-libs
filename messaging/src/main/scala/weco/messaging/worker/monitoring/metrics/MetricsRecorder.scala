@@ -40,9 +40,6 @@ class MetricsRecorder(namespace: String)(
 
   private def secondsSince(startTime: Instant) =
     Duration
-      .between(
-        startTime,
-        Instant.now()
-      )
+      .between(startTime, Instant.now())
       .getSeconds
 }
