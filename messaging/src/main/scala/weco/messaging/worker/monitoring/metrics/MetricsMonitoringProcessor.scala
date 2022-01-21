@@ -18,10 +18,7 @@ final class MetricsMonitoringProcessor(val namespace: String)(
     extends MonitoringProcessor
     with MetricsProcessor {
 
-  override def recordEnd[Recorded](
-    startTime: Instant,
-    result: Result[Recorded]
-  ): Future[Result[Unit]] = {
+  override def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] = {
     val monitoring = metric(result, startTime)
       .map(_ => Successful[Unit]())
 

@@ -8,7 +8,5 @@ import scala.concurrent.{ExecutionContext, Future}
 trait MonitoringProcessor {
   implicit val ec: ExecutionContext
 
-  def recordEnd[Recorded](
-    startTime: Instant,
-    result: Result[Recorded]): Future[Result[Unit]]
+  def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]]
 }
