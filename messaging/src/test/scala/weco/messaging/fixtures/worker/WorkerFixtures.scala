@@ -33,11 +33,11 @@ trait WorkerFixtures {
     if (toActionShouldFail) {
       throw new RuntimeException("BOOM")
     } else {
-      MyExternalMessageAction(result.asInstanceOf[Action])
+      MyExternalMessageAction(result)
     }
   }
 
-  case class MyExternalMessageAction(action: Action)
+  case class MyExternalMessageAction(result: Result[MySummary])
 
   class MyWorker(
     val metricsRecorder: MetricsRecorder,
@@ -49,10 +49,12 @@ trait WorkerFixtures {
     val callCounter = new CallCounter()
 
     override val retryAction: MyMessage => MyExternalMessageAction =
-      _ => MyExternalMessageAction(new Retry {})
+      _ => MyExternalMessageAction(
+        NonDeterministicFailure[MySummary](new Throwable("BOOM!"))
+      )
 
     override val completedAction: MyMessage => MyExternalMessageAction =
-      _ => MyExternalMessageAction(new Completed {})
+      _ => MyExternalMessageAction(Successful())
 
     override val doWork =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)

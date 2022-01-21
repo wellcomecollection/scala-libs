@@ -1,7 +1,7 @@
 package weco.messaging.worker
 
 import grizzled.slf4j.Logging
-import weco.messaging.worker.models.{Completed, DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Retry, Successful}
+import weco.messaging.worker.models.{DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Successful}
 import weco.messaging.worker.monitoring.metrics.MetricsRecorder
 
 import java.time.Instant
@@ -55,8 +55,8 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
     }
 
   private def chooseAction(summary: Result[Summary]): Message => Action =
-    summary.asInstanceOf[Action] match {
-      case _: Retry     => retryAction
-      case _: Completed => completedAction
+    summary match {
+      case _: NonDeterministicFailure[_] => retryAction
+      case _                             => completedAction
     }
 }
