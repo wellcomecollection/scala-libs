@@ -110,7 +110,7 @@ class AlpakkaSQSProcessorTest
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
-            withAlpakkaSQSWorker(queue, deterministicFailure, namespace) {
+            withAlpakkaSQSWorker(queue, terminalFailure, namespace) {
               case (worker, _, metrics, callCounter) =>
                 worker.start
 
@@ -145,7 +145,7 @@ class AlpakkaSQSProcessorTest
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
-            withAlpakkaSQSWorker(queue, nonDeterministicFailure, namespace) {
+            withAlpakkaSQSWorker(queue, retryableFailure, namespace) {
               case (worker, _, metrics, callCounter) =>
                 worker.start
 

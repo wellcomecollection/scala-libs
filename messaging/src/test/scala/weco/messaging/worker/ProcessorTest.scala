@@ -133,7 +133,7 @@ class ProcessorTest
       case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyProcessor(
           monitoringProcessor,
-          deterministicFailure,
+          terminalFailure,
           messageToWork(shouldFail = false)
         )
 
@@ -162,7 +162,7 @@ class ProcessorTest
       case (namespace, metrics, monitoringProcessor) =>
         val worker = new MyProcessor(
           monitoringProcessor,
-          nonDeterministicFailure,
+          retryableFailure,
           messageToWork(shouldFail = false)
         )
 

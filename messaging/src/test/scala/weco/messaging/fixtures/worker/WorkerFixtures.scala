@@ -86,16 +86,16 @@ trait WorkerFixtures {
     )
   }
 
-  val nonDeterministicFailure = (_: MyWork) =>
+  val retryableFailure = (_: MyWork) =>
     RetryableFailure[MySummary](
-      new RuntimeException("NonDeterministicFailure"),
-      Some("Summary NonDeterministicFailure")
+      new RuntimeException("RetryableFailure"),
+      Some("Summary of a RetryableFailure")
   )
 
-  val deterministicFailure = (_: MyWork) =>
+  val terminalFailure = (_: MyWork) =>
     TerminalFailure[MySummary](
-      new RuntimeException("DeterministicFailure"),
-      Some("Summary DeterministicFailure")
+      new RuntimeException("TerminalFailure"),
+      Some("Summary of a TerminalFailure")
   )
 
   val monitoringProcessorFailure = (_: MyWork) =>

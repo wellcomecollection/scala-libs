@@ -60,12 +60,12 @@ class MetricsRecorderTest
     }
   }
 
-  it("records a deterministic failure") {
+  it("records a terminal failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, processor) =>
         val recorded = processor.recordEnd(
           startTime = Instant.now,
-          result = deterministicFailure(work)
+          result = terminalFailure(work)
         )
 
         whenReady(recorded) {
@@ -74,7 +74,7 @@ class MetricsRecorderTest
 
         assertMetricCount(
           metrics = metrics,
-          metricName = s"$namespace/DeterministicFailure",
+          metricName = s"$namespace/TerminalFailure",
           expectedCount = 1)
         assertMetricDurations(
           metrics = metrics,
@@ -83,12 +83,12 @@ class MetricsRecorderTest
     }
   }
 
-  it("records a non deterministic failure") {
+  it("records a retryable failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, processor) =>
         val recorded = processor.recordEnd(
           startTime = Instant.now,
-          result = nonDeterministicFailure(work)
+          result = retryableFailure(work)
         )
 
         whenReady(recorded) {
@@ -97,7 +97,7 @@ class MetricsRecorderTest
 
         assertMetricCount(
           metrics = metrics,
-          metricName = s"$namespace/NonDeterministicFailure",
+          metricName = s"$namespace/RetryableFailure",
           expectedCount = 1)
         assertMetricDurations(
           metrics = metrics,
