@@ -81,7 +81,8 @@ class S3StreamReadableTest
   }
 
   it("retries if it's unable to connect to S3") {
-    val wrongPortClient = createS3ClientWithEndpoint(s"http://localhost:${s3Port + 1}")
+    val wrongPortClient =
+      createS3ClientWithEndpoint(s"http://localhost:${s3Port + 1}")
     val spyClient = spy(wrongPortClient)
 
     val retries = 4
@@ -97,7 +98,8 @@ class S3StreamReadableTest
   }
 
   it("retries if it can't resolve the S3 endpoint") {
-    val wrongPortClient = createS3ClientWithEndpoint(s"http://this-cannot-be-resolved.nope")
+    val wrongPortClient =
+      createS3ClientWithEndpoint(s"http://this-cannot-be-resolved.nope")
     val spyClient = spy(wrongPortClient)
 
     val retries = 4

@@ -18,7 +18,8 @@ object S3Errors {
         if exc.getMessage.startsWith("The specified bucket is not valid") =>
       StoreReadError(exc)
 
-    case exc: SdkClientException if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+    case exc: SdkClientException
+        if exc.getMessage.startsWith("Unable to execute HTTP request") =>
       new StoreReadError(exc) with RetryableError
 
     case exc: SocketTimeoutException =>
