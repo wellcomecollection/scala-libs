@@ -16,7 +16,7 @@ import weco.messaging.fixtures.worker.AlpakkaSQSWorkerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AlpakkaSQSWorkerTest
+class AlpakkaSQSProcessorTest
     extends AnyFunSpec
     with Matchers
     with AlpakkaSQSWorkerFixtures

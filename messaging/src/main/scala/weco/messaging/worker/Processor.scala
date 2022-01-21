@@ -8,10 +8,20 @@ import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait Worker[Message, Work, Summary, Action] extends Logging {
+/** A Processor:
+  *
+  *   - receives a `Message` (e.g. a message from an SQS queue)
+  *   - extracts an `Input` from the message (e.g. the ID of a record)
+  *   - does some processing on the `Input` (e.g. fetching the record and
+  *     doing a data transformation)
+  *   - gets a `Summary` of the processing received
+  *   - applies an `Action` to the message (e.g. removing it from the queue)
+  *
+  */
+trait Processor[Message, Input, Summary, Action] extends Logging {
 
-  protected val parseMessage: Message => Either[Throwable, Work]
-  protected val doWork: Work => Future[Result[Summary]]
+  protected val parseMessage: Message => Either[Throwable, Input]
+  protected val doProcessing: Input => Future[Result[Summary]]
 
   implicit val ec: ExecutionContext
 
@@ -36,10 +46,10 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
     } yield action
   }
 
-  private def process(workEither: Either[Throwable, Work]): Future[Result[Summary]] =
+  private def process(workEither: Either[Throwable, Input]): Future[Result[Summary]] =
     workEither.fold(
       e => Future.successful(DeterministicFailure[Summary](e)),
-      w => doWork(w) recover {
+      w => doProcessing(w) recover {
         case e => DeterministicFailure[Summary](e)
       }
     )

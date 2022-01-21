@@ -6,7 +6,7 @@ import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS
 import weco.messaging.fixtures.SQS.Queue
 import weco.messaging.sqsworker.alpakka.{
-  AlpakkaSQSWorker,
+  AlpakkaSQSProcessor,
   AlpakkaSQSWorkerConfig
 }
 import weco.monitoring.MetricsConfig
@@ -30,7 +30,7 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
     process: TestInnerProcess,
     namespace: String = randomAlphanumeric()
   )(testWith: TestWith[
-      (AlpakkaSQSWorker[MyWork, MySummary],
+      (AlpakkaSQSProcessor[MyWork, MySummary],
        AlpakkaSQSWorkerConfig,
        MemoryMetrics,
        CallCounter),
@@ -45,7 +45,7 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
     val testProcess = (work: MyWork) =>
       createResult(process, callCounter)(ec)(work)
 
-    val worker = new AlpakkaSQSWorker[MyWork, MySummary](config)(testProcess)
+    val worker = new AlpakkaSQSProcessor[MyWork, MySummary](config)(testProcess)
 
     testWith((worker, config, metrics, callCounter))
   }

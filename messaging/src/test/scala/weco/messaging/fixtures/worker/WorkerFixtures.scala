@@ -39,12 +39,12 @@ trait WorkerFixtures {
 
   case class MyExternalMessageAction(result: Result[MySummary])
 
-  class MyWorker(
+  class MyProcessor(
     val metricsRecorder: MetricsRecorder,
     testProcess: TestInnerProcess,
     val parseMessage: MyMessage => Either[Throwable, MyWork]
   )(implicit val ec: ExecutionContext)
-      extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
+      extends Processor[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
 
     val callCounter = new CallCounter()
 
@@ -56,7 +56,7 @@ trait WorkerFixtures {
     override val completedAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(Successful())
 
-    override val doWork =
+    override val doProcessing =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)
   }
 

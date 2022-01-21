@@ -10,7 +10,7 @@ import weco.messaging.fixtures.worker.WorkerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class WorkerTest
+class ProcessorTest
     extends AnyFunSpec
     with Matchers
     with Akka
@@ -21,7 +21,7 @@ class WorkerTest
   it("successfully processes a work and increments success metrics") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           successful,
           messageToWork(shouldFail = false)
@@ -49,7 +49,7 @@ class WorkerTest
   it("increments deterministic failure metric if transformation returns a Left") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           successful,
           messageToWork(shouldFail = true)
@@ -80,7 +80,7 @@ class WorkerTest
 
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           successful,
           transform
@@ -109,7 +109,7 @@ class WorkerTest
     withMetricsMonitoringProcessor[MyWork, Assertion](
       metrics = brokenMemoryMetrics) {
       case (_, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           successful,
           messageToWork(shouldFail = false)
@@ -131,7 +131,7 @@ class WorkerTest
     "increments deterministic failure metric if processing fails with deterministic failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           deterministicFailure,
           messageToWork(shouldFail = false)
@@ -160,7 +160,7 @@ class WorkerTest
     "increments non deterministic failure metric if processing fails with non deterministic failure") {
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
-        val worker = new MyWorker(
+        val worker = new MyProcessor(
           monitoringProcessor,
           nonDeterministicFailure,
           messageToWork(shouldFail = false)
