@@ -44,7 +44,8 @@ class SNSMessageSenderTest
   }
 
   it("fails with a retryable error if it can't connect to SNS") {
-    val wrongPortClient = createClientWithEndpoint(new URI(s"http://localhost:${localStackPort + 1}"))
+    val wrongPortClient = createClientWithEndpoint(
+      new URI(s"http://localhost:${localStackPort + 1}"))
 
     val sender = new SNSIndividualMessageSender(wrongPortClient)
 
@@ -59,7 +60,8 @@ class SNSMessageSenderTest
   }
 
   it("fails with a retryable error if it can't resolve the SNS endpoint") {
-    val unresolvableClient = createClientWithEndpoint(new URI(s"http://this-cannot-be-resolved.nope"))
+    val unresolvableClient =
+      createClientWithEndpoint(new URI(s"http://this-cannot-be-resolved.nope"))
 
     val sender = new SNSIndividualMessageSender(unresolvableClient)
 

@@ -9,7 +9,8 @@ import scala.util.{Failure, Success}
 trait IndividualMessageSender[Destination] {
   type MessageSenderResult = Either[MessageSenderError, Unit]
 
-  def send(body: String)(subject: String, destination: Destination): MessageSenderResult
+  def send(body: String)(subject: String,
+                         destination: Destination): MessageSenderResult
 
   def sendT[T](t: T)(subject: String, destination: Destination)(
     implicit encoder: Encoder[T]): MessageSenderResult =
