@@ -105,9 +105,9 @@ class SQSStream[T](
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
   private def decider(metricName: String): Supervision.Decider = {
-    case e @ (_: RecognisedFailure | _: JsonDecodingError) =>
+    case e: JsonDecodingError =>
       logException(e)
-      metricsSender.incrementCount(s"${metricName}_recognisedFailure")
+      metricsSender.incrementCount(s"${metricName}_jsonDecodingFailure")
       Supervision.resume
     case e: Exception =>
       logException(e)
@@ -120,8 +120,6 @@ class SQSStream[T](
 
   private def logException(exception: Throwable): Unit = {
     exception match {
-      case exception: RecognisedFailure =>
-        logger.warn(s"Recognised failure: ${exception.getMessage}")
       case exception: JsonDecodingError =>
         logger.warn(s"JSON decoding error: ${exception.getMessage}")
       case exception: Exception =>

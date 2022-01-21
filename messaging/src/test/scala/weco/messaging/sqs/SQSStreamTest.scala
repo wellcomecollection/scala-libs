@@ -87,9 +87,9 @@ class SQSStreamTest
 
         eventually {
           metricsSender.incrementedCounts shouldBe Seq(
-            s"${streamName}_ProcessMessage_recognisedFailure",
-            s"${streamName}_ProcessMessage_recognisedFailure",
-            s"${streamName}_ProcessMessage_recognisedFailure"
+            s"${streamName}_ProcessMessage_jsonDecodingFailure",
+            s"${streamName}_ProcessMessage_jsonDecodingFailure",
+            s"${streamName}_ProcessMessage_jsonDecodingFailure"
           )
           received shouldBe empty
 
