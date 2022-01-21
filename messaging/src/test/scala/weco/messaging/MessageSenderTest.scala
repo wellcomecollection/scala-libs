@@ -6,10 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import weco.fixtures.RandomGenerators
 import weco.json.JsonUtil._
 import weco.json.utils.JsonAssertions
-import weco.messaging.memory.{
-  MemoryIndividualMessageSender,
-  MemoryMessageSender
-}
+import weco.messaging.memory.{MemoryIndividualMessageSender, MemoryMessageSender}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -26,10 +23,8 @@ class MessageSenderTest
     sender.send("hello world")(
       subject = "my first message",
       destination = "greetings") shouldBe Right(())
-    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Right(
-      ())
-    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Right(
-      ())
+    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Right(())
+    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Right(())
     sender.send("chinese")(
       subject = "a non-alphabet language",
       destination = "languages") shouldBe Right(())
@@ -45,7 +40,9 @@ class MessageSenderTest
   it("can send many messages in parallel") {
     val sender = new MemoryIndividualMessageSender()
 
-    def send(body: String, subject: String, destination: String): Future[_] =
+    def send(body: String,
+             subject: String,
+             destination: String): Future[_] =
       Future(sender.send(body)(subject, destination))
 
     val toSend = Function.tupled(send _)
@@ -78,8 +75,7 @@ class MessageSenderTest
     val snake = Animal(name = "snake", legs = 0)
 
     Seq(dog, octopus, snake).map { animal =>
-      sender.sendT(animal)(subject = "animals", destination = "all creatures") shouldBe Right(
-        ())
+      sender.sendT(animal)(subject = "animals", destination = "all creatures") shouldBe Right(())
     }
 
     Seq(dog, octopus, snake).zip(sender.messages).map {

@@ -3,13 +3,7 @@ package weco.storage.s3
 import com.amazonaws.SdkClientException
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import weco.errors.RetryableError
-import weco.storage.{
-  DoesNotExistError,
-  ReadError,
-  StoreReadError,
-  StoreWriteError,
-  WriteError
-}
+import weco.storage.{DoesNotExistError, ReadError, StoreReadError, StoreWriteError, WriteError}
 
 import java.net.SocketTimeoutException
 
@@ -25,8 +19,7 @@ object S3Errors {
         if exc.getMessage.startsWith("The specified bucket is not valid") =>
       StoreReadError(exc)
 
-    case exc: SdkClientException
-        if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+    case exc: SdkClientException if exc.getMessage.startsWith("Unable to execute HTTP request") =>
       new StoreReadError(exc) with RetryableError
 
     case exc: SocketTimeoutException =>

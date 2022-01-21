@@ -7,7 +7,11 @@ import weco.errors.RetryableError
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.storage.models.ByteRange
 import weco.storage.streaming.Codec
-import weco.storage.{DoesNotExistError, ReadError, StoreReadError}
+import weco.storage.{
+  DoesNotExistError,
+  ReadError,
+  StoreReadError
+}
 
 trait LargeStreamReaderTestCases[Ident, Namespace]
     extends AnyFunSpec

@@ -1,11 +1,7 @@
 package weco.messaging.fixtures
 
 import software.amazon.awssdk.services.sns.SnsClient
-import software.amazon.awssdk.services.sns.model.{
-  CreateTopicRequest,
-  DeleteTopicRequest,
-  SubscribeRequest
-}
+import software.amazon.awssdk.services.sns.model.{CreateTopicRequest, DeleteTopicRequest, SubscribeRequest}
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS.Queue

@@ -9,9 +9,8 @@ import scala.util.{Failure, Success, Try}
 class SNSIndividualMessageSender(
   snsClient: SnsClient,
 ) extends IndividualMessageSender[SNSConfig] {
-  override def send(message: String)(
-    subject: String,
-    destination: SNSConfig): MessageSenderResult = {
+  override def send(message: String)(subject: String,
+                                     destination: SNSConfig): MessageSenderResult = {
     val result = Try {
       snsClient.publish(
         PublishRequest
