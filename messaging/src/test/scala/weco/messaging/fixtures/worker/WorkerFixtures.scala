@@ -47,17 +47,18 @@ trait WorkerFixtures {
     namespace: String,
     testProcess: TestInnerProcess,
     val transform: MyMessage => (Either[Throwable, MyWork],
-      Either[Throwable, Option[MyContext]])
+                                 Either[Throwable, Option[MyContext]])
   )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
-    extends Worker[
-      MyMessage,
-      MyWork,
-      MyContext,
-      MyContext,
-      MySummary,
-      MyExternalMessageAction
-    ] {
-    override val metricsProcessor: MetricsProcessor = new MetricsProcessor(namespace)
+      extends Worker[
+        MyMessage,
+        MyWork,
+        MyContext,
+        MyContext,
+        MySummary,
+        MyExternalMessageAction
+      ] {
+    override val metricsProcessor: MetricsProcessor = new MetricsProcessor(
+      namespace)
 
     val callCounter = new CallCounter()
 
