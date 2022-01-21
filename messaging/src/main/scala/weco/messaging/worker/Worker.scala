@@ -3,17 +3,15 @@ package weco.messaging.worker
 import grizzled.slf4j.Logging
 import weco.messaging.worker.models.{Completed, DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Retry, Successful, WorkCompletion}
 import weco.messaging.worker.monitoring.metrics.MetricsRecorder
-import weco.messaging.worker.steps.MessageProcessor
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait Worker[Message, Work, Summary, Action]
-    extends MessageProcessor[Work, Summary]
-      with Logging{
+trait Worker[Message, Work, Summary, Action] extends Logging {
 
   protected val parseWork: Message => Either[Throwable, Work]
+  protected val doWork: Work => Future[Result[Summary]]
 
   type Processed = Future[Action]
 
@@ -44,6 +42,14 @@ trait Worker[Message, Work, Summary, Action]
       _ <- metricsRecorder.recordEnd(startTime, summary)
     } yield WorkCompletion(message, summary)
   }
+
+  private def process(workEither: Either[Throwable, Work]): Future[Result[Summary]] =
+    workEither.fold(
+      e => Future.successful(DeterministicFailure[Summary](e)),
+      w => doWork(w) recover {
+        case e => DeterministicFailure[Summary](e)
+      }
+    )
 
   private def completion(done: Completion): Action =
     done match {
