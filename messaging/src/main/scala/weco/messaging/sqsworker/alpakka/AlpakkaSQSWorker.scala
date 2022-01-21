@@ -15,10 +15,6 @@ import weco.monitoring.Metrics
 
 import scala.concurrent.Future
 
-/***
-  * Implementation of [[AkkaWorker]] that uses SQS as source and sink.
-  * It receives messages from SQS and deletes messages from SQS on successful completion
-  */
 class AlpakkaSQSWorker[Work, Summary](
   config: AlpakkaSQSWorkerConfig,
 )(
