@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.1.0 - 2022-01-21
+
+This release removes a couple of classes and traits which aren't used anywhere outside the `messaging` library itself, and so can be removed without any effect on downstream users.
+
 ## v32.0.0 - 2022-01-21
 
 This release rolls back some of the SNS error handling logic in v31.0.0, because it was too disruptive downstream and I found a simpler path forward.
