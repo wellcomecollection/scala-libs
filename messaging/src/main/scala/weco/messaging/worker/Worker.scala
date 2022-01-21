@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 
 trait Worker[Message, Work, Summary, Action] extends Logging {
 
-  protected val parseWork: Message => Either[Throwable, Work]
+  protected val parseMessage: Message => Either[Throwable, Work]
   protected val doWork: Work => Future[Result[Summary]]
 
   implicit val ec: ExecutionContext
@@ -23,7 +23,7 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   final def processMessage(message: Message): Future[Action] = {
     val startTime = Instant.now()
 
-    val workEither = Try(parseWork(message)) match {
+    val workEither = Try(parseMessage(message)) match {
       case Success(value) => value
       case Failure(e)     => Left(e)
     }

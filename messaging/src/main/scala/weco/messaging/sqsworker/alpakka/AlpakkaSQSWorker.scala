@@ -28,7 +28,7 @@ class AlpakkaSQSWorker[Work, Summary](
 
   type SQSAction = SQSMessage => sqs.MessageAction
 
-  override val parseWork = (message: SQSMessage) => {
+  override val parseMessage = (message: SQSMessage) => {
     val f = for {
       notification <- fromJson[NotificationMessage](message.body())
       work <- fromJson[Work](notification.body)

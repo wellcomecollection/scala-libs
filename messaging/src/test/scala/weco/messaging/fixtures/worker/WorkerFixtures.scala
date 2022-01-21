@@ -42,7 +42,7 @@ trait WorkerFixtures {
   class MyWorker(
     val metricsRecorder: MetricsRecorder,
     testProcess: TestInnerProcess,
-    val parseWork: MyMessage => Either[Throwable, MyWork]
+    val parseMessage: MyMessage => Either[Throwable, MyWork]
   )(implicit val ec: ExecutionContext)
       extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
 
