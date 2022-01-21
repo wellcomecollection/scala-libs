@@ -8,7 +8,8 @@ import software.amazon.awssdk.services.dynamodb.model.{
   DynamoDbException,
   ResourceNotFoundException
 }
-import weco.storage.{RetryableError, Version}
+import weco.errors.RetryableError
+import weco.storage.Version
 import weco.storage.dynamo.DynamoEntry
 import weco.storage.fixtures.DynamoFixtures
 import weco.storage.fixtures.DynamoFixtures.Table

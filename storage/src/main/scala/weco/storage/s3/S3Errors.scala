@@ -1,14 +1,10 @@
 package weco.storage.s3
 
-import java.net.SocketTimeoutException
-
 import com.amazonaws.services.s3.model.AmazonS3Exception
-import weco.storage.{
-  DoesNotExistError,
-  ReadError,
-  RetryableError,
-  StoreReadError
-}
+import weco.errors.RetryableError
+import weco.storage.{DoesNotExistError, ReadError, StoreReadError, StoreWriteError, WriteError}
+
+import java.net.SocketTimeoutException
 
 object S3Errors {
   val readErrors: PartialFunction[Throwable, ReadError] = {
@@ -26,5 +22,12 @@ object S3Errors {
       new StoreReadError(exc) with RetryableError
 
     case exc => StoreReadError(exc)
+  }
+
+  val writeErrors: PartialFunction[Throwable, WriteError] = {
+    case exc: AmazonS3Exception if exc.getStatusCode == 500 =>
+      new StoreWriteError(exc) with RetryableError
+
+    case exc => StoreWriteError(exc)
   }
 }

@@ -1,12 +1,8 @@
 package weco.storage.azure
 
 import com.azure.storage.blob.models.BlobStorageException
-import weco.storage.{
-  DoesNotExistError,
-  ReadError,
-  RetryableError,
-  StoreReadError
-}
+import weco.errors.RetryableError
+import weco.storage.{DoesNotExistError, ReadError, StoreReadError}
 
 object AzureStorageErrors {
   val readErrors: PartialFunction[Throwable, ReadError] = {

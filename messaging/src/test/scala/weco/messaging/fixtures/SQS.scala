@@ -34,7 +34,7 @@ trait SQS
 
   import SQS._
 
-  private val sqsInternalEndpointUrl = s"http://sqs:$port"
+  private val sqsInternalEndpointUrl = s"http://sqs:$localStackPort"
 
   def endpoint(queue: Queue) =
     s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
@@ -44,7 +44,7 @@ trait SQS
       .builder()
       .region(region)
       .credentialsProvider(credentials)
-      .endpointOverride(endpoint)
+      .endpointOverride(localStackEndpoint)
       .build()
 
   private def setQueueAttribute(
