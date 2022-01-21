@@ -4,12 +4,13 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
+import weco.json.JsonUtil.fromJson
+import weco.messaging.sns.NotificationMessage
+import weco.messaging.worker.AkkaWorker
 import weco.messaging.worker.models.Result
-import weco.messaging.worker.{AkkaWorker, SnsSqsMessageParser}
 import weco.monitoring.Metrics
 
 import scala.concurrent.Future
@@ -27,11 +28,18 @@ class AlpakkaSQSWorker[Work, Summary](
   val wd: Decoder[Work],
   sc: SqsAsyncClient,
   val metrics: Metrics[Future]
-) extends AkkaWorker[SQSMessage, Work, Summary, MessageAction]
-    with SnsSqsMessageParser[Work]
-    with Logging {
+) extends AkkaWorker[SQSMessage, Work, Summary, MessageAction] {
 
   type SQSAction = SQSMessage => sqs.MessageAction
+
+  override val parseWork = (message: SQSMessage) => {
+    val f = for {
+      notification <- fromJson[NotificationMessage](message.body())
+      work <- fromJson[Work](notification.body)
+    } yield work
+
+    f.toEither
+  }
 
   override val metricsNamespace: String = config.metricsConfig.namespace
 
