@@ -4,7 +4,7 @@ import io.circe.Decoder
 import weco.json.JsonUtil.fromJson
 import weco.messaging.{IndividualMessageSender, MessageSender}
 
-import scala.util.Random
+import scala.util.{Random, Try}
 
 class MemoryIndividualMessageSender extends IndividualMessageSender[String] {
   case class MemoryMessage(
@@ -16,12 +16,11 @@ class MemoryIndividualMessageSender extends IndividualMessageSender[String] {
   var messages: List[MemoryMessage] = List.empty
 
   override def send(body: String)(subject: String,
-                                  destination: String): MessageSenderResult =
+                                  destination: String): Try[Unit] = Try {
     this.synchronized {
       messages = messages :+ MemoryMessage(body, subject, destination)
-
-      Right(())
     }
+  }
 
   def getMessages[T]()(implicit decoder: Decoder[T]): Seq[T] =
     messages

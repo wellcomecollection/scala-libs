@@ -5,19 +5,29 @@ import java.net.URL
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{S3ObjectInputStream, S3ObjectSummary}
 import com.azure.storage.blob.BlobServiceClient
-import com.azure.storage.blob.models.{BlobRange, BlobStorageException, BlockListType}
+import com.azure.storage.blob.models.{
+  BlobRange,
+  BlobStorageException,
+  BlockListType
+}
 import com.azure.storage.blob.specialized.{BlobInputStream, BlockBlobClient}
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
-import weco.errors.RetryableError
+import weco.storage.azure.AzureBlobLocation
 import weco.storage.models.ByteRange
+import weco.storage.s3.S3ObjectLocation
+import weco.storage.services.azure.AzureSizeFinder
 import weco.storage.services.s3.{S3RangedReader, S3Uploader}
 import weco.storage.transfer._
-import weco.storage.StoreWriteError
+import weco.storage.{RetryableError, StoreWriteError}
 import weco.storage.azure.AzureBlobLocation
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.services.azure.AzureSizeFinder
-import weco.storage.transfer.{TransferNoOp, TransferOverwriteFailure, TransferSourceFailure}
+import weco.storage.transfer.{
+  TransferNoOp,
+  TransferOverwriteFailure,
+  TransferSourceFailure
+}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._

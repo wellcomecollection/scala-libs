@@ -3,7 +3,6 @@ package weco.storage
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.errors.RetryableError
 
 class RetryOpsTest extends AnyFunSpec with Matchers with EitherValues {
   import RetryOps._

@@ -1,7 +1,6 @@
 package weco.storage.store
 
 import grizzled.slf4j.Logging
-import weco.errors.RetryableError
 import weco.storage._
 import weco.storage.maxima.Maxima
 
