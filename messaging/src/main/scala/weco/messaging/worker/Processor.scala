@@ -20,13 +20,25 @@ import scala.util.{Failure, Success, Try}
   */
 trait Processor[Message, Input, Summary, Action] extends Logging {
 
+  // Extracts the `Input` for the `doProcessing` method.
+  //
+  // e.g. a lot of our applications receive SNS notifications via SQS.  This
+  // could unpack the body of the SNS notification from the SQS message.
   protected val parseMessage: Message => Either[Throwable, Input]
+
+  // Do the processing on the `Input`.
+  //
+  // Ideally this should always return a successful Future.
   protected val doProcessing: Input => Future[Result[Summary]]
 
-  implicit val ec: ExecutionContext
-
+  // What to do with a message after it's been processed.
+  //
+  // e.g. deleting a message from the queue (completedAction) or releasing it
+  // to the queue so it can be retried (retryAction)
   protected val retryAction: Message => Action
   protected val completedAction: Message => Action
+
+  implicit val ec: ExecutionContext
 
   protected val metricsRecorder: MetricsRecorder
 
