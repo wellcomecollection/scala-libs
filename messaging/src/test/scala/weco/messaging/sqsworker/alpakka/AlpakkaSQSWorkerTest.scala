@@ -105,7 +105,8 @@ class AlpakkaSQSWorkerTest
       }
     }
 
-    it("records a terminal failure metric for a message that can't be processed") {
+    it(
+      "records a terminal failure metric for a message that can't be processed") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
