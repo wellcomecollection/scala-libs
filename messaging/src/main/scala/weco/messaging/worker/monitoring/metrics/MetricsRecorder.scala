@@ -6,10 +6,9 @@ import weco.monitoring.Metrics
 import java.time.{Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
-class MetricsRecorder(namespace: String)(
-  implicit
-  metrics: Metrics[Future],
-  ec: ExecutionContext) {
+class MetricsRecorder(namespace: String)(implicit
+                                         metrics: Metrics[Future],
+                                         ec: ExecutionContext) {
 
   def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] = {
     val r = recordDurationMetric(result, startTime)
@@ -22,11 +21,12 @@ class MetricsRecorder(namespace: String)(
 
   private def metricName(name: String) = s"$namespace/$name"
 
-  private def recordDurationMetric(result: Result[_], startTime: Instant): Future[Unit] = {
+  private def recordDurationMetric(result: Result[_],
+                                   startTime: Instant): Future[Unit] = {
     val resultName = result match {
       case _: Successful[_]                 => "Successful"
-      case _: TerminalFailure[_]       => "DeterministicFailure"
-      case _: RetryableFailure[_]    => "NonDeterministicFailure"
+      case _: TerminalFailure[_]            => "DeterministicFailure"
+      case _: RetryableFailure[_]           => "NonDeterministicFailure"
       case _: MonitoringProcessorFailure[_] => "MonitoringProcessorFailure"
     }
 

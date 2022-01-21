@@ -23,8 +23,8 @@ class AlpakkaSQSProcessor[ProcessInput, Summary](
   val as: ActorSystem,
   val wd: Decoder[ProcessInput],
   sc: SqsAsyncClient,
-  val metrics: Metrics[Future]
-) extends AkkaProcessor[SQSMessage, ProcessInput, Summary, MessageAction] {
+  val metrics: Metrics[Future])
+    extends AkkaProcessor[SQSMessage, ProcessInput, Summary, MessageAction] {
 
   type SQSAction = SQSMessage => sqs.MessageAction
 

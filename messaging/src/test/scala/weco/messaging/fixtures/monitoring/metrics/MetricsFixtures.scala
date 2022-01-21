@@ -23,9 +23,7 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
     namespace: String = s"ns-${randomAlphanumeric()}",
     metrics: MemoryMetrics = new MemoryMetrics
   )(
-    testWith: TestWith[
-      (String, MemoryMetrics, MetricsRecorder),
-      R]
+    testWith: TestWith[(String, MemoryMetrics, MetricsRecorder), R]
   )(
     implicit ec: ExecutionContext
   ): R = {

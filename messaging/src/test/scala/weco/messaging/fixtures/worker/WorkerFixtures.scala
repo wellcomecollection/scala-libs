@@ -20,13 +20,14 @@ trait WorkerFixtures {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean): MyMessage => Either[RuntimeException, MyWork] =
+  def messageToWork(
+    shouldFail: Boolean): MyMessage => Either[RuntimeException, MyWork] =
     (message: MyMessage) =>
       Either.cond(
         !shouldFail,
         right = MyWork(message),
         left = new RuntimeException("messageToWork goes BOOM!")
-      )
+    )
 
   def actionToAction(toActionShouldFail: Boolean)(result: Result[MySummary])(
     implicit ec: ExecutionContext): Future[MyExternalMessageAction] = Future {
@@ -49,8 +50,9 @@ trait WorkerFixtures {
     val callCounter = new CallCounter()
 
     override val retryAction: MyMessage => MyExternalMessageAction =
-      _ => MyExternalMessageAction(
-        RetryableFailure[MySummary](new Throwable("BOOM!"))
+      _ =>
+        MyExternalMessageAction(
+          RetryableFailure[MySummary](new Throwable("BOOM!"))
       )
 
     override val completedAction: MyMessage => MyExternalMessageAction =
