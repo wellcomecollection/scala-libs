@@ -48,16 +48,14 @@ trait WorkerFixtures {
 
     val callCounter = new CallCounter()
 
-    override val retryAction: MessageAction =
+    override val retryAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(new Retry {})
 
-    override val completedAction: MessageAction =
+    override val completedAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(new Completed {})
 
     override val doWork =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)
-
-    override type Completion = WorkCompletion[MyMessage, MySummary]
   }
 
   val message = MyMessage("some_content")

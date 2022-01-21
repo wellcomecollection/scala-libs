@@ -1,7 +1,7 @@
 package weco.messaging.worker
 
 import grizzled.slf4j.Logging
-import weco.messaging.worker.models.{Completed, DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Retry, Successful, WorkCompletion}
+import weco.messaging.worker.models.{Completed, DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Retry, Successful}
 import weco.messaging.worker.monitoring.metrics.MetricsRecorder
 
 import java.time.Instant
@@ -13,22 +13,14 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   protected val parseWork: Message => Either[Throwable, Work]
   protected val doWork: Work => Future[Result[Summary]]
 
-  type Processed = Future[Action]
-
-  type Completion = WorkCompletion[Message, Summary]
-  type MessageAction = Message => Action
-
   implicit val ec: ExecutionContext
 
-  protected val retryAction: MessageAction
-  protected val completedAction: MessageAction
+  protected val retryAction: Message => Action
+  protected val completedAction: Message => Action
 
   protected val metricsRecorder: MetricsRecorder
 
-  final def processMessage(message: Message): Processed =
-    work(message).map(completion)
-
-  private def work(message: Message): Future[Completion] = {
+  final def processMessage(message: Message): Future[Action] = {
     val startTime = Instant.now()
 
     val workEither = Try(parseWork(message)) match {
@@ -40,7 +32,8 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
       summary <- process(workEither)
       _ <- log(summary)
       _ <- metricsRecorder.recordEnd(startTime, summary)
-    } yield WorkCompletion(message, summary)
+      action = chooseAction(summary)(message)
+    } yield action
   }
 
   private def process(workEither: Either[Throwable, Work]): Future[Result[Summary]] =
@@ -51,15 +44,6 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
       }
     )
 
-  private def completion(done: Completion): Action =
-    done match {
-      case WorkCompletion(message, response) =>
-        response.asInstanceOf[Action] match {
-          case _: Retry     => retryAction(message)
-          case _: Completed => completedAction(message)
-        }
-    }
-
   private def log(result: Result[_]): Future[Unit] =
     Future {
       result match {
@@ -68,5 +52,11 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
         case r @ DeterministicFailure(e, _)       => error(r.toString, e)
         case r @ MonitoringProcessorFailure(e, _) => error(r.toString, e)
       }
+    }
+
+  private def chooseAction(summary: Result[Summary]): Message => Action =
+    summary.asInstanceOf[Action] match {
+      case _: Retry     => retryAction
+      case _: Completed => completedAction
     }
 }

@@ -30,8 +30,8 @@ trait AkkaWorker[Message, Work, Summary, Action]
   protected val source: MessageSource
   protected val sink: MessageSink
 
-  protected val retryAction: MessageAction
-  protected val completedAction: MessageAction
+  protected val retryAction: Message => Action
+  protected val completedAction: Message => Action
 
   private def completionSource(parallelism: Int): ProcessedSource =
     source.mapAsyncUnordered(parallelism)(processMessage)
