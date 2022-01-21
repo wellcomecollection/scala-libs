@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
 import com.amazonaws.services.s3.transfer.{TransferManagerBuilder, Upload}
 import weco.storage._
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.Writable
 import weco.storage.streaming.InputStreamWithLength
 
@@ -109,6 +109,6 @@ trait S3StreamWritable
       case exc: SdkClientException
           if exc.getMessage.startsWith("More data read than expected") =>
         IncorrectStreamLengthError(exc)
-      case _ => StoreWriteError(throwable)
+      case _ => S3Errors.writeErrors(throwable)
     }
 }

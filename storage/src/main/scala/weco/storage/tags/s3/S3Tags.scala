@@ -57,12 +57,8 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
         )
       )
     } match {
-      case Success(_) => Right(tags)
-
-      case Failure(exc: AmazonS3Exception) if exc.getStatusCode == 500 =>
-        Left(new StoreWriteError(exc) with RetryableError)
-
-      case Failure(err) => Left(StoreWriteError(err))
+      case Success(_)   => Right(tags)
+      case Failure(err) => Left(S3Errors.writeErrors(err))
     }
   }
 }

@@ -13,13 +13,11 @@ import com.azure.storage.blob.models.{
 import com.azure.storage.blob.specialized.{BlobInputStream, BlockBlobClient}
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
-import weco.storage.azure.AzureBlobLocation
+import weco.errors.RetryableError
 import weco.storage.models.ByteRange
-import weco.storage.s3.S3ObjectLocation
-import weco.storage.services.azure.AzureSizeFinder
 import weco.storage.services.s3.{S3RangedReader, S3Uploader}
 import weco.storage.transfer._
-import weco.storage.{RetryableError, StoreWriteError}
+import weco.storage.StoreWriteError
 import weco.storage.azure.AzureBlobLocation
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.services.azure.AzureSizeFinder

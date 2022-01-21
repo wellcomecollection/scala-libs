@@ -2,7 +2,7 @@ package weco.storage.azure
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.storage.RetryableError
+import weco.errors.RetryableError
 
 class AzureStorageErrorsTest extends AnyFunSpec with Matchers {
   it("marks a timeout as a retriable error") {

@@ -11,6 +11,8 @@ import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS.Queue
 import weco.messaging.sns.NotificationMessage
 
+import java.net.URI
+
 object SNS {
   case class Topic(arn: String, destinationQueue: Queue) {
     override def toString = s"SNS.Topic($arn)"
@@ -21,13 +23,16 @@ trait SNS extends SQS {
 
   import SNS._
 
-  implicit val snsClient: SnsClient =
+  def createClientWithEndpoint(uri: URI): SnsClient =
     SnsClient
       .builder()
       .region(region)
       .credentialsProvider(credentials)
-      .endpointOverride(endpoint)
+      .endpointOverride(uri)
       .build()
+
+  implicit val snsClient: SnsClient =
+    createClientWithEndpoint(localStackEndpoint)
 
   def createTopicName: String =
     randomAlphanumeric()

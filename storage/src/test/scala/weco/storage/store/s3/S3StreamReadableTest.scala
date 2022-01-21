@@ -79,4 +79,38 @@ class S3StreamReadableTest
 
     verify(mockClient, times(retries)).getObject(location.bucket, location.key)
   }
+
+  it("retries if it's unable to connect to S3") {
+    val wrongPortClient =
+      createS3ClientWithEndpoint(s"http://localhost:${s3Port + 1}")
+    val spyClient = spy(wrongPortClient)
+
+    val retries = 4
+    val readable = createS3ReadableWith(spyClient, retries = retries)
+
+    withLocalS3Bucket { bucket =>
+      val location = createS3ObjectLocationWith(bucket)
+
+      readable.get(location).left.value shouldBe a[StoreReadError]
+
+      verify(spyClient, times(retries)).getObject(location.bucket, location.key)
+    }
+  }
+
+  it("retries if it can't resolve the S3 endpoint") {
+    val wrongPortClient =
+      createS3ClientWithEndpoint(s"http://this-cannot-be-resolved.nope")
+    val spyClient = spy(wrongPortClient)
+
+    val retries = 4
+    val readable = createS3ReadableWith(spyClient, retries = retries)
+
+    withLocalS3Bucket { bucket =>
+      val location = createS3ObjectLocationWith(bucket)
+
+      readable.get(location).left.value shouldBe a[StoreReadError]
+
+      verify(spyClient, times(retries)).getObject(location.bucket, location.key)
+    }
+  }
 }
