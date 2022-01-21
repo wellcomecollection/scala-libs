@@ -9,7 +9,6 @@ import weco.messaging.sqsworker.alpakka.{
   AlpakkaSQSWorker,
   AlpakkaSQSWorkerConfig
 }
-import weco.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
 import weco.monitoring.MetricsConfig
 import weco.monitoring.memory.MemoryMetrics
 
@@ -40,10 +39,6 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
           ec: ExecutionContext): R = {
     implicit val metrics: MemoryMetrics = new MemoryMetrics()
 
-    val metricsProcessorBuilder
-      : ExecutionContext => MetricsMonitoringProcessor =
-      new MetricsMonitoringProcessor(namespace)(metrics, _)
-
     val config = createAlpakkaSQSWorkerConfig(queue, namespace)
 
     val callCounter = new CallCounter()
@@ -51,9 +46,7 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
       createResult(process, callCounter)(ec)(work)
 
     val worker =
-      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](
-        config,
-        metricsProcessorBuilder)(testProcess)
+      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](config)(testProcess)
 
     testWith((worker, config, metrics, callCounter))
   }

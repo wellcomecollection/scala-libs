@@ -3,7 +3,7 @@ package weco.messaging.fixtures.monitoring.metrics
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import weco.fixtures.{RandomGenerators, TestWith}
-import weco.messaging.worker.monitoring.metrics.MetricsMonitoringProcessor
+import weco.messaging.worker.monitoring.metrics.MetricsRecorder
 import weco.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,12 +24,12 @@ trait MetricsFixtures extends Matchers with RandomGenerators {
     metrics: MemoryMetrics = new MemoryMetrics
   )(
     testWith: TestWith[
-      (String, MemoryMetrics, MetricsMonitoringProcessor),
+      (String, MemoryMetrics, MetricsRecorder),
       R]
   )(
     implicit ec: ExecutionContext
   ): R = {
-    val processor = new MetricsMonitoringProcessor(namespace)(metrics, ec)
+    val processor = new MetricsRecorder(namespace)(metrics, ec)
 
     testWith((namespace, metrics, processor))
   }

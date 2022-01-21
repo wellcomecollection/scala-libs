@@ -3,13 +3,11 @@ package weco.messaging.worker
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.{Done, NotUsed}
-import weco.messaging.worker.steps.MonitoringProcessor
+import weco.messaging.worker.monitoring.metrics.MetricsRecorder
+import weco.monitoring.Metrics
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
-/**
-  * Implementation of [[weco.messaging.worker.Worker]] based on akka streams
-  */
 trait AkkaWorker[Message,
                  Work,
                  InfraServiceMonitoringContext,
@@ -25,11 +23,14 @@ trait AkkaWorker[Message,
       Action] {
 
   implicit val as: ActorSystem
-  private val ec = as.dispatcher
-  protected val monitoringProcessorBuilder: (
-    ExecutionContext) => MonitoringProcessor
+  implicit val ec: ExecutionContextExecutor = as.dispatcher
 
-  override final val monitoringProcessor = monitoringProcessorBuilder(ec)
+  protected implicit val metrics: Metrics[Future]
+  protected val metricsNamespace: String
+
+  protected lazy val metricsRecorder: MetricsRecorder =
+    new MetricsRecorder(metricsNamespace)
+
   type MessageSource = Source[Message, NotUsed]
   type MessageSink = Sink[Action, Future[Done]]
 

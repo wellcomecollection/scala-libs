@@ -1,18 +1,18 @@
 package weco.messaging.worker
 
 import weco.messaging.worker.models.{Completed, Retry, WorkCompletion}
-import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform, MonitoringProcessor}
+import weco.messaging.worker.monitoring.metrics.MetricsRecorder
+import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform}
 
 import java.time.Instant
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * A Worker receives a `Message` and performs a series of steps. These steps are
   *    - [[weco.messaging.worker.steps.MessageTransform]]: deserialises the payload of the message into a `Work`
-  *    - [[weco.messaging.worker.steps.MonitoringProcessor#recordStart]]: starts monitoring
   *    - [[weco.messaging.worker.steps.MessageProcessor#process]]: performs an operation on the `Work`
   *    - [[weco.messaging.worker.steps.Logger#log]]: logs the result of the processing
-  *    - [[weco.messaging.worker.steps.MonitoringProcessor#recordEnd]]: ends monitoring
+  *    - [[weco.messaging.worker.monitoring.metrics.MetricsRecorder#recordEnd]]: records a success/fail and a duration metric
   * @tparam Message: the message received by the Worker
   * @tparam Work: the payload in the message
   * @tparam InfraServiceMonitoringContext: the monitoring context to be passed around between different services
@@ -35,18 +35,17 @@ trait Worker[Message,
   type Completion = WorkCompletion[Message, Summary]
   type MessageAction = Message => Action
 
+  implicit val ec: ExecutionContext
+
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
-  protected val monitoringProcessor: MonitoringProcessor
+  protected val metricsRecorder: MetricsRecorder
 
-  final def processMessage(message: Message): Processed = {
-    implicit val e = (monitoringProcessor.ec)
+  final def processMessage(message: Message): Processed =
     work(message).map(completion)
-  }
 
   private def work(message: Message): Future[Completion] = {
-    implicit val e = (monitoringProcessor.ec)
     for {
       (workEither, rootContext) <- Future.successful(callTransform(message))
 
@@ -54,7 +53,7 @@ trait Worker[Message,
 
       summary <- process(workEither)
       _ <- log(summary)
-      _ <- monitoringProcessor.recordEnd(startTime, summary)
+      _ <- metricsRecorder.recordEnd(startTime, summary)
     } yield
       WorkCompletion(
         message,
@@ -62,7 +61,7 @@ trait Worker[Message,
       )
   }
 
-  private def completion(done: Completion) =
+  private def completion(done: Completion): Action =
     done match {
       case WorkCompletion(message, response) =>
         response.asInstanceOf[Action] match {
@@ -70,5 +69,4 @@ trait Worker[Message,
           case _: Completed => completedAction(message)
         }
     }
-
 }

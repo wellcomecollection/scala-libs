@@ -11,7 +11,7 @@ import weco.messaging.worker.models.{MonitoringProcessorFailure, Successful}
 
 import scala.concurrent.ExecutionContext.Implicits._
 
-class MetricsMonitoringProcessorTest
+class MetricsRecorderTest
     extends AnyFunSpec
     with Matchers
     with Akka
