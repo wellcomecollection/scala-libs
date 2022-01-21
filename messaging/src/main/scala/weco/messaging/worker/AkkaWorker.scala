@@ -8,19 +8,8 @@ import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-trait AkkaWorker[Message,
-                 Work,
-                 InfraServiceMonitoringContext,
-                 InterServiceMonitoringContext,
-                 Summary,
-                 Action]
-    extends Worker[
-      Message,
-      Work,
-      InfraServiceMonitoringContext,
-      InterServiceMonitoringContext,
-      Summary,
-      Action] {
+trait AkkaWorker[Message, Work, Summary, Action]
+    extends Worker[Message, Work, Summary, Action] {
 
   implicit val as: ActorSystem
   implicit val ec: ExecutionContextExecutor = as.dispatcher

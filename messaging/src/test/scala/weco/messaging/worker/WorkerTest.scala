@@ -1,7 +1,7 @@
 package weco.messaging.worker
 
 import org.scalatest.Assertion
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
@@ -15,7 +15,6 @@ class WorkerTest
     with Matchers
     with Akka
     with ScalaFutures
-    with IntegrationPatience
     with WorkerFixtures
     with MetricsFixtures {
 
@@ -77,7 +76,7 @@ class WorkerTest
 
   it(
     "increments deterministic failure metric if transformation fails unexpectedly") {
-    def transform(message: MyMessage) = throw new RuntimeException
+    def transform(message: MyMessage) = throw new RuntimeException("BOOM!")
 
     withMetricsMonitoringProcessor[MyWork, Unit]() {
       case (namespace, metrics, monitoringProcessor) =>
