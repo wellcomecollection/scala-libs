@@ -8,8 +8,8 @@ import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-trait AkkaProcessor[Message, Input, Summary, Action]
-    extends Processor[Message, Input, Summary, Action] {
+trait AkkaWorker[Message, Input, Summary, Action]
+    extends Worker[Message, Input, Summary, Action] {
 
   implicit val as: ActorSystem
   implicit val ec: ExecutionContextExecutor = as.dispatcher

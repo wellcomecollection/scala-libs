@@ -14,7 +14,7 @@ import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-/** A Processor:
+/** A Worker:
   *
   *   - receives a `Message` (e.g. a message from an SQS queue)
   *   - extracts an `Input` from the message (e.g. the ID of a record)
@@ -24,7 +24,7 @@ import scala.util.{Failure, Success, Try}
   *   - applies an `Action` to the message (e.g. removing it from the queue)
   *
   */
-trait Processor[Message, Input, Summary, Action] extends Logging {
+trait Worker[Message, Input, Summary, Action] extends Logging {
 
   // Extracts the `Input` for the `doProcessing` method.
   //

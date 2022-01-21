@@ -9,13 +9,13 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import weco.json.JsonUtil.fromJson
 import weco.messaging.sns.NotificationMessage
-import weco.messaging.worker.AkkaProcessor
+import weco.messaging.worker.AkkaWorker
 import weco.messaging.worker.models.Result
 import weco.monitoring.Metrics
 
 import scala.concurrent.Future
 
-class AlpakkaSQSProcessor[ProcessInput, Summary](
+class AlpakkaSQSWorker[ProcessInput, Summary](
   config: AlpakkaSQSWorkerConfig,
 )(
   val doProcessing: ProcessInput => Future[Result[Summary]]
@@ -24,7 +24,7 @@ class AlpakkaSQSProcessor[ProcessInput, Summary](
   val wd: Decoder[ProcessInput],
   sc: SqsAsyncClient,
   val metrics: Metrics[Future])
-    extends AkkaProcessor[SQSMessage, ProcessInput, Summary, MessageAction] {
+    extends AkkaWorker[SQSMessage, ProcessInput, Summary, MessageAction] {
 
   type SQSAction = SQSMessage => sqs.MessageAction
 

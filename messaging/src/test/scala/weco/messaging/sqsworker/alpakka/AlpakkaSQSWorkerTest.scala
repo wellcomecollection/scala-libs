@@ -16,7 +16,7 @@ import weco.messaging.fixtures.worker.AlpakkaSQSWorkerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AlpakkaSQSProcessorTest
+class AlpakkaSQSWorkerTest
     extends AnyFunSpec
     with Matchers
     with AlpakkaSQSWorkerFixtures
@@ -105,8 +105,7 @@ class AlpakkaSQSProcessorTest
       }
     }
 
-    it(
-      "consumes a message and increments non deterministic failure metrics metrics") {
+    it("records a terminal failure metric for a message that can't be processed") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -123,7 +122,7 @@ class AlpakkaSQSProcessorTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
@@ -133,7 +132,7 @@ class AlpakkaSQSProcessorTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 0)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
