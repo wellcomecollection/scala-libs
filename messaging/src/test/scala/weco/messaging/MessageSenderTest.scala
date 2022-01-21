@@ -12,7 +12,9 @@ import weco.messaging.memory.{
 }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
+import scala.util.{Success, Try}
 
 class MessageSenderTest
     extends AnyFunSpec
@@ -25,14 +27,14 @@ class MessageSenderTest
 
     sender.send("hello world")(
       subject = "my first message",
-      destination = "greetings") shouldBe Right(())
-    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Right(
+      destination = "greetings") shouldBe Success(())
+    sender.send("guten tag")(subject = "auf deutsch", destination = "greetings") shouldBe Success(
       ())
-    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Right(
+    sender.send("你好")(subject = "中文", destination = "greetings") shouldBe Success(
       ())
     sender.send("chinese")(
       subject = "a non-alphabet language",
-      destination = "languages") shouldBe Right(())
+      destination = "languages") shouldBe Success(())
 
     sender.messages shouldBe List(
       sender.MemoryMessage("hello world", "my first message", "greetings"),
@@ -45,7 +47,9 @@ class MessageSenderTest
   it("can send many messages in parallel") {
     val sender = new MemoryIndividualMessageSender()
 
-    def send(body: String, subject: String, destination: String): Future[_] =
+    def send(body: String,
+             subject: String,
+             destination: String): Future[Try[Unit]] =
       Future(sender.send(body)(subject, destination))
 
     val toSend = Function.tupled(send _)
@@ -63,7 +67,7 @@ class MessageSenderTest
 
     whenReady(eventuallyResults) { results =>
       sender.messages.size shouldBe messages.size
-      results.foreach(_ shouldBe Right(()))
+      results.foreach(_ shouldBe Success(()))
       sender.messages.toSet shouldBe expectedResults
     }
   }
@@ -78,7 +82,7 @@ class MessageSenderTest
     val snake = Animal(name = "snake", legs = 0)
 
     Seq(dog, octopus, snake).map { animal =>
-      sender.sendT(animal)(subject = "animals", destination = "all creatures") shouldBe Right(
+      sender.sendT(animal)(subject = "animals", destination = "all creatures") shouldBe Success(
         ())
     }
 
@@ -101,7 +105,7 @@ class MessageSenderTest
     containers.map { c =>
       sender.sendT[Container](c)(
         destination = "containers",
-        subject = "stuff to store things in") shouldBe Right(())
+        subject = "stuff to store things in") shouldBe Success(())
     }
 
     containers.zip(sender.messages).map {
@@ -116,10 +120,10 @@ class MessageSenderTest
       override val subject = "ideas for my design"
     }
 
-    sender.send("red") shouldBe Right(())
-    sender.send("yellow") shouldBe Right(())
-    sender.send("green") shouldBe Right(())
-    sender.send("blue") shouldBe Right(())
+    sender.send("red") shouldBe Success(())
+    sender.send("yellow") shouldBe Success(())
+    sender.send("green") shouldBe Success(())
+    sender.send("blue") shouldBe Success(())
 
     sender.messages.map { _.destination } shouldBe Seq(
       "colours",
@@ -141,9 +145,9 @@ class MessageSenderTest
 
     case class Tree(name: String)
 
-    sender.sendT(Tree("oak")) shouldBe Right(())
-    sender.sendT(Tree("ash")) shouldBe Right(())
-    sender.sendT(Tree("yew")) shouldBe Right(())
+    sender.sendT(Tree("oak")) shouldBe Success(())
+    sender.sendT(Tree("ash")) shouldBe Success(())
+    sender.sendT(Tree("yew")) shouldBe Success(())
 
     sender.messages.map { _.destination } shouldBe Seq(
       "trees",
@@ -160,7 +164,7 @@ class MessageSenderTest
     val sender = new MemoryMessageSender()
 
     containers.map { c =>
-      sender.sendT[Container](c) shouldBe Right(())
+      sender.sendT[Container](c) shouldBe Success(())
     }
 
     containers.zip(sender.messages).map {

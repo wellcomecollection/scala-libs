@@ -2,10 +2,10 @@ package weco.storage.s3
 
 import com.amazonaws.SdkClientException
 import com.amazonaws.services.s3.model.AmazonS3Exception
-import weco.errors.RetryableError
 import weco.storage.{
   DoesNotExistError,
   ReadError,
+  RetryableError,
   StoreReadError,
   StoreWriteError,
   WriteError

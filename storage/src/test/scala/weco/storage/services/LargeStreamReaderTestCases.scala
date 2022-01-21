@@ -3,11 +3,15 @@ package weco.storage.services
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.errors.RetryableError
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.storage.models.ByteRange
 import weco.storage.streaming.Codec
-import weco.storage.{DoesNotExistError, ReadError, StoreReadError}
+import weco.storage.{
+  DoesNotExistError,
+  ReadError,
+  RetryableError,
+  StoreReadError
+}
 
 trait LargeStreamReaderTestCases[Ident, Namespace]
     extends AnyFunSpec

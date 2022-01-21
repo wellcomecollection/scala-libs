@@ -5,8 +5,7 @@ import org.scanamo.syntax._
 import org.scanamo.{ConditionNotMet, DynamoFormat, Scanamo, Table}
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
-import weco.errors.RetryableError
-import weco.storage.{Identified, StoreWriteError, Version}
+import weco.storage.{Identified, RetryableError, StoreWriteError, Version}
 import weco.storage.dynamo.{DynamoHashEntry, DynamoHashRangeEntry}
 import weco.storage.store.Writable
 

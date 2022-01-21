@@ -5,7 +5,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
-import weco.errors.RetryableError
 import weco.storage._
 import weco.storage.maxima.Maxima
 import weco.storage.maxima.memory.MemoryMaxima
