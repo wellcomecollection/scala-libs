@@ -1,7 +1,7 @@
 package weco.messaging.worker
 
 import grizzled.slf4j.Logging
-import weco.messaging.worker.models.{DeterministicFailure, MonitoringProcessorFailure, NonDeterministicFailure, Result, Successful}
+import weco.messaging.worker.models.{TerminalFailure, MonitoringProcessorFailure, RetryableFailure, Result, Successful}
 import weco.messaging.worker.monitoring.metrics.MetricsRecorder
 
 import java.time.Instant
@@ -60,9 +60,9 @@ trait Processor[Message, Input, Summary, Action] extends Logging {
 
   private def process(workEither: Either[Throwable, Input]): Future[Result[Summary]] =
     workEither.fold(
-      e => Future.successful(DeterministicFailure[Summary](e)),
+      e => Future.successful(TerminalFailure[Summary](e)),
       w => doProcessing(w) recover {
-        case e => DeterministicFailure[Summary](e)
+        case e => TerminalFailure[Summary](e)
       }
     )
 
@@ -70,15 +70,15 @@ trait Processor[Message, Input, Summary, Action] extends Logging {
     Future {
       result match {
         case r @ Successful(_)                    => info(r.pretty)
-        case r @ NonDeterministicFailure(e, _)    => warn(r.pretty, e)
-        case r @ DeterministicFailure(e, _)       => error(r.toString, e)
+        case r @ RetryableFailure(e, _)    => warn(r.pretty, e)
+        case r @ TerminalFailure(e, _)       => error(r.toString, e)
         case r @ MonitoringProcessorFailure(e, _) => error(r.toString, e)
       }
     }
 
   private def chooseAction(summary: Result[Summary]): Message => Action =
     summary match {
-      case _: NonDeterministicFailure[_] => retryAction
+      case _: RetryableFailure[_] => retryAction
       case _                             => completedAction
     }
 }

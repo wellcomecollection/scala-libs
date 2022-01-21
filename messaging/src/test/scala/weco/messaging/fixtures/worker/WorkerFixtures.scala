@@ -50,7 +50,7 @@ trait WorkerFixtures {
 
     override val retryAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(
-        NonDeterministicFailure[MySummary](new Throwable("BOOM!"))
+        RetryableFailure[MySummary](new Throwable("BOOM!"))
       )
 
     override val completedAction: MyMessage => MyExternalMessageAction =
@@ -85,13 +85,13 @@ trait WorkerFixtures {
   }
 
   val nonDeterministicFailure = (_: MyWork) =>
-    NonDeterministicFailure[MySummary](
+    RetryableFailure[MySummary](
       new RuntimeException("NonDeterministicFailure"),
       Some("Summary NonDeterministicFailure")
   )
 
   val deterministicFailure = (_: MyWork) =>
-    DeterministicFailure[MySummary](
+    TerminalFailure[MySummary](
       new RuntimeException("DeterministicFailure"),
       Some("Summary DeterministicFailure")
   )

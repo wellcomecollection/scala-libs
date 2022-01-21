@@ -25,8 +25,8 @@ class MetricsRecorder(namespace: String)(
   private def recordDurationMetric(result: Result[_], startTime: Instant): Future[Unit] = {
     val resultName = result match {
       case _: Successful[_]                 => "Successful"
-      case _: DeterministicFailure[_]       => "DeterministicFailure"
-      case _: NonDeterministicFailure[_]    => "NonDeterministicFailure"
+      case _: TerminalFailure[_]       => "DeterministicFailure"
+      case _: RetryableFailure[_]    => "NonDeterministicFailure"
       case _: MonitoringProcessorFailure[_] => "MonitoringProcessorFailure"
     }
 
