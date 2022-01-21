@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.0.0 - 2022-01-21
+
+This release rolls back some of the SNS error handling logic in v31.0.0, because it was too disruptive downstream and I found a simpler path forward.
+
 ## v31.0.0 - 2022-01-21
 
 This release adds better retrying when there are network connectivity issues with SNS and S3, in particular:
