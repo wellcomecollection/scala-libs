@@ -9,7 +9,6 @@ import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import weco.messaging.worker.models.Result
-import weco.messaging.worker.monitoring.metrics.MetricsProcessor
 import weco.messaging.worker.{AkkaWorker, SnsSqsTransform}
 import weco.monitoring.Metrics
 
@@ -24,7 +23,6 @@ class AlpakkaSQSWorker[Work,
                        InterServiceMonitoringContext,
                        Summary](
   config: AlpakkaSQSWorkerConfig,
-  val metricsProcessor: MetricsProcessor
 )(
   val doWork: Work => Future[Result[Summary]]
 )(implicit
@@ -43,6 +41,8 @@ class AlpakkaSQSWorker[Work,
     with Logging {
 
   type SQSAction = SQSMessage => sqs.MessageAction
+
+  val metricsNamespace: String = config.metricsConfig.namespace
 
   val parallelism: Int = config.sqsConfig.parallelism
   val source = SqsSource(config.sqsConfig.queueUrl)

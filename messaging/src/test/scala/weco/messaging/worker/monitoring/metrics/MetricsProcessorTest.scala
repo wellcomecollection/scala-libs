@@ -17,12 +17,9 @@ class MetricsProcessorTest
     with WorkerFixtures
     with MetricsFixtures {
 
-  val processor = new MetricsProcessor(
-    namespace = s"ns-${randomAlphanumeric()}"
-  )
-
   it("records a success") {
     implicit val metrics = new MemoryMetrics()
+    val processor = new MetricsProcessor(namespace = s"ns-${randomAlphanumeric()}")
 
     val recorded = processor.recordResult(
       startTime = Instant.now(),
@@ -45,6 +42,7 @@ class MetricsProcessorTest
 
   it("fails if it can't record the metric") {
     implicit val metrics = brokenMemoryMetrics
+    val processor = new MetricsProcessor(namespace = s"ns-${randomAlphanumeric()}")
 
     val recorded = processor.recordResult(
       startTime = Instant.now(),
@@ -61,6 +59,7 @@ class MetricsProcessorTest
 
   it("records a deterministic failure") {
     implicit val metrics = new MemoryMetrics()
+    val processor = new MetricsProcessor(namespace = s"ns-${randomAlphanumeric()}")
 
     val recorded = processor.recordResult(
       startTime = Instant.now(),
@@ -83,6 +82,7 @@ class MetricsProcessorTest
 
   it("records a non deterministic failure") {
     implicit val metrics = new MemoryMetrics()
+    val processor = new MetricsProcessor(namespace = s"ns-${randomAlphanumeric()}")
 
     val recorded = processor.recordResult(
       startTime = Instant.now(),

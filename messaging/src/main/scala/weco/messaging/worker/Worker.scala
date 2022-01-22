@@ -26,10 +26,13 @@ trait Worker[Message,
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
+  val metricsNamespace: String
   implicit val metrics: Metrics[Future]
-  protected val metricsProcessor: MetricsProcessor
 
   implicit val ec: ExecutionContext
+
+  protected lazy val metricsProcessor: MetricsProcessor =
+    new MetricsProcessor(metricsNamespace)
 
   final def processMessage(message: Message): Processed =
     work(message).map(completion)
