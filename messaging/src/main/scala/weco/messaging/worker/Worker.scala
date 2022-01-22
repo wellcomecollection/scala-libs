@@ -1,6 +1,13 @@
 package weco.messaging.worker
 
-import weco.messaging.worker.models.{Completed, MonitoringProcessorFailure, Result, Retry, Successful, WorkCompletion}
+import weco.messaging.worker.models.{
+  Completed,
+  MonitoringProcessorFailure,
+  Result,
+  Retry,
+  Successful,
+  WorkCompletion
+}
 import weco.messaging.worker.monitoring.metrics.MetricsProcessor
 import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform}
 import weco.monitoring.Metrics
@@ -45,8 +52,7 @@ trait Worker[Message,
       result <- process(workEither)
       _ <- log(result)
       _ <- recordEnd(startTime = startTime, result = result)
-    } yield
-      WorkCompletion(message, result)
+    } yield WorkCompletion(message, result)
   }
 
   private def completion(done: Completion) =
@@ -61,7 +67,8 @@ trait Worker[Message,
   /** Records metrics about the work that's just been completed; in particular the
     * outcome and the duration.
     */
-  private def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] =
+  private def recordEnd(startTime: Instant,
+                        result: Result[_]): Future[Result[Unit]] =
     metricsProcessor
       .recordResult(result, startTime)
       .map(_ => Successful[Unit]())

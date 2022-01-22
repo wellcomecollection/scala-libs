@@ -7,7 +7,8 @@ import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MetricsProcessor(val namespace: String)(implicit metrics: Metrics[Future], ec: ExecutionContext) {
+class MetricsProcessor(val namespace: String)(implicit metrics: Metrics[Future],
+                                              ec: ExecutionContext) {
   def recordResult(
     result: Result[_],
     startTime: Instant

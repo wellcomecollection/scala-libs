@@ -29,8 +29,8 @@ class AlpakkaSQSWorker[Work,
   val as: ActorSystem,
   val wd: Decoder[Work],
   sc: SqsAsyncClient,
-  val metrics: Metrics[Future]
-) extends AkkaWorker[
+  val metrics: Metrics[Future])
+    extends AkkaWorker[
       SQSMessage,
       Work,
       InfraServiceMonitoringContext,
