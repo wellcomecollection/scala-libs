@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.9.0 - 2022-01-24
+
+AlpakkaSQSWorker will retry a `TerminalFailure` if it determines that the error was a flaky error from somewhere in AWS, e.g. a DNS resolution error.
+
 ## v32.8.0 - 2022-01-24
 
 This release tidies up the `Result` types to reflect the desired behaviour (TerminalFailure, RetryableFailure, Successful) rather than their properties (Deterministic, NonDeterministic).
