@@ -32,11 +32,3 @@ case class RetryableFailure[Summary](
 case class Successful[Summary](
   summary: Option[Summary] = Option.empty[Summary]
 ) extends Result[Summary]
-
-// An operation that couldn't be recorded.
-//
-// TODO: What should we do in this case?  How do we capture the previous result?
-case class MonitoringProcessorFailure[Summary](
-  failure: Throwable,
-  summary: Option[Summary] = Option.empty[Summary]
-) extends Result[Summary]

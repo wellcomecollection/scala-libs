@@ -43,25 +43,23 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
   private def chooseAction(result: Result[_]): Message => Action =
     result match {
-      case _: Successful[_]                 => successfulAction
-      case _: RetryableFailure[_]           => retryAction
-      case _: TerminalFailure[_]            => failureAction
-      case _: MonitoringProcessorFailure[_] => failureAction
+      case _: Successful[_]       => successfulAction
+      case _: RetryableFailure[_] => retryAction
+      case _: TerminalFailure[_]  => failureAction
     }
 
   private def log(result: Result[_]): Unit =
     result match {
-      case r @ Successful(_)                    => info(r.pretty)
-      case r @ RetryableFailure(e, _)           => warn(r.pretty, e)
-      case r @ TerminalFailure(e, _)            => error(r.toString, e)
-      case r @ MonitoringProcessorFailure(e, _) => error(r.toString, e)
+      case r @ Successful(_)          => info(r.pretty)
+      case r @ RetryableFailure(e, _) => warn(r.pretty, e)
+      case r @ TerminalFailure(e, _)  => error(r.toString, e)
     }
 
   /** Records metrics about the work that's just been completed; in particular the
     * outcome and the duration.
     */
   private def recordEnd(startTime: Instant,
-                        result: Result[_]): Future[Result[Unit]] = {
+                        result: Result[_]): Future[Unit] = {
     val futures = Seq(
       metrics.incrementCount(s"$metricsNamespace/${result.name}"),
       metrics
@@ -70,8 +68,11 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
     Future
       .sequence(futures)
-      .map(_ => Successful[Unit]())
-      .recover { case e => MonitoringProcessorFailure[Unit](e) }
+      .map(_ => () )
+      .recover { case e =>
+        warn(s"Unable to record metrics: $e")
+        ()
+      }
   }
 
   private def secondsSince(startTime: Instant): Long =
