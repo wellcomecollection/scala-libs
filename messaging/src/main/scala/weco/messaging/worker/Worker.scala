@@ -14,14 +14,9 @@ import weco.monitoring.Metrics
 import java.time.{Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
-trait Worker[Message,
-             Work,
-             InfraServiceMonitoringContext,
-             InterServiceMonitoringContext,
-             Summary,
-             Action]
+trait Worker[Message, Work, Summary, Action]
     extends MessageProcessor[Work, Summary]
-    with MessageTransform[Message, Work, InfraServiceMonitoringContext]
+    with MessageTransform[Message, Work]
     with Logger {
 
   type Processed = Future[Action]
@@ -44,7 +39,7 @@ trait Worker[Message,
     val startTime = Instant.now()
 
     for {
-      (workEither, _) <- Future.successful(callTransform(message))
+      workEither <- Future.successful(callTransform(message))
       result <- process(workEither)
       _ <- log(result)
       _ <- recordEnd(startTime = startTime, result = result)

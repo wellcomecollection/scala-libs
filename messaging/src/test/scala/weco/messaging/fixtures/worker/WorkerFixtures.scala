@@ -1,6 +1,5 @@
 package weco.messaging.fixtures.worker
 
-import java.time.Instant
 import weco.messaging.worker._
 import weco.messaging.worker.models._
 import weco.messaging.worker.steps.MessageProcessor
@@ -10,7 +9,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait WorkerFixtures {
   type MySummary = String
-  type MyContext = Instant
   type TestResult = Result[MySummary]
   type TestInnerProcess = MyWork => TestResult
   type TestProcess = MyWork => Future[TestResult]
@@ -23,13 +21,12 @@ trait WorkerFixtures {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean)(message: MyMessage)
-    : (Either[Throwable, MyWork], Either[Throwable, Option[MyContext]]) =
-    if (shouldFail) {
-      (Left(new RuntimeException("BOOM")), Right(None))
-    } else {
-      (Right(MyWork(message)), Right(None))
-    }
+  def messageToWork(shouldFail: Boolean)(message: MyMessage): Either[Throwable, MyWork] =
+    Either.cond(
+      !shouldFail,
+      right = MyWork(message),
+      left = new RuntimeException("BOOM")
+    )
 
   def actionToAction(toActionShouldFail: Boolean)(result: Result[MySummary])(
     implicit ec: ExecutionContext): Future[MyExternalMessageAction] = Future {
@@ -45,17 +42,9 @@ trait WorkerFixtures {
   class MyWorker(
     val metricsNamespace: String,
     testProcess: TestInnerProcess,
-    val transform: MyMessage => (Either[Throwable, MyWork],
-                                 Either[Throwable, Option[MyContext]])
+    val transform: MyMessage => Either[Throwable, MyWork]
   )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
-      extends Worker[
-        MyMessage,
-        MyWork,
-        MyContext,
-        MyContext,
-        MySummary,
-        MyExternalMessageAction
-      ] {
+      extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
     val callCounter = new CallCounter()
 
     override val retryAction: MessageAction =

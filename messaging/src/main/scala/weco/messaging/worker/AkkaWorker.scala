@@ -6,23 +6,8 @@ import akka.{Done, NotUsed}
 
 import scala.concurrent.Future
 
-/**
-  * Implementation of [[weco.messaging.worker.Worker]] based on akka streams
-  */
-trait AkkaWorker[Message,
-                 Work,
-                 InfraServiceMonitoringContext,
-                 InterServiceMonitoringContext,
-                 Summary,
-                 Action]
-    extends Worker[
-      Message,
-      Work,
-      InfraServiceMonitoringContext,
-      InterServiceMonitoringContext,
-      Summary,
-      Action] {
-
+trait AkkaWorker[Message, Work, Summary, Action]
+    extends Worker[Message, Work, Summary, Action] {
   implicit val as: ActorSystem
   override implicit val ec = as.dispatcher
 
