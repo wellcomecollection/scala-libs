@@ -8,11 +8,10 @@ import weco.messaging.worker.models.{
   Successful,
   WorkCompletion
 }
-import weco.messaging.worker.monitoring.metrics.MetricsProcessor
 import weco.messaging.worker.steps.{Logger, MessageProcessor, MessageTransform}
 import weco.monitoring.Metrics
 
-import java.time.Instant
+import java.time.{Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Worker[Message,
@@ -34,7 +33,7 @@ trait Worker[Message,
   protected val completedAction: MessageAction
 
   implicit val metrics: Metrics[Future]
-  protected val metricsProcessor: MetricsProcessor
+  protected val metricsNamespace: String
 
   implicit val ec: ExecutionContext
 
@@ -64,10 +63,19 @@ trait Worker[Message,
   /** Records metrics about the work that's just been completed; in particular the
     * outcome and the duration.
     */
-  private def recordEnd(startTime: Instant,
-                        result: Result[_]): Future[Result[Unit]] =
-    metricsProcessor
-      .recordResult(result, startTime)
+  private def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] = {
+    val futures = Seq(
+      metrics.incrementCount(s"$metricsNamespace/${result.name}"),
+      metrics.recordValue(s"$metricsNamespace/Duration", secondsSince(startTime))
+    )
+
+    Future.sequence(futures)
       .map(_ => Successful[Unit]())
       .recover { case e => MonitoringProcessorFailure[Unit](e) }
+  }
+
+  private def secondsSince(startTime: Instant): Long =
+    Duration
+      .between(startTime, Instant.now())
+      .getSeconds
 }
