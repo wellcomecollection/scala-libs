@@ -21,6 +21,9 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
   implicit val ec: ExecutionContext
 
+  protected def isRetryable(t: Throwable): Boolean =
+    false
+
   def process(message: Message): Future[Action] = {
     val startTime = Instant.now()
 
@@ -45,7 +48,16 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
     result match {
       case _: Successful[_]       => successfulAction
       case _: RetryableFailure[_] => retryAction
-      case _: TerminalFailure[_]  => failureAction
+
+      // Although in general terminal failures mean a message should be
+      // stopped immediately, we do allow overriding that here in certain
+      // cases.  This allows us to handle certain classes of flaky errors
+      // (e.g. AWS networking issues) in one place, rather than adding code
+      // to recognise them as Retryable everywhere in the stack.
+      case TerminalFailure(t, _) if isRetryable(t) =>
+        retryAction
+
+      case _: TerminalFailure[_] => failureAction
     }
 
   private def log(result: Result[_]): Unit =
