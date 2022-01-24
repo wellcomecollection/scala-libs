@@ -105,7 +105,8 @@ class AlpakkaSQSWorkerTest
       }
     }
 
-    it("records a failure if it can't process a message, then deletes the message") {
+    it(
+      "records a failure if it can't process a message, then deletes the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
