@@ -56,8 +56,8 @@ class AlpakkaSQSWorker[Work, Summary](
     MessageAction.delete(message)
 
   // We're deliberately quite conservative here -- if a message fails for
-  // any reason, we move it to the DLQ and delete it from the original queue.
-  // This will flag it for human inspection/intervention.
+  // any reason, we log it (including hte full body) and delete it from the
+  // original queue.  This will flag it for human inspection/intervention.
   //
   // This is balancing several concerns:
   //
@@ -66,34 +66,16 @@ class AlpakkaSQSWorker[Work, Summary](
   //      we want to give up immediately and wait for human intervention, rather
   //      than plough on and make things worse.
   //
-  //    - Putting the message on a DLQ means it should show up in our DLQ alerting,
-  //      and can be easily redriven if the failure was flaky/transient.
-  //
-  //      This may help us catch issues that would otherwise be lost, e.g. if an app
-  //      can't send a failure message to SNS (see https://github.com/wellcomecollection/platform/issues/5419)
+  //    - Ideally we'd put the message on a DLQ, where it could be easily redriven --
+  //      but there's no way to automatically put a received message on a DLQ.
+  //      We could send to the queue manually, but that introduces other possible
+  //      failure modes and would need us to update IAM permissions on all our services.
   //
   val failureAction: SQSAction = (message: SQSMessage) => {
 
     // Note: this log includes the full body of the message, so if something goes wrong
-    // further down, we at least have that.
-    warn(s"Deleting and DLQ'ing failed message $message")
-
-    // Note: this is the best way I can think of to send a message directly to the
-    // DLQ; I can't find a way to a better way to modify a message on a queue that
-    // doesn't either (1) delete it entirely or (2) make it available to other consumers.
-    //
-    // The DLQ URL is based on our standard suffix for DLQs; see
-    // https://github.com/wellcomecollection/terraform-aws-sqs/blob/a3bb6892b483c9396df594230c96a16524d57c69/queue/main.tf#L22-L24
-    //
-    // TODO: Make the DLQ URL a configurable parameter.
-    sc.sendMessage(
-        SendMessageRequest
-          .builder()
-          .queueUrl(config.sqsConfig.queueUrl + "_dlq")
-          .messageBody(message.body())
-          .build()
-      )
-      .get
+    // further down, we can get it later.
+    warn(s"Deleting failed message $message")
 
     MessageAction.delete(message)
   }
