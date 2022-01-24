@@ -47,13 +47,17 @@ trait WorkerFixtures {
       extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
     val callCounter = new CallCounter()
 
-    override val retryAction: MessageAction =
+    override val retryAction: MyMessage => MyExternalMessageAction =
       _ =>
         MyExternalMessageAction(
           RetryableFailure[MySummary](failure = new Throwable("BOOM!")))
 
-    override val completedAction: MessageAction =
+    override val successfulAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(Successful())
+
+    override val failureAction: MyMessage => MyExternalMessageAction =
+      _ => MyExternalMessageAction(
+        TerminalFailure[MySummary](failure = new Throwable("BOOM!")))
 
     override val doWork =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)

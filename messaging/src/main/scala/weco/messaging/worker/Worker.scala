@@ -12,10 +12,9 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   protected val parseMessage: Message => Try[Work]
   protected val doWork: Work => Future[Result[Summary]]
 
-  type MessageAction = Message => Action
-
-  protected val retryAction: MessageAction
-  protected val completedAction: MessageAction
+  protected val successfulAction: Message => Action
+  protected val retryAction: Message => Action
+  protected val failureAction: Message => Action
 
   implicit val metrics: Metrics[Future]
   protected val metricsNamespace: String
@@ -26,11 +25,6 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
     val startTime = Instant.now()
 
     for {
-      // TODO: DeterministicFailure is the wrong choice here -- it will cause these
-      // messages to be marked as "completed", and deleted from the queue.
-      //
-      // In either case (we can't parse the message, or an unhandled exception in doWork),
-      // we should put the messages on a DLQ for further investigation.
       result <- parseMessage(message) match {
         case Failure(e) => Future.successful(TerminalFailure[Summary](e))
 
@@ -47,10 +41,12 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
     } yield action(message)
   }
 
-  private def chooseAction(result: Result[_]) =
+  private def chooseAction(result: Result[_]): Message => Action =
     result match {
-      case _: RetryableFailure[_] => retryAction
-      case _                             => completedAction
+      case _: Successful[_]                 => successfulAction
+      case _: RetryableFailure[_]           => retryAction
+      case _: TerminalFailure[_]            => failureAction
+      case _: MonitoringProcessorFailure[_] => failureAction
     }
 
   private def log(result: Result[_]): Unit =

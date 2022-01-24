@@ -105,7 +105,7 @@ class AlpakkaSQSWorkerTest
       }
     }
 
-    it("records a failure if it can't process a message") {
+    it("records a failure if it can't process a message, then DLQs the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -132,7 +132,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 0)
+                  assertQueueHasSize(dlq, size = 1)
                 }
             }
           }
@@ -174,7 +174,7 @@ class AlpakkaSQSWorkerTest
     }
   }
 
-  describe("unparseable messages are deleted and recorded") {
+  describe("unparseable messages are recorded and moved to a DLQ") {
     it("if they're not JSON") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
@@ -198,7 +198,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueEmpty(dlq)
+                  assertQueueHasSize(dlq, size = 1)
                 }
             }
           }
@@ -228,7 +228,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueEmpty(dlq)
+                  assertQueueHasSize(dlq, size = 1)
                 }
             }
           }
