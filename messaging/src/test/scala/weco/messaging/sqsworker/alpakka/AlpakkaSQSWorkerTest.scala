@@ -1,10 +1,8 @@
 package weco.messaging.sqsworker.alpakka
 
-import org.scalatest.concurrent.{
-  AbstractPatienceConfiguration,
-  Eventually,
-  ScalaFutures
-}
+import java.net.SocketTimeoutException
+
+import org.scalatest.concurrent.{AbstractPatienceConfiguration, Eventually, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -13,6 +11,7 @@ import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS.QueuePair
 import weco.messaging.fixtures.monitoring.metrics.MetricsFixtures
 import weco.messaging.fixtures.worker.AlpakkaSQSWorkerFixtures
+import weco.messaging.worker.models.TerminalFailure
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -158,6 +157,46 @@ class AlpakkaSQSWorkerTest
                   assertMetricCount(
                     metrics = metrics,
                     metricName = s"$namespace/RetryableFailure",
+                    expectedCount = 3
+                  )
+                  assertMetricDurations(
+                    metrics = metrics,
+                    metricName = s"$namespace/Duration",
+                    expectedNumberDurations = 3
+                  )
+
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, size = 1)
+                }
+            }
+          }
+      }
+    }
+
+    it("retries a terminal failure if it matches a known flaky exception") {
+      val terminalFailure = (_: MyWork) =>
+        TerminalFailure[MySummary](
+          failure = new SocketTimeoutException("BOOM"),
+          summary = Some("Got a timeout exception, oops")
+        )
+
+      withLocalSqsQueuePair() {
+        case QueuePair(queue, dlq) =>
+          withActorSystem { implicit actorSystem =>
+            withAlpakkaSQSWorker(queue, terminalFailure, namespace) {
+              case (worker, _, metrics, callCounter) =>
+                worker.start
+
+                val myWork = MyWork("my-new-work")
+
+                sendNotificationToSQS(queue, myWork)
+
+                eventually {
+                  callCounter.calledCount shouldBe 3
+
+                  assertMetricCount(
+                    metrics = metrics,
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 3
                   )
                   assertMetricDurations(

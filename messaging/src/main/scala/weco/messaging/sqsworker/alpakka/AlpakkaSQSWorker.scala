@@ -1,10 +1,14 @@
 package weco.messaging.sqsworker.alpakka
 
+import java.net.SocketTimeoutException
+
 import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
+import software.amazon.awssdk.awscore.exception.AwsServiceException
+import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import weco.json.JsonUtil.fromJson
@@ -74,4 +78,35 @@ class AlpakkaSQSWorker[Work, Summary](
 
     MessageAction.delete(message)
   }
+
+  // We should retry an unhandled failure if it looks like an AWS service
+  // flaking out, not a bug in our code.
+  //
+  // This includes network timeouts, 500 errors, DNS lookup failures.
+  // This will cause TerminalFailures with one of these errors to be sent
+  // back to the SQS queue for another try.
+  //
+  // We should be quite conservative here -- as above, we generally want
+  // to hard fail when something goes wrong, but we have occasionally seen
+  // AWS services flake out on us in a way that isn't caught by our other
+  // retrying logic, e.g. https://github.com/wellcomecollection/platform/issues/5419
+  //
+  override def isRetryable(t: Throwable): Boolean =
+    t match {
+      case exc: AwsServiceException if exc.statusCode() == 500 =>
+        true
+
+      case exc: SdkClientException
+        if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+        true
+
+      case exc: SdkClientException
+        if exc.getMessage.startsWith(
+          "Received an UnknownHostException when attempting to interact with a service") =>
+        true
+
+      case _: SocketTimeoutException => true
+
+      case t => super.isRetryable(t)
+    }
 }
