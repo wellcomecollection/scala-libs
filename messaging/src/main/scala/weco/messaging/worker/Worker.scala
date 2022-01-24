@@ -58,8 +58,7 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   /** Records metrics about the work that's just been completed; in particular the
     * outcome and the duration.
     */
-  private def recordEnd(startTime: Instant,
-                        result: Result[_]): Future[Unit] = {
+  private def recordEnd(startTime: Instant, result: Result[_]): Future[Unit] = {
     val futures = Seq(
       metrics.incrementCount(s"$metricsNamespace/${result.name}"),
       metrics
@@ -68,10 +67,11 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
     Future
       .sequence(futures)
-      .map(_ => () )
-      .recover { case e =>
-        warn(s"Unable to record metrics: $e")
-        ()
+      .map(_ => ())
+      .recover {
+        case e =>
+          warn(s"Unable to record metrics: $e")
+          ()
       }
   }
 
