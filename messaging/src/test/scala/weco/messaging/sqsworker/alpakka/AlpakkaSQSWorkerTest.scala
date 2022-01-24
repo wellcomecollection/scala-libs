@@ -62,7 +62,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 0)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
@@ -98,14 +98,14 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 0)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
       }
     }
 
-    it("records a failure if it can't process a message, then DLQs the message") {
+    it("records a failure if it can't process a message, then deletes the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -132,14 +132,14 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 1)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
       }
     }
 
-    it("retries a retryable failure three times, then DLQs the message") {
+    it("retries a retryable failure three times, then deletes the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -166,7 +166,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 1)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
@@ -174,7 +174,7 @@ class AlpakkaSQSWorkerTest
     }
   }
 
-  describe("unparseable messages are recorded and moved to a DLQ") {
+  describe("unparseable messages are recorded and deleted") {
     it("if they're not JSON") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
@@ -198,7 +198,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 1)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
@@ -230,7 +230,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 1)
+                  assertQueueEmpty(dlq)
                 }
             }
           }
