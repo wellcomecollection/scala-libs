@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v32.8.0 - 2022-01-24
+
+This release tidies up the `Result` types to reflect the desired behaviour (TerminalFailure, RetryableFailure, Successful) rather than their properties (Deterministic, NonDeterministic).
+This will need to be changed in downstream code.
+
+Additionally, the full body of any message deleted as a TerminalFailure will be logged, to make it easier to retry/redrive these messages later.
+
 ## v32.7.0 - 2022-01-24
 
 This release tidies up several traits which are only used in the `messaging` library, which were intended to be extensible but in practice only have one implementation.
