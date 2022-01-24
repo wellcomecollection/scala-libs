@@ -2,7 +2,6 @@ package weco.messaging.fixtures.worker
 
 import weco.messaging.worker._
 import weco.messaging.worker.models._
-import weco.messaging.worker.steps.MessageProcessor
 import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,14 +57,6 @@ trait WorkerFixtures {
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)
 
     override type Completion = WorkCompletion[MyMessage, MySummary]
-  }
-
-  class MyMessageProcessor(
-    testProcess: TestProcess
-  ) extends MessageProcessor[MyWork, MySummary] {
-
-    override protected val doWork: TestProcess =
-      testProcess
   }
 
   val message = MyMessage("some_content")
