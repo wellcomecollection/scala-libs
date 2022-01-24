@@ -8,8 +8,7 @@ import weco.messaging.worker.models.{
   NonDeterministicFailure,
   Result,
   Retry,
-  Successful,
-  WorkCompletion
+  Successful
 }
 import weco.monitoring.Metrics
 
@@ -21,7 +20,6 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   protected val parseMessage: Message => Try[Work]
   protected val doWork: Work => Future[Result[Summary]]
 
-  type Completion = WorkCompletion[Message, Summary]
   type MessageAction = Message => Action
 
   protected val retryAction: MessageAction

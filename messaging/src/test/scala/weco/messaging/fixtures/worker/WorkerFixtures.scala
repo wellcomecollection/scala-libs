@@ -55,8 +55,6 @@ trait WorkerFixtures {
 
     override val doWork =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)
-
-    override type Completion = WorkCompletion[MyMessage, MySummary]
   }
 
   val message = MyMessage("some_content")
