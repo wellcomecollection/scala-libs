@@ -2,8 +2,12 @@ package weco.messaging.worker.models
 
 sealed trait Result[Summary] {
   val summary: Option[Summary]
-  def pretty =
-    s"${this.getClass.getSimpleName}: ${summary.getOrElse("<no-summary>")}"
+
+  def name: String =
+    this.getClass.getSimpleName
+
+  def pretty: String =
+    s"$name: ${summary.getOrElse("<no-summary>")}"
 }
 
 case class DeterministicFailure[Summary](

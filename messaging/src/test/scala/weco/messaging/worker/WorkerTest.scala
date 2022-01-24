@@ -21,7 +21,7 @@ class WorkerTest
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = successful,
       transform = messageToWork(shouldFail = false)
     )
@@ -49,7 +49,7 @@ class WorkerTest
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = successful,
       transform = messageToWork(shouldFail = true)
     )
@@ -80,7 +80,7 @@ class WorkerTest
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = successful,
       transform = transform
     )
@@ -108,7 +108,7 @@ class WorkerTest
     implicit val metrics = brokenMemoryMetrics
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = successful,
       transform = messageToWork(shouldFail = false)
     )
@@ -130,7 +130,7 @@ class WorkerTest
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = deterministicFailure,
       transform = messageToWork(shouldFail = false)
     )
@@ -159,7 +159,7 @@ class WorkerTest
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
-      namespace = namespace,
+      metricsNamespace = namespace,
       testProcess = nonDeterministicFailure,
       transform = messageToWork(shouldFail = false)
     )

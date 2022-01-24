@@ -3,7 +3,6 @@ package weco.messaging.fixtures.worker
 import java.time.Instant
 import weco.messaging.worker._
 import weco.messaging.worker.models._
-import weco.messaging.worker.monitoring.metrics.MetricsProcessor
 import weco.messaging.worker.steps.MessageProcessor
 import weco.monitoring.Metrics
 
@@ -44,7 +43,7 @@ trait WorkerFixtures {
   case class MyExternalMessageAction(action: Action)
 
   class MyWorker(
-    namespace: String,
+    val metricsNamespace: String,
     testProcess: TestInnerProcess,
     val transform: MyMessage => (Either[Throwable, MyWork],
                                  Either[Throwable, Option[MyContext]])
@@ -57,9 +56,6 @@ trait WorkerFixtures {
         MySummary,
         MyExternalMessageAction
       ] {
-    override val metricsProcessor: MetricsProcessor = new MetricsProcessor(
-      namespace)
-
     val callCounter = new CallCounter()
 
     override val retryAction: MessageAction =
