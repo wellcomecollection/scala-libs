@@ -140,7 +140,7 @@ class AlpakkaSQSWorkerTest
       }
     }
 
-    it("retries a retryable failure three times, then deletes the message") {
+    it("retries a retryable failure three times, then DLQs the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -167,7 +167,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueEmpty(dlq)
+                  assertQueueHasSize(dlq, size = 1)
                 }
             }
           }
