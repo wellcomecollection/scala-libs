@@ -6,7 +6,10 @@ import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
-import software.amazon.awssdk.services.sqs.model.{SendMessageRequest, Message => SQSMessage}
+import software.amazon.awssdk.services.sqs.model.{
+  SendMessageRequest,
+  Message => SQSMessage
+}
 import weco.json.JsonUtil.fromJson
 import weco.messaging.sns.NotificationMessage
 import weco.messaging.worker.models.Result
@@ -28,7 +31,7 @@ class AlpakkaSQSWorker[Work, Summary](
   val wd: Decoder[Work],
   sc: SqsAsyncClient,
   val metrics: Metrics[Future])
-  extends AkkaWorker[SQSMessage, Work, Summary, MessageAction]
+    extends AkkaWorker[SQSMessage, Work, Summary, MessageAction]
     with Logging {
   override protected val metricsNamespace: String =
     config.metricsConfig.namespace
@@ -81,11 +84,13 @@ class AlpakkaSQSWorker[Work, Summary](
     //
     // TODO: Make the DLQ URL a configurable parameter.
     sc.sendMessage(
-      SendMessageRequest.builder()
-        .queueUrl(config.sqsConfig.queueUrl + "_dlq")
-        .messageBody(message.body())
-        .build()
-    ).get
+        SendMessageRequest
+          .builder()
+          .queueUrl(config.sqsConfig.queueUrl + "_dlq")
+          .messageBody(message.body())
+          .build()
+      )
+      .get
 
     MessageAction.delete(message)
   }

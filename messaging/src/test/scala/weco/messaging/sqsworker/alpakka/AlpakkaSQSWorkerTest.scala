@@ -213,7 +213,9 @@ class AlpakkaSQSWorkerTest
               case (worker, _, metrics, _) =>
                 worker.start
 
-                sendNotificationToSQS(queue, """{"json" : "but not the right format"}""")
+                sendNotificationToSQS(
+                  queue,
+                  """{"json" : "but not the right format"}""")
 
                 eventually {
                   assertMetricCount(
