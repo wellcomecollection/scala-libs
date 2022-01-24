@@ -1,10 +1,9 @@
 package weco.messaging.worker.monitoring.metrics
 
-import java.time.{Duration, Instant}
-
 import weco.messaging.worker.models._
 import weco.monitoring.Metrics
 
+import java.time.{Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
 class MetricsProcessor(val namespace: String) {
@@ -17,14 +16,7 @@ class MetricsProcessor(val namespace: String) {
     implicit metrics: Metrics[Future],
     ec: ExecutionContext
   ): Future[Unit] = {
-    val resultName = result match {
-      case _: Successful[_]                 => "Successful"
-      case _: DeterministicFailure[_]       => "DeterministicFailure"
-      case _: NonDeterministicFailure[_]    => "NonDeterministicFailure"
-      case _: MonitoringProcessorFailure[_] => "MonitoringProcessorFailure"
-    }
-
-    val countResult = metrics.incrementCount(metricName(resultName))
+    val countResult = metrics.incrementCount(metricName(result.name))
 
     val recordDuration =
       metrics.recordValue(
