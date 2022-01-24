@@ -57,7 +57,7 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
       case TerminalFailure(t, _) if isRetryable(t) =>
         retryAction
 
-      case _: TerminalFailure[_]  => failureAction
+      case _: TerminalFailure[_] => failureAction
     }
 
   private def log(result: Result[_]): Unit =

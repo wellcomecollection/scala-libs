@@ -97,12 +97,12 @@ class AlpakkaSQSWorker[Work, Summary](
         true
 
       case exc: SdkClientException
-        if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+          if exc.getMessage.startsWith("Unable to execute HTTP request") =>
         true
 
       case exc: SdkClientException
-        if exc.getMessage.startsWith(
-          "Received an UnknownHostException when attempting to interact with a service") =>
+          if exc.getMessage.startsWith(
+            "Received an UnknownHostException when attempting to interact with a service") =>
         true
 
       case _: SocketTimeoutException => true

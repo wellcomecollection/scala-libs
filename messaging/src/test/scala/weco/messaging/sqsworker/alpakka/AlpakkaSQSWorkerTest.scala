@@ -2,7 +2,11 @@ package weco.messaging.sqsworker.alpakka
 
 import java.net.SocketTimeoutException
 
-import org.scalatest.concurrent.{AbstractPatienceConfiguration, Eventually, ScalaFutures}
+import org.scalatest.concurrent.{
+  AbstractPatienceConfiguration,
+  Eventually,
+  ScalaFutures
+}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -178,7 +182,7 @@ class AlpakkaSQSWorkerTest
         TerminalFailure[MySummary](
           failure = new SocketTimeoutException("BOOM"),
           summary = Some("Got a timeout exception, oops")
-        )
+      )
 
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
