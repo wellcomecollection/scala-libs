@@ -14,8 +14,6 @@ trait AkkaWorker[Message, Work, Summary, Action]
   type MessageSource = Source[Message, NotUsed]
   type MessageSink = Sink[Action, Future[Done]]
 
-  type ProcessedSource = Source[Action, NotUsed]
-
   protected val parallelism: Int
 
   protected val source: MessageSource
@@ -24,11 +22,9 @@ trait AkkaWorker[Message, Work, Summary, Action]
   protected val retryAction: MessageAction
   protected val completedAction: MessageAction
 
-  private def completionSource(parallelism: Int): ProcessedSource =
-    source.mapAsyncUnordered(parallelism)(processMessage)
-
   def start: Future[Done] =
-    completionSource(parallelism)
+    source
+      .mapAsyncUnordered(parallelism)(process)
       .toMat(sink)(Keep.right)
       .run()
 }

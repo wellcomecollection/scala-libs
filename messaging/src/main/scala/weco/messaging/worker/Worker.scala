@@ -1,16 +1,7 @@
 package weco.messaging.worker
 
 import grizzled.slf4j.Logging
-import weco.messaging.worker.models.{
-  Completed,
-  DeterministicFailure,
-  MonitoringProcessorFailure,
-  NonDeterministicFailure,
-  Result,
-  Retry,
-  Successful,
-  WorkCompletion
-}
+import weco.messaging.worker.models._
 import weco.monitoring.Metrics
 
 import java.time.{Duration, Instant}
@@ -21,9 +12,6 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
   protected val parseMessage: Message => Try[Work]
   protected val doWork: Work => Future[Result[Summary]]
 
-  type Processed = Future[Action]
-
-  type Completion = WorkCompletion[Message, Summary]
   type MessageAction = Message => Action
 
   protected val retryAction: MessageAction
@@ -34,10 +22,7 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
   implicit val ec: ExecutionContext
 
-  final def processMessage(message: Message): Processed =
-    work(message).map(completion)
-
-  private def work(message: Message): Future[Completion] = {
+  def process(message: Message): Future[Action] = {
     val startTime = Instant.now()
 
     for {
@@ -57,16 +42,15 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
       _ = log(result)
       _ <- recordEnd(startTime = startTime, result = result)
-    } yield WorkCompletion(message, result)
+
+      action = chooseAction(result)
+    } yield action(message)
   }
 
-  private def completion(done: Completion) =
-    done match {
-      case WorkCompletion(message, response) =>
-        response.asInstanceOf[Action] match {
-          case _: Retry     => retryAction(message)
-          case _: Completed => completedAction(message)
-        }
+  private def chooseAction(result: Result[_]) =
+    result match {
+      case _: NonDeterministicFailure[_] => retryAction
+      case _                             => completedAction
     }
 
   private def log(result: Result[_]): Unit =
