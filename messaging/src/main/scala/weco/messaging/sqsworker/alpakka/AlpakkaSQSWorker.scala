@@ -19,9 +19,9 @@ import scala.concurrent.Future
   * It receives messages from SQS and deletes messages from SQS on successful completion
   */
 class AlpakkaSQSWorker[Work,
-  InfraServiceMonitoringContext,
-  InterServiceMonitoringContext,
-  Summary](
+                       InfraServiceMonitoringContext,
+                       InterServiceMonitoringContext,
+                       Summary](
   config: AlpakkaSQSWorkerConfig
 )(
   val doWork: Work => Future[Result[Summary]]
@@ -39,7 +39,8 @@ class AlpakkaSQSWorker[Work,
       MessageAction]
     with SnsSqsTransform[Work, InfraServiceMonitoringContext]
     with Logging {
-  override protected val metricsNamespace: String = config.metricsConfig.namespace
+  override protected val metricsNamespace: String =
+    config.metricsConfig.namespace
 
   type SQSAction = SQSMessage => sqs.MessageAction
 

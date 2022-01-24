@@ -63,13 +63,16 @@ trait Worker[Message,
   /** Records metrics about the work that's just been completed; in particular the
     * outcome and the duration.
     */
-  private def recordEnd(startTime: Instant, result: Result[_]): Future[Result[Unit]] = {
+  private def recordEnd(startTime: Instant,
+                        result: Result[_]): Future[Result[Unit]] = {
     val futures = Seq(
       metrics.incrementCount(s"$metricsNamespace/${result.name}"),
-      metrics.recordValue(s"$metricsNamespace/Duration", secondsSince(startTime))
+      metrics
+        .recordValue(s"$metricsNamespace/Duration", secondsSince(startTime))
     )
 
-    Future.sequence(futures)
+    Future
+      .sequence(futures)
       .map(_ => Successful[Unit]())
       .recover { case e => MonitoringProcessorFailure[Unit](e) }
   }

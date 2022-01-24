@@ -48,14 +48,14 @@ trait WorkerFixtures {
     val transform: MyMessage => (Either[Throwable, MyWork],
                                  Either[Throwable, Option[MyContext]])
   )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
-    extends Worker[
-      MyMessage,
-      MyWork,
-      MyContext,
-      MyContext,
-      MySummary,
-      MyExternalMessageAction
-    ] {
+      extends Worker[
+        MyMessage,
+        MyWork,
+        MyContext,
+        MyContext,
+        MySummary,
+        MyExternalMessageAction
+      ] {
     val callCounter = new CallCounter()
 
     override val retryAction: MessageAction =

@@ -46,7 +46,8 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
       createResult(process, callCounter)(ec)(work)
 
     val worker =
-      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](config)(testProcess)
+      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](config)(
+        testProcess)
 
     testWith((worker, config, metrics, callCounter))
   }
