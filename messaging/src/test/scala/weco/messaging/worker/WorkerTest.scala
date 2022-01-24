@@ -23,7 +23,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      transform = messageToWork(shouldFail = false)
+      parseMessage = messageToWork(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -51,7 +51,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      transform = messageToWork(shouldFail = true)
+      parseMessage = messageToWork(shouldFail = true)
     )
 
     val process = worker.processMessage(message)
@@ -82,7 +82,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      transform = transform
+      parseMessage = transform
     )
 
     val process = worker.processMessage(message)
@@ -110,7 +110,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      transform = messageToWork(shouldFail = false)
+      parseMessage = messageToWork(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -132,7 +132,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = deterministicFailure,
-      transform = messageToWork(shouldFail = false)
+      parseMessage = messageToWork(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -161,7 +161,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = nonDeterministicFailure,
-      transform = messageToWork(shouldFail = false)
+      parseMessage = messageToWork(shouldFail = false)
     )
 
     val process = worker.processMessage(message)

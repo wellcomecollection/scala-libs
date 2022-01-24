@@ -42,7 +42,7 @@ trait WorkerFixtures {
   class MyWorker(
     val metricsNamespace: String,
     testProcess: TestInnerProcess,
-    val transform: MyMessage => Either[Throwable, MyWork]
+    val parseMessage: MyMessage => Either[Throwable, MyWork]
   )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
       extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
     val callCounter = new CallCounter()
