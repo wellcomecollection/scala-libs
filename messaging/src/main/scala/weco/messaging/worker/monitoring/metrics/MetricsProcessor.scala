@@ -7,13 +7,10 @@ import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MetricsProcessor {
-
-  val namespace: String
-
+class MetricsProcessor(val namespace: String) {
   private def metricName(name: String) = s"$namespace/$name"
 
-  final def metric(
+  def recordResult(
     result: Result[_],
     startTime: Instant
   )(
