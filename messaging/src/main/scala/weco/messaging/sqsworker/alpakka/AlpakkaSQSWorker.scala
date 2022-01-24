@@ -59,17 +59,15 @@ class AlpakkaSQSWorker[Work, Summary](
   // any reason, we log it (including hte full body) and delete it from the
   // original queue.  This will flag it for human inspection/intervention.
   //
-  // This is balancing several concerns:
+  // This class is used in the storage service, where we want to be careful
+  // when things go wrong.  When there is an unexpected failure, we want to
+  // give up immediately and wait for human intervention, rather than plough
+  // on and make things worse.
   //
-  //    - This class is used in the storage service, where we want to be
-  //      conservative when things go wrong.  When there is an unexpected failure,
-  //      we want to give up immediately and wait for human intervention, rather
-  //      than plough on and make things worse.
-  //
-  //    - Ideally we'd put the message on a DLQ, where it could be easily redriven --
-  //      but there's no way to automatically put a received message on a DLQ.
-  //      We could send to the queue manually, but that introduces other possible
-  //      failure modes and would need us to update IAM permissions on all our services.
+  // Ideally we'd put the message on a DLQ, where it could be easily redriven --
+  // but there's no good way to put a received message on a DLQ.  We could send
+  // to the queue manually, but that introduces other possible failure modes and
+  // would need us to update IAM permissions on all our services.
   //
   val failureAction: SQSAction = (message: SQSMessage) => {
 
