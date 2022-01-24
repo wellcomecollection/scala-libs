@@ -7,8 +7,10 @@ import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
+import weco.json.JsonUtil.fromJson
+import weco.messaging.sns.NotificationMessage
 import weco.messaging.worker.models.Result
-import weco.messaging.worker.{AkkaWorker, SnsSqsTransform}
+import weco.messaging.worker.AkkaWorker
 import weco.monitoring.Metrics
 
 import scala.concurrent.Future
@@ -26,10 +28,15 @@ class AlpakkaSQSWorker[Work, Summary](
   val wd: Decoder[Work],
   sc: SqsAsyncClient,
   val metrics: Metrics[Future])
-    extends AkkaWorker[SQSMessage, Work, Summary, MessageAction]
-    with SnsSqsTransform[Work] {
+    extends AkkaWorker[SQSMessage, Work, Summary, MessageAction] {
   override protected val metricsNamespace: String =
     config.metricsConfig.namespace
+
+  val parseMessage = (message: SQSMessage) =>
+    for {
+      notification <- fromJson[NotificationMessage](message.body())
+      work <- fromJson[Work](notification.body)
+    } yield work
 
   type SQSAction = SQSMessage => sqs.MessageAction
 
