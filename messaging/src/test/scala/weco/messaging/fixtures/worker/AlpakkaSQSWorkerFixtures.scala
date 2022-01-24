@@ -29,14 +29,13 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
     queue: Queue,
     process: TestInnerProcess,
     namespace: String = randomAlphanumeric()
-  )(testWith: TestWith[
-      (AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary],
-       AlpakkaSQSWorkerConfig,
-       MemoryMetrics,
-       CallCounter),
-      R])(implicit
-          as: ActorSystem,
-          ec: ExecutionContext): R = {
+  )(testWith: TestWith[(AlpakkaSQSWorker[MyWork, MySummary],
+                        AlpakkaSQSWorkerConfig,
+                        MemoryMetrics,
+                        CallCounter),
+                       R])(implicit
+                           as: ActorSystem,
+                           ec: ExecutionContext): R = {
     implicit val metrics: MemoryMetrics = new MemoryMetrics()
 
     val config = createAlpakkaSQSWorkerConfig(queue, namespace)
@@ -45,9 +44,7 @@ trait AlpakkaSQSWorkerFixtures extends WorkerFixtures with SQS {
     val testProcess = (work: MyWork) =>
       createResult(process, callCounter)(ec)(work)
 
-    val worker =
-      new AlpakkaSQSWorker[MyWork, MyContext, MyContext, MySummary](config)(
-        testProcess)
+    val worker = new AlpakkaSQSWorker[MyWork, MySummary](config)(testProcess)
 
     testWith((worker, config, metrics, callCounter))
   }

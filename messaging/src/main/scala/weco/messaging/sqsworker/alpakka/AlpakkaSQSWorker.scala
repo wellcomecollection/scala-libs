@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
@@ -18,10 +17,7 @@ import scala.concurrent.Future
   * Implementation of [[AkkaWorker]] that uses SQS as source and sink.
   * It receives messages from SQS and deletes messages from SQS on successful completion
   */
-class AlpakkaSQSWorker[Work,
-                       InfraServiceMonitoringContext,
-                       InterServiceMonitoringContext,
-                       Summary](
+class AlpakkaSQSWorker[Work, Summary](
   config: AlpakkaSQSWorkerConfig
 )(
   val doWork: Work => Future[Result[Summary]]
@@ -30,15 +26,8 @@ class AlpakkaSQSWorker[Work,
   val wd: Decoder[Work],
   sc: SqsAsyncClient,
   val metrics: Metrics[Future])
-    extends AkkaWorker[
-      SQSMessage,
-      Work,
-      InfraServiceMonitoringContext,
-      InterServiceMonitoringContext,
-      Summary,
-      MessageAction]
-    with SnsSqsTransform[Work, InfraServiceMonitoringContext]
-    with Logging {
+    extends AkkaWorker[SQSMessage, Work, Summary, MessageAction]
+    with SnsSqsTransform[Work] {
   override protected val metricsNamespace: String =
     config.metricsConfig.namespace
 
