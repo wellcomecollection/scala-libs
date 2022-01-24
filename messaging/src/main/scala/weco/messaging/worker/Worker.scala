@@ -1,6 +1,14 @@
 package weco.messaging.worker
 
-import weco.messaging.worker.models.{Completed, DeterministicFailure, MonitoringProcessorFailure, Result, Retry, Successful, WorkCompletion}
+import weco.messaging.worker.models.{
+  Completed,
+  DeterministicFailure,
+  MonitoringProcessorFailure,
+  Result,
+  Retry,
+  Successful,
+  WorkCompletion
+}
 import weco.messaging.worker.steps.Logger
 import weco.monitoring.Metrics
 
@@ -38,11 +46,12 @@ trait Worker[Message, Work, Summary, Action] extends Logger {
       // In either case (we can't parse the message, or an unhandled exception in doWork),
       // we should put the messages on a DLQ for further investigation.
       result <- parseMessage(message) match {
-        case Failure(e)    => Future.successful(DeterministicFailure[Summary](e))
+        case Failure(e) => Future.successful(DeterministicFailure[Summary](e))
 
-        case Success(work) => doWork(work) recover {
-          case e => DeterministicFailure[Summary](e)
-        }
+        case Success(work) =>
+          doWork(work) recover {
+            case e => DeterministicFailure[Summary](e)
+          }
       }
 
       _ <- log(result)
