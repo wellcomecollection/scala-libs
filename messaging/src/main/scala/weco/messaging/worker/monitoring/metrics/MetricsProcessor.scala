@@ -14,16 +14,12 @@ class MetricsProcessor(val namespace: String) {
     implicit metrics: Metrics[Future],
     ec: ExecutionContext
   ): Future[Unit] = {
-    val countResult = metrics.incrementCount(s"$namespace/${result.name}")
-
-    val recordDuration =
+    val futures = Seq(
+      metrics.incrementCount(s"$namespace/${result.name}"),
       metrics.recordValue(s"$namespace/Duration", secondsSince(startTime))
+    )
 
-    Future
-      .sequence(
-        List(countResult, recordDuration)
-      )
-      .map(_ => ())
+    Future.sequence(futures).map(_ => ())
   }
 
   private def secondsSince(startTime: Instant): Long =
