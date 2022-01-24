@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v32.2.0 - 2022-01-24
+
+This release tidies up several traits which are only used in the `messaging` library, which were intended to be extensible but in practice only have one implementation.
+There should be no effect on downstream users.
+
 ## v32.1.0 - 2022-01-21
 
 This release removes a couple of classes and traits which aren't used anywhere outside the `messaging` library itself, and so can be removed without any effect on downstream users.
