@@ -6,10 +6,7 @@ import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
-import software.amazon.awssdk.services.sqs.model.{
-  SendMessageRequest,
-  Message => SQSMessage
-}
+import software.amazon.awssdk.services.sqs.model.{Message => SQSMessage}
 import weco.json.JsonUtil.fromJson
 import weco.messaging.sns.NotificationMessage
 import weco.messaging.worker.models.Result
