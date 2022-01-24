@@ -48,7 +48,9 @@ trait WorkerFixtures {
     val callCounter = new CallCounter()
 
     override val retryAction: MessageAction =
-      _ => MyExternalMessageAction(NonDeterministicFailure[MySummary](failure = new Throwable("BOOM!")))
+      _ =>
+        MyExternalMessageAction(
+          NonDeterministicFailure[MySummary](failure = new Throwable("BOOM!")))
 
     override val completedAction: MessageAction =
       _ => MyExternalMessageAction(Successful())

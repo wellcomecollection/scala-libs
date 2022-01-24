@@ -23,7 +23,8 @@ trait AkkaWorker[Message, Work, Summary, Action]
   protected val completedAction: MessageAction
 
   def start: Future[Done] =
-    source.mapAsyncUnordered(parallelism)(process)
+    source
+      .mapAsyncUnordered(parallelism)(process)
       .toMat(sink)(Keep.right)
       .run()
 }
