@@ -95,11 +95,6 @@ trait WorkerFixtures {
       failure = new RuntimeException("TerminalFailure"),
       summary = Some("Summary TerminalFailure"))
 
-  val monitoringProcessorFailure = (_: MyWork) =>
-    MonitoringProcessorFailure[MySummary](
-      failure = new RuntimeException("MonitoringProcessorFailure"),
-      summary = Some("Summary MonitoringProcessorFailure"))
-
   val exceptionState = (_: MyWork) => {
     throw new RuntimeException("BOOM")
 
