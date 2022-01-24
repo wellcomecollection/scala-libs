@@ -7,8 +7,6 @@ import java.time.{Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
 class MetricsProcessor(val namespace: String) {
-  private def metricName(name: String) = s"$namespace/$name"
-
   def recordResult(
     result: Result[_],
     startTime: Instant
@@ -16,11 +14,11 @@ class MetricsProcessor(val namespace: String) {
     implicit metrics: Metrics[Future],
     ec: ExecutionContext
   ): Future[Unit] = {
-    val countResult = metrics.incrementCount(metricName(result.name))
+    val countResult = metrics.incrementCount(s"$namespace/${result.name}")
 
     val recordDuration =
       metrics.recordValue(
-        metricName("Duration"),
+        s"$namespace/Duration",
         Duration
           .between(
             startTime,
