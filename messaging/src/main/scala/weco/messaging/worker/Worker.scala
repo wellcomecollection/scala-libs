@@ -1,6 +1,13 @@
 package weco.messaging.worker
 
-import weco.messaging.worker.models.{Completed, MonitoringProcessorFailure, Result, Retry, Successful, WorkCompletion}
+import weco.messaging.worker.models.{
+  Completed,
+  MonitoringProcessorFailure,
+  Result,
+  Retry,
+  Successful,
+  WorkCompletion
+}
 import weco.messaging.worker.steps.{Logger, MessageProcessor}
 import weco.monitoring.Metrics
 

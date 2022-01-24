@@ -21,7 +21,8 @@ trait WorkerFixtures {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean)(message: MyMessage): Either[Throwable, MyWork] =
+  def messageToWork(shouldFail: Boolean)(
+    message: MyMessage): Either[Throwable, MyWork] =
     Either.cond(
       !shouldFail,
       right = MyWork(message),

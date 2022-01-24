@@ -20,6 +20,6 @@ trait MessageProcessor[Work, Summary] {
     w =>
       doWork(w) recover {
         case e => DeterministicFailure[Summary](e)
-      }
+    }
   )
 }
