@@ -8,7 +8,6 @@ import weco.messaging.fixtures.worker.WorkerFixtures
 import weco.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Failure
 
 class WorkerTest
     extends AnyFunSpec
@@ -45,7 +44,7 @@ class WorkerTest
     }
   }
 
-  it("increments deterministic failure metric if transformation returns a Left") {
+  it("records a terminal failure if it can't parse the message") {
     val namespace = s"ns-${randomAlphanumeric()}"
     implicit val metrics = new MemoryMetrics()
 
@@ -61,38 +60,7 @@ class WorkerTest
 
       assertMetricCount(
         metrics = metrics,
-        metricName = s"$namespace/DeterministicFailure",
-        expectedCount = 1
-      )
-
-      assertMetricDurations(
-        metrics = metrics,
-        metricName = s"$namespace/Duration",
-        expectedNumberDurations = 1
-      )
-    }
-  }
-
-  it(
-    "increments deterministic failure metric if transformation fails unexpectedly") {
-    def parseMessage(message: MyMessage) = Failure(new RuntimeException)
-
-    val namespace = s"ns-${randomAlphanumeric()}"
-    implicit val metrics = new MemoryMetrics()
-
-    val worker = new MyWorker(
-      metricsNamespace = namespace,
-      testProcess = successful,
-      parseMessage = parseMessage
-    )
-
-    val process = worker.process(message)
-    whenReady(process) { _ =>
-      worker.callCounter.calledCount shouldBe 0
-
-      assertMetricCount(
-        metrics = metrics,
-        metricName = s"$namespace/DeterministicFailure",
+        metricName = s"$namespace/TerminalFailure",
         expectedCount = 1
       )
 
@@ -125,14 +93,13 @@ class WorkerTest
     }
   }
 
-  it(
-    "increments deterministic failure metric if processing fails with deterministic failure") {
+  it("records a terminal failure if it can't process the message") {
     val namespace = s"ns-${randomAlphanumeric()}"
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
       metricsNamespace = namespace,
-      testProcess = deterministicFailure,
+      testProcess = terminalFailure,
       parseMessage = parseMessage(shouldFail = false)
     )
 
@@ -142,7 +109,7 @@ class WorkerTest
 
       assertMetricCount(
         metrics = metrics,
-        metricName = s"$namespace/DeterministicFailure",
+        metricName = s"$namespace/TerminalFailure",
         expectedCount = 1
       )
 
@@ -154,14 +121,13 @@ class WorkerTest
     }
   }
 
-  it(
-    "increments non deterministic failure metric if processing fails with non deterministic failure") {
+  it("records a retryable failure if there's a retryable error") {
     val namespace = s"ns-${randomAlphanumeric()}"
     implicit val metrics = new MemoryMetrics()
 
     val worker = new MyWorker(
       metricsNamespace = namespace,
-      testProcess = nonDeterministicFailure,
+      testProcess = retryableFailure,
       parseMessage = parseMessage(shouldFail = false)
     )
 
@@ -171,7 +137,7 @@ class WorkerTest
 
       assertMetricCount(
         metrics = metrics,
-        metricName = s"$namespace/NonDeterministicFailure",
+        metricName = s"$namespace/RetryableFailure",
         expectedCount = 1
       )
 

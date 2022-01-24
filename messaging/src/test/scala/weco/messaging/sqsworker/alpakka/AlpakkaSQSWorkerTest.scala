@@ -105,12 +105,11 @@ class AlpakkaSQSWorkerTest
       }
     }
 
-    it(
-      "consumes a message and increments non deterministic failure metrics metrics") {
+    it("records a failure if it can't process a message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
-            withAlpakkaSQSWorker(queue, deterministicFailure, namespace) {
+            withAlpakkaSQSWorker(queue, terminalFailure, namespace) {
               case (worker, _, metrics, callCounter) =>
                 worker.start
 
@@ -123,7 +122,7 @@ class AlpakkaSQSWorkerTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
@@ -133,19 +132,18 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 0)
+                  assertQueueHasSize(dlq, size = 0)
                 }
             }
           }
       }
     }
 
-    it(
-      "retries nonDeterministicFailure 3 times and places the message in the dlq") {
+    it("retries a retryable failure three times, then DLQs the message") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
-            withAlpakkaSQSWorker(queue, nonDeterministicFailure, namespace) {
+            withAlpakkaSQSWorker(queue, retryableFailure, namespace) {
               case (worker, _, metrics, callCounter) =>
                 worker.start
 
@@ -158,7 +156,7 @@ class AlpakkaSQSWorkerTest
 
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/NonDeterministicFailure",
+                    metricName = s"$namespace/RetryableFailure",
                     expectedCount = 3
                   )
                   assertMetricDurations(
@@ -168,7 +166,7 @@ class AlpakkaSQSWorkerTest
                   )
 
                   assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
+                  assertQueueHasSize(dlq, size = 1)
                 }
             }
           }
@@ -176,9 +174,8 @@ class AlpakkaSQSWorkerTest
     }
   }
 
-  describe("When a message cannot be parsed") {
-    it(
-      "consumes the message increments failure metrics if the message is not json") {
+  describe("unparseable messages are deleted and recorded") {
+    it("if they're not JSON") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -189,11 +186,9 @@ class AlpakkaSQSWorkerTest
                 sendNotificationToSQS(queue, "not json")
 
                 eventually {
-                  //process.called shouldBe false
-
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
@@ -205,14 +200,12 @@ class AlpakkaSQSWorkerTest
                   assertQueueEmpty(queue)
                   assertQueueEmpty(dlq)
                 }
-
             }
           }
       }
     }
 
-    it(
-      "consumes the message increments failure metrics if the message is json but not a work") {
+    it("if they can't be parsed") {
       withLocalSqsQueuePair() {
         case QueuePair(queue, dlq) =>
           withActorSystem { implicit actorSystem =>
@@ -220,14 +213,12 @@ class AlpakkaSQSWorkerTest
               case (worker, _, metrics, _) =>
                 worker.start
 
-                sendNotificationToSQS(queue, """{"json" : "but not a work"}""")
+                sendNotificationToSQS(queue, """{"json" : "but not the right format"}""")
 
                 eventually {
-                  //process.called shouldBe false
-
                   assertMetricCount(
                     metrics = metrics,
-                    metricName = s"$namespace/DeterministicFailure",
+                    metricName = s"$namespace/TerminalFailure",
                     expectedCount = 1
                   )
                   assertMetricDurations(
@@ -239,7 +230,6 @@ class AlpakkaSQSWorkerTest
                   assertQueueEmpty(queue)
                   assertQueueEmpty(dlq)
                 }
-
             }
           }
       }

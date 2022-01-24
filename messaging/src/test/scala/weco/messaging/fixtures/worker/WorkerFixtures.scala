@@ -50,7 +50,7 @@ trait WorkerFixtures {
     override val retryAction: MessageAction =
       _ =>
         MyExternalMessageAction(
-          NonDeterministicFailure[MySummary](failure = new Throwable("BOOM!")))
+          RetryableFailure[MySummary](failure = new Throwable("BOOM!")))
 
     override val completedAction: MessageAction =
       _ => MyExternalMessageAction(Successful())
@@ -77,29 +77,23 @@ trait WorkerFixtures {
       }
   }
 
-  val successful = (_: MyWork) => {
-    Successful[MySummary](
-      Some("Summary Successful")
-    )
-  }
+  val successful = (_: MyWork) =>
+    Successful[MySummary](summary = Some("Summary Successful"))
 
-  val nonDeterministicFailure = (_: MyWork) =>
-    NonDeterministicFailure[MySummary](
-      new RuntimeException("NonDeterministicFailure"),
-      Some("Summary NonDeterministicFailure")
-  )
+  val retryableFailure = (_: MyWork) =>
+    RetryableFailure[MySummary](
+      failure = new RuntimeException("RetryableFailure"),
+      summary = Some("Summary RetryableFailure"))
 
-  val deterministicFailure = (_: MyWork) =>
-    DeterministicFailure[MySummary](
-      new RuntimeException("DeterministicFailure"),
-      Some("Summary DeterministicFailure")
-  )
+  val terminalFailure = (_: MyWork) =>
+    TerminalFailure[MySummary](
+      failure = new RuntimeException("TerminalFailure"),
+      summary = Some("Summary TerminalFailure"))
 
   val monitoringProcessorFailure = (_: MyWork) =>
     MonitoringProcessorFailure[MySummary](
-      new RuntimeException("MonitoringProcessorFailure"),
-      Some("Summary MonitoringProcessorFailure")
-  )
+      failure = new RuntimeException("MonitoringProcessorFailure"),
+      summary = Some("Summary MonitoringProcessorFailure"))
 
   val exceptionState = (_: MyWork) => {
     throw new RuntimeException("BOOM")

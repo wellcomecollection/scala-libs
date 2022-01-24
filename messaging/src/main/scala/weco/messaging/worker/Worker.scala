@@ -32,11 +32,11 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
       // In either case (we can't parse the message, or an unhandled exception in doWork),
       // we should put the messages on a DLQ for further investigation.
       result <- parseMessage(message) match {
-        case Failure(e) => Future.successful(DeterministicFailure[Summary](e))
+        case Failure(e) => Future.successful(TerminalFailure[Summary](e))
 
         case Success(work) =>
           doWork(work) recover {
-            case e => DeterministicFailure[Summary](e)
+            case e => TerminalFailure[Summary](e)
           }
       }
 
@@ -49,15 +49,15 @@ trait Worker[Message, Work, Summary, Action] extends Logging {
 
   private def chooseAction(result: Result[_]) =
     result match {
-      case _: NonDeterministicFailure[_] => retryAction
+      case _: RetryableFailure[_] => retryAction
       case _                             => completedAction
     }
 
   private def log(result: Result[_]): Unit =
     result match {
       case r @ Successful(_)                    => info(r.pretty)
-      case r @ NonDeterministicFailure(e, _)    => warn(r.pretty, e)
-      case r @ DeterministicFailure(e, _)       => error(r.toString, e)
+      case r @ RetryableFailure(e, _)           => warn(r.pretty, e)
+      case r @ TerminalFailure(e, _)            => error(r.toString, e)
       case r @ MonitoringProcessorFailure(e, _) => error(r.toString, e)
     }
 
