@@ -73,7 +73,10 @@ class AlpakkaSQSWorker[Work, Summary](
   //      can't send a failure message to SNS (see https://github.com/wellcomecollection/platform/issues/5419)
   //
   val failureAction: SQSAction = (message: SQSMessage) => {
-    warn(s"Deleting failed message $message")
+
+    // Note: this log includes the full body of the message, so if something goes wrong
+    // further down, we at least have that.
+    warn(s"Deleting and DLQ'ing failed message $message")
 
     // Note: this is the best way I can think of to send a message directly to the
     // DLQ; I can't find a way to a better way to modify a message on a queue that
