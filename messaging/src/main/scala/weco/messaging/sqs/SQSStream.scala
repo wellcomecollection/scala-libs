@@ -118,7 +118,7 @@ class SQSStream[T](
       Supervision.Stop
   }
 
-  private def logException(exception: Throwable): Unit = {
+  private def logException(exception: Throwable): Unit =
     exception match {
       case exception: JsonDecodingError =>
         logger.warn(s"JSON decoding error: ${exception.getMessage}")
@@ -127,5 +127,4 @@ class SQSStream[T](
           s"Unrecognised failure while: ${exception.getMessage}",
           exception)
     }
-  }
 }
