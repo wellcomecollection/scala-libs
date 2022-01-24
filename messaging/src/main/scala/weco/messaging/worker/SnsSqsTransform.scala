@@ -11,7 +11,6 @@ trait SnsSqsTransform[Work, MonitoringContext]
 
   type SQSTransform = SQSMessage => Transformed
 
-  implicit val nd = implicitly[Decoder[NotificationMessage]]
   implicit val wd: Decoder[Work]
 
   val transform: SQSTransform = (message: SQSMessage) => {
