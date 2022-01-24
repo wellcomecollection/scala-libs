@@ -6,6 +6,7 @@ import weco.messaging.worker.steps.MessageProcessor
 import weco.monitoring.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 trait WorkerFixtures {
   type MySummary = String
@@ -21,13 +22,12 @@ trait WorkerFixtures {
       new MyWork(message.s)
   }
 
-  def messageToWork(shouldFail: Boolean)(
-    message: MyMessage): Either[Throwable, MyWork] =
-    Either.cond(
-      !shouldFail,
-      right = MyWork(message),
-      left = new RuntimeException("BOOM")
-    )
+  def parseMessage(shouldFail: Boolean)(message: MyMessage): Try[MyWork] =
+    if (shouldFail) {
+      Failure(new RuntimeException("BOOM"))
+    } else {
+      Success(MyWork(message))
+    }
 
   def actionToAction(toActionShouldFail: Boolean)(result: Result[MySummary])(
     implicit ec: ExecutionContext): Future[MyExternalMessageAction] = Future {
@@ -43,7 +43,7 @@ trait WorkerFixtures {
   class MyWorker(
     val metricsNamespace: String,
     testProcess: TestInnerProcess,
-    val parseMessage: MyMessage => Either[Throwable, MyWork]
+    val parseMessage: MyMessage => Try[MyWork]
   )(implicit val ec: ExecutionContext, val metrics: Metrics[Future])
       extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
     val callCounter = new CallCounter()

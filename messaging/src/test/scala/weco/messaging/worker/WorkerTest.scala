@@ -8,6 +8,7 @@ import weco.messaging.fixtures.worker.WorkerFixtures
 import weco.monitoring.memory.MemoryMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Failure
 
 class WorkerTest
     extends AnyFunSpec
@@ -23,7 +24,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      parseMessage = messageToWork(shouldFail = false)
+      parseMessage = parseMessage(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -51,7 +52,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      parseMessage = messageToWork(shouldFail = true)
+      parseMessage = parseMessage(shouldFail = true)
     )
 
     val process = worker.processMessage(message)
@@ -74,7 +75,7 @@ class WorkerTest
 
   it(
     "increments deterministic failure metric if transformation fails unexpectedly") {
-    def transform(message: MyMessage) = throw new RuntimeException
+    def parseMessage(message: MyMessage) = Failure(new RuntimeException)
 
     val namespace = s"ns-${randomAlphanumeric()}"
     implicit val metrics = new MemoryMetrics()
@@ -82,7 +83,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      parseMessage = transform
+      parseMessage = parseMessage
     )
 
     val process = worker.processMessage(message)
@@ -110,7 +111,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = successful,
-      parseMessage = messageToWork(shouldFail = false)
+      parseMessage = parseMessage(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -132,7 +133,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = deterministicFailure,
-      parseMessage = messageToWork(shouldFail = false)
+      parseMessage = parseMessage(shouldFail = false)
     )
 
     val process = worker.processMessage(message)
@@ -161,7 +162,7 @@ class WorkerTest
     val worker = new MyWorker(
       metricsNamespace = namespace,
       testProcess = nonDeterministicFailure,
-      parseMessage = messageToWork(shouldFail = false)
+      parseMessage = parseMessage(shouldFail = false)
     )
 
     val process = worker.processMessage(message)

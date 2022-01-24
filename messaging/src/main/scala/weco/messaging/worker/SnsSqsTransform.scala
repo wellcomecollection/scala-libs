@@ -8,12 +8,9 @@ import weco.messaging.sns.NotificationMessage
 trait SnsSqsTransform[Work] {
   implicit val wd: Decoder[Work]
 
-  val parseMessage = (message: SQSMessage) => {
-    val workResult = for {
+  val parseMessage = (message: SQSMessage) =>
+    for {
       notification <- fromJson[NotificationMessage](message.body())
       work <- fromJson[Work](notification.body)
     } yield work
-
-    workResult.toEither
-  }
 }
