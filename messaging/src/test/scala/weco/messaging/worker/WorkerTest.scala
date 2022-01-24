@@ -27,7 +27,7 @@ class WorkerTest
       parseMessage = parseMessage(shouldFail = false)
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 1
 
@@ -55,7 +55,7 @@ class WorkerTest
       parseMessage = parseMessage(shouldFail = true)
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 0
 
@@ -86,7 +86,7 @@ class WorkerTest
       parseMessage = parseMessage
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 0
 
@@ -114,7 +114,7 @@ class WorkerTest
       parseMessage = parseMessage(shouldFail = false)
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
 
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 1
@@ -136,7 +136,7 @@ class WorkerTest
       parseMessage = parseMessage(shouldFail = false)
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 1
 
@@ -165,7 +165,7 @@ class WorkerTest
       parseMessage = parseMessage(shouldFail = false)
     )
 
-    val process = worker.processMessage(message)
+    val process = worker.process(message)
     whenReady(process) { _ =>
       worker.callCounter.calledCount shouldBe 1
 
