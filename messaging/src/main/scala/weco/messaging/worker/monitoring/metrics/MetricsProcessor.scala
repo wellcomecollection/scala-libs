@@ -17,15 +17,7 @@ class MetricsProcessor(val namespace: String) {
     val countResult = metrics.incrementCount(s"$namespace/${result.name}")
 
     val recordDuration =
-      metrics.recordValue(
-        s"$namespace/Duration",
-        Duration
-          .between(
-            startTime,
-            Instant.now()
-          )
-          .getSeconds
-      )
+      metrics.recordValue(s"$namespace/Duration", secondsSince(startTime))
 
     Future
       .sequence(
@@ -33,4 +25,9 @@ class MetricsProcessor(val namespace: String) {
       )
       .map(_ => ())
   }
+
+  private def secondsSince(startTime: Instant): Long =
+    Duration
+      .between(startTime, Instant.now())
+      .getSeconds
 }
