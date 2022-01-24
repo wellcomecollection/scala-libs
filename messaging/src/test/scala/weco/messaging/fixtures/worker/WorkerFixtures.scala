@@ -47,13 +47,18 @@ trait WorkerFixtures {
       extends Worker[MyMessage, MyWork, MySummary, MyExternalMessageAction] {
     val callCounter = new CallCounter()
 
-    override val retryAction: MessageAction =
+    override val retryAction: MyMessage => MyExternalMessageAction =
       _ =>
         MyExternalMessageAction(
-          NonDeterministicFailure[MySummary](failure = new Throwable("BOOM!")))
+          RetryableFailure[MySummary](failure = new Throwable("BOOM!")))
 
-    override val completedAction: MessageAction =
+    override val successfulAction: MyMessage => MyExternalMessageAction =
       _ => MyExternalMessageAction(Successful())
+
+    override val failureAction: MyMessage => MyExternalMessageAction =
+      _ =>
+        MyExternalMessageAction(
+          TerminalFailure[MySummary](failure = new Throwable("BOOM!")))
 
     override val doWork =
       (work: MyWork) => createResult(testProcess, callCounter)(ec)(work)
@@ -77,29 +82,18 @@ trait WorkerFixtures {
       }
   }
 
-  val successful = (_: MyWork) => {
-    Successful[MySummary](
-      Some("Summary Successful")
-    )
-  }
+  val successful = (_: MyWork) =>
+    Successful[MySummary](summary = Some("Summary Successful"))
 
-  val nonDeterministicFailure = (_: MyWork) =>
-    NonDeterministicFailure[MySummary](
-      new RuntimeException("NonDeterministicFailure"),
-      Some("Summary NonDeterministicFailure")
-  )
+  val retryableFailure = (_: MyWork) =>
+    RetryableFailure[MySummary](
+      failure = new RuntimeException("RetryableFailure"),
+      summary = Some("Summary RetryableFailure"))
 
-  val deterministicFailure = (_: MyWork) =>
-    DeterministicFailure[MySummary](
-      new RuntimeException("DeterministicFailure"),
-      Some("Summary DeterministicFailure")
-  )
-
-  val monitoringProcessorFailure = (_: MyWork) =>
-    MonitoringProcessorFailure[MySummary](
-      new RuntimeException("MonitoringProcessorFailure"),
-      Some("Summary MonitoringProcessorFailure")
-  )
+  val terminalFailure = (_: MyWork) =>
+    TerminalFailure[MySummary](
+      failure = new RuntimeException("TerminalFailure"),
+      summary = Some("Summary TerminalFailure"))
 
   val exceptionState = (_: MyWork) => {
     throw new RuntimeException("BOOM")

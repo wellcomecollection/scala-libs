@@ -124,7 +124,9 @@ trait SQS
     testWith: TestWith[QueuePair, R]): R = {
     val queueName = createQueueName
 
-    withLocalSqsQueue(queueName = s"$queueName-dlq") { dlq =>
+    // This matches the naming convention used by our Terraform module.
+    // See https://github.com/wellcomecollection/terraform-aws-sqs/blob/a3bb6892b483c9396df594230c96a16524d57c69/queue/main.tf#L22-L24
+    withLocalSqsQueue(queueName = s"${queueName}_dlq") { dlq =>
       withLocalSqsQueue(
         queueName = queueName,
         visibilityTimeout = visibilityTimeout) { queue =>

@@ -19,9 +19,6 @@ trait AkkaWorker[Message, Work, Summary, Action]
   protected val source: MessageSource
   protected val sink: MessageSink
 
-  protected val retryAction: MessageAction
-  protected val completedAction: MessageAction
-
   def start: Future[Done] =
     source
       .mapAsyncUnordered(parallelism)(process)
