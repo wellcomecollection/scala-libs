@@ -79,7 +79,8 @@ class WellcomeHttpAppFeatureTest
         whenGetRequestReady(path) { response =>
           assertIsDisplayError(
             response = response,
-            description = "URI length exceeds the configured limit of 2048 characters",
+            description =
+              "URI length exceeds the configured limit of 2048 characters",
             statusCode = UriTooLong
           )
         }

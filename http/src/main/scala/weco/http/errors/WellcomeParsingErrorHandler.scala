@@ -26,11 +26,18 @@ import weco.http.models.DisplayError
   * See https://github.com/wellcomecollection/wellcomecollection.org/issues/7586
   *
   */
-object WellcomeParsingErrorHandler extends ParsingErrorHandler with DisplayJsonUtil with Logging {
-  override def handle(statusCode: StatusCode, info: ErrorInfo, log: LoggingAdapter, settings: ServerSettings): HttpResponse = {
+object WellcomeParsingErrorHandler
+    extends ParsingErrorHandler
+    with DisplayJsonUtil
+    with Logging {
+  override def handle(statusCode: StatusCode,
+                      info: ErrorInfo,
+                      log: LoggingAdapter,
+                      settings: ServerSettings): HttpResponse = {
     warn(s"Illegal request, responding with status '$statusCode': $info")
 
-    val json = toJson(DisplayError(statusCode = statusCode, description = info.summary))
+    val json = toJson(
+      DisplayError(statusCode = statusCode, description = info.summary))
 
     HttpResponse(
       status = statusCode,
