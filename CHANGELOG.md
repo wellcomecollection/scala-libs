@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v32.9.1 - 2022-01-26
+
+Remove some unused code from `messaging_typesafe`.
+This should have no effect on downstream users.
+
 ## v32.9.0 - 2022-01-24
 
 AlpakkaSQSWorker will retry a `TerminalFailure` if it determines that the error was a flaky error from somewhere in AWS, e.g. a DNS resolution error.
