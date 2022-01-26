@@ -85,9 +85,7 @@ class SierraOauthHttpClient(
           existingAuthHeaders.isEmpty,
           s"HTTP request already has auth headers: $request")
 
-        request.copy(
-          headers = request.headers :+ Authorization(token)
-        )
+        request.withHeaders(request.headers :+ Authorization(token))
       }
 
       response <- underlying.singleRequest(authenticatedRequest)
