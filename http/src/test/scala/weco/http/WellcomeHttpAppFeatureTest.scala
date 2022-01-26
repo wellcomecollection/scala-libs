@@ -3,19 +3,22 @@ package weco.http
 import akka.http.scaladsl.model.StatusCodes.{
   BadRequest,
   InternalServerError,
-  NotFound
+  NotFound,
+  UriTooLong
 }
 import akka.http.scaladsl.model._
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import weco.fixtures.RandomGenerators
 import weco.http.fixtures.HttpFixtures
 
 class WellcomeHttpAppFeatureTest
     extends AnyFunSpec
     with Matchers
     with HttpFixtures
-    with IntegrationPatience {
+    with IntegrationPatience
+    with RandomGenerators {
 
   import weco.http.fixtures.ExampleApp._
 
@@ -65,6 +68,20 @@ class WellcomeHttpAppFeatureTest
           assertIsDisplayError(
             response = response,
             statusCode = InternalServerError
+          )
+        }
+      }
+    }
+
+    it("returns a JSON-typed error if you request an overly long URL") {
+      withApp(exampleApi.routes) { _ =>
+        val path = s"/example?query=${randomAlphanumeric(length = 3000)}"
+        whenGetRequestReady(path) { response =>
+          assertIsDisplayError(
+            response = response,
+            description =
+              "URI length exceeds the configured limit of 2048 characters",
+            statusCode = UriTooLong
           )
         }
       }

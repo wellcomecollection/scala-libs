@@ -108,25 +108,23 @@ trait HttpFixtures
   def assertIsDisplayError(
     response: HttpResponse,
     statusCode: StatusCode
-  ): Assertion = {
+  ): Assertion =
     assertIsDisplayError(
       response = response,
       description = None,
       statusCode = statusCode
     )
-  }
 
   def assertIsDisplayError(
     response: HttpResponse,
     description: String,
     statusCode: StatusCode
-  ): Assertion = {
+  ): Assertion =
     assertIsDisplayError(
       response = response,
       description = Some(description),
       statusCode = statusCode
     )
-  }
 
   def assertIsDisplayError(
     response: HttpResponse,

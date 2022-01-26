@@ -10,7 +10,9 @@ import akka.http.scaladsl.server.directives.{
   LogEntry,
   LoggingMagnet
 }
+import akka.http.scaladsl.settings.ServerSettings
 import grizzled.slf4j.Logging
+import weco.http.errors.WellcomeParsingErrorHandler
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.{HttpMetrics, WellcomeHttpLogger}
 import weco.typesafe.Runnable
@@ -44,22 +46,31 @@ class WellcomeHttpApp(
   }
 
   def run(): Future[_] = {
-    val handler: Route = mapResponse { response =>
-      httpMetrics.sendMetric(response)
+    val handler: Route = handleExceptions(exceptionHandler) {
+      handleRejections(rejectionHandler) {
+        mapResponse { response =>
+          httpMetrics.sendMetric(response)
 
-      response
-    }(routes)
+          response
+        }(routes)
+      }
+    }
 
     val loggedHandler =
       DebuggingDirectives
         .logRequestResult(LoggingMagnet(createLogLine))(handler)
 
+    val settings =
+      ServerSettings(as)
+        .withParsingErrorHandler(WellcomeParsingErrorHandler.getClass.getName)
+
     val binding = Http()
-      .bindAndHandle(
-        handler = loggedHandler,
+      .newServerAt(
         interface = httpServerConfig.host,
         port = httpServerConfig.port
       )
+      .withSettings(settings)
+      .bindFlow(loggedHandler)
 
     info(
       s"$appTag - Starting: ${httpServerConfig.host}:${httpServerConfig.port}"

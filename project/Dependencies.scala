@@ -12,7 +12,6 @@ object Dependencies {
 
     val azure = "12.7.0"
 
-    val akkaHttpCirce = "1.32.0"
     val circe = "0.13.0"
     val typesafe = "1.3.2"
     val jackson = "2.12.3"
@@ -40,7 +39,7 @@ object Dependencies {
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
     //
     val akka = "2.6.14"
-    val akkaStreamAlpakka = "3.0.1"
+    val akkaStreamAlpakka = "3.0.4"
 
     // Getting the akka-http dependencies right can be fiddly and takes some work.
     // In particular you need to use the same version of akka-http everywhere, or you
@@ -65,7 +64,8 @@ object Dependencies {
     //      one that uses the same version of akka-http and a compatible Circe:
     //      https://github.com/hseeberger/akka-http-json/blob/master/build.sbt
     //
-    val akkaHttp = "10.1.11"
+    val akkaHttp = "10.2.4"
+    val akkaHttpCirce = "1.37.0"
   }
 
   val circeDependencies = Seq(
