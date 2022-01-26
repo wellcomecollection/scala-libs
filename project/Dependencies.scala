@@ -130,19 +130,9 @@ object Dependencies {
     "org.scanamo" %% "scanamo" % versions.scanamo
   )
 
-  val openTracingDependencies = Seq(
-    "io.opentracing.contrib" %% "opentracing-scala-concurrent" % "0.0.6",
-    "io.opentracing" % "opentracing-mock" % "0.33.0" % Test
-  )
-
   val elasticApmAgentDependencies = Seq(
     "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm,
     "co.elastic.apm" % "apm-agent-api" % versions.elasticApm,
-  )
-
-  val elasticApmBridgeDependencies = Seq(
-    "co.elastic.apm" % "apm-opentracing" % versions.elasticApm,
-    "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm
   )
 
   val swaggerDependencies = Seq(
@@ -173,8 +163,6 @@ object Dependencies {
     // and it also causes weird leaks between tests
       exclude ("com.github.matsluni", "aws-spi-akka-http_2.12")
   ) ++
-    openTracingDependencies ++
-    elasticApmBridgeDependencies ++
     testDependencies
 
   val jsonDependencies =
