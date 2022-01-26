@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v32.10.0 - 2022-01-26
+
+*   Upgrade the version of akka-http and associated libraries
+*   Return JSON errors for an HTTP 414 "URI Too Long", rather than the plaintext errors we were previously returning
+
 ## v32.9.1 - 2022-01-26
 
 Remove some unused code from `messaging_typesafe`.
