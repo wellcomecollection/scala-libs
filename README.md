@@ -2,53 +2,55 @@
 
 [![Build status](https://badge.buildkite.com/4a84a28feca6865e192e0adaba1c2e33f1e773e58957459c47.svg?branch=main)](https://buildkite.com/wellcomecollection/scala-libraries)
 
+This is a collection of utilities that are shared across our Scala-based repositories ([catalogue-api], [catalogue-pipeline], [storage-service]).
+
+It includes:
+
+*   Code for interacting with AWS services we use across the platform, like Amazon S3 and DynamoDB
+*   Test helpers and fixtures that let us write tests in a consistent way
+*   Helpers for using [Typesafe] to get config into our applications
+
+This library is meant to increase code reuse among our applications, not to be a general-purpose library.
+
+[catalogue-api]: https://github.com/wellcomecollection/catalogue-api
+[catalogue-pipeline]: https://github.com/wellcomecollection/catalogue-pipeline
+[storage-service]: https://github.com/wellcomecollection/storage-service
+[elastic4s]: https://github.com/sksamuel/elastic4s
+[Typesafe]: https://lightbend.github.io/config/
 
 
-A collection of scala libraries used at the Wellcome Collection.
 
-Includes:
-- [fixtures](fixtures/README.md): Some shared test helpers and fixtures.
-- [json](json/README.md):
-Common JSON serialisation & de-serialisation.
-- [messaging](messaging/README.md): Messaging libraries for inter-service communication.
-- [monitoring](monitoring/README.md): Shared monitoring libraries in use by services
-- [storage](monitoring/README.md): For working with storage providers such as DynamoDB and S3.
-- [typesafe_app](typesafe_app/README.md): Used as a base for our Scala applications that use Typesafe.
+## Usage
 
-## Installation
+If you work at Wellcome:
 
-This libraries are only published to a private S3 bucket.
+*   These libraries are already configured in our Scala projects.
+    Your IDE should pick up the library as another dependency.
 
-Wellcome projects have access to this S3 bucket -- you can use our build
-scripts to publish a copy to your own private package repository, or vendor
-the library by copying the code into your own repository.
+If you don't work at Wellcome:
 
-Read [the changelog](CHANGELOG.md) to find the latest version.
+*   Copy/paste any code you're interested in (and the tests!) into your codebase, and adding a comment that links to the original project.
+*   We don't make any guarantees of API stability or back/forward compatibility between different versions of the library.
+    We routinely make breaking changes or delete code that we're no longer using.
 
-```scala
-libraryDependencies ++= Seq(
-  "weco" %% "json" % "10.0.2",
-  "weco" %% "messaging" % "10.0.2",
-  "weco" %% "monitoring" % "10.0.2"
-  "weco" %% "storage" % "10.0.2"
-  "weco" %% "typesafe_app" % "10.0.2"
-)
-```
 
-## Releasing
 
-To release from this repository, please create a pull request with a `RELEASE.md` in the root directory in the following format:
+## Release process
 
-```md
-RELEASE_TYPE: major|minor|patch
+Our process is [inspired by the Hypothesis library](https://hypothesis.works/articles/continuous-releases/).
 
-### Libraries affected
+1.  When you open a pull request, include a release ntoe named `RELEASE.md` in the root of the repo:
 
-`first_lib`, `second_lib`
+    ```md
+    RELEASE_TYPE: major|minor|patch
 
-### Description
+    Updating the widget wrangler to reverse the polarity of the neutron flow.
+    ```
 
-A detailed description of the chnages in this release
-```
+2.  When the pull request is merged, our CI system merges the release note into [the changelog](./CHANGELOG.md) and cuts a new release.
+    This release is uploaded to an S3 bucket.
 
-When merged the version will be auto-incremented in line with the [SEMVER](https://semver.org/) standard.
+3.  Our CI system then opens pull requests on our downstream repos, updating them to use the newly released version.
+
+This means that new changes are deployed quickly and consistently across the platform.
+If we've made breaking changes that need more changes in the downstream repo, that happens immediately (usually by the author of the original patch).
