@@ -14,11 +14,12 @@ secrets
 *.pyc
 
 awscredentials
-id_rsa
-id_rsa.pub
 
 .bloop
 .vscode
 .metals
 metals.sbt
 .bsp
+
+.terraform
+terraform.plan
