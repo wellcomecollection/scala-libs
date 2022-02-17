@@ -403,6 +403,7 @@ class SierraSourceTest
                 |      "frozen": false,
                 |      "placed": "2021-05-07",
                 |      "notWantedBeforeDate": "2021-05-07",
+                |      "notNeededAfterDate": "2022-02-22",
                 |      "pickupLocation": {
                 |        "code": "sotop",
                 |        "name": "Rare Materials Room"
@@ -460,7 +461,7 @@ class SierraSourceTest
                     code = "sotop",
                     name = "Rare Materials Room"
                   ),
-                  pickupByDate = None,
+                  notNeededAfterDate = Some(LocalDate.parse("2022-02-22")),
                   status = SierraHoldStatus(code = "0", name = "on hold.")
                 ),
                 SierraHold(
@@ -474,7 +475,7 @@ class SierraSourceTest
                     code = "hgser",
                     name = "Library Enquiry Desk"
                   ),
-                  pickupByDate = None,
+                  notNeededAfterDate = None,
                   status = SierraHoldStatus(
                     code = "i",
                     name = "item hold ready for pickup."
