@@ -403,6 +403,7 @@ class SierraSourceTest
                 |      "frozen": false,
                 |      "placed": "2021-05-07",
                 |      "notWantedBeforeDate": "2021-05-07",
+                |      "notNeededAfterDate": "2022-02-22",
                 |      "pickupLocation": {
                 |        "code": "sotop",
                 |        "name": "Rare Materials Room"
@@ -460,7 +461,7 @@ class SierraSourceTest
                     code = "sotop",
                     name = "Rare Materials Room"
                   ),
-                  pickupByDate = None,
+                  notNeededAfterDate = Some(LocalDate.parse("2022-02-22")),
                   status = SierraHoldStatus(code = "0", name = "on hold.")
                 ),
                 SierraHold(
@@ -474,7 +475,7 @@ class SierraSourceTest
                     code = "hgser",
                     name = "Library Enquiry Desk"
                   ),
-                  pickupByDate = None,
+                  notNeededAfterDate = None,
                   status = SierraHoldStatus(
                     code = "i",
                     name = "item hold ready for pickup."
@@ -526,6 +527,7 @@ class SierraSourceTest
     it("creates a hold") {
       val patron = SierraPatronNumber("1234567")
       val item = SierraItemNumber("1111111")
+      val neededBy = LocalDate.parse("2022-02-22")
 
       val responses = Seq(
         (
@@ -536,7 +538,7 @@ class SierraSourceTest
             ),
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
-              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"pickupLocation":"unspecified"}"""
+              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"neededBy":"2022-02-22","pickupLocation":"unspecified"}"""
             )
           ),
           HttpResponse(
@@ -547,7 +549,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item)
+        val future = source.createHold(patron, item, neededBy)
 
         whenReady(future) {
           _.value shouldBe (())
@@ -558,6 +560,7 @@ class SierraSourceTest
     it("returns an error if the hold can't be placed") {
       val patron = SierraPatronNumber("1234567")
       val item = SierraItemNumber("1111111")
+      val neededBy = LocalDate.parse("2022-02-22")
 
       val responses = Seq(
         (
@@ -568,7 +571,7 @@ class SierraSourceTest
             ),
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
-              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"pickupLocation":"unspecified"}"""
+              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"neededBy":"2022-02-22","pickupLocation":"unspecified"}"""
             )
           ),
           HttpResponse(
@@ -590,7 +593,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item)
+        val future = source.createHold(patron, item, neededBy)
 
         whenReady(future) {
           _.left.value shouldBe SierraErrorCode(

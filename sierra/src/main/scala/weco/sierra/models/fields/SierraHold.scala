@@ -1,7 +1,7 @@
 package weco.sierra.models.fields
 
 import java.net.URI
-import java.time.Instant
+import java.time.LocalDate
 
 // This represents a Sierra Hold object, as described in the Sierra docs:
 // https://techdocs.iii.com/sierraapi/Content/zReference/objects/holdObjectDescription.htm
@@ -15,6 +15,6 @@ case class SierraHold(
   id: URI,
   record: URI,
   pickupLocation: SierraLocation,
-  pickupByDate: Option[Instant],
+  notNeededAfterDate: Option[LocalDate],
   status: SierraHoldStatus
 )
