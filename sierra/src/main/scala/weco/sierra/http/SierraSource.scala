@@ -9,7 +9,11 @@ import weco.http.json.CirceMarshalling
 import weco.json.JsonUtil._
 import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
-import weco.sierra.models.fields.{SierraHoldRequest, SierraHoldsList, SierraItemDataEntries}
+import weco.sierra.models.fields.{
+  SierraHoldRequest,
+  SierraHoldsList,
+  SierraItemDataEntries
+}
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
 
 import java.time.{LocalDate}
