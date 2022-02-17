@@ -39,7 +39,7 @@ If you don't work at Wellcome:
 
 Our process is [inspired by the Hypothesis library](https://hypothesis.works/articles/continuous-releases/).
 
-1.  When you open a pull request, include a release ntoe named `RELEASE.md` in the root of the repo:
+1.  When you open a pull request, include a release note named `RELEASE.md` in the root of the repo:
 
     ```md
     RELEASE_TYPE: major|minor|patch
