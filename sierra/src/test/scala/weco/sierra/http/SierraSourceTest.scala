@@ -24,6 +24,7 @@ import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.time.Instant
 
 class SierraSourceTest
     extends AnyFunSpec
@@ -526,6 +527,7 @@ class SierraSourceTest
     it("creates a hold") {
       val patron = SierraPatronNumber("1234567")
       val item = SierraItemNumber("1111111")
+      val neededBy = LocalDate.parse("2022-02-22")
 
       val responses = Seq(
         (
@@ -536,7 +538,7 @@ class SierraSourceTest
             ),
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
-              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"pickupLocation":"unspecified"}"""
+              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"neededBy":"2022-02-22","pickupLocation":"unspecified"}"""
             )
           ),
           HttpResponse(
@@ -547,7 +549,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item)
+        val future = source.createHold(patron, item, neededBy)
 
         whenReady(future) {
           _.value shouldBe (())
@@ -558,6 +560,7 @@ class SierraSourceTest
     it("returns an error if the hold can't be placed") {
       val patron = SierraPatronNumber("1234567")
       val item = SierraItemNumber("1111111")
+      val neededBy = LocalDate.parse("2022-02-22")
 
       val responses = Seq(
         (
@@ -568,7 +571,7 @@ class SierraSourceTest
             ),
             entity = HttpEntity(
               contentType = ContentTypes.`application/json`,
-              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"pickupLocation":"unspecified"}"""
+              s"""{"recordType":"i","recordNumber":${item.withoutCheckDigit},"neededBy":"2022-02-22","pickupLocation":"unspecified"}"""
             )
           ),
           HttpResponse(
@@ -590,7 +593,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item)
+        val future = source.createHold(patron, item, neededBy)
 
         whenReady(future) {
           _.left.value shouldBe SierraErrorCode(

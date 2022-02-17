@@ -9,14 +9,10 @@ import weco.http.json.CirceMarshalling
 import weco.json.JsonUtil._
 import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
-import weco.sierra.models.fields.{
-  SierraHoldRequest,
-  SierraHoldsList,
-  SierraItemDataEntries
-}
+import weco.sierra.models.fields.{SierraHoldRequest, SierraHoldsList, SierraItemDataEntries}
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
 
-import java.time.LocalDate
+import java.time.{LocalDate}
 import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -139,12 +135,13 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
 
   def createHold(
     patron: SierraPatronNumber,
-    item: SierraItemNumber
+    item: SierraItemNumber,
+    neededBy: LocalDate,
   ): Future[Either[SierraErrorCode, Unit]] =
     for {
       resp <- client.post(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}/holds/requests"),
-        body = Some(SierraHoldRequest(item))
+        body = Some(SierraHoldRequest(item, neededBy))
       )
 
       result <- resp.status match {
