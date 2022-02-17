@@ -24,7 +24,6 @@ import weco.sierra.models.errors.{SierraErrorCode, SierraItemLookupError}
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.time.Instant
 
 class SierraSourceTest
     extends AnyFunSpec
