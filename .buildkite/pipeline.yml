@@ -28,18 +28,14 @@ steps:
   - label: test sierra
     command: .buildkite/scripts/run_sbt_tests.sh sierra
   - wait
-  - label: cut release
+
+  - label: "cut release"
     if: build.branch == "main"
-    plugins:
-      - docker#v3.5.0:
-          image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/wellcome/sbt_wrapper"
-          mount-ssh-agent: true
-          volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-          network: "host"
-          always-pull: true
-          propagate-environment: true
-          entrypoint: "/usr/bin/python3"
-    command: "/workdir/.buildkite/scripts/release.py"
+    commands:
+      - "python3 .buildkite/scripts/release.py"
+    agents:
+      queue: nano
+
   - wait
   - label: publish fixtures
     command: .buildkite/scripts/publish.py fixtures
