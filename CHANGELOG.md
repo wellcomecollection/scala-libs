@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.11.0 - 2022-02-18
+
+Updating the Sierra client to allow adding neededBy date
+
 ## v32.10.0 - 2022-01-26
 
 *   Upgrade the version of akka-http and associated libraries
