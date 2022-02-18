@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.11.1 - 2022-02-18
+
+Fix the build, by running on faster Scala runners.
+
 ## v32.11.0 - 2022-02-18
 
 Updating the Sierra client to allow adding neededBy date
