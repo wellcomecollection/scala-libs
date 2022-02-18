@@ -164,6 +164,8 @@ steps:
   - label: publish sierra_typesafe
     command: .buildkite/scripts/publish.py sierra_typesafe
     if: build.branch == "main"
+    agents:
+      queue: "scala"
 
   - wait
 
