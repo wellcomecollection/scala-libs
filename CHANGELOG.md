@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.11.2 - 2022-02-18
+
+Remember to run *everything* on the Scala runners.
+
 ## v32.11.1 - 2022-02-18
 
 Fix the build, by running on faster Scala runners.
