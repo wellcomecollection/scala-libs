@@ -608,6 +608,74 @@ class SierraSourceTest
     }
   }
 
+  describe("lookupPatronType") {
+    it("finds the type code of a patron") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=patronType")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit},
+                 |  "patronType": 8
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronType(patron)
+
+        whenReady(future) {
+          _.value shouldBe Some(8)
+        }
+      }
+    }
+    it("finds a patron without a patron type") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=patronType")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit}
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronType(patron)
+
+        whenReady(future) {
+          _.value shouldBe None
+        }
+      }
+    }
+  }
+
   describe("lookupPatronExpiryDate") {
     it("finds the expiration date of a patron") {
       val patron = createSierraPatronNumber

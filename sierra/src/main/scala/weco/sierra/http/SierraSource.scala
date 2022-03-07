@@ -194,7 +194,27 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
       }
     } yield result
 
-  private case class PatronRecord(expirationDate: Option[String])
+  def lookupPatronType(
+    patron: SierraPatronNumber): Future[Either[SierraErrorCode, Option[Int]]] =
+    for {
+      resp <- client.get(
+        path = Path(s"v5/patrons/${patron.withoutCheckDigit}"),
+        params = Map("fields" -> "patronType")
+      )
+
+      result <- resp.status match {
+        case StatusCodes.OK =>
+          Unmarshal(resp)
+            .to[PatronRecord]
+            .map { _.patronType }
+            .map(Right(_))
+
+        case _ => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
+      }
+    } yield result
+
+  private case class PatronRecord(expirationDate: Option[String],
+                                  patronType: Option[Int])
 
   private implicit val umPatronRecord: Unmarshaller[HttpEntity, PatronRecord] =
     CirceMarshalling.fromDecoder[PatronRecord]
