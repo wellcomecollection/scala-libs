@@ -14,15 +14,12 @@ object Dependencies {
 
     val circe = "0.13.0"
     val typesafe = "1.3.2"
-    val jackson = "2.12.3"
-    val javaxWebServicesRestful = "2.1.1"
     val logback = "1.1.8"
     val mockito = "1.10.19"
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
     val scanamo = "1.0-M13"
-    val swagger = "2.1.9"
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
@@ -135,16 +132,6 @@ object Dependencies {
     "co.elastic.apm" % "apm-agent-api" % versions.elasticApm,
   )
 
-  val swaggerDependencies = Seq(
-    "io.swagger.core.v3" % "swagger-core" % versions.swagger,
-    "io.swagger.core.v3" % "swagger-annotations" % versions.swagger,
-    "io.swagger.core.v3" % "swagger-models" % versions.swagger,
-    "io.swagger.core.v3" % "swagger-integration" % versions.swagger,
-    "io.swagger.core.v3" % "swagger-jaxrs2" % versions.swagger,
-    "javax.ws.rs" % "javax.ws.rs-api" % versions.javaxWebServicesRestful,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson
-  )
-
   val localstackDependencies = Seq(
     "software.amazon.awssdk" % "auth" % versions.aws2,
     "software.amazon.awssdk" % "regions" % versions.aws2
@@ -191,5 +178,5 @@ object Dependencies {
     apacheCommons
 
   val httpDependencies: Seq[ModuleID] =
-    swaggerDependencies ++ akkaHttpDependencies
+    akkaHttpDependencies
 }
