@@ -7,7 +7,13 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
-import weco.sierra.models.fields.{SierraHold, SierraHoldStatus, SierraHoldsList, SierraItemDataEntries, SierraLocation}
+import weco.sierra.models.fields.{
+  SierraHold,
+  SierraHoldStatus,
+  SierraHoldsList,
+  SierraItemDataEntries,
+  SierraLocation
+}
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.sierra.generators.SierraIdentifierGenerators
 import weco.sierra.models.data.SierraItemData
