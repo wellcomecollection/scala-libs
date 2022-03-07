@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.13.0 - 2022-03-07
+
+Add a method for looking up a patron's patron type.
+
 ## v32.12.0 - 2022-03-07
 
 Remove our Swagger dependencies.
