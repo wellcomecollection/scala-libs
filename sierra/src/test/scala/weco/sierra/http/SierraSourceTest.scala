@@ -7,13 +7,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
-import weco.sierra.models.fields.{
-  SierraHold,
-  SierraHoldStatus,
-  SierraHoldsList,
-  SierraItemDataEntries,
-  SierraLocation
-}
+import weco.sierra.models.fields.{SierraHold, SierraHoldStatus, SierraHoldsList, SierraItemDataEntries, SierraLocation}
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.sierra.generators.SierraIdentifierGenerators
 import weco.sierra.models.data.SierraItemData
@@ -603,6 +597,74 @@ class SierraSourceTest
             name = "XCirc error",
             description = Some("XCirc error : This record is not available")
           )
+        }
+      }
+    }
+  }
+
+  describe("lookupPatronType") {
+    it("finds the type code of a patron") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=patronType")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit},
+                 |  "patronType": 8
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronType(patron)
+
+        whenReady(future) {
+          _.value shouldBe Some(8)
+        }
+      }
+    }
+    it("finds a patron without a patron type") {
+      val patron = createSierraPatronNumber
+
+      val responses = Seq(
+        (
+          HttpRequest(
+            method = HttpMethods.GET,
+            uri = Uri(
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}?fields=patronType")
+          ),
+          HttpResponse(
+            status = StatusCodes.OK,
+            entity = HttpEntity(
+              contentType = ContentTypes.`application/json`,
+              s"""
+                 |{
+                 |  "id": ${patron.withoutCheckDigit}
+                 |}
+                 |""".stripMargin
+            )
+          )
+        )
+      )
+
+      withSource(responses) { source =>
+        val future = source.lookupPatronType(patron)
+
+        whenReady(future) {
+          _.value shouldBe None
         }
       }
     }
