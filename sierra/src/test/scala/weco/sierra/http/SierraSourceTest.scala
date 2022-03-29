@@ -549,7 +549,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item, neededBy)
+        val future = source.createHold(patron, item, Some(neededBy))
 
         whenReady(future) {
           _.value shouldBe (())
@@ -593,7 +593,7 @@ class SierraSourceTest
       )
 
       withSource(responses) { source =>
-        val future = source.createHold(patron, item, neededBy)
+        val future = source.createHold(patron, item, Some(neededBy))
 
         whenReady(future) {
           _.left.value shouldBe SierraErrorCode(

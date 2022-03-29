@@ -16,7 +16,7 @@ import weco.sierra.models.fields.{
 }
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
 
-import java.time.{LocalDate}
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -140,12 +140,13 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
   def createHold(
     patron: SierraPatronNumber,
     item: SierraItemNumber,
-    neededBy: LocalDate,
+    neededBy: Option[LocalDate] = None,
+    note: Option[String] = None
   ): Future[Either[SierraErrorCode, Unit]] =
     for {
       resp <- client.post(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}/holds/requests"),
-        body = Some(SierraHoldRequest(item, neededBy))
+        body = Some(SierraHoldRequest(item, neededBy, note))
       )
 
       result <- resp.status match {
