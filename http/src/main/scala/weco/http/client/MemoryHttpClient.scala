@@ -49,17 +49,26 @@ class MemoryHttpClient(
       }
 
       if (!areEquivalent(nextReq.entity, request.entity)) {
+        val str1 = getEntityString(nextReq.entity)
+        val str2 = getEntityString(request.entity)
         throw new RuntimeException(
-          s"Requests have different entities: ${nextReq.entity} / ${request.entity}")
+          s"Requests have different entities: $str1 / $str2")
       }
 
       nextResp
     }
 
-  private def areEquivalent(e1: HttpEntity, e2: HttpEntity): Boolean =
+  private def getEntityString(entity: HttpEntity): String =
+    entity match {
+      case HttpEntity.Strict(ContentTypes.`application/json`, json) =>
+        parse(json.utf8String).right.get.spaces2
+      case HttpEntity.Strict(_, content) => content.utf8String
+      case _                             => "<streaming entity>"
+    }
+
+  private def areEquivalent(e1: HttpEntity, e2: HttpEntity): Boolean = {
     (e1, e2) match {
       case (entity1, entity2) if entity1 == entity2 => true
-
       case (
           HttpEntity.Strict(ContentTypes.`application/json`, json1),
           HttpEntity.Strict(ContentTypes.`application/json`, json2))
@@ -68,6 +77,7 @@ class MemoryHttpClient(
 
       case _ => false
     }
+  }
 
   private def parseOrElse(json: ByteString): Json =
     parse(new String(json.toArray[Byte])) match {
