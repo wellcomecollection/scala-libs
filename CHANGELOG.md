@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.14.0 - 2022-03-30
+
+Made the `neededBy` field on a hold request optional, and added the ability to (optionally) specify a `note` on holds.
+
 ## v32.13.0 - 2022-03-07
 
 Add a method for looking up a patron's patron type.
