@@ -385,7 +385,7 @@ class SierraSourceTest
         (
           HttpRequest(
             uri = Uri(
-              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}/holds?limit=100&offset=0"
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}/holds?limit=100&offset=0&fields=id,record,pickupLocation,notNeededAfterDate,note,status"
             )
           ),
           HttpResponse(
@@ -399,29 +399,20 @@ class SierraSourceTest
                 |    {
                 |      "id": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/patrons/holds/1111",
                 |      "record": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/items/1111111",
-                |      "patron": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/patrons/${patron.withoutCheckDigit}",
-                |      "frozen": false,
-                |      "placed": "2021-05-07",
-                |      "notWantedBeforeDate": "2021-05-07",
                 |      "notNeededAfterDate": "2022-02-22",
                 |      "pickupLocation": {
                 |        "code": "sotop",
                 |        "name": "Rare Materials Room"
                 |      },
+                |      "note": "Requested for: 2022/02/22",
                 |      "status": {
                 |        "code": "0",
                 |        "name": "on hold."
-                |      },
-                |      "recordType": "i",
-                |      "priority": 1
+                |      }
                 |    },
                 |    {
                 |      "id": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/patrons/holds/2222",
                 |      "record": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/items/2222222",
-                |      "patron": "https://libsys.wellcomelibrary.org/iii/sierra-api/v6/patrons/${patron.withoutCheckDigit}",
-                |      "frozen": false,
-                |      "placed": "2021-05-11",
-                |      "notWantedBeforeDate": "2021-05-11",
                 |      "pickupLocation": {
                 |        "code": "hgser",
                 |        "name": "Library Enquiry Desk"
@@ -429,9 +420,7 @@ class SierraSourceTest
                 |      "status": {
                 |        "code": "i",
                 |        "name": "item hold ready for pickup."
-                |      },
-                |      "recordType": "i",
-                |      "priority": 1
+                |      }
                 |    }
                 |  ]
                 |}
@@ -462,6 +451,7 @@ class SierraSourceTest
                     name = "Rare Materials Room"
                   ),
                   notNeededAfterDate = Some(LocalDate.parse("2022-02-22")),
+                  note = Some("Requested for: 2022/02/22"),
                   status = SierraHoldStatus(code = "0", name = "on hold.")
                 ),
                 SierraHold(
@@ -476,6 +466,7 @@ class SierraSourceTest
                     name = "Library Enquiry Desk"
                   ),
                   notNeededAfterDate = None,
+                  note = None,
                   status = SierraHoldStatus(
                     code = "i",
                     name = "item hold ready for pickup."
@@ -494,7 +485,7 @@ class SierraSourceTest
         (
           HttpRequest(
             uri = Uri(
-              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}/holds?limit=100&offset=0"
+              s"http://sierra:1234/v5/patrons/${patron.withoutCheckDigit}/holds?limit=100&offset=0&fields=id,record,pickupLocation,notNeededAfterDate,note,status"
             )
           ),
           HttpResponse(
