@@ -128,7 +128,11 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
     for {
       resp <- client.get(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}/holds"),
-        params = Map("limit" -> "100", "offset" -> "0")
+        params = Map(
+          "limit" -> "100",
+          "offset" -> "0",
+          "fields" -> SierraSource.requiredHoldFields.mkString(",")
+        )
       )
 
       result <- resp.status match {
@@ -231,5 +235,15 @@ object SierraSource {
     "suppressed",
     "status",
     "varFields"
+  )
+
+  // cf. the fields in the case class `SierraHold`
+  val requiredHoldFields = List(
+    "id",
+    "record",
+    "pickupLocation",
+    "notNeededAfterDate",
+    "note",
+    "status"
   )
 }

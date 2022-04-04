@@ -16,5 +16,6 @@ case class SierraHold(
   record: URI,
   pickupLocation: SierraLocation,
   notNeededAfterDate: Option[LocalDate],
+  note: Option[String],
   status: SierraHoldStatus
 )
