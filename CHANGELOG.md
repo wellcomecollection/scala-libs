@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.14.1 - 2022-04-04
+
+Retrieve the hold note when listing patron holds
+
 ## v32.14.0 - 2022-03-30
 
 Made the `neededBy` field on a hold request optional, and added the ability to (optionally) specify a `note` on holds.
