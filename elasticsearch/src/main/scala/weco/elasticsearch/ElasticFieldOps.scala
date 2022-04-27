@@ -23,6 +23,9 @@ trait ElasticFieldOps {
 
     def withDynamic(dynamic: String): ObjectField =
       of.copy(dynamic = Some(dynamic))
+
+    def withEnabled(enabled: Boolean): ObjectField =
+      of.copy(enabled = Some(enabled))
   }
 
   implicit class TokenCountFieldOps(tcf: TokenCountField) {
