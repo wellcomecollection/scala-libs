@@ -18,8 +18,7 @@ class RandomGeneratorsTest extends AnyFunSpec with Matchers {
     val instances = (1 to 5).map(_ =>
       new RandomGenerators {
         override protected lazy val random: Random = new Random(0)
-      }
-    )
+    })
 
     val strings = instances.map(i => i.randomAlphanumeric()).toSet
 
