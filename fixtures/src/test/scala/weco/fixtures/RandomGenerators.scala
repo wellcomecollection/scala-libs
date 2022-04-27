@@ -6,8 +6,15 @@ import java.util.UUID
 import scala.util.Random
 
 trait RandomGenerators {
+  // All random generation should use this `random` value, and not
+  // calling `Random` directly.
+  //
+  // This allows downstream callers to get deterministic random data by seeding
+  // the random instance here.
+  protected lazy val random: Random = new Random()
+
   def randomAlphanumeric(length: Int = randomInt(from = 5, to = 10)): String =
-    Random.alphanumeric take length mkString
+    random.alphanumeric take length mkString
 
   def randomAlphanumericWithSpace(length: Int = 8): String = {
     val str = randomAlphanumeric(length).toCharArray
@@ -15,14 +22,14 @@ trait RandomGenerators {
     // Randomly choose an index in the string
     // to replace with a space,
     // avoiding the beginning or the end.
-    val spaceIndex = Random.nextInt(str.length - 2) + 1
+    val spaceIndex = random.nextInt(str.length - 2) + 1
     str.updated(spaceIndex, ' ').toString
   }
 
   def randomBytes(length: Int = 1024): Array[Byte] = {
     val byteArray = new Array[Byte](length)
 
-    Random.nextBytes(byteArray)
+    random.nextBytes(byteArray)
 
     byteArray
   }
@@ -44,7 +51,7 @@ trait RandomGenerators {
 
     assert(difference > 0)
 
-    val randomOffset = Random.nextInt(difference) + 1
+    val randomOffset = random.nextInt(difference) + 1
 
     from + randomOffset
   }
@@ -58,11 +65,11 @@ trait RandomGenerators {
     }
 
   def chooseFrom[T](seq: T*): T =
-    seq(Random.nextInt(seq.size))
+    seq(random.nextInt(seq.size))
 
   def randomSample[T](seq: Seq[T], size: Int): Seq[T] =
-    Random.shuffle(seq).take(size)
+    random.shuffle(seq).take(size)
 
   def randomInstant: Instant =
-    Instant.now().plusSeconds(Random.nextInt())
+    Instant.now().plusSeconds(random.nextInt())
 }
