@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.0 - 2022-04-27
+
+Allow seeding an instance of `RandomGenerators` to get deterministic results.
+
 ## v32.15.0 - 2022-04-27
 
 Add a helper for `withEnabled` to ElasticFieldOps.
