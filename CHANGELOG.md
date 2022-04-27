@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.15.0 - 2022-04-27
+
+Add a helper for `withEnabled` to ElasticFieldOps.
+
 ## v32.14.1 - 2022-04-04
 
 Retrieve the hold note when listing patron holds
