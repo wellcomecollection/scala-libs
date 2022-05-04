@@ -27,7 +27,8 @@ object S3Errors {
     //    within the timeout period. Idle connections will be closed.
     //
     case exc: AmazonS3Exception
-        if exc.getMessage.startsWith("Your socket connection to the server was not read from or written to within the timeout period") =>
+        if exc.getMessage.startsWith(
+          "Your socket connection to the server was not read from or written to within the timeout period") =>
       new StoreReadError(exc) with RetryableError
 
     case exc: AmazonS3Exception
