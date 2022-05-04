@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.1 - 2022-05-04
+
+Recognise another type of socket connection timeout from S3 as a retryable error.
+
 ## v32.16.0 - 2022-04-27
 
 Allow seeding an instance of `RandomGenerators` to get deterministic results.
