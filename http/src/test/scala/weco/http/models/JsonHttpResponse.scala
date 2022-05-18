@@ -1,6 +1,12 @@
 package weco.http.models
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCode, StatusCodes}
+import akka.http.scaladsl.model.{
+  ContentTypes,
+  HttpEntity,
+  HttpResponse,
+  StatusCode,
+  StatusCodes
+}
 
 // A convenience wrapper for creating JSON HTTP responses in tests.
 object JsonHttpResponse {
