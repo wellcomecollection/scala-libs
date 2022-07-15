@@ -6,6 +6,7 @@ import org.apache.http.HttpHost
 import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.apache.http.impl.nio.reactor.IOReactorConfig
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
@@ -17,7 +18,16 @@ class ElasticCredentials(username: String, password: String)
 
   override def customizeHttpClient(
     httpClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder = {
-    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+    httpClientBuilder
+      .setDefaultCredentialsProvider(credentialsProvider)
+      // Enabling TCP keepalive
+      // https://github.com/elastic/elasticsearch/issues/65213
+      .setDefaultIOReactorConfig(
+        IOReactorConfig
+          .custom()
+          .setSoKeepAlive(true)
+          .build()
+      )
   }
 }
 
