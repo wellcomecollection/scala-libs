@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.2 - 2022-07-15
+
+Enable TCP keepalive for the Elasticsearch HTTP client in an effort to stop connection reset errors
+
 ## v32.16.1 - 2022-05-04
 
 Recognise another type of socket connection timeout from S3 as a retryable error.
