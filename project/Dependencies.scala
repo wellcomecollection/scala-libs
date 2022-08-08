@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   lazy val versions = new {
     val elasticApm = "1.22.0"
-    val elastic4s = "7.15.5"
+    val elastic4s = "7.17.3"
 
     val aws = "1.11.504"
 
@@ -35,7 +35,7 @@ object Dependencies {
     //
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
     //
-    val akka = "2.6.14"
+    val akka = "2.6.19"
     val akkaStreamAlpakka = "3.0.4"
 
     // Getting the akka-http dependencies right can be fiddly and takes some work.
