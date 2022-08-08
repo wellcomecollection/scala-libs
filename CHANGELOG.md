@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.3 - 2022-08-08
+
+Add the API compatibility headers for the current version (7) of ElasticSearch
+
 ## v32.16.2 - 2022-07-15
 
 Enable TCP keepalive for the Elasticsearch HTTP client in an effort to stop connection reset errors
