@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   lazy val versions = new {
     val elasticApm = "1.22.0"
-    val elastic4s = "7.12.2"
+    val elastic4s = "7.15.5"
 
     val aws = "1.11.504"
 
@@ -89,7 +89,8 @@ object Dependencies {
     "org.mockito" % "mockito-core" % versions.mockito % Test
   )
 
-  val testDependencies: Seq[ModuleID] = scalatestDependencies ++ mockitoDependencies
+  val testDependencies
+    : Seq[ModuleID] = scalatestDependencies ++ mockitoDependencies
 
   val sl4jDependencies = Seq(
     "org.clapper" %% "grizzled-slf4j" % versions.grizzled
