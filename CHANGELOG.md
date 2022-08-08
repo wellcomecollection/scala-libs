@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.4 - 2022-08-08
+
+Use the latest published version of elastic4s 7.x; match the akka version with it
+
 ## v32.16.3 - 2022-08-08
 
 Add the API compatibility headers for the current version (7) of ElasticSearch
