@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.6 - 2022-08-25
+
+Match circe version with that used in elastic4s
+
 ## v32.16.5 - 2022-08-25
 
 Remove dependency on akka-http-json, vendor it
