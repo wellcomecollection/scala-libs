@@ -12,7 +12,6 @@ object Dependencies {
 
     val azure = "12.7.0"
 
-    val circe = "0.13.0"
     val typesafe = "1.3.2"
     val logback = "1.1.8"
     val mockito = "1.10.19"
@@ -37,6 +36,9 @@ object Dependencies {
     //
     val akka = "2.6.19"
     val akkaStreamAlpakka = "3.0.4"
+
+    // As above, this should match the version used by elastic4s
+    val circe = "0.14.2"
 
     // Getting the akka-http dependencies right can be fiddly and takes some work.
     // In particular you need to use the same version of akka-http everywhere, or you
