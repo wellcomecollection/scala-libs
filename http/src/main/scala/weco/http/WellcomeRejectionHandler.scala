@@ -60,13 +60,7 @@ trait WellcomeRejectionHandler extends ErrorDirectives {
         // that a required field was not present.
         case s if s.contains("Attempt to decode value on failed cursor") =>
           "required property not supplied."
-        // These are errors returned by our custom decoders for enum.
-        case s if s.contains("valid values") => s
-        // If a field exists in the JSON but it's of the wrong format
-        // (for example the schema says it should be a String but an object has
-        // been supplied instead), the error message returned by Circe only
-        // contains the expected type.
-        case s => s"should be a $s."
+        case s => s
       }
 
       s"Invalid value at $path: $reason"
