@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.7 - 2022-08-25
+
+Try to sort out the confusing nature of shapeless/scala version resolution
+
 ## v32.16.6 - 2022-08-25
 
 Match circe version with that used in elastic4s
