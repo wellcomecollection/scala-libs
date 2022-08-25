@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.16.5 - 2022-08-25
+
+Remove dependency on akka-http-json, vendor it
+
 ## v32.16.4 - 2022-08-08
 
 Use the latest published version of elastic4s 7.x; match the akka version with it
