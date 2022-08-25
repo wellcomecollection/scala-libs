@@ -40,12 +40,14 @@ import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import akka.stream.scaladsl.{Sink, Source}
 import cats.data.{NonEmptyList, ValidatedNel}
-import io.circe.{DecodingFailure, Encoder, ParsingFailure, Printer}
+import io.circe.{DecodingFailure, Encoder, Json, ParsingFailure, Printer}
 import io.circe.CursorOp.DownField
+import io.circe.DecodingFailure.Reason.WrongTypeExpectation
 import org.scalatest.{BeforeAndAfterAll, EitherValues}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
+
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
@@ -174,7 +176,11 @@ final class CirceSupportSpec
 
     "fail-fast and return only the first unmarshalling error" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val error = DecodingFailure("String", List(DownField("a")))
+      val error = DecodingFailure(
+        WrongTypeExpectation(
+          expectedJsonFieldType = "string",
+          jsonValue = Json.fromInt(1)),
+        List(DownField("a")))
       Unmarshal(entity)
         .to[MultiFoo]
         .failed
@@ -183,7 +189,11 @@ final class CirceSupportSpec
 
     "fail-fast and return only the first unmarshalling error with safeUnmarshaller" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val error = DecodingFailure("String", List(DownField("a")))
+      val error = DecodingFailure(
+        WrongTypeExpectation(
+          expectedJsonFieldType = "string",
+          jsonValue = Json.fromInt(1)),
+        List(DownField("a")))
       Unmarshal(entity)
         .to[Either[io.circe.Error, MultiFoo]]
         .futureValue
@@ -225,8 +235,16 @@ final class CirceSupportSpec
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
       val errors =
         NonEmptyList.of(
-          DecodingFailure("String", List(DownField("a"))),
-          DecodingFailure("String", List(DownField("b")))
+          DecodingFailure(
+            WrongTypeExpectation(
+              expectedJsonFieldType = "string",
+              jsonValue = Json.fromInt(1)),
+            List(DownField("a"))),
+          DecodingFailure(
+            WrongTypeExpectation(
+              expectedJsonFieldType = "string",
+              jsonValue = Json.fromInt(2)),
+            List(DownField("b")))
         )
       val errorMessage =
         ErrorAccumulatingCirceSupport.DecodingFailures(errors).getMessage
@@ -240,8 +258,16 @@ final class CirceSupportSpec
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
       val errors =
         NonEmptyList.of(
-          DecodingFailure("String", List(DownField("a"))),
-          DecodingFailure("String", List(DownField("b")))
+          DecodingFailure(
+            WrongTypeExpectation(
+              expectedJsonFieldType = "string",
+              jsonValue = Json.fromInt(1)),
+            List(DownField("a"))),
+          DecodingFailure(
+            WrongTypeExpectation(
+              expectedJsonFieldType = "string",
+              jsonValue = Json.fromInt(2)),
+            List(DownField("b")))
         )
       Unmarshal(entity)
         .to[ValidatedNel[io.circe.Error, MultiFoo]]
