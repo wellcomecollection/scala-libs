@@ -108,7 +108,7 @@ trait BaseCirceSupport {
   private def sourceByteStringMarshaller(
     mediaType: MediaType.WithFixedCharset
   ): Marshaller[SourceOf[ByteString], MessageEntity] =
-    Marshaller[SourceOf[ByteString], MessageEntity] { implicit ec => value =>
+    Marshaller[SourceOf[ByteString], MessageEntity] { _ => value =>
       try FastFuture.successful {
         Marshalling.WithFixedContentType(
           mediaType,
