@@ -12,6 +12,7 @@ object Dependencies {
 
     val azure = "12.7.0"
 
+    val circe = "0.14.2"
     val typesafe = "1.3.2"
     val logback = "1.1.8"
     val mockito = "1.10.19"
@@ -37,9 +38,6 @@ object Dependencies {
     val akka = "2.6.19"
     val akkaStreamAlpakka = "3.0.4"
 
-    // As above, this should match the version used by elastic4s
-    val circe = "0.14.2"
-
     // Getting the akka-http dependencies right can be fiddly and takes some work.
     // In particular you need to use the same version of akka-http everywhere, or you
     // get errors (from LargeResponsesTest) like:
@@ -60,13 +58,23 @@ object Dependencies {
     //      (At time of writing, alpakka v3.0.1 pulls in akka-http 10.1.11)
     //
     val akkaHttp = "10.2.9"
+
+    // This needs to be set explicitly to match the language version
+    // used by the version of shapeless that Circe uses, otherwise SBT
+    // is liable to resolve it incorrectly when packaging applications.
+    // Without doing this, you might come across weird errors like:
+    //
+    //    java.lang.NoClassDefFoundError: scala/reflect/internal/Names$Name
+    //
+    val scalaReflectVersion = "2.12.15"
   }
 
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circe,
     "io.circe" %% "circe-generic" % versions.circe,
     "io.circe" %% "circe-generic-extras" % versions.circe,
-    "io.circe" %% "circe-parser" % versions.circe
+    "io.circe" %% "circe-parser" % versions.circe,
+    "org.scala-lang" % "scala-reflect" % versions.scalaReflectVersion
   )
 
   val elasticsearchDependencies = Seq(
