@@ -57,12 +57,7 @@ object Dependencies {
     //      https://github.com/akka/alpakka/blob/master/project/Dependencies.scala
     //      (At time of writing, alpakka v3.0.1 pulls in akka-http 10.1.11)
     //
-    //   3. Look at versions of akka-http-json.  Browse the Git tags until you find
-    //      one that uses the same version of akka-http and a compatible Circe:
-    //      https://github.com/hseeberger/akka-http-json/blob/master/build.sbt
-    //
-    val akkaHttp = "10.2.4"
-    val akkaHttpCirce = "1.37.0"
+    val akkaHttp = "10.2.9"
   }
 
   val circeDependencies = Seq(
@@ -115,8 +110,7 @@ object Dependencies {
   )
 
   val akkaHttpDependencies = Seq(
-    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
-    "de.heikoseeberger" %% "akka-http-circe" % versions.akkaHttpCirce
+    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp
   )
 
   val apacheCommons = Seq(
