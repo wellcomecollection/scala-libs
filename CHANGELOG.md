@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.17.0 - 2022-08-26
+
+Bump elastic4s version to 8.3.x
+
 ## v32.16.7 - 2022-08-25
 
 Try to sort out the confusing nature of shapeless/scala version resolution
