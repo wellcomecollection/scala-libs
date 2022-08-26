@@ -148,8 +148,7 @@ class WellcomeHttpAppFeatureTest
         whenPostRequestReady(path, entity) { response =>
           assertIsDisplayError(
             response = response,
-            description =
-              "Invalid value at .name: required property not supplied.",
+            description = "Invalid value at .name: Missing required field",
             statusCode = BadRequest
           )
         }

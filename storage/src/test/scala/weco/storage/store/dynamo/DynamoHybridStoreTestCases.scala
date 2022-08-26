@@ -181,35 +181,33 @@ trait DynamoHybridStoreTestCases[
 
       it("if the prefix creates an S3 key that's too long") {
         withStoreContext { implicit context =>
-          withNamespace { implicit namespace =>
-            withTypedStoreImpl { typedStore =>
-              withIndexedStoreImpl { indexedStore =>
-                withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
-                  // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
-                  // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
+          withTypedStoreImpl { typedStore =>
+            withIndexedStoreImpl { indexedStore =>
+              withHybridStoreImpl(typedStore, indexedStore) { hybridStore =>
+                // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
+                // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
 
-                  // The hybrid store appends _some_ value to this path.
-                  // This test sets the id length to 1024 expecting the
-                  // implementation to append >0 bytes thereby causing
-                  // a failure.
+                // The hybrid store appends _some_ value to this path.
+                // This test sets the id length to 1024 expecting the
+                // implementation to append >0 bytes thereby causing
+                // a failure.
 
-                  // There is also a dynamo hash/range key restriction but
-                  // this is (at time of writing) greater than the s3 key
-                  // length restriction and cannot be reached without
-                  // invoking this error.
+                // There is also a dynamo hash/range key restriction but
+                // this is (at time of writing) greater than the s3 key
+                // length restriction and cannot be reached without
+                // invoking this error.
 
-                  val tooLongId = randomStringOfByteLength(1024)
+                val tooLongId = randomStringOfByteLength(1024)
 
-                  val id = Version(id = tooLongId, version = 1)
-                  val hybridStoreEntry = createT
+                val id = Version(id = tooLongId, version = 1)
+                val hybridStoreEntry = createT
 
-                  val result = hybridStore.put(id)(hybridStoreEntry)
-                  val value = result.left.value
+                val result = hybridStore.put(id)(hybridStoreEntry)
+                val value = result.left.value
 
-                  value shouldBe a[InvalidIdentifierFailure]
-                  value.e.getMessage should startWith(
-                    "S3 object key byte length is too big")
-                }
+                value shouldBe a[InvalidIdentifierFailure]
+                value.e.getMessage should startWith(
+                  "S3 object key byte length is too big")
               }
             }
           }
