@@ -50,7 +50,7 @@ class ElasticHttpClientConfig(username: String,
 }
 
 object ElasticClientBuilder {
-  private val apiCompatibility = Some("7")
+  private val apiCompatibility = Some("8")
 
   def create(hostname: String,
              port: Int,
