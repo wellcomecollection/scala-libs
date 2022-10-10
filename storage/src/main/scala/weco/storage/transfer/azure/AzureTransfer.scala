@@ -3,20 +3,17 @@ package weco.storage.transfer.azure
 import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URL
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{S3ObjectInputStream, S3ObjectSummary}
+import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{
   BlobRange,
   BlobStorageException,
   BlockListType
 }
-import com.azure.storage.blob.specialized.{BlobInputStream, BlockBlobClient}
+import com.azure.storage.blob.specialized.BlockBlobClient
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
-import weco.storage.azure.AzureBlobLocation
 import weco.storage.models.ByteRange
-import weco.storage.s3.S3ObjectLocation
-import weco.storage.services.azure.AzureSizeFinder
 import weco.storage.services.s3.{S3RangedReader, S3Uploader}
 import weco.storage.transfer._
 import weco.storage.{Identified, NotFoundError, RetryableError, StoreWriteError}
