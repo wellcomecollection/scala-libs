@@ -19,10 +19,12 @@ import weco.storage.s3.S3ObjectLocation
 import weco.storage.services.azure.AzureSizeFinder
 import weco.storage.services.s3.{S3RangedReader, S3Uploader}
 import weco.storage.transfer._
-import weco.storage.{RetryableError, StoreWriteError}
+import weco.storage.{Identified, NotFoundError, RetryableError, StoreWriteError}
 import weco.storage.azure.AzureBlobLocation
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.services.azure.AzureSizeFinder
+import weco.storage.store.azure.AzureStreamStore
+import weco.storage.store.s3.S3StreamStore
 import weco.storage.transfer.{
   TransferNoOp,
   TransferOverwriteFailure,
@@ -203,15 +205,19 @@ trait AzureTransfer[Context]
     getAzureStream(dst) match {
       // If the destination object doesn't exist, we can go ahead and
       // start the transfer.
-      case Failure(_) =>
+      case Left(_: NotFoundError) =>
         transferWithOverwrites(src, dst)
 
-      case Success(dstStream) =>
+      case Left(e) =>
+        warn(s"Unexpected error retrieving Azure blob from $dst: $e")
+        transferWithOverwrites(src, dst)
+
+      case Right(Identified(_, dstStream)) =>
         val srcObjectLocation = S3ObjectLocation(src)
         getS3Stream(srcObjectLocation) match {
           // If both the source and the destination exist, we can skip
           // the copy operation.
-          case Success(srcStream) =>
+          case Right(Identified(_, srcStream)) =>
             val result = compare(
               src = src,
               dst = dst,
@@ -228,36 +234,28 @@ trait AzureTransfer[Context]
             // See: https://github.com/wellcometrust/platform/issues/3600
             //      https://github.com/aws/aws-sdk-java/issues/269
             //
-            srcStream.abort()
             srcStream.close()
             dstStream.close()
 
             result
 
-          case Failure(err) =>
+          case Left(err) =>
             // As above, we need to abort the input stream so we don't leave streams
             // open or get warnings from the SDK.
             dstStream.close()
-            Left(TransferSourceFailure(src, dst, err))
+            Left(TransferSourceFailure(src, dst, err.e))
         }
     }
 
-  private def getS3Stream(
-    location: S3ObjectLocation
-  ): Try[S3ObjectInputStream] =
-    Try {
-      s3Client.getObject(location.bucket, location.key)
-    }.map { _.getObjectContent }
+  private def getS3Stream(location: S3ObjectLocation) = {
+    val s3Readable = new S3StreamStore()
+    s3Readable.get(location)
+  }
 
-  private def getAzureStream(
-    location: AzureBlobLocation
-  ): Try[BlobInputStream] =
-    Try {
-      blobServiceClient
-        .getBlobContainerClient(location.container)
-        .getBlobClient(location.name)
-        .openInputStream()
-    }
+  private def getAzureStream(location: AzureBlobLocation) = {
+    val azureReadable = new AzureStreamStore()
+    azureReadable.get(location)
+  }
 
   protected def compare(
     src: S3ObjectSummary,

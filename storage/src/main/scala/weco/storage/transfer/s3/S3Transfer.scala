@@ -1,7 +1,6 @@
 package weco.storage.transfer.s3
 
 import java.io.InputStream
-
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
 import com.amazonaws.services.s3.transfer.{
@@ -9,7 +8,9 @@ import com.amazonaws.services.s3.transfer.{
   TransferManager,
   TransferManagerBuilder
 }
+import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
+import weco.storage.NotFoundError
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.s3.{S3StreamReadable, S3StreamStore}
 import weco.storage.transfer._
@@ -18,7 +19,7 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
-    extends Transfer[S3ObjectLocation, S3ObjectLocation] {
+    extends Transfer[S3ObjectLocation, S3ObjectLocation] with Logging {
 
   import weco.storage.RetryOps._
 
@@ -37,7 +38,11 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
       // We have seen once case where the S3 CopyObject API returned
       // a 500 error, in a bag with multiple 20GB+ files, so we do need
       // to be able to retry failures here.
-      case Left(_) =>
+      case Left(_: NotFoundError) =>
+        transferWithOverwrites(src, dst)
+
+      case Left(e) =>
+        warn(s"Unexpected error retrieving S3 object from $dst: $e")
         transferWithOverwrites(src, dst)
 
       case Right(dstStream) =>
