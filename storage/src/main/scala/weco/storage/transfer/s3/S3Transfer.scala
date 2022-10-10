@@ -19,7 +19,8 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
-    extends Transfer[S3ObjectLocation, S3ObjectLocation] with Logging {
+    extends Transfer[S3ObjectLocation, S3ObjectLocation]
+    with Logging {
 
   import weco.storage.RetryOps._
 
