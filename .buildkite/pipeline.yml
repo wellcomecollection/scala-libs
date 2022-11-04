@@ -35,7 +35,7 @@ steps:
       queue: "scala"
 
   - label: test messaging
-    command: .buildkite/scripts/run_sbt_tests.sh messaging
+    command: .buildkite/scripts/run_sbt_tests_with_docker_compose.sh messaging
     agents:
       queue: "scala"
 
@@ -45,7 +45,7 @@ steps:
       queue: "scala"
 
   - label: test storage
-    command: .buildkite/scripts/run_sbt_tests.sh storage
+    command: .buildkite/scripts/run_sbt_tests_with_docker_compose.sh storage
     agents:
       queue: "scala"
 
@@ -55,7 +55,7 @@ steps:
       queue: "scala"
 
   - label: test elasticsearch
-    command: .buildkite/scripts/run_sbt_tests.sh elasticsearch
+    command: .buildkite/scripts/run_sbt_tests_with_docker_compose.sh elasticsearch
     agents:
       queue: "scala"
 
