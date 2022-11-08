@@ -1,7 +1,0 @@
-{
-  "id" : "typesafe_app",
-  "folder" : "typesafe_app",
-  "dependencyIds" : [
-    "fixtures"
-  ]
-}

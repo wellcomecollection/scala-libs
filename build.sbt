@@ -110,16 +110,3 @@ lazy val sierra_typesafe = Common.setupProject(
   projectVersion = projectVersion,
   localDependencies = Seq(sierra, typesafe_app)
 )
-
-/**
- * To release to the Wellcome maven repo in S3 locally, uncomment this:
- **/
-//import java.util.UUID
-//import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
-//s3CredentialsProvider := { _ =>
-//  val builder = new STSAssumeRoleSessionCredentialsProvider.Builder(
-//    "arn:aws:iam::760097843905:role/platform-developer",
-//    UUID.randomUUID().toString
-//  )
-//  builder.build()
-//}

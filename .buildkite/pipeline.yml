@@ -5,7 +5,7 @@ steps:
       queue: "scala"
 
   - label: "test {{ matrix }}"
-    command: ".buildkite/scripts/run_sbt_tests.sh {{ matrix }}"
+    command: "./builds/run_sbt_tests.sh {{ matrix }}"
     matrix:
       - "fixtures"
       - "http"

@@ -1,7 +1,0 @@
-{
-  "id" : "http_typesafe",
-  "folder" : "http_typesafe",
-  "dependencyIds" : [
-    "http"
-  ]
-}

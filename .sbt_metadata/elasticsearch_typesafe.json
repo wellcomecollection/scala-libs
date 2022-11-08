@@ -1,8 +1,0 @@
-{
-  "id" : "elasticsearch_typesafe",
-  "folder" : "elasticsearch_typesafe",
-  "dependencyIds" : [
-    "elasticsearch",
-    "typesafe_app"
-  ]
-}
