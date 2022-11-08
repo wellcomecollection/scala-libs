@@ -1,6 +1,4 @@
-# -*- encoding: utf-8
-
-import os
+mport os
 
 from git_utils import remote_default_branch
 
