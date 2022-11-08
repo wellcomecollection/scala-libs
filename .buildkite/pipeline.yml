@@ -36,6 +36,7 @@ steps:
   - wait
 
   - label: "publish {{ matrix }}"
+    if: build.branch == "main"
     command: ".buildkite/scripts/publish.py {{ matrix }}"
     matrix:
       - "fixtures"
