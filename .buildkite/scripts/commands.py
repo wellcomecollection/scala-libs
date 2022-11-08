@@ -34,4 +34,4 @@ def git(*args, exit_on_error=True):
 
 def run_build_script(name, *args):
     """Run a build script, and check it completes successfully."""
-    _subprocess_run([f".buildkite/scripts/{name}"] + list(args))
+    _subprocess_run([f"./builds/{name}"] + list(args))
