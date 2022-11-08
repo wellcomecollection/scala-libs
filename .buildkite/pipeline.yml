@@ -4,68 +4,25 @@ steps:
     agents:
       queue: "scala"
 
-  - label: test fixtures
-    command: .buildkite/scripts/run_sbt_tests.sh fixtures
+  - label: "test {{ matrix }}"
+    command: ".buildkite/scripts/run_sbt_tests.sh {{ matrix }}"
+    matrix:
+      - "fixtures"
+      - "http"
+      - "json"
+      - "typesafe_app"
+      - "monitoring"
+      - "monitoring_typesafe"
+      - "messaging"
+      - "messaging_typesafe"
+      - "storage"
+      - "storage_typesafe"
+      - "elasticsearch"
+      - "elasticsearch_typesafe"
+      - "sierra"
+
     agents:
       queue: "scala"
-
-  - label: test http
-    command: .buildkite/scripts/run_sbt_tests.sh http
-    agents:
-      queue: "scala"
-
-  - label: test json
-    command: .buildkite/scripts/run_sbt_tests.sh json
-    agents:
-      queue: "scala"
-
-  - label: test typesafe_app
-    command: .buildkite/scripts/run_sbt_tests.sh typesafe_app
-    agents:
-      queue: "scala"
-
-  - label: test monitoring
-    command: .buildkite/scripts/run_sbt_tests.sh monitoring
-    agents:
-      queue: "scala"
-
-  - label: test monitoring_typesafe
-    command: .buildkite/scripts/run_sbt_tests.sh monitoring_typesafe
-    agents:
-      queue: "scala"
-
-  - label: test messaging
-    command: .buildkite/scripts/run_sbt_tests.sh messaging
-    agents:
-      queue: "scala"
-
-  - label: test messaging_typesafe
-    command: .buildkite/scripts/run_sbt_tests.sh messaging_typesafe
-    agents:
-      queue: "scala"
-
-  - label: test storage
-    command: .buildkite/scripts/run_sbt_tests.sh storage
-    agents:
-      queue: "scala"
-
-  - label: test storage_typesafe
-    command: .buildkite/scripts/run_sbt_tests.sh storage_typesafe
-    agents:
-      queue: "scala"
-
-  - label: test elasticsearch
-    command: .buildkite/scripts/run_sbt_tests.sh elasticsearch
-    agents:
-      queue: "scala"
-
-  - label: test elasticsearch_typesafe
-    command: .buildkite/scripts/run_sbt_tests.sh elasticsearch_typesafe
-    agents:
-      queue: "scala"
-
-  - label: test sierra
-    command: .buildkite/scripts/run_sbt_tests.sh sierra
 
   - wait
 
@@ -77,93 +34,26 @@ steps:
       queue: nano
 
   - wait
-  - label: publish fixtures
-    command: .buildkite/scripts/publish.py fixtures
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
 
-  - label: publish http
-    command: .buildkite/scripts/publish.py http
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
+  - label: "publish {{ matrix }}"
+    command: ".buildkite/scripts/publish.py {{ matrix }}"
+    matrix:
+      - "fixtures"
+      - "http"
+      - "http_typesafe"
+      - "json"
+      - "typesafe_app"
+      - "monitoring"
+      - "monitoring_typesafe"
+      - "messaging"
+      - "messaging_typesafe"
+      - "storage"
+      - "storage_typesafe"
+      - "elasticsearch"
+      - "elasticsearch_typesafe"
+      - "sierra"
+      - "sierra_typesafe"
 
-  - label: publish http_typesafe
-    command: .buildkite/scripts/publish.py http_typesafe
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish json
-    command: .buildkite/scripts/publish.py json
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish typesafe_app
-    command: .buildkite/scripts/publish.py typesafe_app
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish messaging
-    command: .buildkite/scripts/publish.py messaging
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish messaging_typesafe
-    command: .buildkite/scripts/publish.py messaging_typesafe
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish monitoring
-    command: .buildkite/scripts/publish.py monitoring
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish monitoring_typesafe
-    command: .buildkite/scripts/publish.py monitoring_typesafe
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish storage
-    command: .buildkite/scripts/publish.py storage
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish storage_typesafe
-    command: .buildkite/scripts/publish.py storage_typesafe
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish elasticseach
-    command: .buildkite/scripts/publish.py elasticsearch
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish elasticsearch_typesafe
-    command: .buildkite/scripts/publish.py elasticsearch_typesafe
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish sierra
-    command: .buildkite/scripts/publish.py sierra
-    if: build.branch == "main"
-    agents:
-      queue: "scala"
-
-  - label: publish sierra_typesafe
-    command: .buildkite/scripts/publish.py sierra_typesafe
-    if: build.branch == "main"
     agents:
       queue: "scala"
 
