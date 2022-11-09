@@ -1,7 +1,0 @@
-{
-  "id" : "monitoring_typesafe",
-  "folder" : "monitoring_typesafe",
-  "dependencyIds" : [
-    "monitoring"
-  ]
-}

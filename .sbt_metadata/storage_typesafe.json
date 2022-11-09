@@ -1,7 +1,0 @@
-{
-  "id" : "storage_typesafe",
-  "folder" : "storage_typesafe",
-  "dependencyIds" : [
-    "storage"
-  ]
-}

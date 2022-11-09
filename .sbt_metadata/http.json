@@ -1,8 +1,0 @@
-{
-  "id" : "http",
-  "folder" : "http",
-  "dependencyIds" : [
-    "json",
-    "monitoring"
-  ]
-}

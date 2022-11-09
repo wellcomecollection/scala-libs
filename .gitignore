@@ -5,12 +5,6 @@ target
 
 credentials.sbt
 
-pgp-key
-ssh-key
-
-secrets.zip
-secrets
-
 *.pyc
 
 awscredentials
