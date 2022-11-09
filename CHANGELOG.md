@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.17.2 - 2022-11-09
+
+This is some refactoring in the scala-libs build system; there are no changes to the library itself.
+
 ## v32.17.1 - 2022-10-27
 
 Fix an issue where the `AzureTransfer` class might try to overwrite a blob in Azure if it got a transient error while trying to retrieve the blob in the destination.  Also log when objects/blobs are overwritten because the destination object can't be retrieved and it's not a 404 Not Found.
