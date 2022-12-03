@@ -52,7 +52,6 @@ object Common {
     project
       .in(new File(folder))
       .settings(settings: _*)
-      .settings(DockerCompose.settings: _*)
       .enablePlugins(DockerComposePlugin)
       .dependsOn(dependsOn: _*)
       .settings(libraryDependencies ++= externalDependencies)
