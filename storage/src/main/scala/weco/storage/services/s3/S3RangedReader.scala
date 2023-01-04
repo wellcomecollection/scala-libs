@@ -1,8 +1,8 @@
 package weco.storage.services.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.GetObjectRequest
 import org.apache.commons.io.IOUtils
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import weco.storage.ReadError
 import weco.storage.models.{ByteRange, ClosedByteRange, OpenByteRange}
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
@@ -10,7 +10,7 @@ import weco.storage.services.RangedReader
 
 import scala.util.{Failure, Success, Try}
 
-class S3RangedReader(implicit s3Client: AmazonS3)
+class S3RangedReader(implicit s3Client: S3Client)
     extends RangedReader[S3ObjectLocation] {
   override def getBytes(
     location: S3ObjectLocation,
@@ -24,25 +24,21 @@ class S3RangedReader(implicit s3Client: AmazonS3)
       // We never want to read more than bufferSize bytes at a time.
       val getRequest = range match {
         case ClosedByteRange(start, count) =>
-          new GetObjectRequest(location.bucket, location.key)
-            .withRange(start, start + count - 1)
+          GetObjectRequest.builder()
+            .bucket(location.bucket)
+            .key(location.key)
+            .range(s"bytes=$start-${start + count - 1}")
+            .build()
 
         case OpenByteRange(start) =>
-          new GetObjectRequest(location.bucket, location.key)
-            .withRange(start)
+          GetObjectRequest.builder()
+            .bucket(location.bucket)
+            .key(location.key)
+            .range(s"bytes=$start-")
+            .build()
       }
 
-      val s3InputStream = s3Client.getObject(getRequest).getObjectContent
-      val byteArray = IOUtils.toByteArray(s3InputStream)
-
-      // Remember to close the input stream afterwards, or we get errors like
-      //
-      //    com.amazonaws.SdkClientException: Unable to execute HTTP request:
-      //    Timeout waiting for connection from pool
-      //
-      s3InputStream.close()
-
-      byteArray
+      s3Client.getObjectAsBytes(getRequest).asByteArray()
     } match {
       case Success(bytes) => Right(bytes)
       case Failure(err)   => Left(S3Errors.readErrors(err))

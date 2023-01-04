@@ -1,7 +1,7 @@
 package weco.storage.s3
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.services.s3.model.S3Exception
 import weco.storage.{
   DoesNotExistError,
   ReadError,
@@ -15,10 +15,10 @@ import java.net.SocketTimeoutException
 
 object S3Errors {
   val readErrors: PartialFunction[Throwable, ReadError] = {
-    case exc: AmazonS3Exception if exc.getStatusCode == 404 =>
+    case exc: S3Exception if exc.statusCode() == 404 =>
       DoesNotExistError(exc)
 
-    case exc: AmazonS3Exception if exc.getStatusCode == 500 =>
+    case exc: S3Exception if exc.statusCode() == 500 =>
       new StoreReadError(exc) with RetryableError
 
     // The full error message here is:
@@ -26,12 +26,12 @@ object S3Errors {
     //    Your socket connection to the server was not read from or written to
     //    within the timeout period. Idle connections will be closed.
     //
-    case exc: AmazonS3Exception
+    case exc: S3Exception
         if exc.getMessage.startsWith(
           "Your socket connection to the server was not read from or written to within the timeout period") =>
       new StoreReadError(exc) with RetryableError
 
-    case exc: AmazonS3Exception
+    case exc: S3Exception
         if exc.getMessage.startsWith("The specified bucket is not valid") =>
       StoreReadError(exc)
 
@@ -46,7 +46,7 @@ object S3Errors {
   }
 
   val writeErrors: PartialFunction[Throwable, WriteError] = {
-    case exc: AmazonS3Exception if exc.getStatusCode == 500 =>
+    case exc: S3Exception if exc.statusCode() == 500 =>
       new StoreWriteError(exc) with RetryableError
 
     case exc => StoreWriteError(exc)
