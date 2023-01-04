@@ -8,7 +8,7 @@ object Dependencies {
     val aws = "1.11.504"
 
     // Moving what we can to version 2 of the AWS SDKs
-    val aws2 = "2.11.14"
+    val aws2 = "2.19.0"
 
     val azure = "12.7.0"
 
