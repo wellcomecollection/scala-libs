@@ -1,9 +1,7 @@
 package weco.storage.store.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import weco.storage.s3.S3ObjectLocation
 import weco.storage.store.TypedStore
-import weco.storage.streaming.Codec
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.streaming.Codec
 
