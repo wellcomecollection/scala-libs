@@ -14,7 +14,8 @@ class S3ObjectExists(s3Client: S3Client)
     location: S3ObjectLocation
   ): Either[StoreReadError, Boolean] = {
     val headRequest =
-      HeadObjectRequest.builder()
+      HeadObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()

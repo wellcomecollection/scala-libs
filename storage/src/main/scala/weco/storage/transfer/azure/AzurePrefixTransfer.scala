@@ -19,8 +19,7 @@ class AzurePrefixTransfer(
       AzureBlobLocation
     ] {
 
-  override implicit val listing
-    : Listing[S3ObjectLocationPrefix, S3Object] =
+  override implicit val listing: Listing[S3ObjectLocationPrefix, S3Object] =
     new S3ObjectListing()
 
   override protected def buildDstLocation(

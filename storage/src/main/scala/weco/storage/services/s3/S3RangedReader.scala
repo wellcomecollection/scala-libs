@@ -23,14 +23,16 @@ class S3RangedReader(implicit s3Client: S3Client)
       // We never want to read more than bufferSize bytes at a time.
       val getRequest = range match {
         case ClosedByteRange(start, count) =>
-          GetObjectRequest.builder()
+          GetObjectRequest
+            .builder()
             .bucket(location.bucket)
             .key(location.key)
             .range(s"bytes=$start-${start + count - 1}")
             .build()
 
         case OpenByteRange(start) =>
-          GetObjectRequest.builder()
+          GetObjectRequest
+            .builder()
             .bucket(location.bucket)
             .key(location.key)
             .range(s"bytes=$start-")

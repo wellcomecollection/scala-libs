@@ -1,7 +1,10 @@
 package weco.storage.services.s3
 
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest}
+import software.amazon.awssdk.services.s3.model.{
+  GetObjectRequest,
+  HeadObjectRequest
+}
 import weco.storage._
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.services.SizeFinder
@@ -15,7 +18,8 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: S3Client)
 
   override def retryableGetFunction(location: S3ObjectLocation): Long = {
     val headRequest =
-      HeadObjectRequest.builder()
+      HeadObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()

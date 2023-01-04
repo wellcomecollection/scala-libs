@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 class S3ObjectListing(implicit s3Client: S3Client)
-  extends S3Listing[S3Object]
+    extends S3Listing[S3Object]
     with Logging {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult = {
     if (!prefix.keyPrefix.endsWith("/") && prefix.keyPrefix != "") {
@@ -25,18 +25,18 @@ class S3ObjectListing(implicit s3Client: S3Client)
       )
     }
 
-    val listRequest = ListObjectsV2Request.builder()
+    val listRequest = ListObjectsV2Request
+      .builder()
       .bucket(prefix.bucket)
       .prefix(prefix.keyPrefix)
       .build()
 
     Try {
-      val iterator = s3Client.listObjectsV2Paginator(listRequest)
+      val iterator = s3Client
+        .listObjectsV2Paginator(listRequest)
         .iterator()
         .asScala
-        .flatMap((resp: ListObjectsV2Response) =>
-          resp.contents().asScala
-        )
+        .flatMap((resp: ListObjectsV2Response) => resp.contents().asScala)
         .toIterable
 
       // TODO: This was written for the V1 SDK.  Does it still apply for the V2 SDK?
