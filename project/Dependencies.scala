@@ -5,10 +5,7 @@ object Dependencies {
     val elasticApm = "1.22.0"
     val elastic4s = "8.3.2"
 
-    val aws = "1.11.504"
-
-    // Moving what we can to version 2 of the AWS SDKs
-    val aws2 = "2.19.0"
+    val aws = "2.19.0"
 
     val azure = "12.7.0"
 
@@ -138,18 +135,18 @@ object Dependencies {
   )
 
   val localstackDependencies = Seq(
-    "software.amazon.awssdk" % "auth" % versions.aws2,
-    "software.amazon.awssdk" % "regions" % versions.aws2
+    "software.amazon.awssdk" % "auth" % versions.aws,
+    "software.amazon.awssdk" % "regions" % versions.aws
   )
 
   val monitoringDependencies = Seq(
-    "software.amazon.awssdk" % "cloudwatch" % versions.aws2
+    "software.amazon.awssdk" % "cloudwatch" % versions.aws
   ) ++
     testDependencies
 
   val messagingDependencies = Seq(
-    "software.amazon.awssdk" % "sns" % versions.aws2,
-    "software.amazon.awssdk" % "sqs" % versions.aws2,
+    "software.amazon.awssdk" % "sns" % versions.aws,
+    "software.amazon.awssdk" % "sqs" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
     // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
@@ -176,8 +173,8 @@ object Dependencies {
 
   val storageDependencies: Seq[ModuleID] = Seq(
     "com.azure" % "azure-storage-blob" % versions.azure,
-    "software.amazon.awssdk" % "dynamodb" % versions.aws2,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
+    "software.amazon.awssdk" % "dynamodb" % versions.aws,
+    "software.amazon.awssdk" % "s3" % versions.aws
   ) ++
     scanamoDependencies ++
     apacheCommons
