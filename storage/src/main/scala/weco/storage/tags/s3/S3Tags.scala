@@ -16,9 +16,13 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: S3Client)
 
   override protected def retryableGetFunction(
     location: S3ObjectLocation): Map[String, String] = {
-    val response = s3Client.getObjectTagging(
-      new GetObjectTaggingRequest(location.bucket, location.key)
-    )
+    val request =
+      GetObjectTaggingRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    val response = s3Client.getObjectTagging(request)
 
     response.tagSet().asScala.map { tag: Tag =>
       tag.key() -> tag.value()

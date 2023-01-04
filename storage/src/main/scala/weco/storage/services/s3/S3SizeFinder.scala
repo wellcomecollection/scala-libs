@@ -14,7 +14,11 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: S3Client)
     with RetryableReadable[S3ObjectLocation, Long] {
 
   override def retryableGetFunction(location: S3ObjectLocation): Long = {
-    val headRequest = new HeadObjectRequest(location.bucket, location.key)
+    val headRequest =
+      HeadObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
 
     // We default to using getObjectMetadata, which will return the size
     // immediately on the happy path; we fall back to getObject if it fails

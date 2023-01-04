@@ -2,10 +2,10 @@ package weco.storage.services.s3
 
 import java.net.URL
 import java.util
-
 import com.amazonaws.HttpMethod
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
+import software.amazon.awssdk.services.s3.S3Client
 import weco.storage._
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.store.s3.S3StreamStore
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success, Try}
   * It's based on an example from the AWS SDK for Java docs:
   * https://docs.aws.amazon.com/AmazonS3/latest/dev/ShareObjectPreSignedURLJavaSDK.html
   */
-class S3Uploader(implicit val s3Client: AmazonS3) {
+class S3Uploader(implicit val s3Client: S3Client) {
   import S3ObjectExists._
 
   private val s3StreamStore: S3StreamStore = new S3StreamStore()
