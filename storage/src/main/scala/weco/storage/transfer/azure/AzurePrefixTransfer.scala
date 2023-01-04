@@ -2,6 +2,7 @@ package weco.storage.transfer.azure
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.services.s3.S3Client
 import weco.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import weco.storage.listing.Listing
 import weco.storage.listing.s3.S3ObjectSummaryListing
@@ -10,7 +11,7 @@ import weco.storage.transfer.PrefixTransfer
 
 class AzurePrefixTransfer(
   implicit
-  s3Client: AmazonS3,
+  s3Client: S3Client,
   val transfer: AzureTransfer[_]
 ) extends PrefixTransfer[
       S3ObjectLocationPrefix,

@@ -1,6 +1,5 @@
 package weco.storage.services.s3
 
-import org.apache.commons.io.IOUtils
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import weco.storage.ReadError

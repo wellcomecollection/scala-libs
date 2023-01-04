@@ -1,7 +1,7 @@
 package weco.storage.tags.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model._
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{GetObjectTaggingRequest, PutObjectTaggingRequest, Tag, Tagging}
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.RetryableReadable
 import weco.storage.tags.Tags
@@ -10,7 +10,7 @@ import weco.storage._
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
+class S3Tags(val maxRetries: Int = 3)(implicit s3Client: S3Client)
     extends Tags[S3ObjectLocation]
     with RetryableReadable[S3ObjectLocation, Map[String, String]] {
 
@@ -20,8 +20,8 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
       new GetObjectTaggingRequest(location.bucket, location.key)
     )
 
-    response.getTagSet.asScala.map { tag: Tag =>
-      tag.getKey -> tag.getValue
+    response.tagSet().asScala.map { tag: Tag =>
+      tag.key() -> tag.value()
     }.toMap
   }
 
@@ -49,11 +49,11 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
       .asJava
 
     Try {
-      s3Client.setObjectTagging(
-        new SetObjectTaggingRequest(
+      s3Client.putObjectTagging(
+        new PutObjectTaggingRequest(
           location.bucket,
           location.key,
-          new ObjectTagging(tagSet)
+          new Tagging(tagSet)
         )
       )
     } match {
