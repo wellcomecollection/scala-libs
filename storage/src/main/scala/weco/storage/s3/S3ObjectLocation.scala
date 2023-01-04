@@ -2,7 +2,6 @@ package weco.storage.s3
 
 import java.nio.file.Paths
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import weco.storage.{Location, Prefix}
 

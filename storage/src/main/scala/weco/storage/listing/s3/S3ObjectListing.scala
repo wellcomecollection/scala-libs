@@ -1,18 +1,20 @@
 package weco.storage.listing.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.iterable.S3Objects
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import grizzled.slf4j.Logging
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{
+  ListObjectsV2Request,
+  ListObjectsV2Response,
+  S3Object
+}
 import weco.storage.ListingFailure
 import weco.storage.s3.S3ObjectLocationPrefix
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3ObjectSummaryListing(batchSize: Int = 1000)(
-  implicit s3Client: AmazonS3
-) extends S3Listing[S3ObjectSummary]
+class S3ObjectListing(implicit s3Client: S3Client)
+  extends S3Listing[S3Object]
     with Logging {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult = {
     if (!prefix.keyPrefix.endsWith("/") && prefix.keyPrefix != "") {
@@ -23,16 +25,22 @@ class S3ObjectSummaryListing(batchSize: Int = 1000)(
       )
     }
 
-    Try {
-      val iterator = S3Objects
-        .withPrefix(
-          s3Client,
-          prefix.bucket,
-          prefix.keyPrefix
-        )
-        .withBatchSize(batchSize)
-        .asScala
+    val listRequest = ListObjectsV2Request.builder()
+      .bucket(prefix.bucket)
+      .prefix(prefix.keyPrefix)
+      .build()
 
+    Try {
+      val iterator = s3Client.listObjectsV2Paginator(listRequest)
+        .iterator()
+        .asScala
+        .flatMap((resp: ListObjectsV2Response) =>
+          resp.contents().asScala
+        )
+        .toIterable
+
+      // TODO: This was written for the V1 SDK.  Does it still apply for the V2 SDK?
+      //
       // Because the iterator is lazy, it won't make the initial call to S3 until
       // the caller starts to consume the results.  This can cause an exception to
       // be thrown in user code if, for example, the bucket doesn't exist.

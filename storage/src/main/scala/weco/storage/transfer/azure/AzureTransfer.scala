@@ -13,6 +13,7 @@ import com.azure.storage.blob.models.{
 import com.azure.storage.blob.specialized.BlockBlobClient
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
+import software.amazon.awssdk.services.s3.model.S3Object
 import weco.storage.models.ByteRange
 import weco.storage.services.s3.{S3RangedReader, S3Uploader}
 import weco.storage.transfer._
@@ -45,7 +46,7 @@ trait AzureTransfer[Context]
   val blockSize: Long
 
   private def runTransfer(
-    src: S3ObjectSummary,
+    src: S3Object,
     dst: AzureBlobLocation,
     allowOverwrites: Boolean
   ): Either[TransferFailure[S3ObjectSummary, AzureBlobLocation], Unit] = {

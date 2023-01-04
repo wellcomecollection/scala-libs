@@ -8,7 +8,7 @@ import weco.fixtures.TestWith
 import weco.storage.ListingFailure
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.listing.s3.{S3ObjectLocationListing, S3ObjectSummaryListing}
+import weco.storage.listing.s3.{S3ObjectLocationListing, S3ObjectListing}
 import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.s3.{S3TypedStore, S3TypedStoreFixtures}
 import weco.storage.transfer._
@@ -56,8 +56,8 @@ class S3PrefixTransferTest
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R = {
-    implicit val summaryListing: S3ObjectSummaryListing =
-      new S3ObjectSummaryListing()
+    implicit val summaryListing: S3ObjectListing =
+      new S3ObjectListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
         override def list(prefix: S3ObjectLocationPrefix): ListingResult =
@@ -75,8 +75,8 @@ class S3PrefixTransferTest
   )(
     testWith: TestWith[PrefixTransferImpl, R]
   ): R = {
-    implicit val summaryListing: S3ObjectSummaryListing =
-      new S3ObjectSummaryListing()
+    implicit val summaryListing: S3ObjectListing =
+      new S3ObjectListing()
     implicit val listing: S3ObjectLocationListing =
       new S3ObjectLocationListing() {
         override def list(prefix: S3ObjectLocationPrefix): ListingResult =
