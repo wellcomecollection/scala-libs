@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.19.1 - 2023-01-05
+
+Start using the AWS Java V2 SDK for S3 for testing S3-related code.  This doesn't change any library code.
+
 ## v32.19.0 - 2023-01-05
 
 Remove the `checkForExisting` flag from Transfer and TransferPrefix.
