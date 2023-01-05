@@ -2,7 +2,6 @@ package weco.storage.transfer.azure
 
 import java.io.ByteArrayInputStream
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.azure.storage.blob.models.BlobRange
 import weco.fixtures.TestWith
 import weco.json.JsonUtil._
@@ -26,18 +25,17 @@ import weco.storage.transfer.{
 
 class AzurePutBlockTransferTest
     extends TransferTestCases[
-      S3ObjectSummary,
+      SourceS3Object,
       AzureBlobLocation,
       Record,
       Bucket,
       Container,
-      TypedStore[S3ObjectSummary, Record],
+      TypedStore[SourceS3Object, Record],
       AzureTypedStore[Record],
       Unit
     ]
     with S3Fixtures
-    with AzureFixtures
-    with AzureTransferFixtures {
+    with AzureFixtures {
 
   val blockSize: Int = 10000
 
@@ -58,55 +56,67 @@ class AzurePutBlockTransferTest
       testWith(container)
     }
 
-  override def createSrcLocation(bucket: Bucket): S3ObjectSummary = {
+  override def createSrcLocation(bucket: Bucket): SourceS3Object = {
     val src = createS3ObjectLocationWith(bucket)
-    createS3ObjectSummaryFrom(src)
+    SourceS3Object(src, size = blockSize * 10)
   }
 
   override def createDstLocation(container: Container): AzureBlobLocation =
     createAzureBlobLocationWith(container)
 
-  val summaryStreamStore: StreamStore[S3ObjectSummary] =
-    new StreamStore[S3ObjectSummary] {
+  private def getSizeOf(r: Record): Long = {
+    val c = implicitly[Codec[Record]]
+    c.toStream(r).value.length
+  }
+
+  override def createSrcObject(bucket: Bucket): (SourceS3Object, Record) = {
+    val record = createT
+    val location = createS3ObjectLocationWith(bucket)
+    val src = SourceS3Object(location, size = getSizeOf(record))
+
+    (src, record)
+  }
+
+  val summaryStreamStore: StreamStore[SourceS3Object] =
+    new StreamStore[SourceS3Object] {
       private val underlying = new S3StreamStore()
 
-      override def get(summary: S3ObjectSummary): ReadEither =
+      override def get(summary: SourceS3Object): ReadEither =
         underlying
-          .get(S3ObjectLocation(summary))
+          .get(summary.location)
           .map { case Identified(_, result) => Identified(summary, result) }
 
       override def put(
-        summary: S3ObjectSummary
+        summary: SourceS3Object
       )(is: InputStreamWithLength): WriteEither =
         underlying
-          .put(S3ObjectLocation(summary))(is)
+          .put(summary.location)(is)
           .map {
             case Identified(_, result) =>
-              summary.setSize(is.length)
-              Identified(summary, result)
+              Identified(summary.copy(size = is.length), result)
           }
     }
 
-  val stringStore: TypedStore[S3ObjectSummary, String] =
-    new TypedStore[S3ObjectSummary, String] {
+  val stringStore: TypedStore[SourceS3Object, String] =
+    new TypedStore[SourceS3Object, String] {
       override implicit val codec: Codec[String] = Codec.stringCodec
 
-      override implicit val streamStore: StreamStore[S3ObjectSummary] =
+      override implicit val streamStore: StreamStore[SourceS3Object] =
         summaryStreamStore
     }
 
   override def withSrcStore[R](
-    initialEntries: Map[S3ObjectSummary, Record]
+    initialEntries: Map[SourceS3Object, Record]
   )(
-    testWith: TestWith[TypedStore[S3ObjectSummary, Record], R]
+    testWith: TestWith[TypedStore[SourceS3Object, Record], R]
   )(implicit context: Unit): R = {
     val c = implicitly[Codec[Record]]
 
-    val typedStore: TypedStore[S3ObjectSummary, Record] =
-      new TypedStore[S3ObjectSummary, Record] {
+    val typedStore: TypedStore[SourceS3Object, Record] =
+      new TypedStore[SourceS3Object, Record] {
         override implicit val codec: Codec[Record] = c
 
-        override implicit val streamStore: StreamStore[S3ObjectSummary] =
+        override implicit val streamStore: StreamStore[SourceS3Object] =
           summaryStreamStore
       }
 
@@ -132,9 +142,9 @@ class AzurePutBlockTransferTest
   }
 
   override def withTransfer[R](
-    srcStore: TypedStore[S3ObjectSummary, Record],
+    srcStore: TypedStore[SourceS3Object, Record],
     dstStore: AzureTypedStore[Record]
-  )(testWith: TestWith[Transfer[S3ObjectSummary, AzureBlobLocation], R]): R =
+  )(testWith: TestWith[Transfer[SourceS3Object, AzureBlobLocation], R]): R =
     testWith(
       new AzurePutBlockTransfer(blockSize = blockSize)
     )
@@ -143,10 +153,14 @@ class AzurePutBlockTransferTest
     it("copies an object whose size is an exact multiple of blockSize") {
       withNamespacePair {
         case (srcNamespace, dstNamespace) =>
-          val src = createSrcLocation(srcNamespace)
           val dst = createDstLocation(dstNamespace)
 
           val t = Record(randomAlphanumeric(length = blockSize * 10))
+
+          val src = SourceS3Object(
+            location = createS3ObjectLocationWith(bucket = srcNamespace),
+            size = getSizeOf(t)
+          )
 
           withContext { implicit context =>
             withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
@@ -169,11 +183,15 @@ class AzurePutBlockTransferTest
     it("copies an object whose size is not an exact multiple of blockSize") {
       withNamespacePair {
         case (srcNamespace, dstNamespace) =>
-          val src = createSrcLocation(srcNamespace)
           val dst = createDstLocation(dstNamespace)
 
           assert(blockSize > 1)
           val t = Record(randomAlphanumeric(length = blockSize * 10 + 1))
+
+          val src = SourceS3Object(
+            location = createS3ObjectLocationWith(bucket = srcNamespace),
+            size = getSizeOf(t)
+          )
 
           withContext { implicit context =>
             withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
@@ -197,7 +215,10 @@ class AzurePutBlockTransferTest
   it("skips blocks that have already been written") {
     withNamespacePair {
       case (srcBucket, dstContainer) =>
-        val src = createSrcLocation(srcBucket)
+        val src = SourceS3Object(
+          location = createS3ObjectLocationWith(bucket = srcBucket),
+          size = 11
+        )
         val dst = createDstLocation(dstContainer)
 
         stringStore.put(src)("Hello world") shouldBe a[Right[_, _]]
@@ -266,7 +287,9 @@ class AzurePutBlockTransferTest
     it("retries a single flaky error") {
       withNamespacePair {
         case (srcBucket, dstContainer) =>
-          val src = createSrcLocation(srcBucket)
+          val src = SourceS3Object(
+            location = createS3ObjectLocationWith(bucket = srcBucket), size = 11
+          )
           val dst = createDstLocation(dstContainer)
 
           stringStore.put(src)("Hello world") shouldBe a[Right[_, _]]
@@ -289,9 +312,7 @@ class AzurePutBlockTransferTest
           val src = createSrcLocation(srcBucket)
           val dst = createDstLocation(dstContainer)
 
-          S3TypedStore[String].put(
-            S3ObjectLocation(src)
-          )("Hello world") shouldBe a[Right[_, _]]
+          S3TypedStore[String].put(src.location)("Hello world") shouldBe a[Right[_, _]]
 
           val transfer = new AzureFlakyBlockTransfer(maxFailures = Int.MaxValue)
 

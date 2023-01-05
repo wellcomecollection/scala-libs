@@ -36,6 +36,9 @@ trait TransferTestCases[SrcLocation,
   def createSrcLocation(namespace: SrcNamespace): SrcLocation
   def createDstLocation(namespace: DstNamespace): DstLocation
 
+  def createSrcObject(namespace: SrcNamespace): (SrcLocation, T) =
+    (createSrcLocation(namespace), createT)
+
   def withSrcStore[R](initialEntries: Map[SrcLocation, T])(
     testWith: TestWith[SrcStore, R])(implicit context: Context): R
   def withDstStore[R](initialEntries: Map[DstLocation, T])(
@@ -48,10 +51,8 @@ trait TransferTestCases[SrcLocation,
     it("copies an object from a source to a destination") {
       withNamespacePair {
         case (srcNamespace, dstNamespace) =>
-          val src = createSrcLocation(srcNamespace)
+          val (src, t) = createSrcObject(srcNamespace)
           val dst = createDstLocation(dstNamespace)
-
-          val t = createT
 
           withContext { implicit context =>
             withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
@@ -180,10 +181,9 @@ trait TransferTestCases[SrcLocation,
     it("overwrites the destination if checkForExisting=false") {
       withNamespacePair {
         case (srcNamespace, dstNamespace) =>
-          val src = createSrcLocation(srcNamespace)
-          val dst = createDstLocation(dstNamespace)
+          val (src, srcT) = createSrcObject(srcNamespace)
 
-          val srcT = createT
+          val dst = createDstLocation(dstNamespace)
           val dstT = createT
 
           withContext { implicit context =>
