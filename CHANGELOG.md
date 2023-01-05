@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.18.1 - 2023-01-05
+
+Internal refactoring to prepare for the AWS Java V2 SDK for S3.
+
 ## v32.18.0 - 2023-01-05
 
 Remove batchSize from S3ObjectLocationListing.
