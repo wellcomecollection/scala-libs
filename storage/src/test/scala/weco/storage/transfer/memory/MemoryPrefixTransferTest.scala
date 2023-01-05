@@ -163,9 +163,7 @@ class MemoryPrefixTransferTest
   ): R = {
     val prefixTransfer = new MemoryMemoryLocationPrefixTransfer(
       initialEntries = srcStore.entries ++ dstStore.entries) {
-      override def transfer(src: MemoryLocation,
-                            dst: MemoryLocation,
-                            checkForExisting: Boolean = true): TransferEither =
+      override def transfer(src: MemoryLocation, dst: MemoryLocation): TransferEither =
         Left(TransferSourceFailure(src, dst))
     }
 

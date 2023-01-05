@@ -318,38 +318,5 @@ trait PrefixTransferTestCases[SrcLocation,
           }
       }
     }
-
-    it("overwrites an existing object if checkForExisting=false") {
-      withNamespacePair {
-        case (srcNamespace, dstNamespace) =>
-          val srcPrefix = createSrcPrefix(srcNamespace)
-          val dstPrefix = createDstPrefix(dstNamespace)
-
-          val src = createSrcLocationFrom(srcPrefix, suffix = "1.txt")
-          val dst = createDstLocationFrom(dstPrefix, suffix = "1.txt")
-
-          val srcT = createT
-          val dstT = createT
-
-          withContext { implicit context =>
-            withSrcStore(initialEntries = Map(src -> srcT)) { srcStore =>
-              withDstStore(initialEntries = Map(dst -> dstT)) { dstStore =>
-                val result =
-                  withPrefixTransfer(srcStore, dstStore) {
-                    _.transferPrefix(
-                      srcPrefix = srcPrefix,
-                      dstPrefix = dstPrefix,
-                      checkForExisting = false)
-                  }
-
-                result.value shouldBe PrefixTransferSuccess(1)
-
-                srcStore.get(src).value.identifiedT shouldBe srcT
-                dstStore.get(dst).value.identifiedT shouldBe srcT
-              }
-            }
-          }
-      }
-    }
   }
 }
