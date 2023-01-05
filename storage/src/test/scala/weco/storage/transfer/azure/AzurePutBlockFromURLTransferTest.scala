@@ -21,7 +21,6 @@ class AzurePutBlockFromURLTransferTest
     with Matchers
     with S3Fixtures
     with AzureFixtures
-    with AzureTransferFixtures
     with TableDrivenPropertyChecks
     with MockitoSugar {
   val srcStore: S3TypedStore[String] = S3TypedStore[String]
@@ -37,7 +36,7 @@ class AzurePutBlockFromURLTransferTest
           val dst = createAzureBlobLocationWith(dstContainer)
 
           srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
-          val srcSummary = createS3ObjectSummaryFrom(
+          val srcObject = SourceS3Object(
             src,
             size = "Hello world".getBytes().length
           )
@@ -45,8 +44,8 @@ class AzurePutBlockFromURLTransferTest
           dstStore.put(dst)("Hello world") shouldBe a[Right[_, _]]
 
           transfer
-            .transfer(srcSummary, dst, checkForExisting = true)
-            .value shouldBe TransferNoOp(srcSummary, dst)
+            .transfer(srcObject, dst, checkForExisting = true)
+            .value shouldBe TransferNoOp(srcObject, dst)
         }
       }
     }
@@ -58,15 +57,15 @@ class AzurePutBlockFromURLTransferTest
           val dst = createAzureBlobLocationWith(dstContainer)
 
           srcStore.put(src)("hello world") shouldBe a[Right[_, _]]
-          val srcSummary = createS3ObjectSummaryFrom(
+          val srcObject = SourceS3Object(
             src,
             size = "hello world".getBytes().length
           )
           dstStore.put(dst)("HELLO WORLD") shouldBe a[Right[_, _]]
 
           transfer
-            .transfer(srcSummary, dst, checkForExisting = true)
-            .value shouldBe TransferNoOp(srcSummary, dst)
+            .transfer(srcObject, dst, checkForExisting = true)
+            .value shouldBe TransferNoOp(srcObject, dst)
         }
       }
     }
@@ -78,14 +77,14 @@ class AzurePutBlockFromURLTransferTest
           val dst = createAzureBlobLocationWith(dstContainer)
 
           srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
-          val srcSummary = createS3ObjectSummaryFrom(
+          val srcObject = SourceS3Object(
             src,
             size = "Hello world".getBytes().length
           )
           dstStore.put(dst)("Greetings, humans") shouldBe a[Right[_, _]]
 
           transfer
-            .transfer(srcSummary, dst, checkForExisting = true)
+            .transfer(srcObject, dst, checkForExisting = true)
             .left
             .value shouldBe a[TransferOverwriteFailure[_, _]]
         }
@@ -106,9 +105,13 @@ class AzurePutBlockFromURLTransferTest
           val dst = AzureBlobLocation(container.name, key)
 
           srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
+          val srcObject = SourceS3Object(
+            src,
+            size = "Hello world".getBytes().length
+          )
 
           transfer.transfer(
-            src = createS3ObjectSummaryFrom(src),
+            src = srcObject,
             dst = dst,
             checkForExisting = true
           ) shouldBe a[Right[_, _]]
@@ -133,9 +136,13 @@ class AzurePutBlockFromURLTransferTest
         val dst = createAzureBlobLocationWith(container)
 
         srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
+        val srcObject = SourceS3Object(
+          src,
+          size = "Hello world".getBytes().length
+        )
 
         transfer.transfer(
-          src = createS3ObjectSummaryFrom(src),
+          src = srcObject,
           dst = dst,
           checkForExisting = true
         )

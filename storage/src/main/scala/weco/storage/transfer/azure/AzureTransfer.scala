@@ -3,7 +3,6 @@ package weco.storage.transfer.azure
 import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URL
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{
   BlobRange,
@@ -35,7 +34,7 @@ import scala.util.{Failure, Success, Try}
 class AzureSourceTransferException(msg: String) extends RuntimeException(msg)
 
 trait AzureTransfer[Context]
-    extends Transfer[S3ObjectSummary, AzureBlobLocation]
+    extends Transfer[SourceS3Object, AzureBlobLocation]
     with Logging {
   implicit val s3Client: AmazonS3
   implicit val blobServiceClient: BlobServiceClient
@@ -45,18 +44,18 @@ trait AzureTransfer[Context]
   val blockSize: Long
 
   private def runTransfer(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation,
     allowOverwrites: Boolean
-  ): Either[TransferFailure[S3ObjectSummary, AzureBlobLocation], Unit] = {
+  ): Either[TransferFailure[SourceS3Object, AzureBlobLocation], Unit] = {
     for {
 
       context <- getContext(src, dst)
 
       result <- writeBlocks(
-        src = S3ObjectLocation(src),
+        src = src.location,
         dst = dst,
-        s3Length = src.getSize,
+        s3Length = src.size,
         allowOverwrites = allowOverwrites,
         context = context
       ) match {
@@ -69,9 +68,9 @@ trait AzureTransfer[Context]
   }
 
   protected def getContext(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation
-  ): Either[TransferSourceFailure[S3ObjectSummary, AzureBlobLocation], Context]
+  ): Either[TransferSourceFailure[SourceS3Object, AzureBlobLocation], Context]
 
   protected def writeBlockToAzure(
     src: S3ObjectLocation,
@@ -196,7 +195,7 @@ trait AzureTransfer[Context]
     }
 
   override protected def transferWithCheckForExisting(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation
   ): TransferEither =
     getAzureStream(dst) match {
@@ -210,7 +209,7 @@ trait AzureTransfer[Context]
         transferWithOverwrites(src, dst)
 
       case Right(Identified(_, dstStream)) =>
-        val srcObjectLocation = S3ObjectLocation(src)
+        val srcObjectLocation = src.location
         getS3Stream(srcObjectLocation) match {
           // If both the source and the destination exist, we can skip
           // the copy operation.
@@ -255,13 +254,13 @@ trait AzureTransfer[Context]
   }
 
   protected def compare(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation,
     srcStream: InputStream,
     dstStream: InputStream
   ): Either[
-    TransferOverwriteFailure[S3ObjectSummary, AzureBlobLocation],
-    TransferNoOp[S3ObjectSummary, AzureBlobLocation]
+    TransferOverwriteFailure[SourceS3Object, AzureBlobLocation],
+    TransferNoOp[SourceS3Object, AzureBlobLocation]
   ] =
     if (IOUtils.contentEquals(srcStream, dstStream)) {
       Right(TransferNoOp(src, dst))
@@ -270,7 +269,7 @@ trait AzureTransfer[Context]
     }
 
   override protected def transferWithOverwrites(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation
   ): TransferEither =
     runTransfer(src, dst, allowOverwrites = true).map { _ =>
@@ -292,9 +291,9 @@ class AzurePutBlockTransfer(
   private val rangedReader = new S3RangedReader()
 
   override protected def getContext(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation
-  ): Either[TransferSourceFailure[S3ObjectSummary, AzureBlobLocation], Unit] =
+  ): Either[TransferSourceFailure[SourceS3Object, AzureBlobLocation], Unit] =
     Right(())
 
   override protected def writeBlockToAzure(
@@ -342,12 +341,12 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
 ) extends AzureTransfer[URL] {
 
   override protected def getContext(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation
-  ): Either[TransferSourceFailure[S3ObjectSummary, AzureBlobLocation], URL] =
+  ): Either[TransferSourceFailure[SourceS3Object, AzureBlobLocation], URL] =
     s3Uploader
       .getPresignedGetURL(
-        S3ObjectLocation(src),
+        location = src.location,
         expiryLength = signedUrlValidity)
       .left
       .map { readError =>
@@ -371,15 +370,15 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
   }
 
   override protected def compare(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation,
     srcStream: InputStream,
     dstStream: InputStream
   ): Either[
-    TransferOverwriteFailure[S3ObjectSummary, AzureBlobLocation],
-    TransferNoOp[S3ObjectSummary, AzureBlobLocation]
+    TransferOverwriteFailure[SourceS3Object, AzureBlobLocation],
+    TransferNoOp[SourceS3Object, AzureBlobLocation]
   ] =
-    (src.getSize, azureSizeFinder.getSize(dst)) match {
+    (src.size, azureSizeFinder.getSize(dst)) match {
       case (srcSize, Right(dstSize)) if srcSize == dstSize =>
         Right(TransferNoOp(src, dst))
 
@@ -397,11 +396,11 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
     key.endsWith(".")
 
   override def transfer(
-    src: S3ObjectSummary,
+    src: SourceS3Object,
     dst: AzureBlobLocation,
     checkForExisting: Boolean
   ): TransferEither =
-    if (isWeirdKey(src.getKey)) {
+    if (isWeirdKey(src.location.key)) {
       blockTransfer.transfer(src, dst, checkForExisting)
     } else {
       super.transfer(src, dst, checkForExisting)
