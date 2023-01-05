@@ -153,55 +153,5 @@ trait TransferTestCases[SrcLocation,
           }
       }
     }
-
-    it("fails if the source is absent and checkForExisting=false") {
-      withNamespacePair {
-        case (srcNamespace, dstNamespace) =>
-          val src = createSrcLocation(srcNamespace)
-          val dst = createDstLocation(dstNamespace)
-
-          withContext { implicit context =>
-            withSrcStore(initialEntries = Map.empty) { srcStore =>
-              withDstStore(initialEntries = Map.empty) { dstStore =>
-                val result =
-                  withTransfer(srcStore, dstStore) {
-                    _.transfer(src, dst, checkForExisting = false)
-                  }
-
-                result.left.value shouldBe a[TransferSourceFailure[_, _]]
-
-                result.left.value.src shouldBe src
-                result.left.value.dst shouldBe dst
-              }
-            }
-          }
-      }
-    }
-
-    it("overwrites the destination if checkForExisting=false") {
-      withNamespacePair {
-        case (srcNamespace, dstNamespace) =>
-          val (src, srcT) = createSrcObject(srcNamespace)
-
-          val dst = createDstLocation(dstNamespace)
-          val dstT = createT
-
-          withContext { implicit context =>
-            withSrcStore(initialEntries = Map(src -> srcT)) { srcStore =>
-              withDstStore(initialEntries = Map(dst -> dstT)) { dstStore =>
-                val result =
-                  withTransfer(srcStore, dstStore) {
-                    _.transfer(src, dst, checkForExisting = false)
-                  }
-
-                result.value shouldBe TransferPerformed(src, dst)
-
-                srcStore.get(src).value.identifiedT shouldBe srcT
-                dstStore.get(dst).value.identifiedT shouldBe srcT
-              }
-            }
-          }
-      }
-    }
   }
 }

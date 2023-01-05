@@ -43,9 +43,7 @@ class AzurePutBlockFromURLTransferTest
 
           dstStore.put(dst)("Hello world") shouldBe a[Right[_, _]]
 
-          transfer
-            .transfer(srcObject, dst, checkForExisting = true)
-            .value shouldBe TransferNoOp(srcObject, dst)
+          transfer.transfer(srcObject, dst).value shouldBe TransferNoOp(srcObject, dst)
         }
       }
     }
@@ -63,9 +61,7 @@ class AzurePutBlockFromURLTransferTest
           )
           dstStore.put(dst)("HELLO WORLD") shouldBe a[Right[_, _]]
 
-          transfer
-            .transfer(srcObject, dst, checkForExisting = true)
-            .value shouldBe TransferNoOp(srcObject, dst)
+          transfer.transfer(srcObject, dst).value shouldBe TransferNoOp(srcObject, dst)
         }
       }
     }
@@ -83,10 +79,7 @@ class AzurePutBlockFromURLTransferTest
           )
           dstStore.put(dst)("Greetings, humans") shouldBe a[Right[_, _]]
 
-          transfer
-            .transfer(srcObject, dst, checkForExisting = true)
-            .left
-            .value shouldBe a[TransferOverwriteFailure[_, _]]
+          transfer.transfer(srcObject, dst).left.value shouldBe a[TransferOverwriteFailure[_, _]]
         }
       }
     }
@@ -110,11 +103,7 @@ class AzurePutBlockFromURLTransferTest
             size = "Hello world".getBytes().length
           )
 
-          transfer.transfer(
-            src = srcObject,
-            dst = dst,
-            checkForExisting = true
-          ) shouldBe a[Right[_, _]]
+          transfer.transfer(src = srcObject, dst = dst) shouldBe a[Right[_, _]]
 
           dstStore.get(dst).value.identifiedT shouldBe "Hello world"
         }
@@ -141,11 +130,7 @@ class AzurePutBlockFromURLTransferTest
           size = "Hello world".getBytes().length
         )
 
-        transfer.transfer(
-          src = srcObject,
-          dst = dst,
-          checkForExisting = true
-        )
+        transfer.transfer(src = srcObject, dst = dst)
 
         verify(s3Uploader).getPresignedGetURL(src, urlValidity)
       }

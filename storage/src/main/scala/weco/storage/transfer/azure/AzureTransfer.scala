@@ -45,8 +45,7 @@ trait AzureTransfer[Context]
 
   private def runTransfer(
     src: SourceS3Object,
-    dst: AzureBlobLocation,
-    allowOverwrites: Boolean
+    dst: AzureBlobLocation
   ): Either[TransferFailure[SourceS3Object, AzureBlobLocation], Unit] = {
     for {
 
@@ -56,7 +55,6 @@ trait AzureTransfer[Context]
         src = src.location,
         dst = dst,
         s3Length = src.size,
-        allowOverwrites = allowOverwrites,
         context = context
       ) match {
         case Success(_) => Right(())
@@ -172,7 +170,7 @@ trait AzureTransfer[Context]
           }
       }
 
-      blockClient.commitBlockList(identifiers.toList.asJava, allowOverwrites)
+      blockClient.commitBlockList(identifiers.toList.asJava)
     }
   }
 
@@ -194,19 +192,16 @@ trait AzureTransfer[Context]
       case Failure(err) => throw err
     }
 
-  override protected def transferWithCheckForExisting(
-    src: SourceS3Object,
-    dst: AzureBlobLocation
-  ): TransferEither =
+  override def transfer(src: SourceS3Object, dst: AzureBlobLocation): TransferEither =
     getAzureStream(dst) match {
       // If the destination object doesn't exist, we can go ahead and
       // start the transfer.
       case Left(_: NotFoundError) =>
-        transferWithOverwrites(src, dst)
+        runTransfer(src, dst).map { _ => TransferPerformed(src, dst) }
 
       case Left(e) =>
         warn(s"Unexpected error retrieving Azure blob from $dst: $e")
-        transferWithOverwrites(src, dst)
+        runTransfer(src, dst).map { _ => TransferPerformed(src, dst) }
 
       case Right(Identified(_, dstStream)) =>
         val srcObjectLocation = src.location
@@ -266,14 +261,6 @@ trait AzureTransfer[Context]
       Right(TransferNoOp(src, dst))
     } else {
       Left(TransferOverwriteFailure(src, dst))
-    }
-
-  override protected def transferWithOverwrites(
-    src: SourceS3Object,
-    dst: AzureBlobLocation
-  ): TransferEither =
-    runTransfer(src, dst, allowOverwrites = true).map { _ =>
-      TransferPerformed(src, dst)
     }
 }
 
@@ -395,15 +382,11 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
   private def isWeirdKey(key: String): Boolean =
     key.endsWith(".")
 
-  override def transfer(
-    src: SourceS3Object,
-    dst: AzureBlobLocation,
-    checkForExisting: Boolean
-  ): TransferEither =
+  override def transfer(src: SourceS3Object, dst: AzureBlobLocation): TransferEither =
     if (isWeirdKey(src.location.key)) {
-      blockTransfer.transfer(src, dst, checkForExisting)
+      blockTransfer.transfer(src, dst)
     } else {
-      super.transfer(src, dst, checkForExisting)
+      super.transfer(src, dst)
     }
 }
 

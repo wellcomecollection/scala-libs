@@ -20,7 +20,6 @@ trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
     iterator: Iterable[SrcLocation],
     srcPrefix: SrcPrefix,
     dstPrefix: DstPrefix,
-    checkForExisting: Boolean
   ): Either[PrefixTransferIncomplete, PrefixTransferSuccess] = {
     var successes = 0
     var failures = 0
@@ -38,8 +37,7 @@ trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
                   srcPrefix = srcPrefix,
                   dstPrefix = dstPrefix,
                   srcLocation = srcLocation
-                ),
-                checkForExisting = checkForExisting
+                )
               )
             )
           }
@@ -63,8 +61,7 @@ trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
 
   def transferPrefix(
     srcPrefix: SrcPrefix,
-    dstPrefix: DstPrefix,
-    checkForExisting: Boolean = true
+    dstPrefix: DstPrefix
   ): Either[PrefixTransferFailure, PrefixTransferSuccess] = {
     listing.list(srcPrefix) match {
       case Left(error) =>
@@ -74,8 +71,7 @@ trait PrefixTransfer[SrcPrefix, SrcLocation, DstPrefix, DstLocation]
         copyPrefix(
           iterator = iterable,
           srcPrefix = srcPrefix,
-          dstPrefix = dstPrefix,
-          checkForExisting = checkForExisting
+          dstPrefix = dstPrefix
         )
     }
   }

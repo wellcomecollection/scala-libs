@@ -24,13 +24,7 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
 
   import weco.storage.RetryOps._
 
-  override def transferWithOverwrites(src: S3ObjectLocation,
-                                      dst: S3ObjectLocation): TransferEither =
-    runTransfer(src, dst)
-
-  override def transferWithCheckForExisting(
-    src: S3ObjectLocation,
-    dst: S3ObjectLocation): TransferEither =
+  override def transfer(src: S3ObjectLocation, dst: S3ObjectLocation): TransferEither =
     getStream(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and
@@ -40,11 +34,11 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
       // a 500 error, in a bag with multiple 20GB+ files, so we do need
       // to be able to retry failures here.
       case Left(_: NotFoundError) =>
-        transferWithOverwrites(src, dst)
+        runTransfer(src, dst)
 
       case Left(e) =>
         warn(s"Unexpected error retrieving S3 object from $dst: $e")
-        transferWithOverwrites(src, dst)
+        runTransfer(src, dst)
 
       case Right(dstStream) =>
         getStream(src) match {
@@ -96,7 +90,7 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
     s3Readable.get(location).map(id => id.identifiedT)
 
   private def runTransfer(src: S3ObjectLocation,
-                          dst: S3ObjectLocation): TransferEither = {
+                          dst: S3ObjectLocation): TransferEither =
     for {
       transfer <- tryCopyFromSource(src, dst)
         .retry(maxAttempts = 3)
@@ -107,7 +101,6 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
         .left
         .map(err => TransferDestinationFailure(src, dst, err.e))
     } yield result
-  }
 
   private def tryCopyFromSource(src: S3ObjectLocation,
                                 dst: S3ObjectLocation) = {
@@ -130,14 +123,13 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
 
   private def tryCopyToDestination(src: S3ObjectLocation,
                                    dst: S3ObjectLocation,
-                                   transfer: Copy) = {
+                                   transfer: Copy) =
     Try {
       transfer.waitForCopyResult()
     } match {
       case Success(_)   => Right(TransferPerformed(src, dst))
       case Failure(err) => Left(S3Errors.readErrors(err))
     }
-  }
 }
 
 object S3Transfer {
