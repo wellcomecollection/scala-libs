@@ -121,27 +121,37 @@ trait S3Fixtures
 
           listKeysInBucket(bucket).foreach { key =>
             safeCleanup(key) { _ =>
-              val deleteObjectRequest =
-                DeleteObjectRequest.builder()
-                  .bucket(bucket.name)
-                  .key(key)
-                  .build()
-
-              s3ClientV2.deleteObject(deleteObjectRequest)
+              deleteObject(
+                S3ObjectLocation(bucket = bucket.name, key = key)
+              )
             }
           }
 
-          val deleteBucketRequest =
-            DeleteBucketRequest.builder()
-              .bucket(bucket.name)
-              .build()
-
-          s3ClientV2.deleteBucket(deleteBucketRequest)
+          deleteBucket(bucket)
         } else {
           info(s"Trying to clean up ${bucket.name}, bucket does not exist.")
         }
       }
     )
+
+  def deleteBucket(bucket: Bucket): Unit = {
+    val deleteBucketRequest =
+      DeleteBucketRequest.builder()
+        .bucket(bucket.name)
+        .build()
+
+    s3ClientV2.deleteBucket(deleteBucketRequest)
+  }
+
+  def deleteObject(location: S3ObjectLocation): Unit = {
+    val deleteObjectRequest =
+      DeleteObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    s3ClientV2.deleteObject(deleteObjectRequest)
+  }
 
   def getContentFromS3(location: S3ObjectLocation): String = {
     val getRequest =
@@ -165,6 +175,18 @@ trait S3Fixtures
   def getObjectFromS3[T](location: S3ObjectLocation)(
     implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(location)).get
+
+  def putString(location: S3ObjectLocation, contents: String): Unit = {
+    val putRequest =
+      PutObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    val requestBody = RequestBody.fromString(contents)
+
+    s3ClientV2.putObject(putRequest, requestBody)
+  }
 
   def putStream(
     location: S3ObjectLocation,

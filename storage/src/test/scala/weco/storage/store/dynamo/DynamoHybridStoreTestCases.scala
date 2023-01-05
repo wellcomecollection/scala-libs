@@ -258,7 +258,7 @@ trait DynamoHybridStoreTestCases[
                     val indexedEntry = indexedStore.get(id).value
                     val s3Location = indexedEntry.identifiedT
 
-                    s3Client.deleteObject(s3Location.bucket, s3Location.key)
+                    deleteObject(s3Location)
 
                     val value = hybridStore.get(id).left.value
 
@@ -288,8 +288,8 @@ trait DynamoHybridStoreTestCases[
                     val indexedEntry = indexedStore.get(id).value
                     val s3Location = indexedEntry.identifiedT
 
-                    s3Client.deleteObject(s3Location.bucket, s3Location.key)
-                    s3Client.deleteBucket(s3Location.bucket)
+                    deleteObject(s3Location)
+                    deleteBucket(bucket)
 
                     val value = hybridStore.get(id).left.value
 

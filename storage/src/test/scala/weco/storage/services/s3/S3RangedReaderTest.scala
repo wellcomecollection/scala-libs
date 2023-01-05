@@ -18,7 +18,7 @@ class S3RangedReaderTest
     createS3ObjectLocationWith(bucket)
 
   override def writeString(location: S3ObjectLocation, contents: String): Unit =
-    s3Client.putObject(location.bucket, location.key, contents)
+    putString(location, contents)
 
   override def withRangedReader[R](
     testWith: TestWith[RangedReader[S3ObjectLocation], R]

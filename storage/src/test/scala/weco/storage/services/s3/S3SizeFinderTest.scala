@@ -1,8 +1,10 @@
 package weco.storage.services.s3
 
-import com.amazonaws.services.s3.model._
+import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.model.{PutObjectRequest, StorageClass}
 import weco.fixtures.TestWith
 import weco.storage.DoesNotExistError
 import weco.storage.fixtures.S3Fixtures
@@ -32,7 +34,7 @@ class S3SizeFinderTest
   override def createObject(location: S3ObjectLocation, contents: String)(
     implicit context: Bucket
   ): Unit =
-    s3Client.putObject(location.bucket, location.key, contents)
+    putString(location, contents)
 
   it("fails if the prefix is for a non-existent S3 bucket") {
     val sizeFinder = new S3SizeFinder()
@@ -57,14 +59,16 @@ class S3SizeFinderTest
 
       val inputStream = createInputStream()
 
-      s3Client.putObject(
-        new PutObjectRequest(
-          location.bucket,
-          location.key,
-          inputStream,
-          new ObjectMetadata()
-        ).withStorageClass(StorageClass.Glacier)
-      )
+      val putRequest =
+        PutObjectRequest.builder()
+          .bucket(location.bucket)
+          .key(location.key)
+          .storageClass(StorageClass.GLACIER)
+          .build()
+
+      val requestBody = RequestBody.fromInputStream(inputStream, inputStream.length)
+
+      s3ClientV2.putObject(putRequest, requestBody)
 
       val spyClient = spy(s3Client)
 

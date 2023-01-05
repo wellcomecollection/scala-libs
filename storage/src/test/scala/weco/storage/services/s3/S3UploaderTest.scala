@@ -2,15 +2,15 @@ package weco.storage.services.s3
 
 import java.io.IOException
 import java.net.URL
-import java.util.Date
-
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest
 import weco.storage._
 import weco.storage.fixtures.S3Fixtures
 import weco.storage.s3.S3ObjectLocation
 
+import java.time.Instant
 import scala.concurrent.duration._
 import scala.io.Source
 
@@ -104,7 +104,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
       newUrl shouldNot equal(url)
 
       lastModified shouldNot equal(newLastModified)
-      newLastModified.after(lastModified) shouldBe true
+      newLastModified should be >= lastModified
 
       getUrl(newUrl) shouldBe content
     }
@@ -162,8 +162,13 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
   def getUrl(url: URL): String =
     Source.fromURL(url).mkString
 
-  def getLastModified(location: S3ObjectLocation): Date =
-    s3Client
-      .getObjectMetadata(location.bucket, location.key)
-      .getLastModified
+  def getLastModified(location: S3ObjectLocation): Instant = {
+    val request =
+      HeadObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    s3ClientV2.headObject(request).lastModified()
+  }
 }
