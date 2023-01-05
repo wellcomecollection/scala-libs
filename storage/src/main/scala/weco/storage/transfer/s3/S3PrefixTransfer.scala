@@ -1,6 +1,6 @@
 package weco.storage.transfer.s3
 
-import com.amazonaws.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.S3Client
 import weco.storage.listing.s3.S3ObjectLocationListing
 import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.transfer.PrefixTransfer
@@ -26,7 +26,7 @@ class S3PrefixTransfer()(
 }
 
 object S3PrefixTransfer {
-  def apply()(implicit s3Client: AmazonS3): S3PrefixTransfer = {
+  def apply()(implicit s3Client: S3Client): S3PrefixTransfer = {
     implicit val transfer: S3Transfer = S3Transfer.apply
     implicit val listing: S3ObjectLocationListing = S3ObjectLocationListing()
 

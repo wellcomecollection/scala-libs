@@ -2,7 +2,6 @@ package weco.storage.s3
 
 import java.nio.file.Paths
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import io.circe.{Decoder, DecodingFailure, HCursor}
 import weco.storage.{Location, Prefix}
 
@@ -111,12 +110,6 @@ case object S3ObjectLocation extends S3Decodable {
       (bucket: String, key: String) =>
         S3ObjectLocation(bucket = bucket, key = key)
     }
-
-  def apply(summary: S3ObjectSummary): S3ObjectLocation =
-    S3ObjectLocation(
-      bucket = summary.getBucketName,
-      key = summary.getKey
-    )
 }
 
 case object S3ObjectLocationPrefix extends S3Decodable {

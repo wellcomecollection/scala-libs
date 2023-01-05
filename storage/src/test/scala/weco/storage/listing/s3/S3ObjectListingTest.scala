@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary
 import org.scalatest.Assertion
 import weco.storage.s3.S3ObjectLocation
 
-class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
+class S3ObjectListingTest extends S3ListingTestCases[S3ObjectSummary] {
   override def assertResultCorrect(
     result: Iterable[S3ObjectSummary],
     entries: Seq[S3ObjectLocation]): Assertion = {
@@ -18,5 +18,5 @@ class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
   }
 
   override def createS3Listing(implicit s3Client: AmazonS3 = s3Client): S3Listing[S3ObjectSummary] =
-    new S3ObjectSummaryListing()
+    new S3ObjectListing()
 }

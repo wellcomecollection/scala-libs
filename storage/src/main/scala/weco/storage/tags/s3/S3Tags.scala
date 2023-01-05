@@ -1,7 +1,7 @@
 package weco.storage.tags.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model._
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{GetObjectTaggingRequest, PutObjectTaggingRequest, Tag, Tagging}
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.RetryableReadable
 import weco.storage.tags.Tags
@@ -10,18 +10,22 @@ import weco.storage._
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
+class S3Tags(val maxRetries: Int = 3)(implicit s3Client: S3Client)
     extends Tags[S3ObjectLocation]
     with RetryableReadable[S3ObjectLocation, Map[String, String]] {
 
   override protected def retryableGetFunction(
     location: S3ObjectLocation): Map[String, String] = {
-    val request = new GetObjectTaggingRequest(location.bucket, location.key)
+    val request =
+      GetObjectTaggingRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
 
     val response = s3Client.getObjectTagging(request)
 
-    response.getTagSet.asScala.map { tag: Tag =>
-      tag.getKey -> tag.getValue
+    response.tagSet().asScala.map { tag: Tag =>
+      tag.key() -> tag.value()
     }.toMap
   }
 
@@ -44,18 +48,24 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     location: S3ObjectLocation,
     tags: Map[String, String]): Either[WriteError, Map[String, String]] = {
     val tagSet = tags
-      .map { case (k, v) => new Tag(k, v) }
+      .map { case (k, v) => Tag.builder().key(k).value(v).build() }
       .toSeq
       .asJava
 
-    val request = new SetObjectTaggingRequest(
-      location.bucket,
-      location.key,
-      new ObjectTagging(tagSet)
-    )
+    val tagging =
+      Tagging.builder()
+        .tagSet(tagSet)
+        .build()
+
+    val request =
+      PutObjectTaggingRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .tagging(tagging)
+        .build()
 
     Try {
-      s3Client.setObjectTagging(request)
+      s3Client.putObjectTagging(request)
     } match {
       case Success(_)   => Right(tags)
       case Failure(err) => Left(S3Errors.writeErrors(err))
