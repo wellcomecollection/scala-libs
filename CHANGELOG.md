@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v32.18.0 - 2023-01-05
+
+Remove batchSize from S3ObjectLocationListing.
+
+This is never set to a non-default value, so there should be no impact on downstream code.
+
+Also contains some refactoring ahead of upgrading to the AWS Java V2 SDK for S3.
+
 ## v32.17.2 - 2022-11-09
 
 This is some refactoring in the scala-libs build system; there are no changes to the library itself.
