@@ -191,16 +191,21 @@ trait AzureTransfer[Context]
       case Failure(err) => throw err
     }
 
-  override def transfer(src: SourceS3Object, dst: AzureBlobLocation): TransferEither =
+  override def transfer(src: SourceS3Object,
+                        dst: AzureBlobLocation): TransferEither =
     getAzureStream(dst) match {
       // If the destination object doesn't exist, we can go ahead and
       // start the transfer.
       case Left(_: NotFoundError) =>
-        runTransfer(src, dst).map { _ => TransferPerformed(src, dst) }
+        runTransfer(src, dst).map { _ =>
+          TransferPerformed(src, dst)
+        }
 
       case Left(e) =>
         warn(s"Unexpected error retrieving Azure blob from $dst: $e")
-        runTransfer(src, dst).map { _ => TransferPerformed(src, dst) }
+        runTransfer(src, dst).map { _ =>
+          TransferPerformed(src, dst)
+        }
 
       case Right(Identified(_, dstStream)) =>
         val srcObjectLocation = src.location
@@ -381,7 +386,8 @@ class AzurePutBlockFromUrlTransfer(s3Uploader: S3Uploader,
   private def isWeirdKey(key: String): Boolean =
     key.endsWith(".")
 
-  override def transfer(src: SourceS3Object, dst: AzureBlobLocation): TransferEither =
+  override def transfer(src: SourceS3Object,
+                        dst: AzureBlobLocation): TransferEither =
     if (isWeirdKey(src.location.key)) {
       blockTransfer.transfer(src, dst)
     } else {

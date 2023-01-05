@@ -24,7 +24,8 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
 
   import weco.storage.RetryOps._
 
-  override def transfer(src: S3ObjectLocation, dst: S3ObjectLocation): TransferEither =
+  override def transfer(src: S3ObjectLocation,
+                        dst: S3ObjectLocation): TransferEither =
     getStream(dst) match {
 
       // If the destination object doesn't exist, we can go ahead and
