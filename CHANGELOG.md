@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v32.19.0 - 2023-01-05
+
+Remove the `checkForExisting` flag from Transfer and TransferPrefix.
+
+These classes will now *always* check for an existing object before overwriting it.
+
 ## v32.18.1 - 2023-01-05
 
 Internal refactoring to prepare for the AWS Java V2 SDK for S3.
