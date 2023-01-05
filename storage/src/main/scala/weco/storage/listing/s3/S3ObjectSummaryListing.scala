@@ -10,7 +10,8 @@ import weco.storage.s3.S3ObjectLocationPrefix
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3ObjectSummaryListing()(implicit s3Client: AmazonS3) extends S3Listing[S3ObjectSummary]
+class S3ObjectSummaryListing()(implicit s3Client: AmazonS3)
+    extends S3Listing[S3ObjectSummary]
     with Logging {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult = {
     if (!prefix.keyPrefix.endsWith("/") && prefix.keyPrefix != "") {
