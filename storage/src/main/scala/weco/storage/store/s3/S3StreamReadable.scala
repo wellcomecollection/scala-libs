@@ -1,6 +1,7 @@
 package weco.storage.store.s3
 
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.GetObjectRequest
 import weco.storage._
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.RetryableReadable
@@ -12,7 +13,9 @@ trait S3StreamReadable
 
   override protected def retryableGetFunction(
     location: S3ObjectLocation): InputStreamWithLength = {
-    val retrievedObject = s3Client.getObject(location.bucket, location.key)
+    val getRequest = new GetObjectRequest(location.bucket, location.key)
+
+    val retrievedObject = s3Client.getObject(getRequest)
 
     new InputStreamWithLength(
       retrievedObject.getObjectContent,
