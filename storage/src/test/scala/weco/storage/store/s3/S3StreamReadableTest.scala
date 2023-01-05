@@ -1,7 +1,7 @@
 package weco.storage.store.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.EitherValues
@@ -39,7 +39,8 @@ class S3StreamReadableTest
 
       readable.get(location).left.value shouldBe a[DoesNotExistError]
 
-      verify(spyClient, times(1)).getObject(location.bucket, location.key)
+      verify(spyClient, times(1))
+        .getObject(new GetObjectRequest(location.bucket, location.key))
     }
   }
 
@@ -50,14 +51,14 @@ class S3StreamReadableTest
       val location = createS3ObjectLocationWith(bucket)
       putStream(location)
 
-      when(mockClient.getObject(any[String], any[String]))
+      when(mockClient.getObject(any[GetObjectRequest]))
         .thenThrow(s3ServerException)
-        .thenReturn(s3Client.getObject(location.bucket, location.key))
+        .thenReturn(s3Client.getObject(new GetObjectRequest(location.bucket, location.key)))
 
       val readable = createS3ReadableWith(mockClient, retries = 3)
       readable.get(location) shouldBe a[Right[_, _]]
 
-      verify(mockClient, times(2)).getObject(location.bucket, location.key)
+      verify(mockClient, times(2)).getObject(new GetObjectRequest(location.bucket, location.key))
     }
   }
 
@@ -68,7 +69,7 @@ class S3StreamReadableTest
 
     val retries = 4
 
-    when(mockClient.getObject(any[String], any[String]))
+    when(mockClient.getObject(any[GetObjectRequest]))
       .thenThrow(s3ServerException)
       .thenThrow(s3ServerException)
       .thenThrow(s3ServerException)
@@ -77,7 +78,7 @@ class S3StreamReadableTest
     val readable = createS3ReadableWith(mockClient, retries = retries)
     readable.get(location).left.value shouldBe a[StoreReadError]
 
-    verify(mockClient, times(retries)).getObject(location.bucket, location.key)
+    verify(mockClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
   }
 
   it("retries if it's unable to connect to S3") {
@@ -93,7 +94,7 @@ class S3StreamReadableTest
 
       readable.get(location).left.value shouldBe a[StoreReadError]
 
-      verify(spyClient, times(retries)).getObject(location.bucket, location.key)
+      verify(spyClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
     }
   }
 
@@ -110,7 +111,7 @@ class S3StreamReadableTest
 
       readable.get(location).left.value shouldBe a[StoreReadError]
 
-      verify(spyClient, times(retries)).getObject(location.bucket, location.key)
+      verify(spyClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
     }
   }
 }

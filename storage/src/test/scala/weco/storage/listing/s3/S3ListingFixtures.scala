@@ -33,6 +33,5 @@ trait S3ListingFixtures[ListingResult]
       testWith(bucket)
     }
 
-  def createS3Listing(batchSize: Int = 1000)(
-    implicit s3Client: AmazonS3 = s3Client): S3Listing[ListingResult]
+  def createS3Listing(implicit s3Client: AmazonS3 = s3Client): S3Listing[ListingResult]
 }

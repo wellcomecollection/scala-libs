@@ -29,9 +29,9 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: AmazonS3)
     } match {
       case Success(length) => length
       case Failure(_) =>
-        val s3Object = s3Client.getObject(
-          new GetObjectRequest(location.bucket, location.key)
-        )
+        val getRequest = new GetObjectRequest(location.bucket, location.key)
+
+        val s3Object = s3Client.getObject(getRequest)
         val metadata = s3Object.getObjectMetadata
         val contentLength = metadata.getContentLength
 

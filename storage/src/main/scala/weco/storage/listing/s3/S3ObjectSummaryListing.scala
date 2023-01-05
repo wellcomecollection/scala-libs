@@ -10,9 +10,8 @@ import weco.storage.s3.S3ObjectLocationPrefix
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-class S3ObjectSummaryListing(batchSize: Int = 1000)(
-  implicit s3Client: AmazonS3
-) extends S3Listing[S3ObjectSummary]
+class S3ObjectSummaryListing()(implicit s3Client: AmazonS3)
+    extends S3Listing[S3ObjectSummary]
     with Logging {
   override def list(prefix: S3ObjectLocationPrefix): ListingResult = {
     if (!prefix.keyPrefix.endsWith("/") && prefix.keyPrefix != "") {
@@ -30,7 +29,6 @@ class S3ObjectSummaryListing(batchSize: Int = 1000)(
           prefix.bucket,
           prefix.keyPrefix
         )
-        .withBatchSize(batchSize)
         .asScala
 
       // Because the iterator is lazy, it won't make the initial call to S3 until

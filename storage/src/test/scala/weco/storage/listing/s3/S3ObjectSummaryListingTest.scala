@@ -17,7 +17,6 @@ class S3ObjectSummaryListingTest extends S3ListingTestCases[S3ObjectSummary] {
     actualLocations should contain theSameElementsAs entries
   }
 
-  override def createS3Listing(batchSize: Int = 1000)(
-    implicit s3Client: AmazonS3 = s3Client): S3Listing[S3ObjectSummary] =
-    new S3ObjectSummaryListing(batchSize)
+  override def createS3Listing(implicit s3Client: AmazonS3 = s3Client): S3Listing[S3ObjectSummary] =
+    new S3ObjectSummaryListing()
 }
