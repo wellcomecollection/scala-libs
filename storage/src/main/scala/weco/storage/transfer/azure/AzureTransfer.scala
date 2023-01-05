@@ -83,7 +83,6 @@ trait AzureTransfer[Context]
     src: S3ObjectLocation,
     dst: AzureBlobLocation,
     s3Length: Long,
-    allowOverwrites: Boolean,
     context: Context
   ): Try[Unit] = {
     val blockClient = blobServiceClient
