@@ -6,7 +6,6 @@ import weco.fixtures.TestWith
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.listing.ListingTestCases
 import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
-import weco.storage.fixtures.S3Fixtures.Bucket
 
 trait S3ListingTestCases[ListingResult]
     extends ListingTestCases[
