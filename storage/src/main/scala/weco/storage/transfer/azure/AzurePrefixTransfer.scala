@@ -28,7 +28,8 @@ class AzurePrefixTransfer(
         underlying.list(prefix).map { iterable =>
           iterable.map { s3Obj: S3Object =>
             SourceS3Object(
-              location = S3ObjectLocation(bucket = prefix.bucket, key = s3Obj.key()),
+              location =
+                S3ObjectLocation(bucket = prefix.bucket, key = s3Obj.key()),
               size = s3Obj.size()
             )
           }

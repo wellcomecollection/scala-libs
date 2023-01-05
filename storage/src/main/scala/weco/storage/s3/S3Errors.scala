@@ -2,7 +2,14 @@ package weco.storage.s3
 
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
-import weco.storage.{DoesNotExistError, ReadError, RetryableError, StoreReadError, StoreWriteError, WriteError}
+import weco.storage.{
+  DoesNotExistError,
+  ReadError,
+  RetryableError,
+  StoreReadError,
+  StoreWriteError,
+  WriteError
+}
 
 import java.net.SocketTimeoutException
 

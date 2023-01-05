@@ -1,7 +1,12 @@
 package weco.storage.tags.s3
 
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{GetObjectTaggingRequest, PutObjectTaggingRequest, Tag, Tagging}
+import software.amazon.awssdk.services.s3.model.{
+  GetObjectTaggingRequest,
+  PutObjectTaggingRequest,
+  Tag,
+  Tagging
+}
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.RetryableReadable
 import weco.storage.tags.Tags
@@ -17,16 +22,21 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: S3Client)
   override protected def retryableGetFunction(
     location: S3ObjectLocation): Map[String, String] = {
     val request =
-      GetObjectTaggingRequest.builder()
+      GetObjectTaggingRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
 
     val response = s3Client.getObjectTagging(request)
 
-    response.tagSet().asScala.map { tag: Tag =>
-      tag.key() -> tag.value()
-    }.toMap
+    response
+      .tagSet()
+      .asScala
+      .map { tag: Tag =>
+        tag.key() -> tag.value()
+      }
+      .toMap
   }
 
   override protected def buildGetError(throwable: Throwable): ReadError =
@@ -53,12 +63,14 @@ class S3Tags(val maxRetries: Int = 3)(implicit s3Client: S3Client)
       .asJava
 
     val tagging =
-      Tagging.builder()
+      Tagging
+        .builder()
         .tagSet(tagSet)
         .build()
 
     val request =
-      PutObjectTaggingRequest.builder()
+      PutObjectTaggingRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .tagging(tagging)

@@ -2,7 +2,11 @@ package weco.storage.listing.s3
 
 import grizzled.slf4j.Logging
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{ListObjectsV2Request, ListObjectsV2Response, S3Object}
+import software.amazon.awssdk.services.s3.model.{
+  ListObjectsV2Request,
+  ListObjectsV2Response,
+  S3Object
+}
 import weco.storage.ListingFailure
 import weco.storage.s3.S3ObjectLocationPrefix
 
@@ -23,7 +27,8 @@ class S3ObjectListing()(implicit s3Client: S3Client)
 
     Try {
       val listRequest =
-        ListObjectsV2Request.builder()
+        ListObjectsV2Request
+          .builder()
           .bucket(prefix.bucket)
           .prefix(prefix.keyPrefix)
           .build()
