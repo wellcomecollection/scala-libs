@@ -1,7 +1,7 @@
 package weco.storage.tags.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model._
+import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectTaggingRequest, GetObjectTaggingResult, ObjectTagging, SetObjectTaggingRequest, Tag => TagV1}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
@@ -9,6 +9,7 @@ import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
+import software.amazon.awssdk.services.s3.model.{PutObjectTaggingRequest, Tag, Tagging}
 import weco.fixtures.TestWith
 import weco.storage.fixtures.S3Fixtures
 import weco.storage.fixtures.S3Fixtures.Bucket
@@ -37,17 +38,21 @@ class S3TagsTest
           putStream(location)
 
           val tagSet = tags
-            .map { case (k, v) => new Tag(k, v) }
+            .map { case (k, v) => Tag.builder().key(k).value(v).build() }
             .toSeq
             .asJava
 
-          s3Client.setObjectTagging(
-            new SetObjectTaggingRequest(
-              location.bucket,
-              location.key,
-              new ObjectTagging(tagSet)
-            )
-          )
+          val tagging = Tagging.builder()
+            .tagSet(tagSet)
+            .build()
+
+          val request = PutObjectTaggingRequest.builder()
+            .bucket(location.bucket)
+            .key(location.key)
+            .tagging(tagging)
+            .build()
+
+          s3ClientV2.putObjectTagging(request)
       }
 
     testWith(new S3Tags())
@@ -192,7 +197,7 @@ class S3TagsTest
               new SetObjectTaggingRequest(
                 location.bucket,
                 location.key,
-                new ObjectTagging(Seq(new Tag("colour", "red")).asJava)
+                new ObjectTagging(Seq(new TagV1("colour", "red")).asJava)
               )
             )
           )

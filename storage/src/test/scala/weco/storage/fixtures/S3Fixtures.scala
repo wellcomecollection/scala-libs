@@ -2,12 +2,6 @@ package weco.storage.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.s3.iterable.S3Objects
-import com.amazonaws.services.s3.model.{
-  ObjectMetadata,
-  PutObjectRequest,
-  S3ObjectSummary
-}
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import grizzled.slf4j.Logging
 import io.circe.parser.parse
@@ -15,6 +9,13 @@ import io.circe.{Decoder, Json}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
+import software.amazon.awssdk.auth.credentials.{
+  AwsBasicCredentials,
+  StaticCredentialsProvider
+}
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model._
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}
@@ -22,7 +23,9 @@ import weco.storage.s3.{S3Config, S3ObjectLocation}
 import weco.storage.streaming.Codec._
 import weco.storage.streaming.InputStreamWithLength
 
+import java.net.URI
 import scala.collection.JavaConverters._
+import scala.util.{Failure, Success, Try}
 
 object S3Fixtures {
   class Bucket(val name: String) extends AnyVal {
@@ -57,46 +60,111 @@ trait S3Fixtures
         new EndpointConfiguration(endpoint, "localhost"))
       .build()
 
+  def createS3ClientV2WithEndpoint(endpoint: String): S3Client =
+    S3Client.builder()
+      .credentialsProvider(
+        StaticCredentialsProvider.create(
+          AwsBasicCredentials.create("accessKey1", "verySecretKey1"))
+      )
+      .forcePathStyle(true)
+      .endpointOverride(new URI(endpoint))
+      .build()
+
   implicit val s3Client: AmazonS3 =
     createS3ClientWithEndpoint(s"http://localhost:$s3Port")
 
   val brokenS3Client: AmazonS3 =
     createS3ClientWithEndpoint("http://nope.nope")
 
+  implicit val s3ClientV2: S3Client =
+    createS3ClientV2WithEndpoint(s"http://localhost:$s3Port")
+
+  val brokenS3ClientV2: S3Client =
+    createS3ClientV2WithEndpoint("http://nope.nope")
+
+  private def doesBucketExist(bucketName: String): Boolean = {
+    // This is based on a method called doesBucketExistV2 in the V1 Java SDK,
+    // which used GetBucketAcl under the hood to check if a bucket existed.
+    val request =
+      GetBucketAclRequest.builder()
+        .bucket(bucketName)
+        .build()
+
+    Try { s3ClientV2.getBucketAcl(request) } match {
+      case Success(_) => true
+      case Failure(e: S3Exception) if e.statusCode() == 404 => false
+      case Failure(e) => throw e
+    }
+  }
+
   def withLocalS3Bucket[R]: Fixture[Bucket, R] =
     fixture[Bucket, R](
       create = {
         eventually {
-          s3Client.listBuckets().asScala.size should be >= 0
+          s3ClientV2.listBuckets().buckets().asScala.size should be >= 0
         }
         val bucketName: String = createBucketName
-        s3Client.createBucket(bucketName)
-        eventually { s3Client.doesBucketExistV2(bucketName) }
+
+        val request =
+          CreateBucketRequest.builder()
+            .bucket(bucketName)
+            .build()
+
+        s3ClientV2.createBucket(request)
+
+        eventually { doesBucketExist(bucketName) }
 
         Bucket(bucketName)
       },
       destroy = { bucket: Bucket =>
-        if (s3Client.doesBucketExistV2(bucket.name)) {
+        if (doesBucketExist(bucket.name)) {
 
           listKeysInBucket(bucket).foreach { key =>
-            safeCleanup(key) {
-              s3Client.deleteObject(bucket.name, _)
+            safeCleanup(key) { _ =>
+              deleteObject(
+                S3ObjectLocation(bucket = bucket.name, key = key)
+              )
             }
           }
 
-          s3Client.deleteBucket(bucket.name)
+          deleteBucket(bucket)
         } else {
           info(s"Trying to clean up ${bucket.name}, bucket does not exist.")
         }
       }
     )
 
+  def deleteBucket(bucket: Bucket): Unit = {
+    val deleteBucketRequest =
+      DeleteBucketRequest.builder()
+        .bucket(bucket.name)
+        .build()
+
+    s3ClientV2.deleteBucket(deleteBucketRequest)
+  }
+
+  def deleteObject(location: S3ObjectLocation): Unit = {
+    val deleteObjectRequest =
+      DeleteObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    s3ClientV2.deleteObject(deleteObjectRequest)
+  }
+
   def getContentFromS3(location: S3ObjectLocation): String = {
-    val s3Object = s3Client.getObject(location.bucket, location.key)
+    val getRequest =
+      GetObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    val s3Object = s3ClientV2.getObject(getRequest)
 
     val inputStream = new InputStreamWithLength(
-      s3Object.getObjectContent,
-      length = s3Object.getObjectMetadata.getContentLength
+      s3Object,
+      length = s3Object.response().contentLength()
     )
     stringCodec.fromStream(inputStream).value
   }
@@ -108,20 +176,31 @@ trait S3Fixtures
     implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(location)).get
 
+  def putString(location: S3ObjectLocation, contents: String): Unit = {
+    val putRequest =
+      PutObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .build()
+
+    val requestBody = RequestBody.fromString(contents)
+
+    s3ClientV2.putObject(putRequest, requestBody)
+  }
+
   def putStream(
     location: S3ObjectLocation,
     inputStream: InputStreamWithLength = createInputStream()): Unit = {
-    val metadata = new ObjectMetadata()
-    metadata.setContentLength(inputStream.length)
+    val putRequest =
+      PutObjectRequest.builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .contentLength(inputStream.length)
+        .build()
 
-    val putObjectRequest = new PutObjectRequest(
-      location.bucket,
-      location.key,
-      inputStream,
-      metadata
-    )
+    val requestBody = RequestBody.fromInputStream(inputStream, inputStream.length)
 
-    s3Client.putObject(putObjectRequest)
+    s3ClientV2.putObject(putRequest, requestBody)
 
     inputStream.close()
   }
@@ -134,18 +213,19 @@ trait S3Fixtures
     * @param bucket The instance of S3.Bucket to list.
     * @return A list of object keys.
     */
-  def listKeysInBucket(bucket: Bucket): List[String] =
-    S3Objects
-      .inBucket(s3Client, bucket.name)
-      .withBatchSize(1000)
+  def listKeysInBucket(bucket: Bucket): List[String] = {
+    val listRequest =
+      ListObjectsV2Request.builder()
+        .bucket(bucket.name)
+        .build()
+
+    s3ClientV2.listObjectsV2Paginator(listRequest)
       .iterator()
       .asScala
+      .flatMap { resp: ListObjectsV2Response => resp.contents().asScala }
+      .map { s3Obj: S3Object => s3Obj.key() }
       .toList
-      .par
-      .map { objectSummary: S3ObjectSummary =>
-        objectSummary.getKey
-      }
-      .toList
+  }
 
   /** Returns a map (key -> contents) for all objects in an S3 bucket.
     *

@@ -177,6 +177,7 @@ object Dependencies {
   val storageDependencies: Seq[ModuleID] = Seq(
     "com.azure" % "azure-storage-blob" % versions.azure,
     "software.amazon.awssdk" % "dynamodb" % versions.aws,
+    "software.amazon.awssdk" % "s3" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws1
   ) ++
     scanamoDependencies ++
