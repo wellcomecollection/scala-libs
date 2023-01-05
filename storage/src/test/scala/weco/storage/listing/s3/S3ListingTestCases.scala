@@ -23,10 +23,10 @@ trait S3ListingTestCases[ListingResult]
         putStream(loc)
       }
 
-    testWith(createS3Listing())
+    testWith(createS3Listing)
   }
 
-  val listing: S3Listing[ListingResult] = createS3Listing()
+  val listing: S3Listing[ListingResult] = createS3Listing
 
   describe("behaves as an S3 listing") {
     it("throws an exception if asked to list from a non-existent bucket") {
@@ -55,7 +55,7 @@ trait S3ListingTestCases[ListingResult]
     it("handles an error from S3") {
       val prefix = createPrefix
 
-      val brokenListing = createS3Listing()(s3Client = brokenS3Client)
+      val brokenListing = createS3Listing(s3Client = brokenS3Client)
 
       val err = brokenListing.list(prefix).left.value
       err.e.getMessage should startWith("Unable to execute HTTP request")
@@ -72,18 +72,20 @@ trait S3ListingTestCases[ListingResult]
       }
     }
 
-    it("fetches all the objects, not just the batch size") {
+    it("fetches more objects than can be retrieved in a single page") {
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
 
-        val locations = (1 to 10).map { i =>
+        // A single ListObjects API call can return up to 1000 objects
+        // See https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjects.html
+        val locations = (1 to 1001).map { i =>
           location.join(s"file_$i.txt")
         }
         locations.foreach { loc =>
           putStream(loc)
         }
 
-        val smallBatchListing = createS3Listing(batchSize = 5)
+        val smallBatchListing = createS3Listing
         assertResultCorrect(
           smallBatchListing.list(location.asPrefix).value,
           entries = locations

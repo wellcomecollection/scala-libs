@@ -16,10 +16,9 @@ class S3ObjectLocationListing(implicit summaryListing: S3ObjectSummaryListing)
 }
 
 object S3ObjectLocationListing {
-  def apply(batchSize: Int = 1000)(
-    implicit s3Client: AmazonS3): S3ObjectLocationListing = {
+  def apply()(implicit s3Client: AmazonS3): S3ObjectLocationListing = {
     implicit val summaryListing: S3ObjectSummaryListing =
-      new S3ObjectSummaryListing(batchSize)
+      new S3ObjectSummaryListing()
 
     new S3ObjectLocationListing()
   }
