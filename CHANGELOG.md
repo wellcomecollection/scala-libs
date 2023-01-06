@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v32.19.4 - 2023-01-06
+
+Split out creating pre-signed S3 URLs from the S3Uploader class; there's a new S3PresignedUrls class.
+
+This also simplifies the construction of AzurePutBlockFromURLTransfer.
+
+This is more refactoring ahead of the V2 SDK upgrade: you need a different client for pre-signing URLs compared to other operations (`S3Presigner` / `S3Client`), and it makes sense to separate them now.
+
 ## v32.19.3 - 2023-01-06
 
 Replace scality/s3server with zenko/cloudserver as the Docker image used to mimic S3 in tests.
