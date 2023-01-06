@@ -2,6 +2,7 @@ package weco.storage.s3
 
 import com.amazonaws.SdkClientException
 import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.services.s3.model.S3Exception
 import weco.storage.{
   DoesNotExistError,
   ReadError,
@@ -17,8 +18,12 @@ object S3Errors {
   val readErrors: PartialFunction[Throwable, ReadError] = {
     case exc: AmazonS3Exception if exc.getStatusCode == 404 =>
       DoesNotExistError(exc)
+    case exc: S3Exception if exc.statusCode() == 404 =>
+      DoesNotExistError(exc)
 
     case exc: AmazonS3Exception if exc.getStatusCode == 500 =>
+      new StoreReadError(exc) with RetryableError
+    case exc: S3Exception if exc.statusCode() == 500 =>
       new StoreReadError(exc) with RetryableError
 
     // The full error message here is:
