@@ -1,21 +1,22 @@
 package weco.storage.transfer.s3
 
-import java.io.InputStream
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
-import com.amazonaws.services.s3.transfer.{Copy, TransferManager, TransferManagerBuilder}
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
 import software.amazon.awssdk.services.s3.S3Client
-import weco.storage.NotFoundError
+import software.amazon.awssdk.services.s3.model.{CopyObjectRequest, NoSuchKeyException, Tag, Tagging, TaggingDirective}
+import software.amazon.awssdk.transfer.s3.S3TransferManager
+import software.amazon.awssdk.transfer.s3.model.{Copy, CopyRequest}
+import weco.storage.{NotFoundError, ReadError}
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.s3.{S3StreamReadable, S3StreamReader}
 import weco.storage.transfer._
 
 import scala.collection.JavaConverters._
+import java.io.InputStream
+import java.util.concurrent.CompletionException
 import scala.util.{Failure, Success, Try}
 
-class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
+class S3Transfer(implicit transferManager: S3TransferManager, s3Readable: S3StreamReadable)
     extends Transfer[S3ObjectLocation, S3ObjectLocation]
     with Logging {
 
@@ -97,23 +98,43 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
       result <- tryCopyToDestination(src, dst, transfer)
         .retry(maxAttempts = 3)
         .left
-        .map(err => TransferDestinationFailure(src, dst, err.e))
+        .map{
+          // Handle theb case where the source object doesn't exist
+          case err if err.e.isInstanceOf[NoSuchKeyException] =>
+            TransferSourceFailure(src, dst, err.e)
+
+          case err => TransferDestinationFailure(src, dst, err.e)
+        }
     } yield result
 
   private def tryCopyFromSource(src: S3ObjectLocation,
-                                dst: S3ObjectLocation) = {
+                                dst: S3ObjectLocation): Either[ReadError, Copy] = {
     // We use tags in the verifier in the storage service to check if we've already
     // verified an object.  For safety, we drop all the tags every time an object
     // gets rewritten or copied around.
+    val tagging = Tagging.builder().tagSet(List[Tag]().asJava).build()
+
+    val copyObjectRequest =
+      CopyObjectRequest.builder()
+        .sourceBucket(src.bucket)
+        .sourceKey(src.key)
+        .destinationBucket(dst.bucket)
+        .destinationKey(dst.key)
+        .taggingDirective(TaggingDirective.REPLACE)
+        .tagging(tagging)
+        .build()
+
     val copyRequest =
-      new CopyObjectRequest(src.bucket, src.key, dst.bucket, dst.key)
-        .withNewObjectTagging(new ObjectTagging(List().asJava))
+      CopyRequest.builder()
+        .copyObjectRequest(copyObjectRequest)
+        .build()
 
     Try {
-      // This code will throw if the source object doesn't exist.
       transferManager.copy(copyRequest)
     } match {
       case Success(request) => Right(request)
+      case Failure(err: CompletionException) =>
+        Left(S3Errors.readErrors(err.getCause))
       case Failure(err) =>
         Left(S3Errors.readErrors(err))
     }
@@ -123,20 +144,19 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
                                    dst: S3ObjectLocation,
                                    transfer: Copy) =
     Try {
-      transfer.waitForCopyResult()
+      transfer.completionFuture().join()
     } match {
       case Success(_)   => Right(TransferPerformed(src, dst))
+      case Failure(err: CompletionException) =>
+        Left(S3Errors.readErrors(err.getCause))
       case Failure(err) => Left(S3Errors.readErrors(err))
     }
 }
 
 object S3Transfer {
-  def apply(implicit s3Client: AmazonS3, s3ClientV2: S3Client) = {
-    val transferManager: TransferManager = TransferManagerBuilder.standard
-      .withS3Client(s3Client)
-      .build
-    val s3Readable = new S3StreamReader()
+  def apply()(implicit s3Client: S3Client, transferManager: S3TransferManager): S3Transfer = {
+    implicit val readable: S3StreamReader = new S3StreamReader()
 
-    new S3Transfer(transferManager, s3Readable)
+    new S3Transfer()
   }
 }
