@@ -23,13 +23,15 @@ class S3ObjectListing()(implicit s3Client: S3Client)
 
     Try {
       val listRequest =
-        ListObjectsV2Request.builder()
+        ListObjectsV2Request
+          .builder()
           .bucket(prefix.bucket)
           .prefix(prefix.keyPrefix)
           .build()
 
       val iterator =
-        s3Client.listObjectsV2Paginator(listRequest)
+        s3Client
+          .listObjectsV2Paginator(listRequest)
           .contents()
           .iterator()
           .asScala

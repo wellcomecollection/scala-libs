@@ -18,13 +18,15 @@ class S3PresignedUrls(implicit s3Presigner: S3Presigner) {
   ): Either[ReadError, URL] = {
 
     val getRequest =
-      GetObjectRequest.builder()
+      GetObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
 
     val presignRequest =
-      GetObjectPresignRequest.builder()
+      GetObjectPresignRequest
+        .builder()
         .getObjectRequest(getRequest)
         .signatureDuration(JavaTime.Duration.ofSeconds(expiryLength.toSeconds))
         .build()
@@ -33,7 +35,7 @@ class S3PresignedUrls(implicit s3Presigner: S3Presigner) {
       s3Presigner.presignGetObject(presignRequest)
     } match {
       case Success(resp) => Right(resp.url())
-      case Failure(err) => Left(StoreReadError(err))
+      case Failure(err)  => Left(StoreReadError(err))
     }
   }
 }

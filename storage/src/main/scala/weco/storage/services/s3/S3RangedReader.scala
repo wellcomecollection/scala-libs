@@ -30,7 +30,8 @@ class S3RangedReader(implicit s3Client: S3Client)
       }
 
       val getRequest =
-        GetObjectRequest.builder()
+        GetObjectRequest
+          .builder()
           .bucket(location.bucket)
           .key(location.key)
           .range(rangeHeader)

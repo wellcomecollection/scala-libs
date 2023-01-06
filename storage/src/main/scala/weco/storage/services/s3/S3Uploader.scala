@@ -18,7 +18,9 @@ import scala.concurrent.duration.Duration
   * It's based on an example from the AWS SDK for Java docs:
   * https://docs.aws.amazon.com/AmazonS3/latest/dev/ShareObjectPreSignedURLJavaSDK.html
   */
-class S3Uploader(implicit val s3Client: S3Client, s3TransferManager: S3TransferManager, s3Presigner: S3Presigner) {
+class S3Uploader(implicit val s3Client: S3Client,
+                 s3TransferManager: S3TransferManager,
+                 s3Presigner: S3Presigner) {
   import S3ObjectExists._
 
   private val presignedUrls = new S3PresignedUrls()

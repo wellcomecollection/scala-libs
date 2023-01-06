@@ -14,7 +14,8 @@ trait S3StreamReadable
   override protected def retryableGetFunction(
     location: S3ObjectLocation): InputStreamWithLength = {
     val getRequest =
-      GetObjectRequest.builder()
+      GetObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -32,5 +33,4 @@ trait S3StreamReadable
 }
 
 class S3StreamReader(val maxRetries: Int = 2)(implicit val s3Client: S3Client)
-  extends S3StreamReadable
-
+    extends S3StreamReadable

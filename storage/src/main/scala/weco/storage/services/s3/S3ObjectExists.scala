@@ -14,7 +14,8 @@ class S3ObjectExists(s3Client: S3Client)
     location: S3ObjectLocation
   ): Either[StoreReadError, Boolean] = {
     val headRequest =
-      HeadObjectRequest.builder()
+      HeadObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -22,9 +23,9 @@ class S3ObjectExists(s3Client: S3Client)
     Try {
       s3Client.headObject(headRequest)
     } match {
-      case Success(exists) => Right(true)
+      case Success(exists)                                  => Right(true)
       case Failure(e: S3Exception) if e.statusCode() == 404 => Right(false)
-      case Failure(e)      => Left(StoreReadError(e))
+      case Failure(e)                                       => Left(StoreReadError(e))
     }
   }
 }

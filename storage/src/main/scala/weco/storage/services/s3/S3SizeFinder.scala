@@ -1,7 +1,10 @@
 package weco.storage.services.s3
 
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest}
+import software.amazon.awssdk.services.s3.model.{
+  GetObjectRequest,
+  HeadObjectRequest
+}
 import weco.storage._
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.services.SizeFinder
@@ -23,7 +26,8 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: S3Client)
     // tell us "The bucket name was invalid".
     //
     val headRequest =
-      HeadObjectRequest.builder()
+      HeadObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -36,7 +40,8 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: S3Client)
       case Success(length) => length
       case Failure(_) =>
         val getRequest =
-          GetObjectRequest.builder()
+          GetObjectRequest
+            .builder()
             .bucket(location.bucket)
             .key(location.key)
             .build()

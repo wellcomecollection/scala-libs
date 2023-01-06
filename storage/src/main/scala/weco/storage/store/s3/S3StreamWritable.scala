@@ -28,7 +28,8 @@ trait S3StreamWritable
     val keyByteLength = location.key.getBytes.length
 
     val putRequest =
-      PutObjectRequest.builder()
+      PutObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .contentLength(inputStream.length)
@@ -42,7 +43,8 @@ trait S3StreamWritable
       )
 
     val uploadRequest =
-      UploadRequest.builder()
+      UploadRequest
+        .builder()
         .putObjectRequest(putRequest)
         .requestBody(requestBody)
         .build()
@@ -69,9 +71,13 @@ trait S3StreamWritable
         .join()
     } match {
       case Success(_) if inputStream.available() > 0 =>
-        Left(IncorrectStreamLengthError(new RuntimeException("Data read has a different length than the expected")))
-      case Success(_)   => Right(Identified(location, inputStream))
-      case Failure(err: CompletionException) => Left(buildPutError(err.getCause))
+        Left(
+          IncorrectStreamLengthError(
+            new RuntimeException(
+              "Data read has a different length than the expected")))
+      case Success(_) => Right(Identified(location, inputStream))
+      case Failure(err: CompletionException) =>
+        Left(buildPutError(err.getCause))
       case Failure(err) => Left(buildPutError(err))
     }
 
@@ -79,10 +85,7 @@ trait S3StreamWritable
     inputStream: InputStreamWithLength): WriteEither =
     for {
       uploadRequest <- createUploadRequest(location, inputStream)
-      result <- uploadWithTransferManager(
-        uploadRequest,
-        location,
-        inputStream)
+      result <- uploadWithTransferManager(uploadRequest, location, inputStream)
     } yield result
 
   private def buildPutError(throwable: Throwable): WriteError =
@@ -96,7 +99,11 @@ trait S3StreamWritable
         IncorrectStreamLengthError(exc)
 
       // e.g. Request content was only 1024 bytes, but the specified content-length was 1025 bytes.
-      case exc: SdkClientException if exc.getCause.isInstanceOf[IllegalStateException] && exc.getCause.getMessage.contains("Request content was only") && exc.getCause.getMessage.contains("but the specified content-length was") =>
+      case exc: SdkClientException
+          if exc.getCause
+            .isInstanceOf[IllegalStateException] && exc.getCause.getMessage
+            .contains("Request content was only") && exc.getCause.getMessage
+            .contains("but the specified content-length was") =>
         IncorrectStreamLengthError(exc)
 
       case _ => S3Errors.writeErrors(throwable)

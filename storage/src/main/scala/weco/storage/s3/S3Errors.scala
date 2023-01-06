@@ -29,10 +29,11 @@ object S3Errors {
       StoreReadError(exc)
 
     case exc: SdkClientException
-      if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+        if exc.getMessage.startsWith("Unable to execute HTTP request") =>
       new StoreReadError(exc) with RetryableError
 
-    case exc: SdkClientException if exc.getCause.isInstanceOf[UnknownHostException] =>
+    case exc: SdkClientException
+        if exc.getCause.isInstanceOf[UnknownHostException] =>
       new StoreReadError(exc) with RetryableError
 
     case exc: SocketTimeoutException =>

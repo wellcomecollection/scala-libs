@@ -1,7 +1,11 @@
 package weco.storage.transfer.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import com.azure.storage.blob.models.{BlobRange, BlobStorageException, BlockListType}
+import com.azure.storage.blob.models.{
+  BlobRange,
+  BlobStorageException,
+  BlockListType
+}
 import com.azure.storage.blob.specialized.BlockBlobClient
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
@@ -14,7 +18,12 @@ import weco.storage.services.azure.AzureSizeFinder
 import weco.storage.services.s3.{S3PresignedUrls, S3RangedReader}
 import weco.storage.store.azure.AzureStreamStore
 import weco.storage.store.s3.S3StreamReader
-import weco.storage.transfer.{TransferNoOp, TransferOverwriteFailure, TransferSourceFailure, _}
+import weco.storage.transfer.{
+  TransferNoOp,
+  TransferOverwriteFailure,
+  TransferSourceFailure,
+  _
+}
 import weco.storage.{Identified, NotFoundError, RetryableError, StoreWriteError}
 
 import java.io.{ByteArrayInputStream, InputStream}
