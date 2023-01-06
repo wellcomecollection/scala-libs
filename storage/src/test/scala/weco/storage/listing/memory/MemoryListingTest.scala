@@ -28,6 +28,6 @@ class MemoryListingTest
   override def createPrefixMatching(id: String): String = id
 
   override def assertResultCorrect(result: Iterable[String],
-                                   entries: Seq[String]): Assertion =
+                                   entries: Seq[String])(implicit context: MemoryStore[String, Array[Byte]]): Assertion =
     result.toSeq should contain theSameElementsAs entries
 }

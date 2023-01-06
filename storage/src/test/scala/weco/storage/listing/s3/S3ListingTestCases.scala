@@ -1,7 +1,7 @@
 package weco.storage.listing.s3
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException
 import weco.fixtures.TestWith
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.listing.ListingTestCases
@@ -33,7 +33,7 @@ trait S3ListingTestCases[ListingResult]
 
       val err = listing.list(prefix).left.value
       err.e.getMessage should startWith("The specified bucket does not exist")
-      err.e shouldBe a[AmazonS3Exception]
+      err.e shouldBe a[NoSuchBucketException]
     }
 
     it("ignores entries with a matching key in a different bucket") {
@@ -54,15 +54,15 @@ trait S3ListingTestCases[ListingResult]
     it("handles an error from S3") {
       val prefix = createPrefix
 
-      val brokenListing = createS3Listing(s3Client = brokenS3Client)
+      val brokenListing = createS3Listing(s3Client = brokenS3ClientV2)
 
       val err = brokenListing.list(prefix).left.value
-      err.e.getMessage should startWith("Unable to execute HTTP request")
+      err.e.getMessage should startWith("Received an UnknownHostException when attempting to interact with a service")
       err.e shouldBe a[SdkClientException]
     }
 
     it("ignores objects in the same bucket with a different key") {
-      withLocalS3Bucket { bucket =>
+      withLocalS3Bucket { implicit bucket =>
         val location = createS3ObjectLocationWith(bucket)
         putStream(location)
 
@@ -72,7 +72,7 @@ trait S3ListingTestCases[ListingResult]
     }
 
     it("fetches more objects than can be retrieved in a single page") {
-      withLocalS3Bucket { bucket =>
+      withLocalS3Bucket { implicit bucket =>
         val location = createS3ObjectLocationWith(bucket)
 
         // A single ListObjects API call can return up to 1000 objects
