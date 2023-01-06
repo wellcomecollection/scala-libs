@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.19.3 - 2023-01-06
+
+Replace scality/s3server with zenko/cloudserver as the Docker image used to mimic S3 in tests.
+
 ## v32.19.2 - 2023-01-06
 
 Provide better error messages in the LocalResources fixture.
