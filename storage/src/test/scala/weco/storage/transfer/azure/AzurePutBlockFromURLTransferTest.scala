@@ -1,15 +1,11 @@
 package weco.storage.transfer.azure
 
-import org.mockito.Mockito.{spy, verify}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatestplus.mockito.MockitoSugar
 import weco.storage.azure.AzureBlobLocation
 import weco.storage.fixtures.{AzureFixtures, S3Fixtures}
 import weco.storage.s3.S3ObjectLocation
-import weco.storage.services.azure.AzureSizeFinder
-import weco.storage.services.s3.S3Uploader
 import weco.storage.store.azure.AzureTypedStore
 import weco.storage.store.s3.S3TypedStore
 import weco.storage.transfer.{TransferNoOp, TransferOverwriteFailure}
@@ -21,8 +17,7 @@ class AzurePutBlockFromURLTransferTest
     with Matchers
     with S3Fixtures
     with AzureFixtures
-    with TableDrivenPropertyChecks
-    with MockitoSugar {
+    with TableDrivenPropertyChecks {
   val srcStore: S3TypedStore[String] = S3TypedStore[String]
   val dstStore: AzureTypedStore[String] = AzureTypedStore[String]
 
@@ -107,32 +102,6 @@ class AzurePutBlockFromURLTransferTest
 
           dstStore.get(dst).value.identifiedT shouldBe "Hello world"
         }
-      }
-    }
-  }
-
-  it("passes the expiry flag to the S3Uploader") {
-    val s3Uploader = spy(new S3Uploader())
-    val urlValidity = 1 minute
-    val transfer = new AzurePutBlockFromUrlTransfer(
-      s3Uploader,
-      new AzureSizeFinder(),
-      new AzurePutBlockTransfer())(urlValidity, 10L)
-
-    withLocalS3Bucket { bucket =>
-      withAzureContainer { container =>
-        val src = createS3ObjectLocationWith(bucket)
-        val dst = createAzureBlobLocationWith(container)
-
-        srcStore.put(src)("Hello world") shouldBe a[Right[_, _]]
-        val srcObject = SourceS3Object(
-          src,
-          size = "Hello world".getBytes().length
-        )
-
-        transfer.transfer(src = srcObject, dst = dst)
-
-        verify(s3Uploader).getPresignedGetURL(src, urlValidity)
       }
     }
   }
