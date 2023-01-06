@@ -35,7 +35,8 @@ object PrefixTransferBuilder {
     (srcCloudProvider, dstCloudProvider) match {
       case (AWS, AWS) =>
         implicit val s3Client: S3Client = S3Client.builder().build()
-        implicit val transferManager: S3TransferManager = S3TransferManager.builder().build()
+        implicit val transferManager: S3TransferManager =
+          S3TransferManager.builder().build()
 
         S3PrefixTransfer()
 
