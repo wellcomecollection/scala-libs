@@ -1,18 +1,12 @@
 package weco.storage.s3
 
-import com.amazonaws.SdkClientException
+import com.amazonaws.{SdkClientException => OldSdkClientException}
 import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
-import weco.storage.{
-  DoesNotExistError,
-  ReadError,
-  RetryableError,
-  StoreReadError,
-  StoreWriteError,
-  WriteError
-}
+import weco.storage.{DoesNotExistError, ReadError, RetryableError, StoreReadError, StoreWriteError, WriteError}
 
-import java.net.SocketTimeoutException
+import java.net.{SocketTimeoutException, UnknownHostException}
 
 object S3Errors {
   val readErrors: PartialFunction[Throwable, ReadError] = {
@@ -40,8 +34,13 @@ object S3Errors {
         if exc.getMessage.startsWith("The specified bucket is not valid") =>
       StoreReadError(exc)
 
-    case exc: SdkClientException
+    case exc: OldSdkClientException
         if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+      new StoreReadError(exc) with RetryableError
+    case exc: SdkClientException
+      if exc.getMessage.startsWith("Unable to execute HTTP request") =>
+      new StoreReadError(exc) with RetryableError
+    case exc: SdkClientException if exc.getCause.isInstanceOf[UnknownHostException] =>
       new StoreReadError(exc) with RetryableError
 
     case exc: SocketTimeoutException =>

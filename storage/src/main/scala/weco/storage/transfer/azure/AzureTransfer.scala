@@ -8,6 +8,7 @@ import com.azure.storage.blob.models.{BlobRange, BlobStorageException, BlockList
 import com.azure.storage.blob.specialized.BlockBlobClient
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
+import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import weco.storage.models.ByteRange
 import weco.storage.services.s3.{S3PresignedUrls, S3RangedReader}
@@ -30,6 +31,7 @@ trait AzureTransfer[Context]
     extends Transfer[SourceS3Object, AzureBlobLocation]
     with Logging {
   implicit val s3Client: AmazonS3
+  implicit val s3ClientV2: S3Client
   implicit val blobServiceClient: BlobServiceClient
 
   import weco.storage.RetryOps._
@@ -269,6 +271,7 @@ class AzurePutBlockTransfer(
 )(
   implicit
   val s3Client: AmazonS3,
+  val s3ClientV2: S3Client,
   val blobServiceClient: BlobServiceClient
 ) extends AzureTransfer[Unit] {
 
@@ -320,6 +323,7 @@ class AzurePutBlockFromUrlTransfer(azureSizeFinder: AzureSizeFinder,
   val blockSize: Long)(
   implicit
   val s3Client: AmazonS3,
+  val s3ClientV2: S3Client,
   val s3Presigner: S3Presigner,
   val blobServiceClient: BlobServiceClient
 ) extends AzureTransfer[URL] {
@@ -394,6 +398,7 @@ object AzurePutBlockFromUrlTransfer {
   def apply(signedUrlValidity: FiniteDuration, blockSize: Long)(
     implicit
     s3Client: AmazonS3,
+    s3ClientV2: S3Client,
     s3Presigner: S3Presigner,
     blobServiceClient: BlobServiceClient) = {
 

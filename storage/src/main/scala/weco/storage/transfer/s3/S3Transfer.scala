@@ -3,13 +3,10 @@ package weco.storage.transfer.s3
 import java.io.InputStream
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{CopyObjectRequest, ObjectTagging}
-import com.amazonaws.services.s3.transfer.{
-  Copy,
-  TransferManager,
-  TransferManagerBuilder
-}
+import com.amazonaws.services.s3.transfer.{Copy, TransferManager, TransferManagerBuilder}
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
+import software.amazon.awssdk.services.s3.S3Client
 import weco.storage.NotFoundError
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.s3.{S3StreamReadable, S3StreamStore}
@@ -134,7 +131,7 @@ class S3Transfer(transferManager: TransferManager, s3Readable: S3StreamReadable)
 }
 
 object S3Transfer {
-  def apply(implicit s3Client: AmazonS3) = {
+  def apply(implicit s3Client: AmazonS3, s3ClientV2: S3Client) = {
     val transferManager: TransferManager = TransferManagerBuilder.standard
       .withS3Client(s3Client)
       .build
