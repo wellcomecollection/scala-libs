@@ -14,9 +14,6 @@ import scala.concurrent.duration.Duration
 
 /** This class allows you to upload a string to an S3 bucket, and get a
   * pre-signed URL for somebody to GET that string out of the bucket.
-  *
-  * It's based on an example from the AWS SDK for Java docs:
-  * https://docs.aws.amazon.com/AmazonS3/latest/dev/ShareObjectPreSignedURLJavaSDK.html
   */
 class S3Uploader(implicit val s3Client: S3Client,
                  s3TransferManager: S3TransferManager,

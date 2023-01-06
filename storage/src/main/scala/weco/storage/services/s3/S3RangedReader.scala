@@ -21,6 +21,10 @@ class S3RangedReader(implicit s3Client: S3Client)
       //
       // For example, if you read (start=0, end=5), you get bytes [0, 1, 2, 3, 4, 5].
       // We never want to read more than bufferSize bytes at a time.
+      //
+      // This uses the syntax of the Range HTTP header.  See:
+      // https://docs.aws.amazon.com/AmazonS3/latest/userguide/range-get-olap.html
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
       val rangeHeader = range match {
         case ClosedByteRange(start, count) =>
           s"bytes=$start-${start + count - 1}"
@@ -37,12 +41,9 @@ class S3RangedReader(implicit s3Client: S3Client)
           .range(rangeHeader)
           .build()
 
-      val byteArray =
-        s3Client
-          .getObjectAsBytes(getRequest)
-          .asByteArray()
-
-      byteArray
+      s3Client
+        .getObjectAsBytes(getRequest)
+        .asByteArray()
     } match {
       case Success(bytes) => Right(bytes)
       case Failure(err)   => Left(S3Errors.readErrors(err))
