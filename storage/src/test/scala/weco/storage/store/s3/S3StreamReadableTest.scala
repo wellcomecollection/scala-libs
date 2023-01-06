@@ -69,7 +69,7 @@ class S3StreamReadableTest
               .key(location.key)
               .build()
 
-          s3ClientV2.getObject(getRequest)
+          s3Client.getObject(getRequest)
         })
 
       val readable = createS3ReadableWith(mockClient, retries = 3)

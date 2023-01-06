@@ -15,7 +15,7 @@ class S3StreamStoreTest
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
-        val store = new S3StreamStore()(brokenS3ClientV2, brokenS3AsyncClientV2)
+        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
 
         val result = store.get(createS3ObjectLocation).left.value
         result shouldBe a[StoreReadError]
@@ -65,7 +65,7 @@ class S3StreamStoreTest
 
     describe("put") {
       it("errors if S3 fails to respond") {
-        val store = new S3StreamStore()(brokenS3ClientV2, brokenS3AsyncClientV2)
+        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
 
         val result = store.put(createS3ObjectLocation)(createT).left.value
         result shouldBe a[StoreWriteError]

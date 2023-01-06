@@ -5,9 +5,6 @@ object Dependencies {
     val elasticApm = "1.22.0"
     val elastic4s = "8.3.2"
 
-    val aws1 = "1.11.504"
-
-    // Moving what we can to version 2 of the AWS SDKs
     val aws = "2.19.0"
     val awsCrt = "0.20.3"
 
@@ -180,8 +177,7 @@ object Dependencies {
     "software.amazon.awssdk" % "dynamodb" % versions.aws,
     "software.amazon.awssdk" % "s3" % versions.aws,
     "software.amazon.awssdk" % "s3-transfer-manager" % versions.aws,
-    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws1
+    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt
   ) ++
     scanamoDependencies ++
     apacheCommons

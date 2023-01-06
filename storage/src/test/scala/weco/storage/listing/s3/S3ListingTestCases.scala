@@ -54,7 +54,7 @@ trait S3ListingTestCases[ListingResult]
     it("handles an error from S3") {
       val prefix = createPrefix
 
-      val brokenListing = createS3Listing(s3Client = brokenS3ClientV2)
+      val brokenListing = createS3Listing(s3Client = brokenS3Client)
 
       val err = brokenListing.list(prefix).left.value
       err.e.getMessage should startWith("Received an UnknownHostException when attempting to interact with a service")

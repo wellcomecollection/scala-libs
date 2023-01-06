@@ -51,7 +51,7 @@ class S3TagsTest
             .tagging(tagging)
             .build()
 
-          s3ClientV2.putObjectTagging(request)
+          s3Client.putObjectTagging(request)
       }
 
     testWith(new S3Tags())
@@ -210,7 +210,7 @@ class S3TagsTest
                 .tagging(tagging)
                 .build()
 
-            s3ClientV2.putObjectTagging(request)
+            s3Client.putObjectTagging(request)
           })
 
         val tags = new S3Tags()(s3Client = mockClient)
@@ -258,7 +258,7 @@ class S3TagsTest
       location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResponse] =
       when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
         .thenReturn(
-          s3ClientV2
+          s3Client
             .getObjectTagging(
               GetObjectTaggingRequest.builder()
                 .bucket(location.bucket)

@@ -18,6 +18,6 @@ class S3ObjectListingTest extends S3ListingTestCases[S3Object] {
     actualLocations should contain theSameElementsAs entries
   }
 
-  override def createS3Listing(implicit s3Client: S3Client = s3ClientV2): S3Listing[S3Object] =
-    new S3ObjectListing()(s3Client)
+  override def createS3Listing(implicit s3Client: S3Client = s3Client): S3Listing[S3Object] =
+    new S3ObjectListing()
 }

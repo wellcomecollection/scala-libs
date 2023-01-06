@@ -168,6 +168,6 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
         .key(location.key)
         .build()
 
-    s3ClientV2.headObject(request).lastModified()
+    s3Client.headObject(request).lastModified()
   }
 }

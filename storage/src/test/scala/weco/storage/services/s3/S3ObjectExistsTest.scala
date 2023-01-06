@@ -48,7 +48,7 @@ class S3ObjectExistsTest extends AnyFunSpec with Matchers with S3Fixtures {
         val location = createS3ObjectLocation
 
         val existsCheck = new S3ObjectExists.S3ObjectExistsImplicit(location)(
-          brokenS3ClientV2
+          brokenS3Client
         ).exists
 
         existsCheck.left.value shouldBe a[StorageError]
