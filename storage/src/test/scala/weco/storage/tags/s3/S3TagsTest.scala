@@ -1,7 +1,5 @@
 package weco.storage.tags.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectTaggingRequest, GetObjectTaggingResult, ObjectTagging, SetObjectTaggingRequest, Tag => TagV1}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
@@ -9,13 +7,14 @@ import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import software.amazon.awssdk.services.s3.model.{PutObjectTaggingRequest, Tag, Tagging}
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model._
 import weco.fixtures.TestWith
+import weco.storage.UpdateWriteError
 import weco.storage.fixtures.S3Fixtures
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.tags.{Tags, TagsTestCases}
-import weco.storage.UpdateWriteError
 
 import scala.collection.JavaConverters._
 
@@ -151,13 +150,14 @@ class S3TagsTest
     }
   }
 
-  val s3ServerException = new AmazonS3Exception(
-    "We encountered an internal error. Please try again.")
-  s3ServerException.setStatusCode(500)
+  val s3ServerException = S3Exception.builder()
+    .message("We encountered an internal error. Please try again.")
+    .statusCode(500)
+    .build()
 
   describe("retries flaky errors from the SetObjectTagging API") {
     it("doesn't retry a persistent error") {
-      val mockClient = mock[AmazonS3]
+      val mockClient = mock[S3Client]
 
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
@@ -168,8 +168,13 @@ class S3TagsTest
         // This simulates the case where the object is deleted between the
         // GET call to find the current tags, and the SET call to update them.
         // That would be quite unusual and worth further investigation.
-        when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
-          .thenThrow(new AmazonS3Exception("The specified key does not exist"))
+        when(mockClient.putObjectTagging(any[PutObjectTaggingRequest]))
+          .thenThrow(
+            S3Exception.builder()
+              .message("The specified key does not exist")
+              .statusCode(404)
+              .build()
+          )
 
         val tags = new S3Tags()(s3Client = mockClient)
         tags.update(location) { _ =>
@@ -177,12 +182,12 @@ class S3TagsTest
         } shouldBe a[Left[_, _]]
 
         verify(mockClient, times(1))
-          .setObjectTagging(any[SetObjectTaggingRequest])
+          .putObjectTagging(any[PutObjectTaggingRequest])
       }
     }
 
     it("it retries a single error") {
-      val mockClient = mock[AmazonS3]
+      val mockClient = mock[S3Client]
 
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
@@ -190,17 +195,23 @@ class S3TagsTest
 
         createGetObjectTaggingMock(mockClient, location = location)
 
-        when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
+        when(mockClient.putObjectTagging(any[PutObjectTaggingRequest]))
           .thenThrow(s3ServerException)
-          .thenReturn(
-            s3Client.setObjectTagging(
-              new SetObjectTaggingRequest(
-                location.bucket,
-                location.key,
-                new ObjectTagging(Seq(new TagV1("colour", "red")).asJava)
-              )
-            )
-          )
+          .thenReturn({
+            val tagging =
+              Tagging.builder()
+                .tagSet(Seq(Tag.builder().key("colour").value("red").build()).asJava)
+                .build()
+
+            val request =
+              PutObjectTaggingRequest.builder()
+                .bucket(location.bucket)
+                .key(location.key)
+                .tagging(tagging)
+                .build()
+
+            s3ClientV2.putObjectTagging(request)
+          })
 
         val tags = new S3Tags()(s3Client = mockClient)
         tags.update(location) { _ =>
@@ -208,7 +219,7 @@ class S3TagsTest
         } shouldBe a[Right[_, _]]
 
         verify(mockClient, times(2))
-          .setObjectTagging(any[SetObjectTaggingRequest])
+          .putObjectTagging(any[PutObjectTaggingRequest])
 
         // Use a fresh instance of S3Tags so we use the unmocked client,
         // and not one with a mocked return value for getObjectTagging.
@@ -218,7 +229,7 @@ class S3TagsTest
     }
 
     it("gives up if there are too many flaky errors") {
-      val mockClient = mock[AmazonS3]
+      val mockClient = mock[S3Client]
 
       withLocalS3Bucket { bucket =>
         val location = createS3ObjectLocationWith(bucket)
@@ -226,7 +237,7 @@ class S3TagsTest
 
         createGetObjectTaggingMock(mockClient, location = location)
 
-        when(mockClient.setObjectTagging(any[SetObjectTaggingRequest]))
+        when(mockClient.putObjectTagging(any[PutObjectTaggingRequest]))
           .thenThrow(s3ServerException)
           .thenThrow(s3ServerException)
           .thenThrow(s3ServerException)
@@ -238,18 +249,21 @@ class S3TagsTest
         } shouldBe a[Left[_, _]]
 
         verify(mockClient, times(4))
-          .setObjectTagging(any[SetObjectTaggingRequest])
+          .putObjectTagging(any[PutObjectTaggingRequest])
       }
     }
 
     def createGetObjectTaggingMock(
-      mockClient: AmazonS3,
-      location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResult] =
+      mockClient: S3Client,
+      location: S3ObjectLocation): OngoingStubbing[GetObjectTaggingResponse] =
       when(mockClient.getObjectTagging(any[GetObjectTaggingRequest]))
         .thenReturn(
-          s3Client
+          s3ClientV2
             .getObjectTagging(
-              new GetObjectTaggingRequest(location.bucket, location.key)
+              GetObjectTaggingRequest.builder()
+                .bucket(location.bucket)
+                .key(location.key)
+                .build()
             )
         )
   }
@@ -259,7 +273,7 @@ class S3TagsTest
     val err = result.left.value
 
     err shouldBe a[UpdateWriteError]
-    err.e shouldBe a[AmazonS3Exception]
+    err.e shouldBe a[S3Exception]
     assert(err.e.getMessage)
   }
 }

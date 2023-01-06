@@ -53,6 +53,8 @@ object S3Errors {
   val writeErrors: PartialFunction[Throwable, WriteError] = {
     case exc: AmazonS3Exception if exc.getStatusCode == 500 =>
       new StoreWriteError(exc) with RetryableError
+    case exc: S3Exception if exc.statusCode() == 500 =>
+      new StoreWriteError(exc) with RetryableError
 
     case exc => StoreWriteError(exc)
   }
