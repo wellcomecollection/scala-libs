@@ -6,6 +6,10 @@ object Dependencies {
     val elastic4s = "8.3.2"
 
     val aws = "2.19.0"
+
+    // These are the "Common Runtime Libraries", which you're encouraged to use for
+    // better performance.
+    // See https://docs.aws.amazon.com/sdkref/latest/guide/common-runtime.html
     val awsCrt = "0.20.3"
 
     val azure = "12.7.0"
