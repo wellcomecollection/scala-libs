@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.19.2 - 2023-01-06
+
+Provide better error messages in the LocalResources fixture.
+
 ## v32.19.1 - 2023-01-05
 
 Start using the AWS Java V2 SDK for S3 for testing S3-related code.  This doesn't change any library code.
