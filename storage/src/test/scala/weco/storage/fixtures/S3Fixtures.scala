@@ -11,9 +11,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
+import software.amazon.awssdk.services.s3.{S3AsyncClient, S3Client, S3Configuration}
 import software.amazon.awssdk.services.s3.model._
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.transfer.s3.S3TransferManager
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}
@@ -48,6 +49,10 @@ trait S3Fixtures
 
   val s3Port = 33333
 
+  val s3Credentials =
+    StaticCredentialsProvider.create(
+      AwsBasicCredentials.create("accessKey1", "verySecretKey1"))
+
   def createS3ClientWithEndpoint(endpoint: String): AmazonS3 =
     AmazonS3ClientBuilder
       .standard()
@@ -60,25 +65,38 @@ trait S3Fixtures
 
   def createS3ClientV2WithEndpoint(endpoint: String): S3Client =
     S3Client.builder()
-      .credentialsProvider(
-        StaticCredentialsProvider.create(
-          AwsBasicCredentials.create("accessKey1", "verySecretKey1"))
-      )
+      .credentialsProvider(s3Credentials)
       .forcePathStyle(true)
       .endpointOverride(new URI(endpoint))
       .build()
 
+  def createS3TransferManagerWithEndpoint(endpoint: String): S3TransferManager = {
+    val s3AsyncClient =
+      S3AsyncClient.builder()
+      .credentialsProvider(s3Credentials)
+      .forcePathStyle(true)
+      .endpointOverride(new URI(endpoint))
+      .build()
+
+    S3TransferManager.builder()
+      .s3Client(s3AsyncClient)
+      .build();
+  }
+
   implicit val s3Client: AmazonS3 =
     createS3ClientWithEndpoint(s"http://localhost:$s3Port")
-
-  val brokenS3Client: AmazonS3 =
-    createS3ClientWithEndpoint("http://nope.nope")
 
   implicit val s3ClientV2: S3Client =
     createS3ClientV2WithEndpoint(s"http://localhost:$s3Port")
 
+  implicit val s3TransferManager: S3TransferManager =
+    createS3TransferManagerWithEndpoint(s"http://localhost:$s3Port")
+
   val brokenS3ClientV2: S3Client =
     createS3ClientV2WithEndpoint("http://nope.nope")
+
+  val brokenS3AsyncClientV2: S3TransferManager =
+    createS3TransferManagerWithEndpoint("http://nope.nope")
 
   implicit val s3Presigner: S3Presigner =
     S3Presigner.builder()

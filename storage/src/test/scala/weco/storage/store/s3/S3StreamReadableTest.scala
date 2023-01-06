@@ -21,7 +21,7 @@ class S3StreamReadableTest
   def createS3ReadableWith(client: S3Client,
                            retries: Int = 1): S3StreamReadable =
     new S3StreamReadable {
-      override implicit val s3ClientV2: S3Client = client
+      override implicit val s3Client: S3Client = client
 
       override val maxRetries: Int = retries
     }

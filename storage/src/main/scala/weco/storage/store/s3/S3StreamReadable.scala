@@ -9,7 +9,7 @@ import weco.storage.streaming._
 
 trait S3StreamReadable
     extends RetryableReadable[S3ObjectLocation, InputStreamWithLength] {
-  implicit val s3ClientV2: S3Client
+  implicit val s3Client: S3Client
 
   override protected def retryableGetFunction(
     location: S3ObjectLocation): InputStreamWithLength = {
@@ -19,7 +19,7 @@ trait S3StreamReadable
         .key(location.key)
         .build()
 
-    val retrievedObject = s3ClientV2.getObject(getRequest)
+    val retrievedObject = s3Client.getObject(getRequest)
 
     new InputStreamWithLength(
       retrievedObject,
@@ -30,3 +30,7 @@ trait S3StreamReadable
   override protected def buildGetError(throwable: Throwable): ReadError =
     S3Errors.readErrors(throwable)
 }
+
+class S3StreamReader(val maxRetries: Int = 2)(implicit val s3Client: S3Client)
+  extends S3StreamReadable
+

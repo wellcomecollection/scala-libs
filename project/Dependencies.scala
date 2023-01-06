@@ -9,6 +9,7 @@ object Dependencies {
 
     // Moving what we can to version 2 of the AWS SDKs
     val aws = "2.19.0"
+    val awsCrt = "0.20.3"
 
     val azure = "12.7.0"
 
@@ -178,6 +179,8 @@ object Dependencies {
     "com.azure" % "azure-storage-blob" % versions.azure,
     "software.amazon.awssdk" % "dynamodb" % versions.aws,
     "software.amazon.awssdk" % "s3" % versions.aws,
+    "software.amazon.awssdk" % "s3-transfer-manager" % versions.aws,
+    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws1
   ) ++
     scanamoDependencies ++

@@ -1,7 +1,5 @@
 package weco.storage.store.s3
 
-import com.amazonaws.{SdkClientException => OldSdkClientException}
-import com.amazonaws.services.s3.model.AmazonS3Exception
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
 import weco.storage.fixtures.S3Fixtures.Bucket
@@ -17,7 +15,7 @@ class S3StreamStoreTest
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
-        val store = new S3StreamStore()(brokenS3Client, brokenS3ClientV2)
+        val store = new S3StreamStore()(brokenS3ClientV2, brokenS3AsyncClientV2)
 
         val result = store.get(createS3ObjectLocation).left.value
         result shouldBe a[StoreReadError]
@@ -67,14 +65,14 @@ class S3StreamStoreTest
 
     describe("put") {
       it("errors if S3 fails to respond") {
-        val store = new S3StreamStore()(brokenS3Client, brokenS3ClientV2)
+        val store = new S3StreamStore()(brokenS3ClientV2, brokenS3AsyncClientV2)
 
         val result = store.put(createS3ObjectLocation)(createT).left.value
         result shouldBe a[StoreWriteError]
 
         val err = result.e
-        err shouldBe a[OldSdkClientException]
-        err.getMessage should startWith("Unable to execute HTTP request")
+        err shouldBe a[SdkClientException]
+        err.getCause.getMessage should startWith("Unable to execute HTTP request")
       }
 
       it("errors if the bucket doesn't exist") {
@@ -84,7 +82,7 @@ class S3StreamStoreTest
           result shouldBe a[StoreWriteError]
 
           val err = result.e
-          err shouldBe a[AmazonS3Exception]
+          err shouldBe a[S3Exception]
           err.getMessage should startWith("The specified bucket does not exist")
         }
       }
@@ -99,7 +97,7 @@ class S3StreamStoreTest
           result shouldBe a[StoreWriteError]
 
           val err = result.e
-          err shouldBe a[AmazonS3Exception]
+          err shouldBe a[S3Exception]
           err.getMessage should startWith("The specified bucket is not valid")
         }
       }

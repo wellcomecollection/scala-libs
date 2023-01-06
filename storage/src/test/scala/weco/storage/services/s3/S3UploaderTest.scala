@@ -2,10 +2,9 @@ package weco.storage.services.s3
 
 import java.io.IOException
 import java.net.URL
-import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, S3Exception}
 import weco.storage._
 import weco.storage.fixtures.S3Fixtures
 import weco.storage.s3.S3ObjectLocation
@@ -152,7 +151,7 @@ class S3UploaderTest extends AnyFunSpec with Matchers with S3Fixtures {
       .value
 
     err shouldBe a[StoreWriteError]
-    err.e shouldBe a[AmazonS3Exception]
+    err.e shouldBe a[S3Exception]
     err.e.getMessage should startWith("The specified bucket does not exist")
   }
 

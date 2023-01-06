@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils
 import software.amazon.awssdk.services.s3.S3Client
 import weco.storage.NotFoundError
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
-import weco.storage.store.s3.{S3StreamReadable, S3StreamStore}
+import weco.storage.store.s3.{S3StreamReadable, S3StreamReader}
 import weco.storage.transfer._
 
 import scala.collection.JavaConverters._
@@ -135,7 +135,8 @@ object S3Transfer {
     val transferManager: TransferManager = TransferManagerBuilder.standard
       .withS3Client(s3Client)
       .build
-    val s3Readable = new S3StreamStore()
+    val s3Readable = new S3StreamReader()
+
     new S3Transfer(transferManager, s3Readable)
   }
 }

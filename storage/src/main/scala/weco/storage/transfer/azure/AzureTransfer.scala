@@ -1,26 +1,24 @@
 package weco.storage.transfer.azure
 
-import java.io.{ByteArrayInputStream, InputStream}
-import java.net.URL
-import com.amazonaws.services.s3.AmazonS3
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobRange, BlobStorageException, BlockListType}
 import com.azure.storage.blob.specialized.BlockBlobClient
 import grizzled.slf4j.Logging
 import org.apache.commons.io.IOUtils
-import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
-import weco.storage.models.ByteRange
-import weco.storage.services.s3.{S3PresignedUrls, S3RangedReader}
-import weco.storage.transfer._
-import weco.storage.{Identified, NotFoundError, RetryableError, StoreWriteError}
+import software.amazon.awssdk.services.s3.S3Client
 import weco.storage.azure.AzureBlobLocation
+import weco.storage.models.ByteRange
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.services.azure.AzureSizeFinder
+import weco.storage.services.s3.{S3PresignedUrls, S3RangedReader}
 import weco.storage.store.azure.AzureStreamStore
-import weco.storage.store.s3.S3StreamStore
-import weco.storage.transfer.{TransferNoOp, TransferOverwriteFailure, TransferSourceFailure}
+import weco.storage.store.s3.S3StreamReader
+import weco.storage.transfer.{TransferNoOp, TransferOverwriteFailure, TransferSourceFailure, _}
+import weco.storage.{Identified, NotFoundError, RetryableError, StoreWriteError}
 
+import java.io.{ByteArrayInputStream, InputStream}
+import java.net.URL
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
@@ -30,8 +28,7 @@ class AzureSourceTransferException(msg: String) extends RuntimeException(msg)
 trait AzureTransfer[Context]
     extends Transfer[SourceS3Object, AzureBlobLocation]
     with Logging {
-  implicit val s3Client: AmazonS3
-  implicit val s3ClientV2: S3Client
+  implicit val s3Client: S3Client
   implicit val blobServiceClient: BlobServiceClient
 
   import weco.storage.RetryOps._
@@ -238,7 +235,7 @@ trait AzureTransfer[Context]
     }
 
   private def getS3Stream(location: S3ObjectLocation) = {
-    val s3Readable = new S3StreamStore()
+    val s3Readable = new S3StreamReader()
     s3Readable.get(location)
   }
 
@@ -270,8 +267,7 @@ class AzurePutBlockTransfer(
   val blockSize: Long = 1000000000
 )(
   implicit
-  val s3Client: AmazonS3,
-  val s3ClientV2: S3Client,
+  val s3Client: S3Client,
   val blobServiceClient: BlobServiceClient
 ) extends AzureTransfer[Unit] {
 
@@ -322,8 +318,7 @@ class AzurePutBlockFromUrlTransfer(azureSizeFinder: AzureSizeFinder,
   signedUrlValidity: FiniteDuration,
   val blockSize: Long)(
   implicit
-  val s3Client: AmazonS3,
-  val s3ClientV2: S3Client,
+  val s3Client: S3Client,
   val s3Presigner: S3Presigner,
   val blobServiceClient: BlobServiceClient
 ) extends AzureTransfer[URL] {
@@ -397,8 +392,7 @@ class AzurePutBlockFromUrlTransfer(azureSizeFinder: AzureSizeFinder,
 object AzurePutBlockFromUrlTransfer {
   def apply(signedUrlValidity: FiniteDuration, blockSize: Long)(
     implicit
-    s3Client: AmazonS3,
-    s3ClientV2: S3Client,
+    s3Client: S3Client,
     s3Presigner: S3Presigner,
     blobServiceClient: BlobServiceClient) = {
 

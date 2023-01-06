@@ -1,8 +1,8 @@
 package weco.storage.services.s3
 
-import com.amazonaws.services.s3.AmazonS3
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.transfer.s3.S3TransferManager
 import weco.storage._
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.store.s3.S3StreamStore
@@ -18,7 +18,7 @@ import scala.concurrent.duration.Duration
   * It's based on an example from the AWS SDK for Java docs:
   * https://docs.aws.amazon.com/AmazonS3/latest/dev/ShareObjectPreSignedURLJavaSDK.html
   */
-class S3Uploader(implicit val s3Client: AmazonS3, s3ClientV2: S3Client, s3Presigner: S3Presigner) {
+class S3Uploader(implicit val s3Client: S3Client, s3TransferManager: S3TransferManager, s3Presigner: S3Presigner) {
   import S3ObjectExists._
 
   private val presignedUrls = new S3PresignedUrls()
