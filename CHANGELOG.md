@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v32.20.0 - 2023-01-09
+
+This replaces the AWS Java V1 SDK for S3 with the Java V2 SDK.
+
+All the previous storage-related classes should remain as-is, and just requires replacing the S3 clients which are passed in.
+
 ## v32.19.4 - 2023-01-06
 
 Split out creating pre-signed S3 URLs from the S3Uploader class; there's a new S3PresignedUrls class.
