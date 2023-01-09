@@ -47,6 +47,12 @@ class S3SizeFinder(val maxRetries: Int = 3)(implicit s3Client: S3Client)
             .build()
 
         val s3Object = s3Client.getObject(getRequest)
+
+        // Note: does it make any sense to look at the contentLength here?
+        //
+        // Would the GetObject call ever succeed where the HeadObject call failed?
+        // If we're only making this call for the quality of the error message, we
+        // should already have thrown by this point and this line is unreachable.
         val contentLength = s3Object.response().contentLength()
 
         // Abort the stream to avoid getting a warning:
