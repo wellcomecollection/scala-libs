@@ -1,6 +1,6 @@
 package weco.storage.listing.s3
 
-import com.amazonaws.services.s3.AmazonS3
+import software.amazon.awssdk.services.s3.S3Client
 import weco.fixtures.TestWith
 import weco.storage.fixtures.S3Fixtures
 import weco.storage.fixtures.S3Fixtures.Bucket
@@ -33,5 +33,5 @@ trait S3ListingFixtures[ListingResult]
       testWith(bucket)
     }
 
-  def createS3Listing(implicit s3Client: AmazonS3 = s3Client): S3Listing[ListingResult]
+  def createS3Listing(implicit s3Client: S3Client = s3Client): S3Listing[ListingResult]
 }

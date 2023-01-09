@@ -1,7 +1,7 @@
 package weco.storage.store.s3
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.services.s3.model.AmazonS3Exception
+import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.services.s3.model.S3Exception
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.store.StreamStoreTestCases
 import weco.storage._
@@ -15,14 +15,14 @@ class S3StreamStoreTest
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
-        val store = new S3StreamStore()(brokenS3Client)
+        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
 
         val result = store.get(createS3ObjectLocation).left.value
         result shouldBe a[StoreReadError]
 
         val err = result.e
         err shouldBe a[SdkClientException]
-        err.getMessage should startWith("Unable to execute HTTP request")
+        err.getMessage should startWith("Received an UnknownHostException when attempting to interact with a service")
       }
 
       it("errors if the key doesn't exist") {
@@ -32,7 +32,7 @@ class S3StreamStoreTest
             val err = store.get(location).left.value
             err shouldBe a[DoesNotExistError]
 
-            err.e shouldBe a[AmazonS3Exception]
+            err.e shouldBe a[S3Exception]
             err.e.getMessage should startWith(
               "The specified key does not exist")
           }
@@ -45,7 +45,7 @@ class S3StreamStoreTest
             store.get(createS3ObjectLocationWith(createBucket)).left.value
           err shouldBe a[DoesNotExistError]
 
-          err.e shouldBe a[AmazonS3Exception]
+          err.e shouldBe a[S3Exception]
           err.e.getMessage should startWith(
             "The specified bucket does not exist")
         }
@@ -57,7 +57,7 @@ class S3StreamStoreTest
           val err = store.get(invalidLocation).left.value
           err shouldBe a[StoreReadError]
 
-          err.e shouldBe a[AmazonS3Exception]
+          err.e shouldBe a[S3Exception]
           err.e.getMessage should startWith("The specified bucket is not valid")
         }
       }
@@ -65,14 +65,14 @@ class S3StreamStoreTest
 
     describe("put") {
       it("errors if S3 fails to respond") {
-        val store = new S3StreamStore()(brokenS3Client)
+        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
 
         val result = store.put(createS3ObjectLocation)(createT).left.value
         result shouldBe a[StoreWriteError]
 
         val err = result.e
         err shouldBe a[SdkClientException]
-        err.getMessage should startWith("Unable to execute HTTP request")
+        err.getCause.getMessage should startWith("Unable to execute HTTP request")
       }
 
       it("errors if the bucket doesn't exist") {
@@ -82,7 +82,7 @@ class S3StreamStoreTest
           result shouldBe a[StoreWriteError]
 
           val err = result.e
-          err shouldBe a[AmazonS3Exception]
+          err shouldBe a[S3Exception]
           err.getMessage should startWith("The specified bucket does not exist")
         }
       }
@@ -97,7 +97,7 @@ class S3StreamStoreTest
           result shouldBe a[StoreWriteError]
 
           val err = result.e
-          err shouldBe a[AmazonS3Exception]
+          err shouldBe a[S3Exception]
           err.getMessage should startWith("The specified bucket is not valid")
         }
       }

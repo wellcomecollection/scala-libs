@@ -1,7 +1,8 @@
 package weco.storage.typesafe
 
-import com.amazonaws.services.s3.AmazonS3
 import com.typesafe.config.Config
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.transfer.s3.S3TransferManager
 import weco.storage.transfer.s3.S3PrefixTransfer
 import weco.typesafe.config.builders.EnrichConfig._
 
@@ -33,7 +34,9 @@ object PrefixTransferBuilder {
 
     (srcCloudProvider, dstCloudProvider) match {
       case (AWS, AWS) =>
-        implicit val s3Client: AmazonS3 = S3Builder.buildS3Client
+        implicit val s3Client: S3Client = S3Client.builder().build()
+        implicit val transferManager: S3TransferManager =
+          S3TransferManager.builder().build()
 
         S3PrefixTransfer()
 

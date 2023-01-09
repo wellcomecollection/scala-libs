@@ -33,7 +33,7 @@ class AzureBlobLocationListingTest
     location.asPrefix
 
   override def assertResultCorrect(result: Iterable[AzureBlobLocation],
-                                   entries: Seq[AzureBlobLocation]): Assertion =
+                                   entries: Seq[AzureBlobLocation])(implicit container: Container): Assertion =
     result.toSeq should contain theSameElementsAs entries
 
   override def withListingContext[R](testWith: TestWith[Container, R]): R =

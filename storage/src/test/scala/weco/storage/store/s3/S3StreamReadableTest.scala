@@ -1,13 +1,14 @@
 package weco.storage.store.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
+import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{GetObjectRequest, S3Exception}
 import weco.storage.{DoesNotExistError, StoreReadError}
 import weco.storage.fixtures.S3Fixtures
 
@@ -17,35 +18,43 @@ class S3StreamReadableTest
     with S3Fixtures
     with EitherValues
     with MockitoSugar {
-  def createS3ReadableWith(client: AmazonS3,
+  def createS3ReadableWith(client: S3Client,
                            retries: Int = 1): S3StreamReadable =
     new S3StreamReadable {
-      override implicit val s3Client: AmazonS3 = client
+      override implicit val s3Client: S3Client = client
 
       override val maxRetries: Int = retries
     }
 
-  val s3ServerException = new AmazonS3Exception(
-    "We encountered an internal error. Please try again.")
-  s3ServerException.setStatusCode(500)
+  val s3ServerException = S3Exception.builder()
+    .message("We encountered an internal error. Please try again.")
+    .statusCode(500)
+    .build()
 
   it("does not retry a deterministic error") {
-    val spyClient = spy(s3Client)
+    val mockClient = mock[S3Client]
 
-    val readable = createS3ReadableWith(spyClient)
+    val readable = createS3ReadableWith(mockClient)
 
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
 
+      when(mockClient.getObject(any[GetObjectRequest]))
+        .thenThrow(
+          S3Exception.builder()
+            .statusCode(404)
+            .build()
+        )
+
       readable.get(location).left.value shouldBe a[DoesNotExistError]
 
-      verify(spyClient, times(1))
-        .getObject(new GetObjectRequest(location.bucket, location.key))
+      verify(mockClient, times(1))
+        .getObject(any[GetObjectRequest])
     }
   }
 
   it("retries a flaky error from S3") {
-    val mockClient = mock[AmazonS3]
+    val mockClient = mock[S3Client]
 
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
@@ -53,17 +62,25 @@ class S3StreamReadableTest
 
       when(mockClient.getObject(any[GetObjectRequest]))
         .thenThrow(s3ServerException)
-        .thenReturn(s3Client.getObject(new GetObjectRequest(location.bucket, location.key)))
+        .thenReturn({
+          val getRequest =
+            GetObjectRequest.builder()
+              .bucket(location.bucket)
+              .key(location.key)
+              .build()
+
+          s3Client.getObject(getRequest)
+        })
 
       val readable = createS3ReadableWith(mockClient, retries = 3)
       readable.get(location) shouldBe a[Right[_, _]]
 
-      verify(mockClient, times(2)).getObject(new GetObjectRequest(location.bucket, location.key))
+      verify(mockClient, times(2)).getObject(any[GetObjectRequest])
     }
   }
 
   it("gives up if there are too many flaky errors") {
-    val mockClient = mock[AmazonS3]
+    val mockClient = mock[S3Client]
 
     val location = createS3ObjectLocation
 
@@ -78,40 +95,31 @@ class S3StreamReadableTest
     val readable = createS3ReadableWith(mockClient, retries = retries)
     readable.get(location).left.value shouldBe a[StoreReadError]
 
-    verify(mockClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
+    verify(mockClient, times(retries)).getObject(any[GetObjectRequest])
   }
 
   it("retries if it's unable to connect to S3") {
-    val wrongPortClient =
-      createS3ClientWithEndpoint(s"http://localhost:${s3Port + 1}")
-    val spyClient = spy(wrongPortClient)
+    val mockClient = mock[S3Client]
 
     val retries = 4
-    val readable = createS3ReadableWith(spyClient, retries = retries)
+    val readable = createS3ReadableWith(mockClient, retries = retries)
 
+    // TODO: We don't need a real bucket here
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
 
-      readable.get(location).left.value shouldBe a[StoreReadError]
+      val exception = SdkClientException.builder().message("Unable to execute HTTP request").build()
 
-      verify(spyClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
-    }
-  }
-
-  it("retries if it can't resolve the S3 endpoint") {
-    val wrongPortClient =
-      createS3ClientWithEndpoint(s"http://this-cannot-be-resolved.nope")
-    val spyClient = spy(wrongPortClient)
-
-    val retries = 4
-    val readable = createS3ReadableWith(spyClient, retries = retries)
-
-    withLocalS3Bucket { bucket =>
-      val location = createS3ObjectLocationWith(bucket)
+      when(mockClient.getObject(any[GetObjectRequest]))
+        .thenThrow(exception)
+        .thenThrow(exception)
+        .thenThrow(exception)
+        .thenThrow(exception)
+        .thenThrow(exception)
 
       readable.get(location).left.value shouldBe a[StoreReadError]
 
-      verify(spyClient, times(retries)).getObject(new GetObjectRequest(location.bucket, location.key))
+      verify(mockClient, times(retries)).getObject(any[GetObjectRequest])
     }
   }
 }

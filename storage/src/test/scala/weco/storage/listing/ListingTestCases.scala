@@ -27,7 +27,7 @@ trait ListingTestCases[Ident,
   def createPrefixMatching(id: Ident): Prefix
 
   def assertResultCorrect(result: Iterable[ListingResult],
-                          entries: Seq[Ident]): Assertion
+                          entries: Seq[Ident])(implicit context: ListingContext): Assertion
 
   describe("behaves as a Listing") {
     describe("list") {

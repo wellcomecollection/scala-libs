@@ -5,10 +5,12 @@ object Dependencies {
     val elasticApm = "1.22.0"
     val elastic4s = "8.3.2"
 
-    val aws1 = "1.11.504"
-
-    // Moving what we can to version 2 of the AWS SDKs
     val aws = "2.19.0"
+
+    // These are the "Common Runtime Libraries", which you're encouraged to use for
+    // better performance.
+    // See https://docs.aws.amazon.com/sdkref/latest/guide/common-runtime.html
+    val awsCrt = "0.20.3"
 
     val azure = "12.7.0"
 
@@ -178,7 +180,8 @@ object Dependencies {
     "com.azure" % "azure-storage-blob" % versions.azure,
     "software.amazon.awssdk" % "dynamodb" % versions.aws,
     "software.amazon.awssdk" % "s3" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws1
+    "software.amazon.awssdk" % "s3-transfer-manager" % versions.aws,
+    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt
   ) ++
     scanamoDependencies ++
     apacheCommons

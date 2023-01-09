@@ -1,26 +1,19 @@
 package weco.storage.transfer.s3
 
-import com.amazonaws.services.s3.model.{AmazonS3Exception, CopyObjectRequest}
-import com.amazonaws.services.s3.transfer.{
-  TransferManager,
-  TransferManagerBuilder
-}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.scalatestplus.mockito.MockitoSugar
+import software.amazon.awssdk.services.s3.model.S3Exception
+import software.amazon.awssdk.transfer.s3.S3TransferManager
+import software.amazon.awssdk.transfer.s3.model.CopyRequest
 import weco.fixtures.TestWith
-import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
-import weco.storage.tags.s3.S3Tags
-import weco.storage.transfer._
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.s3.S3ObjectLocation
-import weco.storage.transfer.{
-  Transfer,
-  TransferSourceFailure,
-  TransferTestCases
-}
+import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
+import weco.storage.tags.s3.S3Tags
+import weco.storage.transfer.{Transfer, TransferSourceFailure, TransferTestCases, _}
 
 class S3TransferTest
     extends TransferTestCases[
@@ -46,16 +39,13 @@ class S3TransferTest
 
   override def withContext[R](testWith: TestWith[Unit, R]): R =
     testWith(())
-  def s3ServerException = {
-    val exception = new AmazonS3Exception(
-      "We encountered an internal error. Please try again.")
-    exception.setStatusCode(500)
-    exception
-  }
 
-  val transferManager = TransferManagerBuilder.standard
-    .withS3Client(s3Client)
-    .build
+  val s3ServerException =
+    S3Exception.builder()
+      .message("We encountered an internal error. Please try again.")
+      .statusCode(500)
+      .build()
+
   // This test is intended to spot warnings from the SDK if we don't close
   // the dst inputStream correctly.
   it("errors if the destination exists but the source does not") {
@@ -130,15 +120,15 @@ class S3TransferTest
         withContext { implicit context =>
           withSrcStore(initialEntries = Map(src -> t)) { srcStore =>
             withDstStore(initialEntries = Map.empty) { dstStore =>
-              val failingOnceTransfer = mock[TransferManager]
-              when(failingOnceTransfer.copy(any[CopyObjectRequest]))
+              val failingOnceTransfer = mock[S3TransferManager]
+              when(failingOnceTransfer.copy(any[CopyRequest]))
                 .thenThrow(s3ServerException)
                 .thenAnswer((invocation: InvocationOnMock) => {
-                  transferManager.copy(invocation.getArguments.toList.head
-                    .asInstanceOf[CopyObjectRequest])
+                  s3TransferManager.copy(
+                    invocation.getArguments.toList.head.asInstanceOf[CopyRequest])
                 })
               val transfer =
-                new S3Transfer(failingOnceTransfer, new S3StreamStore())
+                new S3Transfer()(failingOnceTransfer, new S3StreamStore())
 
               val result = transfer.transfer(src, dst)
 
@@ -163,17 +153,17 @@ class S3TransferTest
         withContext { implicit context =>
           withSrcStore(initialEntries = Map(src -> t)) { _ =>
             withDstStore(initialEntries = Map.empty) { _ =>
-              val alwaysFailingTransfer = mock[TransferManager]
-              when(alwaysFailingTransfer.copy(any[CopyObjectRequest]))
+              val alwaysFailingTransfer = mock[S3TransferManager]
+              when(alwaysFailingTransfer.copy(any[CopyRequest]))
                 .thenThrow(s3ServerException)
               val transfer =
-                new S3Transfer(alwaysFailingTransfer, new S3StreamStore())
+                new S3Transfer()(alwaysFailingTransfer, new S3StreamStore())
 
               val result = transfer.transfer(src, dst)
 
               result.left.value shouldBe a[TransferSourceFailure[_, _]]
               verify(alwaysFailingTransfer, times(3))
-                .copy(any[CopyObjectRequest])
+                .copy(any[CopyRequest])
             }
           }
         }
