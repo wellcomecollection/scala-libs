@@ -1,92 +1,109 @@
 package weco.storage.store.s3
 
-import software.amazon.awssdk.core.async.AsyncRequestBody
+import grizzled.slf4j.Logging
+import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import software.amazon.awssdk.transfer.s3.S3TransferManager
-import software.amazon.awssdk.transfer.s3.model.UploadRequest
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model._
 import weco.storage._
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.Writable
 import weco.storage.streaming.InputStreamWithLength
 
-import java.util.concurrent.{CompletionException, Executors}
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 trait S3StreamWritable
-    extends Writable[S3ObjectLocation, InputStreamWithLength] {
-  implicit val transferManager: S3TransferManager
+    extends Writable[S3ObjectLocation, InputStreamWithLength] with Logging {
+  implicit val s3Client: S3Client
+  val partSize: Long
 
-  // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
-  // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
-  private val MAX_KEY_BYTE_LENGTH = 1024
+  require(
+    partSize >= 5 * FileUtils.ONE_MB,
+    s"Parts must be at least 5 MB in size, got $partSize < ${5 * FileUtils.ONE_MB}; see https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPart.html"
+  )
 
-  private def createUploadRequest(
-    location: S3ObjectLocation,
-    inputStream: InputStreamWithLength,
-  ): Either[WriteError, UploadRequest] = {
-    val keyByteLength = location.key.getBytes.length
-
-    val putRequest =
-      PutObjectRequest
+  override def put(location: S3ObjectLocation)(
+    inputStream: InputStreamWithLength): WriteEither = Try {
+    val createRequest =
+      CreateMultipartUploadRequest
         .builder()
         .bucket(location.bucket)
         .key(location.key)
-        .contentLength(inputStream.length)
         .build()
 
-    val requestBody =
-      AsyncRequestBody.fromInputStream(
-        inputStream,
-        inputStream.length,
-        Executors.newSingleThreadExecutor()
-      )
+    val createResponse = s3Client.createMultipartUpload(createRequest)
 
-    val uploadRequest =
-      UploadRequest
-        .builder()
-        .putObjectRequest(putRequest)
-        .requestBody(requestBody)
-        .build()
-
-    Either.cond(
-      keyByteLength <= MAX_KEY_BYTE_LENGTH,
-      uploadRequest,
-      InvalidIdentifierFailure(
-        new Error(
-          s"S3 object key byte length is too big: $keyByteLength > $MAX_KEY_BYTE_LENGTH")
-      )
+    debug(
+      s"Got CreateMultipartUploadResponse with upload ID ${createResponse.uploadId()}"
     )
+
+    val completedParts = uploadParts(createResponse, location, inputStream)
+
+    val completedMultipartUpload =
+      CompletedMultipartUpload
+        .builder()
+        .parts(completedParts.asJava)
+        .build()
+
+    val completeRequest =
+      CompleteMultipartUploadRequest
+        .builder()
+        .bucket(location.bucket)
+        .key(location.key)
+        .uploadId(createResponse.uploadId())
+        .multipartUpload(completedMultipartUpload)
+        .build()
+
+    s3Client.completeMultipartUpload(completeRequest)
+  } match {
+    case Success(_) => Right(Identified(location, inputStream))
+    case Failure(e) => Left(buildPutError(e))
   }
 
-  private def uploadWithTransferManager(
-    uploadRequest: UploadRequest,
+  private def uploadParts(
+    createResponse: CreateMultipartUploadResponse,
     location: S3ObjectLocation,
     inputStream: InputStreamWithLength
-  ): Either[WriteError, Identified[S3ObjectLocation, InputStreamWithLength]] =
-    Try {
-      transferManager
-        .upload(uploadRequest)
-        .completionFuture()
-        .join()
-    } match {
-      case Success(_) if inputStream.available() > 0 =>
-        Left(
-          IncorrectStreamLengthError(
-            new RuntimeException(
-              "Data read has a different length than the expected")))
-      case Success(_) => Right(Identified(location, inputStream))
-      case Failure(err: CompletionException) =>
-        Left(buildPutError(err.getCause))
-      case Failure(err) => Left(buildPutError(err))
-    }
+  ): List[CompletedPart] = {
+    val partCount = (inputStream.length.toFloat / partSize).ceil.toInt
 
-  override def put(location: S3ObjectLocation)(
-    inputStream: InputStreamWithLength): WriteEither =
-    for {
-      uploadRequest <- createUploadRequest(location, inputStream)
-      result <- uploadWithTransferManager(uploadRequest, location, inputStream)
-    } yield result
+    // part numbers in MultiPart uploads are 1-indexed
+    Range(1, partCount + 1).map { partNumber =>
+
+      // We need to know how many bytes to read from the InputStream for
+      // this part; remember that the final part may be shorter than the
+      // other parts.
+      val start = (partNumber - 1) * partSize
+      val end = Math.min(partNumber * partSize, inputStream.length)
+      val partLength = (end - start).toInt
+
+      val bytes: Array[Byte] = new Array[Byte](partLength)
+      inputStream.read(bytes, 0, partLength)
+
+      val uploadPartRequest =
+        UploadPartRequest
+          .builder()
+          .bucket(location.bucket)
+          .key(location.key)
+          .uploadId(createResponse.uploadId())
+          .partNumber(partNumber)
+          .build()
+
+      val requestBody = RequestBody.fromBytes(bytes)
+
+      val uploadPartResponse =
+        s3Client.uploadPart(uploadPartRequest, requestBody)
+
+      CompletedPart
+        .builder()
+        .eTag(uploadPartResponse.eTag())
+        .partNumber(partNumber)
+        .build()
+    }
+      .toList
+  }
 
   private def buildPutError(throwable: Throwable): WriteError =
     throwable match {
