@@ -68,7 +68,7 @@ class S3StreamStoreTest
     }
 
     describe("put") {
-      it("errors if S3 fails to respond") { 
+      it("errors if S3 fails to respond") {
         val store = new S3StreamStore()(brokenS3Client)
 
         val result = store.put(createS3ObjectLocation)(createT).left.value
@@ -121,8 +121,7 @@ class S3StreamStoreTest
             val value = store.put(id)(entry).left.value
 
             value shouldBe a[InvalidIdentifierFailure]
-            value.e.getMessage should startWith(
-              "S3 object key byte length is too big")
+            value.e.getMessage should startWith("Object key is too long")
           }
         }
       }
