@@ -47,7 +47,8 @@ object S3Errors {
       new StoreWriteError(exc) with RetryableError
 
     // e.g. S3Exception: Object key is too long. Maximum number of bytes allowed in keys is 915.
-    case exc: S3Exception if exc.getMessage.startsWith("Object key is too long") =>
+    case exc: S3Exception
+        if exc.getMessage.startsWith("Object key is too long") =>
       InvalidIdentifierFailure(exc)
 
     case exc => StoreWriteError(exc)
