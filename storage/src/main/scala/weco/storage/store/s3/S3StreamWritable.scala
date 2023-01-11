@@ -15,7 +15,8 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 trait S3StreamWritable
-    extends Writable[S3ObjectLocation, InputStreamWithLength] with Logging {
+    extends Writable[S3ObjectLocation, InputStreamWithLength]
+    with Logging {
   implicit val s3Client: S3Client
   val partSize: Long
 
@@ -25,42 +26,43 @@ trait S3StreamWritable
   )
 
   override def put(location: S3ObjectLocation)(
-    inputStream: InputStreamWithLength): WriteEither = Try {
-    val createRequest =
-      CreateMultipartUploadRequest
-        .builder()
-        .bucket(location.bucket)
-        .key(location.key)
-        .build()
+    inputStream: InputStreamWithLength): WriteEither =
+    Try {
+      val createRequest =
+        CreateMultipartUploadRequest
+          .builder()
+          .bucket(location.bucket)
+          .key(location.key)
+          .build()
 
-    val createResponse = s3Client.createMultipartUpload(createRequest)
+      val createResponse = s3Client.createMultipartUpload(createRequest)
 
-    debug(
-      s"Got CreateMultipartUploadResponse with upload ID ${createResponse.uploadId()}"
-    )
+      debug(
+        s"Got CreateMultipartUploadResponse with upload ID ${createResponse.uploadId()}"
+      )
 
-    val completedParts = uploadParts(createResponse, location, inputStream)
+      val completedParts = uploadParts(createResponse, location, inputStream)
 
-    val completedMultipartUpload =
-      CompletedMultipartUpload
-        .builder()
-        .parts(completedParts.asJava)
-        .build()
+      val completedMultipartUpload =
+        CompletedMultipartUpload
+          .builder()
+          .parts(completedParts.asJava)
+          .build()
 
-    val completeRequest =
-      CompleteMultipartUploadRequest
-        .builder()
-        .bucket(location.bucket)
-        .key(location.key)
-        .uploadId(createResponse.uploadId())
-        .multipartUpload(completedMultipartUpload)
-        .build()
+      val completeRequest =
+        CompleteMultipartUploadRequest
+          .builder()
+          .bucket(location.bucket)
+          .key(location.key)
+          .uploadId(createResponse.uploadId())
+          .multipartUpload(completedMultipartUpload)
+          .build()
 
-    s3Client.completeMultipartUpload(completeRequest)
-  } match {
-    case Success(_) => Right(Identified(location, inputStream))
-    case Failure(e) => Left(buildPutError(e))
-  }
+      s3Client.completeMultipartUpload(completeRequest)
+    } match {
+      case Success(_) => Right(Identified(location, inputStream))
+      case Failure(e) => Left(buildPutError(e))
+    }
 
   private def uploadParts(
     createResponse: CreateMultipartUploadResponse,
@@ -71,7 +73,6 @@ trait S3StreamWritable
 
     // part numbers in MultiPart uploads are 1-indexed
     Range(1, partCount + 1).map { partNumber =>
-
       // We need to know how many bytes to read from the InputStream for
       // this part; remember that the final part may be shorter than the
       // other parts.
@@ -101,8 +102,7 @@ trait S3StreamWritable
         .eTag(uploadPartResponse.eTag())
         .partNumber(partNumber)
         .build()
-    }
-      .toList
+    }.toList
   }
 
   private def buildPutError(throwable: Throwable): WriteError =
