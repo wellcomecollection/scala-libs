@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.21.0 - 2023-01-12
+
+This changes the way S3StreamWritable works internally, so it should work better with our applications – in particular it now uses a blocking S3 client, rather than an asynchronous S3TransferManager, which is a better fit for how we do concurrency elsewhere.
+
 ## v32.20.0 - 2023-01-09
 
 This replaces the AWS Java V1 SDK for S3 with the Java V2 SDK.
