@@ -30,7 +30,8 @@ trait S3StreamWritable
     val result =
       if (inputStream.length <= partSize) {
         val putObjectRequest =
-          PutObjectRequest.builder()
+          PutObjectRequest
+            .builder()
             .bucket(location.bucket)
             .key(location.key)
             .build()
