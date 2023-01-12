@@ -81,7 +81,17 @@ trait S3StreamWritable
       val partLength = (end - start).toInt
 
       val bytes: Array[Byte] = new Array[Byte](partLength)
-      inputStream.read(bytes, 0, partLength)
+      val bytesRead = inputStream.read(bytes, 0, partLength)
+
+      if (bytesRead < partLength) {
+        throw new RuntimeException(
+          s"Input stream is too short: tried to read $partLength bytes in part $partNumber, only got $bytesRead"
+        )
+      }
+
+      if (partNumber == partCount && inputStream.available() > 0) {
+        throw new RuntimeException(s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream.available()} bytes still available")
+      }
 
       val uploadPartRequest =
         UploadPartRequest
@@ -105,14 +115,16 @@ trait S3StreamWritable
     }.toList
   }
 
+
+
   private def buildPutError(throwable: Throwable): WriteError =
     throwable match {
-      case exc: SdkClientException
+      case exc: RuntimeException
           if exc.getMessage.startsWith(
-            "Data read has a different length than the expected") =>
+            "Not all bytes read from input stream") =>
         IncorrectStreamLengthError(exc)
-      case exc: SdkClientException
-          if exc.getMessage.startsWith("More data read than expected") =>
+      case exc: RuntimeException
+          if exc.getMessage.startsWith("Input stream is too short") =>
         IncorrectStreamLengthError(exc)
 
       // e.g. Request content was only 1024 bytes, but the specified content-length was 1025 bytes.
