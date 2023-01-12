@@ -3,7 +3,13 @@ package weco.storage.store.s3
 import grizzled.slf4j.Logging
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{CompleteMultipartUploadRequest, CompletedMultipartUpload, CompletedPart, CreateMultipartUploadRequest, UploadPartRequest}
+import software.amazon.awssdk.services.s3.model.{
+  CompleteMultipartUploadRequest,
+  CompletedMultipartUpload,
+  CompletedPart,
+  CreateMultipartUploadRequest,
+  UploadPartRequest
+}
 import weco.storage.s3.S3ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -31,7 +37,10 @@ trait S3MultipartUploader extends Logging {
       createResponse.uploadId()
     }
 
-  def uploadPart(location: S3ObjectLocation, uploadId: String, bytes: Array[Byte], partNumber: Int): Try[CompletedPart] =
+  def uploadPart(location: S3ObjectLocation,
+                 uploadId: String,
+                 bytes: Array[Byte],
+                 partNumber: Int): Try[CompletedPart] =
     Try {
       val uploadPartRequest =
         UploadPartRequest
@@ -54,7 +63,9 @@ trait S3MultipartUploader extends Logging {
         .build()
     }
 
-  def completeMultipartUpload(location: S3ObjectLocation, uploadId: String, completedParts: List[CompletedPart]): Try[Unit] =
+  def completeMultipartUpload(location: S3ObjectLocation,
+                              uploadId: String,
+                              completedParts: List[CompletedPart]): Try[Unit] =
     Try {
       val completedMultipartUpload =
         CompletedMultipartUpload

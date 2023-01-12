@@ -64,13 +64,15 @@ trait S3StreamWritable
       }
 
       if (partNumber == partCount && inputStream.available() > 0) {
-        throw new RuntimeException(s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream.available()} bytes still available")
+        throw new RuntimeException(
+          s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+            .available()} bytes still available")
       }
 
       uploadPart(location, uploadId, bytes, partNumber)
     }.toList
 
-    val successes = result.collect { case Success(s) => s }
+    val successes = result.collect { case Success(s)     => s }
     val failures = result.collectFirst { case Failure(e) => e }
 
     failures match {
