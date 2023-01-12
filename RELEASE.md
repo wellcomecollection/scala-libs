@@ -1,0 +1,3 @@
+RELEASE_TYPE: patch
+
+Return the CompleteMultipartUploadResponse from S3MultipartUploader.completeMultipartUpload.

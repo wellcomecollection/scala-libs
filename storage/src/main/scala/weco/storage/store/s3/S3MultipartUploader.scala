@@ -5,6 +5,7 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{
   CompleteMultipartUploadRequest,
+  CompleteMultipartUploadResponse,
   CompletedMultipartUpload,
   CompletedPart,
   CreateMultipartUploadRequest,
@@ -65,7 +66,7 @@ trait S3MultipartUploader extends Logging {
 
   def completeMultipartUpload(location: S3ObjectLocation,
                               uploadId: String,
-                              completedParts: List[CompletedPart]): Try[Unit] =
+                              completedParts: List[CompletedPart]): Try[CompleteMultipartUploadResponse] =
     Try {
       val completedMultipartUpload =
         CompletedMultipartUpload
