@@ -206,8 +206,7 @@ trait DynamoHybridStoreTestCases[
                 val value = result.left.value
 
                 value shouldBe a[InvalidIdentifierFailure]
-                value.e.getMessage should startWith(
-                  "S3 object key byte length is too big")
+                value.e.getMessage should startWith("Object key is too long")
               }
             }
           }

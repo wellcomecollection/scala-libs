@@ -1,101 +1,94 @@
 package weco.storage.store.s3
 
-import software.amazon.awssdk.core.async.AsyncRequestBody
+import grizzled.slf4j.Logging
+import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import software.amazon.awssdk.transfer.s3.S3TransferManager
-import software.amazon.awssdk.transfer.s3.model.UploadRequest
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model._
 import weco.storage._
 import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.Writable
 import weco.storage.streaming.InputStreamWithLength
 
-import java.util.concurrent.{CompletionException, Executors}
 import scala.util.{Failure, Success, Try}
 
 trait S3StreamWritable
-    extends Writable[S3ObjectLocation, InputStreamWithLength] {
-  implicit val transferManager: S3TransferManager
+    extends Writable[S3ObjectLocation, InputStreamWithLength]
+    with S3MultipartUploader
+    with Logging {
+  implicit val s3Client: S3Client
+  val partSize: Long
 
-  // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
-  // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
-  private val MAX_KEY_BYTE_LENGTH = 1024
-
-  private def createUploadRequest(
-    location: S3ObjectLocation,
-    inputStream: InputStreamWithLength,
-  ): Either[WriteError, UploadRequest] = {
-    val keyByteLength = location.key.getBytes.length
-
-    val putRequest =
-      PutObjectRequest
-        .builder()
-        .bucket(location.bucket)
-        .key(location.key)
-        .contentLength(inputStream.length)
-        .build()
-
-    val requestBody =
-      AsyncRequestBody.fromInputStream(
-        inputStream,
-        inputStream.length,
-        Executors.newSingleThreadExecutor()
-      )
-
-    val uploadRequest =
-      UploadRequest
-        .builder()
-        .putObjectRequest(putRequest)
-        .requestBody(requestBody)
-        .build()
-
-    Either.cond(
-      keyByteLength <= MAX_KEY_BYTE_LENGTH,
-      uploadRequest,
-      InvalidIdentifierFailure(
-        new Error(
-          s"S3 object key byte length is too big: $keyByteLength > $MAX_KEY_BYTE_LENGTH")
-      )
-    )
-  }
-
-  private def uploadWithTransferManager(
-    uploadRequest: UploadRequest,
-    location: S3ObjectLocation,
-    inputStream: InputStreamWithLength
-  ): Either[WriteError, Identified[S3ObjectLocation, InputStreamWithLength]] =
-    Try {
-      transferManager
-        .upload(uploadRequest)
-        .completionFuture()
-        .join()
-    } match {
-      case Success(_) if inputStream.available() > 0 =>
-        Left(
-          IncorrectStreamLengthError(
-            new RuntimeException(
-              "Data read has a different length than the expected")))
-      case Success(_) => Right(Identified(location, inputStream))
-      case Failure(err: CompletionException) =>
-        Left(buildPutError(err.getCause))
-      case Failure(err) => Left(buildPutError(err))
-    }
+  require(
+    partSize >= 5 * FileUtils.ONE_MB,
+    s"Parts must be at least 5 MB in size, got $partSize < ${5 * FileUtils.ONE_MB}; see https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPart.html"
+  )
 
   override def put(location: S3ObjectLocation)(
-    inputStream: InputStreamWithLength): WriteEither =
-    for {
-      uploadRequest <- createUploadRequest(location, inputStream)
-      result <- uploadWithTransferManager(uploadRequest, location, inputStream)
-    } yield result
+    inputStream: InputStreamWithLength): WriteEither = {
+    val result = for {
+      uploadId <- createMultipartUpload(location)
+      completedParts <- uploadParts(uploadId, location, inputStream)
+      _ <- completeMultipartUpload(location, uploadId, completedParts)
+    } yield ()
+
+    result match {
+      case Success(_) => Right(Identified(location, inputStream))
+      case Failure(e) => Left(buildPutError(e))
+    }
+  }
+
+  private def uploadParts(
+    uploadId: String,
+    location: S3ObjectLocation,
+    inputStream: InputStreamWithLength
+  ): Try[List[CompletedPart]] = {
+    val partCount = (inputStream.length.toFloat / partSize).ceil.toInt
+
+    // part numbers in MultiPart uploads are 1-indexed
+    val result = Range(1, partCount + 1).map { partNumber =>
+      // We need to know how many bytes to read from the InputStream for
+      // this part; remember that the final part may be shorter than the
+      // other parts.
+      val start = (partNumber - 1) * partSize
+      val end = Math.min(partNumber * partSize, inputStream.length)
+      val partLength = (end - start).toInt
+
+      val bytes: Array[Byte] = new Array[Byte](partLength)
+      val bytesRead = inputStream.read(bytes, 0, partLength)
+
+      if (bytesRead < partLength) {
+        throw new RuntimeException(
+          s"Input stream is too short: tried to read $partLength bytes in part $partNumber, only got $bytesRead"
+        )
+      }
+
+      if (partNumber == partCount && inputStream.available() > 0) {
+        throw new RuntimeException(
+          s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+            .available()} bytes still available")
+      }
+
+      uploadPart(location, uploadId, bytes, partNumber)
+    }.toList
+
+    val successes = result.collect { case Success(s)     => s }
+    val failures = result.collectFirst { case Failure(e) => e }
+
+    failures match {
+      case None    => Success(successes)
+      case Some(e) => Failure(e)
+    }
+  }
 
   private def buildPutError(throwable: Throwable): WriteError =
     throwable match {
-      case exc: SdkClientException
+      case exc: RuntimeException
           if exc.getMessage.startsWith(
-            "Data read has a different length than the expected") =>
+            "Not all bytes read from input stream") =>
         IncorrectStreamLengthError(exc)
-      case exc: SdkClientException
-          if exc.getMessage.startsWith("More data read than expected") =>
+      case exc: RuntimeException
+          if exc.getMessage.startsWith("Input stream is too short") =>
         IncorrectStreamLengthError(exc)
 
       // e.g. Request content was only 1024 bytes, but the specified content-length was 1025 bytes.

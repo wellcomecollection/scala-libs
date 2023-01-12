@@ -1,12 +1,16 @@
 package weco.storage.store.s3
 
+import java.io.ByteArrayInputStream
+
+import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.services.s3.model.S3Exception
+import software.amazon.awssdk.services.s3.model.{GetObjectRequest, S3Exception}
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.store.StreamStoreTestCases
 import weco.storage._
 import weco.storage.s3.S3ObjectLocation
 import weco.storage.store.fixtures.S3NamespaceFixtures
+import weco.storage.streaming.InputStreamWithLength
 
 class S3StreamStoreTest
     extends StreamStoreTestCases[S3ObjectLocation, Bucket, S3StreamStore, Unit]
@@ -15,7 +19,7 @@ class S3StreamStoreTest
   describe("handles errors from S3") {
     describe("get") {
       it("errors if S3 has a problem") {
-        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
+        val store = new S3StreamStore()(brokenS3Client)
 
         val result = store.get(createS3ObjectLocation).left.value
         result shouldBe a[StoreReadError]
@@ -65,7 +69,7 @@ class S3StreamStoreTest
 
     describe("put") {
       it("errors if S3 fails to respond") {
-        val store = new S3StreamStore()(brokenS3Client, brokenS3TransferManager)
+        val store = new S3StreamStore()(brokenS3Client)
 
         val result = store.put(createS3ObjectLocation)(createT).left.value
         result shouldBe a[StoreWriteError]
@@ -117,11 +121,33 @@ class S3StreamStoreTest
             val value = store.put(id)(entry).left.value
 
             value shouldBe a[InvalidIdentifierFailure]
-            value.e.getMessage should startWith(
-              "S3 object key byte length is too big")
+            value.e.getMessage should startWith("Object key is too long")
           }
         }
       }
+    }
+  }
+
+  it("uploads a large file (>partSize)") {
+    val length = (10 * FileUtils.ONE_MB).toInt + 1
+
+    val bytes = randomBytes(length)
+    val inputStream = new ByteArrayInputStream(bytes.toArray)
+    val store = new S3StreamStore(partSize = length - 1)
+
+    withLocalS3Bucket { bucket =>
+      val location = createS3ObjectLocationWith(bucket)
+
+      val result = store.put(location)(new InputStreamWithLength(inputStream, length))
+      result shouldBe a[Right[_, _]]
+
+      val getRequest =
+        GetObjectRequest.builder()
+          .bucket(location.bucket)
+          .key(location.key)
+          .build()
+
+      s3Client.getObjectAsBytes(getRequest).asByteArray() shouldBe bytes
     }
   }
 }
