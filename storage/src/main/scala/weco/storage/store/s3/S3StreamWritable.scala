@@ -3,6 +3,7 @@ package weco.storage.store.s3
 import grizzled.slf4j.Logging
 import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
 import weco.storage._
@@ -26,11 +27,27 @@ trait S3StreamWritable
 
   override def put(location: S3ObjectLocation)(
     inputStream: InputStreamWithLength): WriteEither = {
-    val result = for {
-      uploadId <- createMultipartUpload(location)
-      completedParts <- uploadParts(uploadId, location, inputStream)
-      _ <- completeMultipartUpload(location, uploadId, completedParts)
-    } yield ()
+    val result =
+      if (inputStream.length <= partSize) {
+        val putObjectRequest =
+          PutObjectRequest.builder()
+            .bucket(location.bucket)
+            .key(location.key)
+            .build()
+
+        val requestBody = RequestBody.fromInputStream(
+          inputStream,
+          inputStream.length
+        )
+
+        Try { s3Client.putObject(putObjectRequest, requestBody) }
+      } else {
+        for {
+          uploadId <- createMultipartUpload(location)
+          completedParts <- uploadParts(uploadId, location, inputStream)
+          _ <- completeMultipartUpload(location, uploadId, completedParts)
+        } yield ()
+      }
 
     result match {
       case Success(_) => Right(Identified(location, inputStream))
@@ -59,7 +76,7 @@ trait S3StreamWritable
 
       if (bytesRead < partLength) {
         throw new RuntimeException(
-          s"Input stream is too short: tried to read $partLength bytes in part $partNumber, only got $bytesRead"
+          s"Input stream is too short: tried to read $partLength bytes, only got $bytesRead"
         )
       }
 

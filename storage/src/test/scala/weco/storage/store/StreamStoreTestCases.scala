@@ -82,6 +82,17 @@ trait StreamStoreTestCases[
         }
       }
 
+      it("can put an empty stream") {
+        withNamespace { implicit namespace =>
+          val id = createId
+          val entry = ReplayableStream(Array[Byte]())
+
+          withStoreImpl(initialEntries = Map.empty) { store =>
+            store.put(id)(entry) shouldBe a[Right[_, _]]
+          }
+        }
+      }
+
       it("errors if the stream length is too long") {
         assume(!skipStreamLengthTests)
 
