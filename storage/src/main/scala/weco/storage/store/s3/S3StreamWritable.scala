@@ -3,7 +3,6 @@ package weco.storage.store.s3
 import grizzled.slf4j.Logging
 import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
 import weco.storage._
@@ -11,11 +10,11 @@ import weco.storage.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.Writable
 import weco.storage.streaming.InputStreamWithLength
 
-import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 trait S3StreamWritable
     extends Writable[S3ObjectLocation, InputStreamWithLength]
+    with S3MultipartUploader
     with Logging {
   implicit val s3Client: S3Client
   val partSize: Long
@@ -26,53 +25,28 @@ trait S3StreamWritable
   )
 
   override def put(location: S3ObjectLocation)(
-    inputStream: InputStreamWithLength): WriteEither =
-    Try {
-      val createRequest =
-        CreateMultipartUploadRequest
-          .builder()
-          .bucket(location.bucket)
-          .key(location.key)
-          .build()
+    inputStream: InputStreamWithLength): WriteEither = {
+    val result = for {
+      uploadId <- createMultipartUpload(location)
+      completedParts <- uploadParts(uploadId, location, inputStream)
+      _ <- completeMultipartUpload(location, uploadId, completedParts)
+    } yield ()
 
-      val createResponse = s3Client.createMultipartUpload(createRequest)
-
-      debug(
-        s"Got CreateMultipartUploadResponse with upload ID ${createResponse.uploadId()}"
-      )
-
-      val completedParts = uploadParts(createResponse, location, inputStream)
-
-      val completedMultipartUpload =
-        CompletedMultipartUpload
-          .builder()
-          .parts(completedParts.asJava)
-          .build()
-
-      val completeRequest =
-        CompleteMultipartUploadRequest
-          .builder()
-          .bucket(location.bucket)
-          .key(location.key)
-          .uploadId(createResponse.uploadId())
-          .multipartUpload(completedMultipartUpload)
-          .build()
-
-      s3Client.completeMultipartUpload(completeRequest)
-    } match {
+    result match {
       case Success(_) => Right(Identified(location, inputStream))
       case Failure(e) => Left(buildPutError(e))
     }
+  }
 
   private def uploadParts(
-    createResponse: CreateMultipartUploadResponse,
+    uploadId: String,
     location: S3ObjectLocation,
     inputStream: InputStreamWithLength
-  ): List[CompletedPart] = {
+  ): Try[List[CompletedPart]] = {
     val partCount = (inputStream.length.toFloat / partSize).ceil.toInt
 
     // part numbers in MultiPart uploads are 1-indexed
-    Range(1, partCount + 1).map { partNumber =>
+    val result = Range(1, partCount + 1).map { partNumber =>
       // We need to know how many bytes to read from the InputStream for
       // this part; remember that the final part may be shorter than the
       // other parts.
@@ -93,29 +67,17 @@ trait S3StreamWritable
         throw new RuntimeException(s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream.available()} bytes still available")
       }
 
-      val uploadPartRequest =
-        UploadPartRequest
-          .builder()
-          .bucket(location.bucket)
-          .key(location.key)
-          .uploadId(createResponse.uploadId())
-          .partNumber(partNumber)
-          .build()
-
-      val requestBody = RequestBody.fromBytes(bytes)
-
-      val uploadPartResponse =
-        s3Client.uploadPart(uploadPartRequest, requestBody)
-
-      CompletedPart
-        .builder()
-        .eTag(uploadPartResponse.eTag())
-        .partNumber(partNumber)
-        .build()
+      uploadPart(location, uploadId, bytes, partNumber)
     }.toList
+
+    val successes = result.collect { case Success(s) => s }
+    val failures = result.collectFirst { case Failure(e) => e }
+
+    failures match {
+      case None    => Success(successes)
+      case Some(e) => Failure(e)
+    }
   }
-
-
 
   private def buildPutError(throwable: Throwable): WriteError =
     throwable match {
