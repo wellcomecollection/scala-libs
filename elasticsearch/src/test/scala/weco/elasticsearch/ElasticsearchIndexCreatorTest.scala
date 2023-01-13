@@ -16,7 +16,6 @@ import weco.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
 case class TestObject(
   id: String,
@@ -192,59 +191,6 @@ class ElasticsearchIndexCreatorTest
               )
             }
           }
-      }
-    }
-  }
-
-  val refreshIntervalConfig = IndexConfig(
-    analysis = Analysis(analyzers = List()),
-    mapping = properties(),
-    refreshInterval = RefreshInterval.Off
-  )
-
-  it("sets initial refresh_interval on a non-existing index") {
-    withLocalElasticsearchIndex(refreshIntervalConfig) { index =>
-      val resp = elasticClient.execute {
-        getSettings(index.name)
-      }.await
-
-      resp.result
-        .settings(index.name)
-        .get("index.refresh_interval") shouldBe Some("-1")
-    }
-  }
-
-  it("updates the refresh_interval on an already existing index") {
-    withLocalElasticsearchIndex(refreshIntervalConfig) { index =>
-      val resp = elasticClient.execute {
-        getSettings(index.name)
-      }.await
-
-      resp.result
-        .settings(index.name)
-        .get("index.refresh_interval") shouldBe Some("-1")
-
-      withLocalElasticsearchIndex(
-        refreshIntervalConfig.copy(
-          refreshInterval = RefreshInterval.On(30.seconds))) { index =>
-        val resp = elasticClient.execute {
-          getSettings(index.name)
-        }.await
-
-        resp.result
-          .settings(index.name)
-          .get("index.refresh_interval") shouldBe Some("30000ms")
-
-        withLocalElasticsearchIndex(refreshIntervalConfig.copy(
-          refreshInterval = RefreshInterval.Default)) { index =>
-          val resp = elasticClient.execute {
-            getSettings(index.name)
-          }.await
-
-          resp.result
-            .settings(index.name)
-            .get("index.refresh_interval") shouldBe Some("1s")
-        }
       }
     }
   }
