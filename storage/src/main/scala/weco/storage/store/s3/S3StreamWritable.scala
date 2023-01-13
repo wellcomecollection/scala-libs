@@ -36,10 +36,22 @@ trait S3StreamWritable
             .key(location.key)
             .build()
 
-        val requestBody = RequestBody.fromInputStream(
-          inputStream,
-          inputStream.length
-        )
+        val bytes: Array[Byte] = new Array[Byte](inputStream.length)
+        val bytesRead = inputStream.read(bytes, 0, inputStream.length)
+
+        if (bytesRead < inputStream.length) {
+          throw new RuntimeException(
+            s"Input stream is too short: tried to read ${inputStream.length} bytes, only got $bytesRead"
+          )
+        }
+
+        if (inputStream.available() > 0) {
+          throw new RuntimeException(
+            s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+              .available()} bytes still available")
+        }
+
+        val requestBody = RequestBody.fromBytes(bytes)
 
         Try { s3Client.putObject(putObjectRequest, requestBody) }
       } else {
