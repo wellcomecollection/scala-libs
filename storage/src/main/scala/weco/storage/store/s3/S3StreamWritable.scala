@@ -40,7 +40,8 @@ trait S3StreamWritable
           requestBody <- Try {
             if (inputStream.length > 0) {
               val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
-              val bytesRead = inputStream.read(bytes, 0, inputStream.length.toInt)
+              val bytesRead =
+                inputStream.read(bytes, 0, inputStream.length.toInt)
 
               if (bytesRead < inputStream.length) {
                 throw new RuntimeException(
