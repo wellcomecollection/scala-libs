@@ -36,8 +36,8 @@ trait S3StreamWritable
             .key(location.key)
             .build()
 
-        val bytes: Array[Byte] = new Array[Byte](inputStream.length)
-        val bytesRead = inputStream.read(bytes, 0, inputStream.length)
+        val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
+        val bytesRead = inputStream.read(bytes, 0, inputStream.length.toInt)
 
         if (bytesRead < inputStream.length) {
           throw new RuntimeException(
