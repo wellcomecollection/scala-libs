@@ -36,28 +36,31 @@ trait S3StreamWritable
             .key(location.key)
             .build()
 
-        val requestBody = if (inputStream.length > 0) {
-          val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
-          val bytesRead = inputStream.read(bytes, 0, inputStream.length.toInt)
+        for {
+          requestBody <- Try {
+            if (inputStream.length > 0) {
+              val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
+              val bytesRead = inputStream.read(bytes, 0, inputStream.length.toInt)
 
-          if (bytesRead < inputStream.length) {
-            throw new RuntimeException(
-              s"Input stream is too short: tried to read ${inputStream.length} bytes, only got $bytesRead"
-            )
+              if (bytesRead < inputStream.length) {
+                throw new RuntimeException(
+                  s"Input stream is too short: tried to read ${inputStream.length} bytes, only got $bytesRead"
+                )
+              }
+
+              if (inputStream.available() > 0) {
+                throw new RuntimeException(
+                  s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+                    .available()} bytes still available")
+              }
+
+              RequestBody.fromBytes(bytes)
+            } else {
+              RequestBody.empty()
+            }
           }
-
-          if (inputStream.available() > 0) {
-            throw new RuntimeException(
-              s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
-                .available()} bytes still available")
-          }
-
-          RequestBody.fromBytes(bytes)
-        } else {
-          RequestBody.empty()
-        }
-        
-        Try { s3Client.putObject(putObjectRequest, requestBody) }
+          _ <- Try { s3Client.putObject(putObjectRequest, requestBody) }
+        } yield ()
       } else {
         for {
           uploadId <- createMultipartUpload(location)
