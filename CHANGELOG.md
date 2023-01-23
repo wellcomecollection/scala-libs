@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.24.0 - 2023-01-23
+
+Remove an unused AzureBlobServiceClientBuilder object.
+
 ## v32.23.0 - 2023-01-23
 
 Remove a bunch of one-line builder methods (e.g. S3Builder.buildS3Client), which can be inlined whenever called, removing an unnecessary bit of abstraction.
