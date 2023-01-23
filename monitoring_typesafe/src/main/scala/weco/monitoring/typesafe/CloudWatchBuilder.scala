@@ -10,9 +10,6 @@ import weco.monitoring.typesafe.MetricsBuilder.buildMetricsConfig
 import scala.concurrent.ExecutionContext
 
 object CloudWatchBuilder {
-  def buildCloudWatchClient: CloudWatchClient =
-    CloudWatchClient.builder().build()
-
   private def buildCloudWatchMetrics(
     cloudWatchClient: CloudWatchClient,
     metricsConfig: MetricsConfig
@@ -29,7 +26,7 @@ object CloudWatchBuilder {
     materializer: Materializer,
     ec: ExecutionContext): CloudWatchMetrics =
     buildCloudWatchMetrics(
-      cloudWatchClient = CloudWatchBuilder.buildCloudWatchClient,
+      cloudWatchClient = CloudWatchClient.builder().build(),
       metricsConfig = buildMetricsConfig(config)
     )
 }

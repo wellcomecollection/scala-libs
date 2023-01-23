@@ -23,13 +23,10 @@ object SQSBuilder {
     )
   }
 
-  def buildSQSAsyncClient: SqsAsyncClient =
-    SqsAsyncClient.builder().build()
-
   def buildSQSStream[T](config: Config)(implicit actorSystem: ActorSystem,
                                         ec: ExecutionContext): SQSStream[T] =
     new SQSStream[T](
-      sqsClient = buildSQSAsyncClient,
+      sqsClient = SqsAsyncClient.builder().build(),
       sqsConfig = buildSQSConfig(config),
       metricsSender = CloudWatchBuilder.buildCloudWatchMetrics(config)
     )
