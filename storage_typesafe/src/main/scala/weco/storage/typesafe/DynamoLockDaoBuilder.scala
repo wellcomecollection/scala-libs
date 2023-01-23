@@ -1,6 +1,7 @@
 package weco.storage.typesafe
 
 import com.typesafe.config.Config
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import weco.storage.locking.dynamo.{DynamoLockDao, DynamoLockDaoConfig}
 import weco.typesafe.config.builders.EnrichConfig._
 
@@ -12,7 +13,7 @@ object DynamoLockDaoBuilder {
     implicit
     ec: ExecutionContext,
   ) = new DynamoLockDao(
-    client = DynamoBuilder.buildDynamoClient,
+    client = DynamoDbClient.builder().build(),
     config = DynamoLockDaoConfig(
       dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace),
       expiryTime = config

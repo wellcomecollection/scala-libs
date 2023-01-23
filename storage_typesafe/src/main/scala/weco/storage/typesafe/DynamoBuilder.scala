@@ -1,7 +1,6 @@
 package weco.storage.typesafe
 
 import com.typesafe.config.Config
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import weco.storage.dynamo.DynamoConfig
 import weco.typesafe.config.builders.EnrichConfig._
 
@@ -19,7 +18,4 @@ object DynamoBuilder {
       maybeIndexName = if (tableIndex.isEmpty) None else Some(tableIndex)
     )
   }
-
-  def buildDynamoClient: DynamoDbClient =
-    DynamoDbClient.builder().build()
 }
