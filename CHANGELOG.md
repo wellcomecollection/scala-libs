@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.24.1 - 2023-01-30
+
+Retry instances of `java.net.SocketException` when reading from S3.
+
 ## v32.24.0 - 2023-01-23
 
 Remove an unused AzureBlobServiceClientBuilder object.
