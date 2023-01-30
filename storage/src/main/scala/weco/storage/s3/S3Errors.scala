@@ -4,7 +4,7 @@ import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
 import weco.storage._
 
-import java.net.{SocketTimeoutException, UnknownHostException}
+import java.net.{SocketException, SocketTimeoutException, UnknownHostException}
 
 object S3Errors {
   val readErrors: PartialFunction[Throwable, ReadError] = {
@@ -34,6 +34,10 @@ object S3Errors {
 
     case exc: SdkClientException
         if exc.getCause.isInstanceOf[UnknownHostException] =>
+      new StoreReadError(exc) with RetryableError
+
+    // e.g. java.net.SocketException: Connection reset
+    case exc: SocketException =>
       new StoreReadError(exc) with RetryableError
 
     case exc: SocketTimeoutException =>
