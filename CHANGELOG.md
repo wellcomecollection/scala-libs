@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.24.2 - 2023-02-07
+
+Make S3StreamWritable more efficient; fix a bug when writing objects with empty bodies.
+
 ## v32.24.1 - 2023-01-30
 
 Retry instances of `java.net.SocketException` when reading from S3.
