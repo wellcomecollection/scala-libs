@@ -3,6 +3,7 @@ package weco.storage.store.s3
 import grizzled.slf4j.Logging
 import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
 import weco.storage._
@@ -26,11 +27,48 @@ trait S3StreamWritable
 
   override def put(location: S3ObjectLocation)(
     inputStream: InputStreamWithLength): WriteEither = {
-    val result = for {
-      uploadId <- createMultipartUpload(location)
-      completedParts <- uploadParts(uploadId, location, inputStream)
-      _ <- completeMultipartUpload(location, uploadId, completedParts)
-    } yield ()
+    val result =
+      if (inputStream.length <= partSize) {
+        val putObjectRequest =
+          PutObjectRequest
+            .builder()
+            .bucket(location.bucket)
+            .key(location.key)
+            .build()
+
+        for {
+          requestBody <- Try {
+            if (inputStream.length > 0) {
+              val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
+              val bytesRead =
+                inputStream.read(bytes, 0, inputStream.length.toInt)
+
+              if (bytesRead < inputStream.length) {
+                throw new RuntimeException(
+                  s"Input stream is too short: tried to read ${inputStream.length} bytes, only got $bytesRead"
+                )
+              }
+
+              if (inputStream.available() > 0) {
+                throw new RuntimeException(
+                  s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+                    .available()} bytes still available")
+              }
+
+              RequestBody.fromBytes(bytes)
+            } else {
+              RequestBody.empty()
+            }
+          }
+          _ <- Try { s3Client.putObject(putObjectRequest, requestBody) }
+        } yield ()
+      } else {
+        for {
+          uploadId <- createMultipartUpload(location)
+          completedParts <- uploadParts(uploadId, location, inputStream)
+          _ <- completeMultipartUpload(location, uploadId, completedParts)
+        } yield ()
+      }
 
     result match {
       case Success(_) => Right(Identified(location, inputStream))
@@ -59,7 +97,7 @@ trait S3StreamWritable
 
       if (bytesRead < partLength) {
         throw new RuntimeException(
-          s"Input stream is too short: tried to read $partLength bytes in part $partNumber, only got $bytesRead"
+          s"Input stream is too short: tried to read $partLength bytes, only got $bytesRead"
         )
       }
 
