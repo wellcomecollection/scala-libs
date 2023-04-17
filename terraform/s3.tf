@@ -1,10 +1,18 @@
 resource "aws_s3_bucket" "releases" {
   bucket = "releases.mvn-repo.wellcomecollection.org"
-  acl    = "public-read"
+}
 
-  lifecycle_rule {
+resource "aws_s3_bucket_acl" "releases" {
+  bucket = aws_s3_bucket.releases.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "releases" {
+  bucket = aws_s3_bucket.releases.id
+
+  rule {
     id      = "transition_all_to_standard_ia"
-    enabled = true
+    status = "Enabled"
 
     transition {
       days          = 30
