@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v32.25.0 - 2023-05-27
+
+Remove the AWS CRT libraries, which are causing link issues in the bag replicator in the storage service:
+
+> java.lang.UnsatisfiedLinkError: /tmp/AWSCRT_18127555281524790519libaws-crt-jni.so: Error loading shared library ld-linux-x86-64.so.2: No such file or directory (needed by /tmp/AWSCRT_18127555281524790519libaws-crt-jni.so)
+
 ## v32.24.2 - 2023-02-07
 
 Make S3StreamWritable more efficient; fix a bug when writing objects with empty bodies.
