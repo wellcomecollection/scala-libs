@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.26.0 - 2023-05-31
+
+Restore the AWS CRT libraries, because their absence is causing the bag replicator to fail when transferring files >5GB in size.
+
 ## v32.25.0 - 2023-05-27
 
 Remove the AWS CRT libraries, which are causing link issues in the bag replicator in the storage service:
