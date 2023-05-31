@@ -7,6 +7,11 @@ object Dependencies {
 
     val aws = "2.19.0"
 
+    // These are the "Common Runtime Libraries", which you're encouraged to use for
+    // better performance.
+    // See https://docs.aws.amazon.com/sdkref/latest/guide/common-runtime.html
+    val awsCrt = "0.20.3"
+
     val azure = "12.7.0"
 
     val circe = "0.14.2"
@@ -176,6 +181,7 @@ object Dependencies {
     "software.amazon.awssdk" % "dynamodb" % versions.aws,
     "software.amazon.awssdk" % "s3" % versions.aws,
     "software.amazon.awssdk" % "s3-transfer-manager" % versions.aws,
+    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt
   ) ++
     scanamoDependencies ++
     apacheCommons
