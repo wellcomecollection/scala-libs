@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.27.0 - 2023-07-25
+
+Bump elastic4s to v8.8.1 and matching Akka v2.6.20
+
 ## v32.26.0 - 2023-05-31
 
 Restore the AWS CRT libraries, because their absence is causing the bag replicator to fail when transferring files >5GB in size.
