@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.29.0 - 2023-08-03
+
+Bump the version of Circe to 0.14.5 to match elastic4s.
+
 ## v32.28.0 - 2023-08-03
 
 Remove the unused PrefixTransferBuilder object from storage-typesafe.
