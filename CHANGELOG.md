@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.30.0 - 2023-08-03
+
+Remove the `transfer` namespace from the `storage` library, which is only used in the storage service.
+
 ## v32.29.0 - 2023-08-03
 
 Bump the version of Circe to 0.14.5 to match elastic4s.
