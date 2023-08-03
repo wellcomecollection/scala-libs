@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.28.0 - 2023-08-03
+
+Remove the unused PrefixTransferBuilder object from storage-typesafe.
+
 ## v32.27.0 - 2023-07-25
 
 Bump elastic4s to v8.8.1 and matching Akka v2.6.20
