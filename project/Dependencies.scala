@@ -14,7 +14,11 @@ object Dependencies {
 
     val azure = "12.7.0"
 
-    val circe = "0.14.2"
+    // Note: this should probably match the version of Circe used by elastic4s.
+    // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
+    val circe = "0.14.5"
+    val circeGenericExtras = "0.14.3"
+
     val typesafe = "1.3.2"
     val logback = "1.1.8"
     val mockito = "1.10.19"
@@ -74,7 +78,7 @@ object Dependencies {
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circe,
     "io.circe" %% "circe-generic" % versions.circe,
-    "io.circe" %% "circe-generic-extras" % versions.circe,
+    "io.circe" %% "circe-generic-extras" % versions.circeGenericExtras,
     "io.circe" %% "circe-parser" % versions.circe,
     "org.scala-lang" % "scala-reflect" % versions.scalaReflectVersion
   )
