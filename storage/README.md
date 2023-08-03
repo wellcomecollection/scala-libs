@@ -60,10 +60,6 @@ The library includes classes for:
 
 - [`streaming`](https://github.com/wellcomecollection/scala-libs/tree/main/storage/src/main/scala/weco/storage/streaming): Convert Java/Scala classes to and from an `InputStream`.
 
-- [`transfer`](https://github.com/wellcomecollection/scala-libs/tree/main/storage/src/main/scala/weco/storage/transfer): Transferring things within a storage provider, including transfer by prefix
-
-    For example, this allows us to copy a folder in S3 to another location.
-
 ## How it is written
 
 ### Traits AKA Type classes

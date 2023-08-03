@@ -7,11 +7,6 @@ object Dependencies {
 
     val aws = "2.19.0"
 
-    // These are the "Common Runtime Libraries", which you're encouraged to use for
-    // better performance.
-    // See https://docs.aws.amazon.com/sdkref/latest/guide/common-runtime.html
-    val awsCrt = "0.20.3"
-
     val azure = "12.7.0"
 
     // Note: this should probably match the version of Circe used by elastic4s.
@@ -182,10 +177,8 @@ object Dependencies {
 
   val storageDependencies: Seq[ModuleID] = Seq(
     "com.azure" % "azure-storage-blob" % versions.azure,
-    "software.amazon.awssdk" % "dynamodb" % versions.aws,
     "software.amazon.awssdk" % "s3" % versions.aws,
-    "software.amazon.awssdk" % "s3-transfer-manager" % versions.aws,
-    "software.amazon.awssdk.crt" % "aws-crt" % versions.awsCrt
+    "software.amazon.awssdk" % "dynamodb" % versions.aws
   ) ++
     scanamoDependencies ++
     apacheCommons
