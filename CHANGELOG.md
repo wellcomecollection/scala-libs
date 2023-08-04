@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.31.0 - 2023-08-04
+
+Remove the S3PresignedUrls and S3Uploader classes, which are only used in the storage service.
+
 ## v32.30.0 - 2023-08-03
 
 Remove the `transfer` namespace from the `storage` library, which is only used in the storage service.
