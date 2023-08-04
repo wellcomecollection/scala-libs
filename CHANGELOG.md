@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.33.0 - 2023-08-04
+
+Remove the `services` namespace from the storage library, which is only used by the storage service.
+
 ## v32.32.0 - 2023-08-04
 
 Remove the `tags` namespace from the storage library, which is only used in the storage service.
