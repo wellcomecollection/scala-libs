@@ -7,8 +7,6 @@ object Dependencies {
 
     val aws = "2.19.0"
 
-    val azure = "12.7.0"
-
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
     val circe = "0.14.5"
@@ -176,7 +174,6 @@ object Dependencies {
       testDependencies
 
   val storageDependencies: Seq[ModuleID] = Seq(
-    "com.azure" % "azure-storage-blob" % versions.azure,
     "software.amazon.awssdk" % "s3" % versions.aws,
     "software.amazon.awssdk" % "dynamodb" % versions.aws
   ) ++
