@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.34.0 - 2023-08-07
+
+Move the `storage.azure` and `storage.s3` packages into the `storage.providers` namespace for consistency.
+
 ## v32.33.0 - 2023-08-04
 
 Remove the `services` namespace from the storage library, which is only used by the storage service.
