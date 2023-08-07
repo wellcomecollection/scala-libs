@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.37.0 - 2023-08-07
+
+Remove the remaining bits of the Azure storage library, which is only used by the storage service.
+
 ## v32.36.0 - 2023-08-07
 
 Remove the `storage.models` namespace, which is only used by the storage service.
