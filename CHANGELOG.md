@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.36.0 - 2023-08-07
+
+Remove the `storage.models` namespace, which is only used by the storage service.
+
 ## v32.35.0 - 2023-08-07
 
 Remove the `storage.listing` namespace, which is only used by the storage service.
