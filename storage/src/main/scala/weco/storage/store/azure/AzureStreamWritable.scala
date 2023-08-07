@@ -4,7 +4,7 @@ import java.io.BufferedInputStream
 
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobErrorCode, BlobStorageException}
-import weco.storage.azure.AzureBlobLocation
+import weco.storage.providers.azure.AzureBlobLocation
 import weco.storage.store.Writable
 import weco.storage.streaming.InputStreamWithLength
 import weco.storage.{Identified, OverwriteError, StoreWriteError}

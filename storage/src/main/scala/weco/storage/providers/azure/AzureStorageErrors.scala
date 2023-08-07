@@ -1,4 +1,4 @@
-package weco.storage.azure
+package weco.storage.providers.azure
 
 import com.azure.storage.blob.models.BlobStorageException
 import weco.storage.{

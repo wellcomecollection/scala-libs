@@ -3,7 +3,7 @@ package weco.storage.store.s3
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import weco.storage._
-import weco.storage.s3.{S3Errors, S3ObjectLocation}
+import weco.storage.providers.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.RetryableReadable
 import weco.storage.streaming._
 

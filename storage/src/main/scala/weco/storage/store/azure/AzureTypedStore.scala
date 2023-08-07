@@ -1,7 +1,7 @@
 package weco.storage.store.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import weco.storage.azure.AzureBlobLocation
+import weco.storage.providers.azure.AzureBlobLocation
 import weco.storage.store.TypedStore
 import weco.storage.streaming.Codec
 

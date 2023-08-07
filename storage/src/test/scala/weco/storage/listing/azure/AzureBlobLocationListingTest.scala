@@ -2,11 +2,11 @@ package weco.storage.listing.azure
 
 import org.scalatest.Assertion
 import weco.fixtures.TestWith
-import weco.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import weco.storage.fixtures.AzureFixtures
 import weco.storage.fixtures.AzureFixtures.Container
 import weco.storage.generators.StreamGenerators
 import weco.storage.listing.ListingTestCases
+import weco.storage.providers.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 
 class AzureBlobLocationListingTest
     extends ListingTestCases[

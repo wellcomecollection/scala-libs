@@ -3,10 +3,10 @@ package weco.storage.store.azure
 import java.io.InputStream
 
 import weco.fixtures.TestWith
-import weco.storage.azure.AzureBlobLocation
 import weco.storage.fixtures.AzureFixtures
 import weco.storage.fixtures.AzureFixtures.Container
 import weco.storage.generators.{Record, RecordGenerators}
+import weco.storage.providers.azure.AzureBlobLocation
 import weco.storage.store.TypedStoreTestCases
 import weco.storage.streaming.{Codec, InputStreamWithLength}
 import weco.storage.{Identified, StoreReadError, StoreWriteError}

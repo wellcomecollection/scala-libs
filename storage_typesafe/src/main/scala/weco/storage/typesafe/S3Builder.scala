@@ -1,7 +1,7 @@
 package weco.storage.typesafe
 
 import com.typesafe.config.Config
-import weco.storage.s3._
+import weco.storage.providers.s3._
 import weco.typesafe.config.builders.EnrichConfig._
 
 object S3Builder {

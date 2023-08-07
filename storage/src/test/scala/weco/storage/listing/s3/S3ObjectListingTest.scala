@@ -4,7 +4,7 @@ import org.scalatest.Assertion
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.S3Object
 import weco.storage.fixtures.S3Fixtures.Bucket
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 
 class S3ObjectListingTest extends S3ListingTestCases[S3Object] {
   override def assertResultCorrect(

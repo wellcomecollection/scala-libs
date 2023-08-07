@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.s3.model.{
   CreateMultipartUploadRequest,
   UploadPartRequest
 }
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 
 import scala.collection.JavaConverters._
 import scala.util.Try

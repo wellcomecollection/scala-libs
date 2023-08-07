@@ -1,4 +1,4 @@
-package weco.storage.s3
+package weco.storage.providers.s3
 
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception

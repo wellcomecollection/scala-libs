@@ -5,7 +5,7 @@ import java.util.UUID
 import weco.storage.store._
 import weco.storage.store.s3.S3TypedStore
 import weco.storage._
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 class DynamoHybridStore[T](prefix: S3ObjectLocationPrefix)(
   implicit val indexedStore: DynamoHashStore[String, Int, S3ObjectLocation],

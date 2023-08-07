@@ -8,7 +8,7 @@ import software.amazon.awssdk.services.s3.model.{GetObjectRequest, S3Exception}
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.store.StreamStoreTestCases
 import weco.storage._
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 import weco.storage.store.fixtures.S3NamespaceFixtures
 import weco.storage.streaming.InputStreamWithLength
 

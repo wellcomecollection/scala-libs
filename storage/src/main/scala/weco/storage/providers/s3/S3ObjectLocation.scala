@@ -1,4 +1,4 @@
-package weco.storage.s3
+package weco.storage.providers.s3
 
 import java.nio.file.Paths
 

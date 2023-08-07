@@ -1,7 +1,7 @@
 package weco.storage.store.s3
 
 import weco.fixtures.TestWith
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 import weco.storage.store.fixtures.TypedStoreFixtures
 import weco.storage.streaming.Codec
 

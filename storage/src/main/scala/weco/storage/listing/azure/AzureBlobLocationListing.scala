@@ -1,7 +1,7 @@
 package weco.storage.listing.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import weco.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
+import weco.storage.providers.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 
 class AzureBlobLocationListing(implicit itemListing: AzureBlobItemListing)
     extends AzureListing[AzureBlobLocation] {

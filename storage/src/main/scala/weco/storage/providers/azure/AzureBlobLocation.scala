@@ -1,4 +1,4 @@
-package weco.storage.azure
+package weco.storage.providers.azure
 
 import java.nio.file.Paths
 
