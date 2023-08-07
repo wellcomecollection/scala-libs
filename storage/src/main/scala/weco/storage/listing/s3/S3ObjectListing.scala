@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{ListObjectsV2Request, S3Object}
 import weco.storage.ListingFailure
-import weco.storage.s3.S3ObjectLocationPrefix
+import weco.storage.providers.s3.S3ObjectLocationPrefix
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}

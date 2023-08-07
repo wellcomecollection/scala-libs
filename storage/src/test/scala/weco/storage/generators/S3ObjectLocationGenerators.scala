@@ -2,7 +2,7 @@ package weco.storage.generators
 
 import weco.fixtures.RandomGenerators
 import weco.storage.fixtures.S3Fixtures.Bucket
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 import scala.util.Random
 

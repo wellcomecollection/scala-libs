@@ -6,7 +6,7 @@ import weco.storage.dynamo.DynamoConfig
 import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.fixtures.{DynamoFixtures, S3Fixtures}
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.s3.S3TypedStore
 import weco.storage.store.VersionedStoreWithOverwriteTestCases
 import weco.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}

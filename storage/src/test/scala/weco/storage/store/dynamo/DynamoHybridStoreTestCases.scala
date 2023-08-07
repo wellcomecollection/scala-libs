@@ -7,7 +7,7 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.fixtures.{DynamoFixtures, S3Fixtures}
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store._
 import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
 import weco.storage.{
@@ -20,7 +20,7 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.fixtures.{DynamoFixtures, S3Fixtures}
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.HybridStoreWithoutOverwritesTestCases
 import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
 

@@ -6,7 +6,7 @@ import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.{BlobItem, ListBlobsOptions}
 import grizzled.slf4j.Logging
 import weco.storage.ListingFailure
-import weco.storage.azure.AzureBlobLocationPrefix
+import weco.storage.providers.azure.AzureBlobLocationPrefix
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}

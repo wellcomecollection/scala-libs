@@ -1,9 +1,8 @@
 package weco.storage.store.azure
 
 import com.azure.storage.blob.BlobServiceClient
-import weco.storage.azure.AzureBlobLocation
 import weco.storage.store.StreamStore
-import weco.storage.azure.AzureBlobLocation
+import weco.storage.providers.azure.AzureBlobLocation
 
 class AzureStreamStore(
   val maxRetries: Int = 2,

@@ -1,8 +1,8 @@
 package weco.storage.generators
 
 import weco.fixtures.RandomGenerators
-import weco.storage.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 import weco.storage.fixtures.AzureFixtures.Container
+import weco.storage.providers.azure.{AzureBlobLocation, AzureBlobLocationPrefix}
 
 trait AzureBlobLocationGenerators extends RandomGenerators {
 

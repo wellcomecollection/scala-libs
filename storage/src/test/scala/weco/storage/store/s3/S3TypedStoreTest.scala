@@ -6,7 +6,7 @@ import weco.fixtures.TestWith
 import weco.storage._
 import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 import weco.storage.store.TypedStoreTestCases
 import weco.storage.store.fixtures.S3NamespaceFixtures
 import weco.storage.streaming.InputStreamWithLength

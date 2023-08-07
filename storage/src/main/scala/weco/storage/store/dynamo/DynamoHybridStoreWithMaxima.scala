@@ -3,7 +3,7 @@ package weco.storage.store.dynamo
 import java.util.UUID
 
 import weco.storage.Version
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.HybridStoreWithMaxima
 import weco.storage.store.s3.S3TypedStore
 

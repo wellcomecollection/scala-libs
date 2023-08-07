@@ -1,4 +1,4 @@
-package weco.storage.s3
+package weco.storage.providers.s3
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

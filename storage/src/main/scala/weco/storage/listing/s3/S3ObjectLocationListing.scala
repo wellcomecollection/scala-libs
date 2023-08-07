@@ -1,7 +1,7 @@
 package weco.storage.listing.s3
 
 import software.amazon.awssdk.services.s3.S3Client
-import weco.storage.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
+import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 
 class S3ObjectLocationListing(implicit objectListing: S3ObjectListing)
     extends S3Listing[S3ObjectLocation] {

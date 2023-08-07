@@ -1,4 +1,4 @@
-package weco.storage.azure
+package weco.storage.providers.azure
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

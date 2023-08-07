@@ -2,7 +2,7 @@ package weco.storage.store.s3
 
 import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.services.s3.S3Client
-import weco.storage.s3.S3ObjectLocation
+import weco.storage.providers.s3.S3ObjectLocation
 import weco.storage.store.StreamStore
 
 class S3StreamStore(

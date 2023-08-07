@@ -2,9 +2,9 @@ package weco.storage.store.azure
 
 import weco.fixtures.TestWith
 import weco.storage.OverwriteError
-import weco.storage.azure.AzureBlobLocation
 import weco.storage.fixtures.AzureFixtures
 import weco.storage.fixtures.AzureFixtures.Container
+import weco.storage.providers.azure.AzureBlobLocation
 import weco.storage.store.StreamStoreTestCases
 import weco.storage.streaming.InputStreamWithLength
 

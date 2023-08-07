@@ -1,3 +1,3 @@
-package weco.storage.s3
+package weco.storage.providers.s3
 
 case class S3Config(bucketName: String)
