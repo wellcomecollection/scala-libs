@@ -21,8 +21,3 @@ services:
       interval: 2s
       timeout: 10s
       retries: 5
-  azurite:
-    image: "mcr.microsoft.com/azure-storage/azurite"
-    ports:
-      - "10000:10000"
-    command: ["azurite", "--blobHost", "0.0.0.0"]
