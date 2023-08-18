@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.39.0 - 2023-08-18
+
+Remove the `weco.messaging.worker` namespace, which is only used in the storage service.
+
 ## v32.38.0 - 2023-08-17
 
 Remove the `sqsworker.alpakka` namespace, which is only used in the storage service.
