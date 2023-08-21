@@ -77,7 +77,7 @@ trait SQS
     }.toMap
   }
 
-  def createQueueName: String =
+  private def createQueueName: String =
     randomAlphanumeric()
 
   def withLocalSqsQueue[R](
@@ -147,7 +147,7 @@ trait SQS
     metrics: Metrics[Future] = new MemoryMetrics()
   )(testWith: TestWith[SQSStream[T], R])(
     implicit actorSystem: ActorSystem): R = {
-    val sqsConfig = createSQSConfigWith(queue)
+    val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val stream = new SQSStream[T](
       sqsClient = asyncSqsClient,
@@ -204,6 +204,8 @@ trait SQS
       .map { case (name, count) => name -> count.toInt }
   }
 
+  // TODO: Rewrite with assertion helpers?
+
   def assertQueueEmpty(queue: Queue): Unit = {
     countMessagesOnQueue(queue).foreach {
       case (name, count) =>
@@ -241,7 +243,4 @@ trait SQS
       .get
       .messages()
       .asScala
-
-  def createSQSConfigWith(queue: Queue): SQSConfig =
-    SQSConfig(queueUrl = queue.url)
 }

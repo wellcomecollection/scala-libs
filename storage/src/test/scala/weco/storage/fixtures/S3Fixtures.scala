@@ -150,29 +150,6 @@ trait S3Fixtures
     s3Client.deleteObject(deleteObjectRequest)
   }
 
-  def getContentFromS3(location: S3ObjectLocation): String = {
-    val getRequest =
-      GetObjectRequest.builder()
-        .bucket(location.bucket)
-        .key(location.key)
-        .build()
-
-    val s3Object = s3Client.getObject(getRequest)
-
-    val inputStream = new InputStreamWithLength(
-      s3Object,
-      length = s3Object.response().contentLength()
-    )
-    stringCodec.fromStream(inputStream).value
-  }
-
-  def getJsonFromS3(location: S3ObjectLocation): Json =
-    parse(getContentFromS3(location)).right.get
-
-  def getObjectFromS3[T](location: S3ObjectLocation)(
-    implicit decoder: Decoder[T]): T =
-    fromJson[T](getContentFromS3(location)).get
-
   def putString(location: S3ObjectLocation, contents: String): Unit = {
     val putRequest =
       PutObjectRequest.builder()
@@ -223,17 +200,4 @@ trait S3Fixtures
       .map { s3Obj: S3Object => s3Obj.key() }
       .toList
   }
-
-  /** Returns a map (key -> contents) for all objects in an S3 bucket.
-    *
-    * @param bucket The instance of S3.Bucket to read.
-    *
-    */
-  def getAllObjectContents(bucket: Bucket): Map[String, String] =
-    listKeysInBucket(bucket).map { key =>
-      key -> getContentFromS3(S3ObjectLocation(bucket = bucket.name, key = key))
-    }.toMap
-
-  def createS3ConfigWith(bucket: Bucket): S3Config =
-    S3Config(bucketName = bucket.name)
 }
