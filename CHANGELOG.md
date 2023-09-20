@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.39.1 - 2023-09-20
+
+Update logging dependencies.
+
 ## v32.39.0 - 2023-08-18
 
 Remove the `weco.messaging.worker` namespace, which is only used in the storage service.
