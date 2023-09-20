@@ -12,8 +12,8 @@ object Dependencies {
     val circe = "0.14.5"
     val circeGenericExtras = "0.14.3"
 
-    val typesafe = "1.3.2"
-    val logback = "1.1.8"
+    val typesafe = "1.4.2"
+    val logback = "1.4.7"
     val mockito = "1.10.19"
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
@@ -22,7 +22,7 @@ object Dependencies {
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
-    val grizzled = "1.3.2"
+    val grizzled = "1.3.4"
 
     // This has to match the version of akka used by elastic4s
     // Otherwise we get errors like:
