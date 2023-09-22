@@ -84,18 +84,6 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
-  val scalatestDependencies = Seq(
-    "org.scalatest" %% "scalatest" % versions.scalatest % Test
-  )
-
-  val mockitoDependencies = Seq(
-    "org.scalatestplus" %% versions.scalatestPlusMockitoArtifactId % versions.scalatestPlus % Test,
-    "org.mockito" % "mockito-core" % versions.mockito % Test
-  )
-
-  val testDependencies
-    : Seq[ModuleID] = scalatestDependencies ++ mockitoDependencies
-
   val sl4jDependencies = Seq(
     "org.clapper" %% "grizzled-slf4j" % versions.grizzled
   )
@@ -109,6 +97,22 @@ object Dependencies {
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
   )
+
+  val scalatestDependencies = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % Test
+  )
+
+  val mockitoDependencies = Seq(
+    "org.scalatestplus" %% versions.scalatestPlusMockitoArtifactId % versions.scalatestPlus % Test,
+    "org.mockito" % "mockito-core" % versions.mockito % Test
+  )
+
+  val testDependencies: Seq[ModuleID] =
+    scalatestDependencies ++
+      mockitoDependencies ++
+      // This needs to be here in order that Test output always works even for libraries that
+      // don't include the logging dependencies.
+      loggingDependencies.map(_ % Test)
 
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
