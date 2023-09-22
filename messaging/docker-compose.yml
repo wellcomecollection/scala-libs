@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   localstack:
-    image: "public.ecr.aws/localstack/localstack:latest"
+    image: "public.ecr.aws/localstack/localstack:2.2.0"
     environment:
       - SERVICES=sns,sqs
       - ALLOW_NONSTANDARD_REGIONS=1
