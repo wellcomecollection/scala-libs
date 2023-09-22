@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.40.0 - 2023-09-22
+
+Allow configuration of Elasticsearch clients to use an API key
+
 ## v32.39.1 - 2023-09-20
 
 Update logging dependencies.
