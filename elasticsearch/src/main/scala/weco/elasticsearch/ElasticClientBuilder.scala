@@ -13,19 +13,20 @@ import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
 import scala.collection.JavaConverters._
 
-class ElasticHttpClientApiKeyConfig(encodedApiKey: String,
-                                    apiCompatibleWith: Option[String])
+private class ElasticHttpClientApiKeyConfig(encodedApiKey: String,
+                                            apiCompatibleWith: Option[String])
     extends ElasticHttpClientConfig(apiCompatibleWith) {
-  override protected def defaultHeaders
-    : Seq[BasicHeader] = super.defaultHeaders :+ new BasicHeader(
-    "Authorization",
-    s"ApiKey $encodedApiKey"
-  )
+  override protected def defaultHeaders: Seq[BasicHeader] =
+    super.defaultHeaders :+ new BasicHeader(
+      HttpHeaders.AUTHORIZATION,
+      s"ApiKey $encodedApiKey"
+    )
 }
 
-class ElasticHttpClientBasicAuthConfig(username: String,
-                                       password: String,
-                                       apiCompatibleWith: Option[String])
+private class ElasticHttpClientBasicAuthConfig(
+  username: String,
+  password: String,
+  apiCompatibleWith: Option[String])
     extends ElasticHttpClientConfig(apiCompatibleWith) {
   private val credentials = new UsernamePasswordCredentials(username, password)
   private val credentialsProvider = new BasicCredentialsProvider()
@@ -38,19 +39,20 @@ class ElasticHttpClientBasicAuthConfig(username: String,
       .setDefaultCredentialsProvider(credentialsProvider)
 }
 
-class ElasticHttpClientConfig(apiCompatibleWith: Option[String])
+private class ElasticHttpClientConfig(apiCompatibleWith: Option[String])
     extends HttpClientConfigCallback {
   // See https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-api-compatibility.html#_rest_api_compatibility_workflow
-  protected def defaultHeaders: Seq[BasicHeader] = apiCompatibleWith
-    .map { compatVersion =>
-      val compatHeader =
-        s"application/vnd.elasticsearch+json;compatible-with=$compatVersion"
-      Seq(
-        new BasicHeader(HttpHeaders.ACCEPT, compatHeader),
-        new BasicHeader(HttpHeaders.CONTENT_TYPE, compatHeader)
-      )
-    }
-    .getOrElse(Nil)
+  protected def defaultHeaders: Seq[BasicHeader] =
+    apiCompatibleWith
+      .map { compatVersion =>
+        val compatHeader =
+          s"application/vnd.elasticsearch+json;compatible-with=$compatVersion"
+        Seq(
+          new BasicHeader(HttpHeaders.ACCEPT, compatHeader),
+          new BasicHeader(HttpHeaders.CONTENT_TYPE, compatHeader)
+        )
+      }
+      .getOrElse(Nil)
   override def customizeHttpClient(
     httpClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder =
     httpClientBuilder
