@@ -34,7 +34,7 @@ class SNSMessageSenderTest
 
     val result = sender.send("hello world")(
       subject = "Sent from SNSMessageSenderTest",
-      destination = SNSConfig(topicArn = "arn::doesnotexist")
+      destination = SNSConfig(topicArn = "arn:aws:sns:eu-west-1:012345678912:doesnotexist")
     )
 
     result shouldBe a[Failure[_]]
