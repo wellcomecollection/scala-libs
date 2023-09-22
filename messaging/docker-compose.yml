@@ -1,8 +1,9 @@
 version: "2.1"
 services:
   localstack:
-    image: "760097843905.dkr.ecr.eu-west-1.amazonaws.com/localstack/localstack"
+    image: "public.ecr.aws/localstack/localstack:2.2.0"
     environment:
       - SERVICES=sns,sqs
+      - ALLOW_NONSTANDARD_REGIONS=1
     ports:
       - "4566:4566"

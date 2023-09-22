@@ -76,14 +76,14 @@ class ElasticsearchIndexCreatorTest
       val testObject = TestObject("id", "description", visible = true)
       val testObjectJson = toJson(testObject).get
 
-      eventually {
-        for {
-          _ <- elasticClient.execute(indexInto(index.name).doc(testObjectJson))
-          response: Response[SearchResponse] <- elasticClient
-            .execute {
-              search(index).matchAllQuery()
-            }
-        } yield {
+      whenReady(
+        elasticClient.execute(indexInto(index.name).doc(testObjectJson))
+      ) { _ =>
+        eventually {
+          val response = elasticClient.execute {
+            search(index).matchAllQuery()
+          }.await
+
           val hits = response.result.hits.hits
           hits should have size 1
 
