@@ -29,12 +29,12 @@ steps:
   - group: "Report evictions"
     steps:
       - label: "{{ matrix }} evicted"
-        command: |
-          ./builds/run_sbt_task_in_docker.sh 'project {{ matrix }}' 'evicted' | grep '^\\[warn\\]' | tee .reports/evicted"
-          WARNING_COUNT=$(sed '/^$/d' | wc -l )
-          if [ $WARNING_COUNT != 0 ]
-            exit 2
-          fi
+      - command: |
+            ./builds/run_sbt_task_in_docker.sh 'project {{ matrix }}' 'evicted' | grep '^\\[warn\\]' | tee .reports/evicted"
+            WARNING_COUNT=$(sed '/^$/d' | wc -l )
+            if [ $WARNING_COUNT != 0 ]
+              exit 2
+            fi
         soft_fail:
           - exit_status: 2
         matrix:
