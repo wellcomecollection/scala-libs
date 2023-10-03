@@ -28,7 +28,7 @@ steps:
 
   - group: "Report evictions"
     steps:
-      - label: "{{ matrix }} evicted"
+      - label: "evictions {{ matrix }}"
         command: "./builds/report_sbt_evictions.sh {{ matrix }}"
 
         soft_fail:
