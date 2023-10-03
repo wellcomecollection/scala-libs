@@ -17,3 +17,6 @@ metals.sbt
 
 .terraform
 terraform.plan
+
+# output from code checkers, tests etc.
+.reports

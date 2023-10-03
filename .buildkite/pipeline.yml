@@ -26,6 +26,27 @@ steps:
         agents:
           queue: "scala"
 
+  - group: "Report evictions"
+    steps:
+      - label: "{{ matrix }} evicted"
+        command: "./builds/run_sbt_task_in_docker.sh 'project {{ matrix }}' 'evicted'"
+        matrix:
+          - "fixtures"
+          - "http"
+          - "json"
+          - "typesafe_app"
+          - "monitoring"
+          - "monitoring_typesafe"
+          - "messaging"
+          - "messaging_typesafe"
+          - "storage"
+          - "storage_typesafe"
+          - "elasticsearch"
+          - "elasticsearch_typesafe"
+          - "sierra"
+
+        agents:
+          queue: "scala"
   - wait
 
   - label: "cut release"
