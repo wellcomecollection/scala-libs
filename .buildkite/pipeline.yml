@@ -30,7 +30,6 @@ steps:
     steps:
       - label: "evictions {{ matrix }}"
         command: "./builds/report_sbt_evictions.sh {{ matrix }}"
-
         soft_fail:
           - exit_status: 2
         matrix:
