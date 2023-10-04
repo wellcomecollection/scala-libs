@@ -55,7 +55,8 @@ steps:
 
       - label: "Collate evictions"
         commands:
-          - "buildkite-agent artifact download '.reports/evicted_*' ./reports"
+          - "mkdir -p .reports"
+          - "buildkite-agent artifact download '.reports/evicted_*' .reports/"
           - "report_unique_evictions.sh | buildkite-annotate --context=evictions"
         agents:
           queue: nano
