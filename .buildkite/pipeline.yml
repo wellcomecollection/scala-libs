@@ -49,7 +49,7 @@ steps:
         agents:
           queue: "scala"
         artifact_paths:
-          ".reports/evicted_{{ matrix }}"
+          ".reports/evicted*"
 
       - wait
 
