@@ -51,11 +51,12 @@ steps:
         artifact_paths:
           ".reports/evicted_{{ matrix }}"
   - wait
-  -
+  
   - label: "report evictions"
     commands:
       - "buildkite-agent artifact download '.reports/evicted_*' ./reports"
       - "report_unique_evictions.sh | buildkite-annotate --context=evictions"
+
   - label: "cut release"
     if: build.branch == "main"
     commands:
