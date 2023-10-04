@@ -4,31 +4,6 @@ steps:
     agents:
       queue: "scala"
 
-  - group: "Report evictions"
-    steps:
-      - label: "evictions {{ matrix }}"
-        command: "./builds/report_sbt_evictions.sh {{ matrix }}"
-        soft_fail:
-          - exit_status: 2
-        matrix:
-          - "fixtures"
-          - "http"
-          - "json"
-          - "typesafe_app"
-          - "monitoring"
-          - "monitoring_typesafe"
-          - "messaging"
-          - "messaging_typesafe"
-          - "storage"
-          - "storage_typesafe"
-          - "elasticsearch"
-          - "elasticsearch_typesafe"
-          - "sierra"
-
-        agents:
-          queue: "scala"
-  - wait
-
   - group: "Test"
     steps:
       - label: "test {{ matrix }}"
@@ -51,8 +26,36 @@ steps:
         agents:
           queue: "scala"
 
+  - group: "Find evictions"
+    steps:
+      - label: "evictions {{ matrix }}"
+        command: "./builds/report_sbt_evictions.sh {{ matrix }}"
+        soft_fail:
+          - exit_status: 2
+        matrix:
+          - "fixtures"
+          - "http"
+          - "json"
+          - "typesafe_app"
+          - "monitoring"
+          - "monitoring_typesafe"
+          - "messaging"
+          - "messaging_typesafe"
+          - "storage"
+          - "storage_typesafe"
+          - "elasticsearch"
+          - "elasticsearch_typesafe"
+          - "sierra"
+        agents:
+          queue: "scala"
+        artifact_paths:
+          ".reports/evicted_{{ matrix }}"
   - wait
-
+  -
+  - label: "report evictions"
+    commands:
+      - "buildkite-agent artifact download '.reports/evicted_*' ./reports"
+      - "report_unique_evictions.sh | buildkite-annotate --context=evictions"
   - label: "cut release"
     if: build.branch == "main"
     commands:
