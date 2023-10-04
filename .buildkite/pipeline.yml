@@ -51,29 +51,6 @@ steps:
         agents:
           queue: "scala"
 
-  - group: "Report evictions"
-    steps:
-      - label: "evictions {{ matrix }}"
-        command: "./builds/report_sbt_evictions.sh {{ matrix }}"
-        soft_fail:
-          - exit_status: 2
-        matrix:
-          - "fixtures"
-          - "http"
-          - "json"
-          - "typesafe_app"
-          - "monitoring"
-          - "monitoring_typesafe"
-          - "messaging"
-          - "messaging_typesafe"
-          - "storage"
-          - "storage_typesafe"
-          - "elasticsearch"
-          - "elasticsearch_typesafe"
-          - "sierra"
-
-        agents:
-          queue: "scala"
   - wait
 
   - label: "cut release"
