@@ -3,6 +3,6 @@ mkdir -p .reports
 WARNING_COUNT=$(cat .reports/evicted | grep -E '^\[warn\]\s+\*' | wc -l )
 if [ "$WARNING_COUNT" != "0" ]
 then
-  echo "found $WARNING_COUNT suspected binary incompatible evictions"
+  echo "found $WARNING_COUNT suspected binary incompatible eviction(s)"
   exit 2
 fi
