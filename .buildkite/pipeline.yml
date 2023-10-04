@@ -57,7 +57,7 @@ steps:
         commands:
           - "mkdir -p .reports"
           - "buildkite-agent artifact download '.reports/evicted_*' .reports/"
-          - "report_unique_evictions.sh | buildkite-annotate --context=evictions"
+          - "builds/report_unique_evictions.sh | buildkite-annotate --context=evictions"
         agents:
           queue: nano
   - wait
