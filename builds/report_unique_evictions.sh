@@ -1,4 +1,4 @@
-echo "# Distinct suspected binary incompatible evictions across all projects"
+echo "# Suspected binary incompatible evictions across all projects (distinct)"
+cat .reports/evicted_* | grep -E '^\[warn\]\s+\*' | sed 's/.*\*/*/'  |sort | uniq
 echo '```'
-cat .reports/evicted_* | grep -E '^\[warn\]\s+\*' | sort | uniq
 echo '```'
