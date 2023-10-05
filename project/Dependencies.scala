@@ -23,6 +23,13 @@ object Dependencies {
 
     // Provides slf4j-api
     val grizzled = "1.3.4"
+    // SLF4J:
+    // which version is the right one
+    // between 1.7 and 2?
+    // They're compatible
+    // but we should be explicit
+    // 2 needs different providers
+    val slf4j = "2.0.5"
 
     // This has to match the version of akka used by elastic4s
     // Otherwise we get errors like:
@@ -86,6 +93,13 @@ object Dependencies {
 
   val sl4jDependencies = Seq(
     "org.clapper" %% "grizzled-slf4j" % versions.grizzled
+      // Grizzled is a thin layer over slf4j and very rarely changes.
+      // It depends on a very old version of slf4j, but appears to work with any new version
+      // we run it against.
+      // Allowing it to bring along its transitive dependency on v1.7 causes unnecessary
+      // eviction warnings.
+      exclude("org.slf4j", "slf4j-api"),
+    "org.slf4j" % "slf4j-api" % versions.slf4j
   )
 
   val loggingDependencies = Seq(
@@ -119,7 +133,8 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka,
     // Force Akka to use SL4J logging adapter
     // https://doc.akka.io/docs/akka/current/logging.html#slf4j
-    "com.typesafe.akka" %% "akka-slf4j" % versions.akka
+    "com.typesafe.akka" %% "akka-slf4j" % versions.akka exclude("org.slf4j", "slf4j-api"),
+    "org.slf4j" % "slf4j-api" % versions.slf4j
   )
 
   val akkaHttpDependencies = Seq(
@@ -143,10 +158,11 @@ object Dependencies {
   val localstackDependencies = Seq(
     "software.amazon.awssdk" % "auth" % versions.aws,
     "software.amazon.awssdk" % "regions" % versions.aws
-  )
+  ).map(_ exclude("org.slf4j", "slf4j-api")) :+ "org.slf4j" % "slf4j-api" % versions.slf4j
 
   val monitoringDependencies = Seq(
-    "software.amazon.awssdk" % "cloudwatch" % versions.aws
+    "software.amazon.awssdk" % "cloudwatch" % versions.aws exclude("org.slf4j", "slf4j-api"),
+    "org.slf4j" % "slf4j-api" % versions.slf4j
   ) ++
     testDependencies
 
