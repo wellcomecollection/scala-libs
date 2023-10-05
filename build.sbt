@@ -7,14 +7,16 @@ lazy val fixtures = Common.setupProject(
   project,
   "fixtures",
   projectVersion,
-  externalDependencies = Dependencies.fixturesDependencies
+  externalDependencies = Dependencies.fixturesDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val json = Common.setupProject(
   project,
   "json",
   projectVersion,
-  externalDependencies = Dependencies.jsonDependencies
+  externalDependencies = Dependencies.jsonDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val typesafe_app = Common.setupProject(
@@ -22,7 +24,8 @@ lazy val typesafe_app = Common.setupProject(
   "typesafe_app",
   projectVersion,
   localDependencies = Seq(fixtures),
-  externalDependencies = Dependencies.typesafeAppDependencies
+  externalDependencies = Dependencies.typesafeAppDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val monitoring = Common.setupProject(
