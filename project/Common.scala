@@ -4,7 +4,7 @@ import com.tapad.docker.DockerComposePlugin
 import sbt.Keys._
 import sbt._
 
-object Common {
+object Common extends LoggingProviderPresent{
   def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.15",
     organization := "weco",
@@ -50,7 +50,7 @@ object Common {
 
     val settings = createSettings(projectVersion)
 
-    project
+      project
       .in(new File(folder))
       .settings(settings: _*)
       .settings(DockerCompose.settings: _*)
@@ -58,7 +58,8 @@ object Common {
       .dependsOn(dependsOn: _*)
       .settings(libraryDependencies ++= externalDependencies)
       .settings(dependencyOverrides ++= versionOverrides)
-
+      .settings(checkSLF4JProvider := checkSLF4JProviderImpl.value)
+      .settings((Compile / compile) := ((Compile / compile) dependsOn checkSLF4JProvider).value)
   }
 }
 

@@ -170,11 +170,11 @@ object Dependencies {
 
   val jsonDependencies =
     circeDependencies ++
-      sl4jDependencies ++
+      loggingDependencies ++
       testDependencies
 
   val fixturesDependencies: Seq[ModuleID] =
-    sl4jDependencies ++
+    loggingDependencies ++
       scalatestDependencies ++
       localstackDependencies
 

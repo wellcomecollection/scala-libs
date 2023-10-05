@@ -84,7 +84,7 @@ lazy val messaging_typesafe = Common.setupProject(
   project,
   "messaging_typesafe",
   projectVersion,
-  localDependencies = Seq(messaging, monitoring_typesafe)
+  localDependencies = Seq(messaging, monitoring_typesafe),
 )
 
 lazy val http = Common.setupProject(
