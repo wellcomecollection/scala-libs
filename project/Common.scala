@@ -37,7 +37,8 @@ object Common {
     folder: String,
     projectVersion: String,
     localDependencies: Seq[Project] = Seq(),
-    externalDependencies: Seq[ModuleID] = Seq()
+    externalDependencies: Seq[ModuleID] = Seq(),
+    versionOverrides: Seq[ModuleID] = Seq()
   ): Project = {
     val dependsOn = localDependencies
       .map { project: Project =>
@@ -56,6 +57,8 @@ object Common {
       .enablePlugins(DockerComposePlugin)
       .dependsOn(dependsOn: _*)
       .settings(libraryDependencies ++= externalDependencies)
+      .settings(dependencyOverrides ++= versionOverrides)
+
   }
 }
 

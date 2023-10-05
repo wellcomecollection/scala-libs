@@ -1,3 +1,4 @@
+
 val projectVersion = "32.40.0"
 
 Global / excludeLintKeys += composeNoBuild
@@ -59,7 +60,8 @@ lazy val storage = Common.setupProject(
   "storage",
   projectVersion,
   localDependencies = Seq(typesafe_app, fixtures, json),
-  externalDependencies = Dependencies.storageDependencies
+  externalDependencies = Dependencies.storageDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val storage_typesafe = Common.setupProject(
@@ -74,7 +76,8 @@ lazy val messaging = Common.setupProject(
   "messaging",
   projectVersion,
   localDependencies = Seq(typesafe_app, fixtures, json, monitoring),
-  externalDependencies = Dependencies.messagingDependencies
+  externalDependencies = Dependencies.messagingDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val messaging_typesafe = Common.setupProject(
@@ -89,7 +92,8 @@ lazy val http = Common.setupProject(
   "http",
   projectVersion,
   localDependencies = Seq(json, monitoring),
-  externalDependencies = Dependencies.httpDependencies
+  externalDependencies = Dependencies.httpDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val http_typesafe = Common.setupProject(
