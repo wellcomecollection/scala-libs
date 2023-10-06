@@ -33,14 +33,16 @@ lazy val monitoring = Common.setupProject(
   "monitoring",
   projectVersion,
   localDependencies = Seq(typesafe_app, fixtures),
-  externalDependencies = Dependencies.monitoringDependencies
+  externalDependencies = Dependencies.monitoringDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val monitoring_typesafe = Common.setupProject(
   project,
   "monitoring_typesafe",
   projectVersion,
-  localDependencies = Seq(monitoring)
+  localDependencies = Seq(monitoring),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val elasticsearch = Common.setupProject(
@@ -48,7 +50,8 @@ lazy val elasticsearch = Common.setupProject(
   "elasticsearch",
   projectVersion,
   localDependencies = Seq(fixtures, json),
-  externalDependencies = Dependencies.elasticsearchDependencies
+  externalDependencies = Dependencies.elasticsearchDependencies,
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val elasticsearch_typesafe = Common.setupProject(
@@ -110,12 +113,14 @@ lazy val sierra = Common.setupProject(
   project,
   folder = "sierra",
   projectVersion = projectVersion,
-  localDependencies = Seq(fixtures, http, json)
+  localDependencies = Seq(fixtures, http, json),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val sierra_typesafe = Common.setupProject(
   project,
   folder = "sierra_typesafe",
   projectVersion = projectVersion,
-  localDependencies = Seq(sierra, typesafe_app)
+  localDependencies = Seq(sierra, typesafe_app),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
