@@ -58,7 +58,8 @@ lazy val elasticsearch_typesafe = Common.setupProject(
   project,
   "elasticsearch_typesafe",
   projectVersion,
-  localDependencies = Seq(elasticsearch, typesafe_app)
+  localDependencies = Seq(elasticsearch, typesafe_app),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val storage = Common.setupProject(
@@ -74,7 +75,8 @@ lazy val storage_typesafe = Common.setupProject(
   project,
   "storage_typesafe",
   projectVersion,
-  localDependencies = Seq(storage)
+  localDependencies = Seq(storage),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val messaging = Common.setupProject(
@@ -91,6 +93,7 @@ lazy val messaging_typesafe = Common.setupProject(
   "messaging_typesafe",
   projectVersion,
   localDependencies = Seq(messaging, monitoring_typesafe),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val http = Common.setupProject(
@@ -106,7 +109,8 @@ lazy val http_typesafe = Common.setupProject(
   project,
   "http_typesafe",
   projectVersion,
-  localDependencies = Seq(http)
+  localDependencies = Seq(http),
+  versionOverrides = Seq("org.slf4j" % "slf4j-api" % Dependencies.versions.slf4j)
 )
 
 lazy val sierra = Common.setupProject(
