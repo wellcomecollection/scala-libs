@@ -167,8 +167,9 @@ object Dependencies {
     testDependencies
 
   val messagingDependencies = Seq(
-    "software.amazon.awssdk" % "sns" % versions.aws,
-    "software.amazon.awssdk" % "sqs" % versions.aws,
+    "org.slf4j" % "slf4j-api" % versions.slf4j,
+    "software.amazon.awssdk" % "sns" % versions.aws exclude("org.slf4j", "slf4j-api"),
+    "software.amazon.awssdk" % "sqs" % versions.aws exclude("org.slf4j", "slf4j-api"),
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
     // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
