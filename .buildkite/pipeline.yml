@@ -4,27 +4,64 @@ steps:
     agents:
       queue: "scala"
 
-  - label: "test {{ matrix }}"
-    command: "./builds/run_sbt_tests.sh {{ matrix }}"
-    matrix:
-      - "fixtures"
-      - "http"
-      - "json"
-      - "typesafe_app"
-      - "monitoring"
-      - "monitoring_typesafe"
-      - "messaging"
-      - "messaging_typesafe"
-      - "storage"
-      - "storage_typesafe"
-      - "elasticsearch"
-      - "elasticsearch_typesafe"
-      - "sierra"
+  - group: "Test"
+    steps:
+      - label: "test {{ matrix }}"
+        command: "./builds/run_sbt_tests.sh {{ matrix }}"
+        matrix:
+          - "fixtures"
+          - "http"
+          - "json"
+          - "typesafe_app"
+          - "monitoring"
+          - "monitoring_typesafe"
+          - "messaging"
+          - "messaging_typesafe"
+          - "storage"
+          - "storage_typesafe"
+          - "elasticsearch"
+          - "elasticsearch_typesafe"
+          - "sierra"
 
-    agents:
-      queue: "scala"
+        agents:
+          queue: "scala"
 
+  - group: "Report evictions"
+    steps:
+      - label: "evictions {{ matrix }}"
+        command: "./builds/report_sbt_evictions.sh {{ matrix }}"
+        soft_fail:
+          - exit_status: 2
+        matrix:
+          - "fixtures"
+          - "http"
+          - "json"
+          - "typesafe_app"
+          - "monitoring"
+          - "monitoring_typesafe"
+          - "messaging"
+          - "messaging_typesafe"
+          - "storage"
+          - "storage_typesafe"
+          - "elasticsearch"
+          - "elasticsearch_typesafe"
+          - "sierra"
+        agents:
+          queue: "scala"
+        artifact_paths:
+          ".reports/evicted*"
+
+      - wait
+
+      - label: "Collate evictions"
+        commands:
+          - "mkdir -p .reports"
+          - "buildkite-agent artifact download '.reports/evicted_*' .reports/"
+          - "builds/report_unique_evictions.sh | buildkite-agent annotate --context=evictions"
+        agents:
+          queue: nano
   - wait
+
 
   - label: "cut release"
     if: build.branch == "main"
@@ -35,28 +72,30 @@ steps:
 
   - wait
 
-  - label: "publish {{ matrix }}"
-    if: build.branch == "main"
-    command: ".buildkite/scripts/publish.py {{ matrix }}"
-    matrix:
-      - "fixtures"
-      - "http"
-      - "http_typesafe"
-      - "json"
-      - "typesafe_app"
-      - "monitoring"
-      - "monitoring_typesafe"
-      - "messaging"
-      - "messaging_typesafe"
-      - "storage"
-      - "storage_typesafe"
-      - "elasticsearch"
-      - "elasticsearch_typesafe"
-      - "sierra"
-      - "sierra_typesafe"
+  - group: "Publish"
+    steps:
+    - label: "publish {{ matrix }}"
+      if: build.branch == "main"
+      command: ".buildkite/scripts/publish.py {{ matrix }}"
+      matrix:
+        - "fixtures"
+        - "http"
+        - "http_typesafe"
+        - "json"
+        - "typesafe_app"
+        - "monitoring"
+        - "monitoring_typesafe"
+        - "messaging"
+        - "messaging_typesafe"
+        - "storage"
+        - "storage_typesafe"
+        - "elasticsearch"
+        - "elasticsearch_typesafe"
+        - "sierra"
+        - "sierra_typesafe"
 
-    agents:
-      queue: "scala"
+      agents:
+        queue: "scala"
 
   - wait
 
