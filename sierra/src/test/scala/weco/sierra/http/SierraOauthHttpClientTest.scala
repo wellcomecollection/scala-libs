@@ -203,4 +203,226 @@ class SierraOauthHttpClientTest
       }
     }
   }
+
+  it(
+    "fetches a new token if sierra returns a 401 with description 'invalid_grant'") {
+    val token1 = OAuth2BearerToken("dummy_access_token1")
+    val token2 = OAuth2BearerToken("dummy_access_token2")
+
+    val responses = Seq(
+      (
+        HttpRequest(
+          method = HttpMethods.POST,
+          headers = List(Authorization(credentials)),
+          uri = Uri("http://sierra:1234/v5/token")
+        ),
+        HttpResponse(
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "access_token": "${token1.token}",
+               |  "token_type": "bearer",
+               |  "expires_in": 3600
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          headers = List(Authorization(token1)),
+          uri = Uri("http://sierra:1234/v5/items/1601017")
+        ),
+        HttpResponse(
+          status = StatusCodes.Unauthorized,
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "code": 123,
+               |  "specificCode": 0,
+               |  "httpStatus": 401,
+               |  "name": "Unauthorized",
+               |  "description": "invalid_grant"
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          method = HttpMethods.POST,
+          headers = List(Authorization(credentials)),
+          uri = Uri("http://sierra:1234/v5/token")
+        ),
+        HttpResponse(
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "access_token": "${token2.token}",
+               |  "token_type": "bearer",
+               |  "expires_in": 3600
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          headers = List(Authorization(token2)),
+          uri = Uri("http://sierra:1234/v5/items/1601017")
+        ),
+        HttpResponse(
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            itemJson
+          )
+        )
+      )
+    )
+
+    val underlying = new MemoryHttpClient(responses) with HttpGet
+    with HttpPost {
+      override val baseUri: Uri = Uri("http://sierra:1234/v5")
+    }
+
+    withActorSystem { implicit actorSystem =>
+      val authClient = new SierraOauthHttpClient(
+        underlying,
+        credentials = credentials,
+        expiryGracePeriod = 60.seconds
+      )
+
+      val future1 = authClient.get(path = Path("items/1601017"))
+
+      whenReady(future1) { resp1 =>
+        withStringEntity(resp1.entity) {
+          assertJsonStringsAreEqual(_, itemJson)
+        }
+      }
+    }
+  }
+
+  it(
+    "returns the error response if Sierra returns invalid_grant more than once") {
+    val token1 = OAuth2BearerToken("dummy_access_token1")
+    val token2 = OAuth2BearerToken("dummy_access_token2")
+
+    val responses = Seq(
+      (
+        HttpRequest(
+          method = HttpMethods.POST,
+          headers = List(Authorization(credentials)),
+          uri = Uri("http://sierra:1234/v5/token")
+        ),
+        HttpResponse(
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "access_token": "${token1.token}",
+               |  "token_type": "bearer",
+               |  "expires_in": 3600
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          headers = List(Authorization(token1)),
+          uri = Uri("http://sierra:1234/v5/items/1601017")
+        ),
+        HttpResponse(
+          status = StatusCodes.Unauthorized,
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "code": 123,
+               |  "specificCode": 0,
+               |  "httpStatus": 401,
+               |  "name": "Unauthorized",
+               |  "description": "invalid_grant"
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          method = HttpMethods.POST,
+          headers = List(Authorization(credentials)),
+          uri = Uri("http://sierra:1234/v5/token")
+        ),
+        HttpResponse(
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "access_token": "${token2.token}",
+               |  "token_type": "bearer",
+               |  "expires_in": 3600
+               |}
+               |""".stripMargin
+          )
+        )
+      ),
+      (
+        HttpRequest(
+          headers = List(Authorization(token2)),
+          uri = Uri("http://sierra:1234/v5/items/1601017")
+        ),
+        HttpResponse(
+          status = StatusCodes.Unauthorized,
+          entity = HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            s"""
+               |{
+               |  "code": 123,
+               |  "specificCode": 0,
+               |  "httpStatus": 401,
+               |  "name": "Unauthorized",
+               |  "description": "invalid_grant"
+               |}
+               |""".stripMargin
+          )
+        )
+      )
+    )
+
+    val underlying = new MemoryHttpClient(responses) with HttpGet
+    with HttpPost {
+      override val baseUri: Uri = Uri("http://sierra:1234/v5")
+    }
+
+    withActorSystem { implicit actorSystem =>
+      val authClient = new SierraOauthHttpClient(
+        underlying,
+        credentials = credentials,
+        expiryGracePeriod = 60.seconds
+      )
+
+      val future1 = authClient.get(path = Path("items/1601017"))
+
+      whenReady(future1) { resp1 =>
+        withStringEntity(resp1.entity) {
+          assertJsonStringsAreEqual(
+            _,
+            s"""
+               |{
+               |  "code": 123,
+               |  "specificCode": 0,
+               |  "httpStatus": 401,
+               |  "name": "Unauthorized",
+               |  "description": "invalid_grant"
+               |}
+               |""".stripMargin
+          )
+        }
+      }
+    }
+  }
 }
