@@ -24,7 +24,7 @@ steps:
           - "sierra"
 
         agents:
-          queue: "scala"
+          queue: "test-upgrade"
 
   - group: "Report evictions"
     steps:
@@ -47,7 +47,7 @@ steps:
           - "elasticsearch_typesafe"
           - "sierra"
         agents:
-          queue: "scala"
+          queue: "test-upgrade"
         artifact_paths:
           ".reports/evicted*"
 
