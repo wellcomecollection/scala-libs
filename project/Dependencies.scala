@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val elasticApm = "1.45.0"
+    val elasticApm = "1.22.0"
     val elastic4s = "8.8.1"
 
     val aws = "2.19.0"
@@ -136,7 +136,11 @@ object Dependencies {
   )
 
   val elasticApmAgentDependencies = Seq(
-    "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm,
+    "co.elastic.apm" % "apm-agent-attach" % versions.elasticApm
+      // This needs to be excluded because it prevents this library functioning on M1 macs
+      // at the current version of apm-agent-attach it pulls in version 5.3.1 of jna,
+      // we need at least 5.7 to fix this issue. See https://github.com/java-native-access/jna/pull/1238
+      exclude("net.java.dev.jna", "jna"),
     "co.elastic.apm" % "apm-agent-api" % versions.elasticApm,
   )
 
