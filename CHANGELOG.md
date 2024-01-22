@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v32.40.3 - 2024-01-22
+
+Update elastic APM libraries, needed to avoid JNA issue on M1 macs.
+
+See https://github.com/wellcomecollection/scala-libs/pull/236
+
 ## v32.40.2 - 2024-01-19
 
 Use sbt v1.9.8 to avoid build issues on M1 macs.
