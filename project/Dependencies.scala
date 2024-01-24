@@ -144,6 +144,14 @@ object Dependencies {
     "co.elastic.apm" % "apm-agent-api" % versions.elasticApm,
   )
 
+  // This is required to provide a version of jna to consumers of the apm library,
+  // when running in a jre (as specified in Dockerfiles for deployable images).
+  // See https://github.com/elastic/apm-agent-java/issues/2353 for an explanation
+  // of the issue this addresses.
+  val jnaDependencies: Seq[ModuleID] = Seq(
+    "net.java.dev.jna" % "jna" % "5.7.0"
+  )
+
   val localstackDependencies = Seq(
     "software.amazon.awssdk" % "auth" % versions.aws,
     "software.amazon.awssdk" % "regions" % versions.aws
@@ -160,7 +168,7 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
     // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
     // and it also causes weird leaks between tests
-      exclude ("com.github.matsluni", "aws-spi-akka-http_2.12")
+      exclude("com.github.matsluni", "aws-spi-akka-http_2.12")
   ) ++
     testDependencies
 
@@ -179,6 +187,7 @@ object Dependencies {
       loggingDependencies ++
       typesafeDependencies ++
       elasticApmAgentDependencies ++
+      jnaDependencies ++
       testDependencies
 
   val storageDependencies: Seq[ModuleID] = Seq(
