@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.40.4 - 2024-01-24
+
+Adds a dependency on a jre compatible version of jna for apm, whatever that means.
+
 ## v32.40.3 - 2024-01-22
 
 Update elastic APM libraries, needed to avoid JNA issue on M1 macs.
