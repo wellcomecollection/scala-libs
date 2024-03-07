@@ -1,7 +1,7 @@
 package weco.http.monitoring
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCode}
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.monitoring.Metrics
 
 import scala.concurrent.Future

@@ -1,6 +1,6 @@
 package weco.storage.store
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.storage.{Identified, ReadError, RetryOps}
 
 import scala.util.{Failure, Success, Try}

@@ -1,9 +1,9 @@
 package weco.storage.store
 
-import grizzled.slf4j.Logging
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
+import weco.Logging
 import weco.fixtures.TestWith
 import weco.storage._
 import weco.storage.store.fixtures.VersionedStoreFixtures

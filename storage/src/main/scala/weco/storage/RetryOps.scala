@@ -1,6 +1,7 @@
 package weco.storage
 
-import grizzled.slf4j.Logging
+
+import weco.Logging
 
 import scala.annotation.tailrec
 

@@ -1,17 +1,12 @@
 package weco.monitoring.cloudwatch
 
 import java.time.Instant
-
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
 import akka.stream.{Materializer, OverflowStrategy, ThrottleMode}
 import akka.{Done, NotUsed}
-import grizzled.slf4j.Logging
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient
-import software.amazon.awssdk.services.cloudwatch.model.{
-  MetricDatum,
-  PutMetricDataRequest,
-  StandardUnit
-}
+import software.amazon.awssdk.services.cloudwatch.model.{MetricDatum, PutMetricDataRequest, StandardUnit}
+import weco.Logging
 import weco.monitoring.{Metrics, MetricsConfig}
 
 import scala.collection.immutable

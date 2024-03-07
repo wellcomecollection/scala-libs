@@ -5,13 +5,9 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.{
-  DebuggingDirectives,
-  LogEntry,
-  LoggingMagnet
-}
+import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry, LoggingMagnet}
 import akka.http.scaladsl.settings.ServerSettings
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.http.errors.WellcomeParsingErrorHandler
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.{HttpMetrics, WellcomeHttpLogger}

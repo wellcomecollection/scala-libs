@@ -1,6 +1,6 @@
 package weco.sierra.models
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.sierra.models.data.{SierraBibData, SierraItemData}
 import weco.sierra.models.marc.{Subfield, VarField}
 

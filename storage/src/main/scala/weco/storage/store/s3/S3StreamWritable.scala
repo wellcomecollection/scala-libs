@@ -1,11 +1,11 @@
 package weco.storage.store.s3
 
-import grizzled.slf4j.Logging
 import org.apache.commons.io.FileUtils
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
+import weco.Logging
 import weco.storage._
 import weco.storage.providers.s3.{S3Errors, S3ObjectLocation}
 import weco.storage.store.Writable

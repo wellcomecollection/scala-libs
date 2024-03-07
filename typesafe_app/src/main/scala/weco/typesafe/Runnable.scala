@@ -1,6 +1,6 @@
 package weco.typesafe
 
-import grizzled.slf4j.Logging
+import weco.Logging
 
 import scala.concurrent.Future
 

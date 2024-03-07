@@ -22,7 +22,7 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
     var exitStatus: Option[Int] = None
 
     override protected def exit(statusCode: Int = 0): Unit = {
-      info(statusCode)
+      info(statusCode.toString)
       exitStatus = Some(statusCode)
     }
   }

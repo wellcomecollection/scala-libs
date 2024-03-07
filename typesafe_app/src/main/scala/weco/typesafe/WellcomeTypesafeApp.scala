@@ -1,7 +1,7 @@
 package weco.typesafe
 
 import com.typesafe.config.{Config, ConfigFactory}
-import grizzled.slf4j.Logging
+import weco.Logging
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

@@ -1,8 +1,8 @@
 package weco.storage.fixtures
 
-import grizzled.slf4j.Logging
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues, TryValues}
+import weco.Logging
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.storage.locking._
 

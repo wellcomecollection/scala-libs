@@ -4,7 +4,7 @@ import akka.event.LoggingAdapter
 import akka.http.ParsingErrorHandler
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ServerSettings
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.models.DisplayError
 

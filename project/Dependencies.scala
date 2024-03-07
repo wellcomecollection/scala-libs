@@ -22,7 +22,7 @@ object Dependencies {
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
-    val grizzled = "1.3.4"
+    val scalaLogging = "3.9.4"
 
     // This has to match the version of akka used by elastic4s
     // Otherwise we get errors like:
@@ -85,7 +85,7 @@ object Dependencies {
   )
 
   val sl4jDependencies = Seq(
-    "org.clapper" %% "grizzled-slf4j" % versions.grizzled
+    "com.typesafe.scala-logging" %% "scala-logging" % versions.scalaLogging
   )
 
   val loggingDependencies = Seq(
@@ -184,7 +184,6 @@ object Dependencies {
 
   val typesafeAppDependencies =
     akkaDependencies ++
-      loggingDependencies ++
       typesafeDependencies ++
       elasticApmAgentDependencies ++
       jnaDependencies ++

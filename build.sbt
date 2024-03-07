@@ -2,10 +2,19 @@ val projectVersion = "32.40.4"
 
 Global / excludeLintKeys += composeNoBuild
 
+lazy val logging = Common.setupProject(
+  project,
+  "logging",
+  projectVersion,
+  localDependencies = Seq(),
+  externalDependencies = Dependencies.loggingDependencies
+)
+
 lazy val fixtures = Common.setupProject(
   project,
   "fixtures",
   projectVersion,
+  localDependencies = Seq(logging),
   externalDependencies = Dependencies.fixturesDependencies
 )
 
@@ -13,6 +22,7 @@ lazy val json = Common.setupProject(
   project,
   "json",
   projectVersion,
+  localDependencies = Seq(logging),
   externalDependencies = Dependencies.jsonDependencies
 )
 
@@ -20,7 +30,7 @@ lazy val typesafe_app = Common.setupProject(
   project,
   "typesafe_app",
   projectVersion,
-  localDependencies = Seq(fixtures),
+  localDependencies = Seq(fixtures, logging),
   externalDependencies = Dependencies.typesafeAppDependencies
 )
 
@@ -28,7 +38,7 @@ lazy val monitoring = Common.setupProject(
   project,
   "monitoring",
   projectVersion,
-  localDependencies = Seq(typesafe_app, fixtures),
+  localDependencies = Seq(typesafe_app, fixtures, logging),
   externalDependencies = Dependencies.monitoringDependencies
 )
 
@@ -43,7 +53,7 @@ lazy val elasticsearch = Common.setupProject(
   project,
   "elasticsearch",
   projectVersion,
-  localDependencies = Seq(fixtures, json),
+  localDependencies = Seq(fixtures, json, logging),
   externalDependencies = Dependencies.elasticsearchDependencies
 )
 
@@ -58,7 +68,7 @@ lazy val storage = Common.setupProject(
   project,
   "storage",
   projectVersion,
-  localDependencies = Seq(typesafe_app, fixtures, json),
+  localDependencies = Seq(typesafe_app, fixtures, json, logging),
   externalDependencies = Dependencies.storageDependencies
 )
 
@@ -73,7 +83,7 @@ lazy val messaging = Common.setupProject(
   project,
   "messaging",
   projectVersion,
-  localDependencies = Seq(typesafe_app, fixtures, json, monitoring),
+  localDependencies = Seq(typesafe_app, fixtures, json, monitoring, logging),
   externalDependencies = Dependencies.messagingDependencies
 )
 
@@ -88,7 +98,7 @@ lazy val http = Common.setupProject(
   project,
   "http",
   projectVersion,
-  localDependencies = Seq(json, monitoring),
+  localDependencies = Seq(json, monitoring, logging),
   externalDependencies = Dependencies.httpDependencies
 )
 
@@ -103,7 +113,7 @@ lazy val sierra = Common.setupProject(
   project,
   folder = "sierra",
   projectVersion = projectVersion,
-  localDependencies = Seq(fixtures, http, json)
+  localDependencies = Seq(fixtures, http, json, logging)
 )
 
 lazy val sierra_typesafe = Common.setupProject(

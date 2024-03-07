@@ -1,10 +1,10 @@
 package weco.json
 
-import grizzled.slf4j.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.parser._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder}
+import weco.Logging
 import weco.json.exceptions.JsonDecodingError
 
 import scala.util.Try
