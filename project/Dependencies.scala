@@ -1,4 +1,6 @@
-import sbt._
+import sbt.*
+
+import scala.language.postfixOps
 
 object Dependencies {
   lazy val versions = new {
@@ -13,7 +15,7 @@ object Dependencies {
     val circeGenericExtras = "0.14.3"
 
     val typesafe = "1.4.2"
-    val logback = "1.4.7"
+    val logback = "1.4.9"
     val mockito = "1.10.19"
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
@@ -23,6 +25,9 @@ object Dependencies {
 
     // Provides slf4j-api
     val scalaLogging = "3.9.4"
+
+    // Logstash logback encoder
+    val logstashLogbackEncoder = "7.4"
 
     // This has to match the version of akka used by elastic4s
     // Otherwise we get errors like:
@@ -84,15 +89,13 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
+  val logstashLogbackEncoderDependencies = Seq(
+    "net.logstash.logback" % "logstash-logback-encoder" % versions.logstashLogbackEncoder
+  )
+
   val sl4jDependencies = Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % versions.scalaLogging
   )
-
-  val loggingDependencies = Seq(
-    "ch.qos.logback" % "logback-classic" % versions.logback,
-    "ch.qos.logback" % "logback-core" % versions.logback,
-    "ch.qos.logback" % "logback-access" % versions.logback
-  ) ++ sl4jDependencies
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
@@ -109,10 +112,13 @@ object Dependencies {
 
   val testDependencies: Seq[ModuleID] =
     scalatestDependencies ++
-      mockitoDependencies ++
-      // This needs to be here in order that Test output always works even for libraries that
-      // don't include the logging dependencies.
-      loggingDependencies.map(_ % Test)
+      mockitoDependencies
+
+  val loggingDependencies = Seq(
+    "ch.qos.logback" % "logback-classic" % versions.logback,
+    "ch.qos.logback" % "logback-core" % versions.logback,
+    "ch.qos.logback" % "logback-access" % versions.logback
+  ) ++ sl4jDependencies ++ logstashLogbackEncoderDependencies ++ testDependencies
 
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,

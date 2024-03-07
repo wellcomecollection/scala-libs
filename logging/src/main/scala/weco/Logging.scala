@@ -1,7 +1,8 @@
 package weco
 
 import com.typesafe.scalalogging.LazyLogging
-import org.slf4j.Marker
+import net.logstash.logback.argument.StructuredArguments.entries
+import scala.collection.JavaConverters._
 
 trait Logging extends LazyLogging {
 
@@ -9,45 +10,37 @@ trait Logging extends LazyLogging {
   def error(message: String): Unit = logger.error(message)
   def error(message: String, cause: Throwable): Unit =
     logger.error(message, cause)
-  def error(marker: Marker, message: String): Unit =
-    logger.error(marker, message)
-  def error(marker: Marker, message: String, cause: Throwable): Unit =
-    logger.error(marker, message, cause)
-  def error(marker: Marker, message: String, args: Any*): Unit =
-    logger.error(marker, message, args)
+  def error(message: String, event: Map[String, String]): Unit =
+    logger.error(message, entries(event.asJava))
+  def error(message: String, event: Map[String, String], cause: Throwable): Unit =
+    logger.error(message, entries(event.asJava), cause)
 
   // Warn
   def warn(message: String): Unit = logger.warn(message)
   def warn(message: String, cause: Throwable): Unit =
     logger.warn(message, cause)
-  def warn(marker: Marker, message: String): Unit =
-    logger.warn(marker, message)
-  def warn(marker: Marker, message: String, cause: Throwable): Unit =
-    logger.warn(marker, message, cause)
-  def warn(marker: Marker, message: String, args: Any*): Unit =
-    logger.warn(marker, message, args)
+  def warn(message: String, event: Map[String, String]): Unit =
+    logger.warn(message, entries(event.asJava))
+  def warn(message: String, event: Map[String, String], cause: Throwable): Unit =
+    logger.warn(message, entries(event.asJava), cause)
 
   // Info
   def info(message: String): Unit = logger.info(message)
   def info(message: String, cause: Throwable): Unit =
     logger.info(message, cause)
-  def info(marker: Marker, message: String): Unit =
-    logger.info(marker, message)
-  def info(marker: Marker, message: String, cause: Throwable): Unit =
-    logger.info(marker, message, cause)
-  def info(marker: Marker, message: String, args: Any*): Unit =
-    logger.info(marker, message, args)
+  def info(message: String, event: Map[String, String]): Unit =
+    logger.info(message, entries(event.asJava))
+  def info(message: String, event: Map[String, String], cause: Throwable): Unit =
+    logger.info(message, entries(event.asJava), cause)
 
   // Debug
   def debug(message: String): Unit = logger.debug(message)
   def debug(message: String, cause: Throwable): Unit =
     logger.debug(message, cause)
-  def debug(marker: Marker, message: String): Unit =
-    logger.debug(marker, message)
-  def debug(marker: Marker, message: String, cause: Throwable): Unit =
-    logger.debug(marker, message, cause)
-  def debug(marker: Marker, message: String, args: Any*): Unit =
-    logger.debug(marker, message, args)
+  def debug(message: String, event: Map[String, String]): Unit =
+    logger.debug(message, entries(event.asJava))
+  def debug(message: String, event: Map[String, String], cause: Throwable): Unit =
+    logger.debug(message, entries(event.asJava), cause)
 
   // Trace
   def trace(message: String): Unit = logger.trace(message)
@@ -55,11 +48,9 @@ trait Logging extends LazyLogging {
     logger.trace(message, cause)
   def trace(message: String, args: Any*): Unit =
     logger.trace(message, args)
-  def trace(marker: Marker, message: String): Unit =
-    logger.trace(marker, message)
-  def trace(marker: Marker, message: String, cause: Throwable): Unit =
-    logger.trace(marker, message, cause)
-  def trace(marker: Marker, message: String, args: Any*): Unit =
-    logger.trace(marker, message, args)
+  def trace(message: String, event: Map[String, String]): Unit =
+    logger.trace(message, entries(event.asJava))
+  def trace(message: String, event: Map[String, String], cause: Throwable): Unit =
+    logger.trace(message, entries(event.asJava), cause)
 
 }
