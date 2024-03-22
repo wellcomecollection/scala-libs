@@ -3,7 +3,7 @@ name: Update Dependency Graph
 on:
   push:
     branches:
-      - rk/scala-dep-graph
+      - main
 
 permissions:
   id-token: write
