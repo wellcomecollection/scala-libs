@@ -65,7 +65,7 @@ object Dependencies {
     //
     //    java.lang.NoClassDefFoundError: scala/reflect/internal/Names$Name
     //
-    val scalaReflectVersion = "2.12.15"
+    val scalaReflectVersion = "2.12.19"
   }
 
   val circeDependencies = Seq(
