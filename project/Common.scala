@@ -6,7 +6,7 @@ import sbt._
 
 object Common {
   def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.12.19",
     organization := "weco",
     scalacOptions ++= Seq(
       "-deprecation",
