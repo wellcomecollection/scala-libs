@@ -1,6 +1,6 @@
 package weco.storage.store.memory
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.storage._
 import weco.storage.store.StreamStore
 import weco.storage.streaming.Codec._

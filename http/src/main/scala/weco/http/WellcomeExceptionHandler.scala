@@ -2,7 +2,7 @@ package weco.http
 
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.server.ExceptionHandler
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.monitoring.HttpMetrics
 

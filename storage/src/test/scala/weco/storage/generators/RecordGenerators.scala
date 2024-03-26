@@ -1,6 +1,6 @@
 package weco.storage.generators
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.fixtures.RandomGenerators
 import weco.json.JsonUtil._
 import weco.storage.IdentityKey

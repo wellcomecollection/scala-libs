@@ -1,12 +1,12 @@
 package weco.messaging.fixtures
 
 import akka.actor.ActorSystem
-import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model._
+import weco.Logging
 import weco.fixtures._
 import weco.json.JsonUtil.toJson
 import weco.messaging.sns.NotificationMessage

@@ -1,6 +1,6 @@
 package weco.storage.locking.memory
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.storage.locking.{Lock, LockDao, LockFailure}
 
 class MemoryLockDao[MemoryIdent, MemoryContextId]

@@ -2,10 +2,9 @@ package weco.storage.streaming
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.{Charset, StandardCharsets}
-
-import grizzled.slf4j.Logging
 import io.circe
 import io.circe.Json
+import weco.Logging
 import weco.json.JsonUtil.toJson
 import weco.storage.{EncoderError, JsonEncodingError}
 

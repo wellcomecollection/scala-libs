@@ -2,7 +2,7 @@ package weco.storage.locking
 
 import cats._
 import cats.data._
-import grizzled.slf4j.Logging
+import weco.Logging
 
 import scala.annotation.tailrec
 import scala.language.higherKinds

@@ -1,6 +1,6 @@
 package weco.storage.store.memory
 
-import grizzled.slf4j.Logging
+import weco.Logging
 import weco.storage.store.Store
 import weco.storage.{DoesNotExistError, Identified, ReadError, WriteError}
 

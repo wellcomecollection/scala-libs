@@ -3,12 +3,12 @@ package weco.storage.locking.dynamo
 import java.util.UUID
 import cats.data.EitherT
 import cats.implicits._
-import grizzled.slf4j.Logging
 import org.scanamo.generic.semiauto.deriveDynamoFormat
 import org.scanamo.query.Condition
 import org.scanamo.syntax._
 import org.scanamo.{DynamoFormat, Table => ScanamoTable}
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import weco.Logging
 import weco.storage.locking.{LockDao, LockFailure, UnlockFailure}
 import weco.storage.dynamo.DynamoTimeFormat._
 

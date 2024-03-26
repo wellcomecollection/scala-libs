@@ -1,16 +1,9 @@
 package weco.storage.store.s3
 
-import grizzled.slf4j.Logging
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{
-  CompleteMultipartUploadRequest,
-  CompleteMultipartUploadResponse,
-  CompletedMultipartUpload,
-  CompletedPart,
-  CreateMultipartUploadRequest,
-  UploadPartRequest
-}
+import software.amazon.awssdk.services.s3.model.{CompleteMultipartUploadRequest, CompleteMultipartUploadResponse, CompletedMultipartUpload, CompletedPart, CreateMultipartUploadRequest, UploadPartRequest}
+import weco.Logging
 import weco.storage.providers.s3.S3ObjectLocation
 
 import scala.collection.JavaConverters._

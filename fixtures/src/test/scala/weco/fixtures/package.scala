@@ -1,6 +1,5 @@
 package weco
 
-import grizzled.slf4j.Logging
 
 import scala.util.Try
 

@@ -1,19 +1,16 @@
 package weco.storage.fixtures
 
-import grizzled.slf4j.Logging
 import io.circe.parser.parse
 import io.circe.{Decoder, Json}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, EitherValues}
-import software.amazon.awssdk.auth.credentials.{
-  AwsBasicCredentials,
-  StaticCredentialsProvider
-}
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model._
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
+import weco.Logging
 import weco.fixtures._
 import weco.json.JsonUtil._
 import weco.storage.generators.{S3ObjectLocationGenerators, StreamGenerators}

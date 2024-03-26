@@ -6,10 +6,10 @@ import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorAttributes, Supervision}
 import akka.{Done, NotUsed}
-import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.Message
+import weco.Logging
 import weco.json.JsonUtil.fromJson
 import weco.json.exceptions.JsonDecodingError
 import weco.monitoring.Metrics

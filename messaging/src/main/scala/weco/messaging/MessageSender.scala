@@ -1,7 +1,7 @@
 package weco.messaging
 
-import grizzled.slf4j.Logging
 import io.circe.Encoder
+import weco.Logging
 import weco.json.JsonUtil.toJson
 
 import scala.util.{Failure, Success, Try}
