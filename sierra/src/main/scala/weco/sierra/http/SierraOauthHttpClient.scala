@@ -11,6 +11,7 @@ import akka.http.scaladsl.model.headers.{
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal}
 import weco.http.client.{HttpClient, HttpGet, HttpPost, TokenExchange}
 import weco.http.json.CirceMarshalling
+import weco.sierra.models.errors.SierraErrorCode
 
 import java.time.Instant
 import scala.concurrent.duration._
@@ -31,6 +32,9 @@ class SierraOauthHttpClient(
     with TokenExchange[BasicHttpCredentials, OAuth2BearerToken] {
 
   import weco.json.JsonUtil._
+
+  private implicit val umErrorCode: FromEntityUnmarshaller[SierraErrorCode] =
+    CirceMarshalling.fromDecoder[SierraErrorCode]
 
   implicit val um: FromEntityUnmarshaller[SierraAccessToken] =
     CirceMarshalling.fromDecoder[SierraAccessToken]
@@ -68,10 +72,22 @@ class SierraOauthHttpClient(
       )
     } yield result
 
-  override def singleRequest(request: HttpRequest): Future[HttpResponse] =
-    for {
-      token <- getToken(credentials)
+  // Sierra seems to occasionally tell us we have an invalid grant even when the token should
+  // be fine - we force-refresh the token once if we find this.
+  private def isInvalidGrant(response: HttpResponse): Future[Boolean] =
+    response match {
+      case HttpResponse(StatusCodes.Unauthorized, _, _, _) =>
+        Unmarshal(response)
+          .to[SierraErrorCode]
+          .map(_.description.contains("invalid_grant"))
+      case _ => Future.successful(false)
+    }
 
+  private def doRequest(request: HttpRequest,
+                        refreshCredentials: Boolean = false,
+                        nAttempts: Int = 0): Future[HttpResponse] =
+    for {
+      token <- getToken(credentials, refreshCredentials)
       authenticatedRequest = {
         // We're going to set our own Authorization header on this request
         // using the token, so there shouldn't be one already.
@@ -89,7 +105,14 @@ class SierraOauthHttpClient(
       }
 
       response <- underlying.singleRequest(authenticatedRequest)
-    } yield response
+      needsRetry <- isInvalidGrant(response).map(_ && nAttempts == 0)
+      result <- if (needsRetry)
+        doRequest(request, refreshCredentials = true, nAttempts = nAttempts + 1)
+      else Future.successful(response)
+    } yield result
+
+  override def singleRequest(request: HttpRequest): Future[HttpResponse] =
+    doRequest(request)
 
   override val baseUri: Uri = underlying.baseUri
 }
