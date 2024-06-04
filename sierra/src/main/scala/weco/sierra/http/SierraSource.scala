@@ -234,7 +234,8 @@ object SierraSource {
     "holdCount",
     "suppressed",
     "status",
-    "varFields"
+    "varFields",
+    "location"
   )
 
   // cf. the fields in the case class `SierraHold`
