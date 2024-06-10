@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.41.1 - 2024-06-10
+
+Add location to Sierrasource's requiredItemFields
+
 ## v32.41.0 - 2024-04-11
 
 Bump aws to v2.25.28
