@@ -18,7 +18,7 @@ object Dependencies {
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0-M13"
+    val scanamo = "1.0.4"
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
@@ -35,7 +35,7 @@ object Dependencies {
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
     //
     val akka = "2.6.20"
-    val akkaStreamAlpakka = "3.0.4"
+    val akkaStreamAlpakka = "4.0.0"
 
     // Getting the akka-http dependencies right can be fiddly and takes some work.
     // In particular you need to use the same version of akka-http everywhere, or you
@@ -65,7 +65,7 @@ object Dependencies {
     //
     //    java.lang.NoClassDefFoundError: scala/reflect/internal/Names$Name
     //
-    val scalaReflectVersion = "2.12.15"
+    val scalaReflectVersion = "2.13.8"
   }
 
   val circeDependencies = Seq(
