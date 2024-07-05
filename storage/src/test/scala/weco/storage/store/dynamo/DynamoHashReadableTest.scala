@@ -13,9 +13,6 @@ import software.amazon.awssdk.services.dynamodb.model.{
   GetItemRequest,
   ScalarAttributeType
 }
-
-import scala.language.higherKinds
-
 class DynamoHashReadableTest
     extends DynamoReadableTestCases[
       String,

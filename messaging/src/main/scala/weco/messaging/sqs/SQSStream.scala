@@ -14,7 +14,7 @@ import weco.json.JsonUtil.fromJson
 import weco.json.exceptions.JsonDecodingError
 import weco.monitoring.Metrics
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 // Provides a stream for processing SQS messages.
 //
@@ -37,7 +37,7 @@ class SQSStream[T](
   metricsSender: Metrics[Future])(implicit val actorSystem: ActorSystem)
     extends Logging {
 
-  implicit val dispatcher = actorSystem.dispatcher
+  implicit val dispatcher: ExecutionContextExecutor = actorSystem.dispatcher
 
   private val source: Source[Message, NotUsed] =
     SqsSource(sqsConfig.queueUrl)(sqsClient)
@@ -122,7 +122,7 @@ class SQSStream[T](
     exception match {
       case exception: JsonDecodingError =>
         logger.warn(s"JSON decoding error: ${exception.getMessage}")
-      case exception: Exception =>
+      case exception: Throwable =>
         logger.error(
           s"Unrecognised failure while: ${exception.getMessage}",
           exception)

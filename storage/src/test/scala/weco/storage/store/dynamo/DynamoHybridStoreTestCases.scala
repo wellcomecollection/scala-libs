@@ -16,15 +16,8 @@ import weco.storage.{
   StoreReadError,
   StoreWriteError
 }
-import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.fixtures.{DynamoFixtures, S3Fixtures}
-import weco.storage.fixtures.S3Fixtures.Bucket
-import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.HybridStoreWithoutOverwritesTestCases
-import weco.storage.store.s3.{S3StreamStore, S3TypedStore}
 
-import scala.language.higherKinds
 
 trait DynamoHybridStoreTestCases[
   DynamoStoreImpl <: Store[Version[String, Int], S3ObjectLocation]]

@@ -4,7 +4,6 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.EitherValues
 import weco.storage.store.fixtures.StoreFixtures
 import weco.storage.{Identified, NotFoundError, WriteError}
-import weco.storage.WriteError
 
 trait StoreTestCases[Id, T, Namespace, StoreContext]
     extends AnyFunSpec

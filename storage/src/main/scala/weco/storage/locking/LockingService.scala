@@ -5,8 +5,6 @@ import cats.data._
 import grizzled.slf4j.Logging
 
 import scala.annotation.tailrec
-import scala.language.higherKinds
-
 trait LockingService[Out, OutMonad[_], LockDaoImpl <: LockDao[_, _]]
     extends Logging {
 

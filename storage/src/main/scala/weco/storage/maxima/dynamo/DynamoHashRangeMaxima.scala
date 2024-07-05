@@ -6,8 +6,6 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import weco.storage.dynamo.DynamoHashRangeEntry
 import weco.storage.maxima.Maxima
 import weco.storage.{Identified, MaximaReadError, NoMaximaValueError, Version}
-import weco.storage.dynamo.DynamoHashRangeEntry
-import weco.storage.maxima.Maxima
 
 import scala.util.{Failure, Success, Try}
 

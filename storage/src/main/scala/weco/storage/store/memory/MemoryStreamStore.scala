@@ -17,7 +17,7 @@ class MemoryStreamStore[Ident](val memoryStore: MemoryStore[Ident, Array[Byte]])
       // This is sort of cheating, but since we created these streams the lengths
       // should never be incorrect, and it means we can't get an EncoderError
       // (a WriteError) from inside a REad method.
-      inputStream = bytesCodec.toStream(bytes).right.get
+      inputStream = bytesCodec.toStream(bytes).toOption.get
     } yield Identified(id, inputStream)
 
   override def put(id: Ident)(entry: InputStreamWithLength): WriteEither =

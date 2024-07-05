@@ -16,9 +16,9 @@ object Common {
       "-Xlint",
       "-Xverify",
       "-Xfatal-warnings",
-      "-Ypartial-unification",
       "-feature",
-      "-language:postfixOps"
+      "-language:postfixOps",
+      "-Xlint:-byname-implicit"
     ),
     parallelExecution in Test := false,
     publishMavenStyle := true,

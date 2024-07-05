@@ -14,9 +14,6 @@ import software.amazon.awssdk.services.dynamodb.model.{
   DynamoDbException,
   ResourceNotFoundException
 }
-
-import scala.language.higherKinds
-
 trait DynamoReadableTestCases[
   DynamoIdent, EntryType <: DynamoEntry[String, Record]]
     extends AnyFunSpec

@@ -10,9 +10,6 @@ import weco.storage.providers.s3.{S3ObjectLocation, S3ObjectLocationPrefix}
 import weco.storage.store.s3.S3TypedStore
 import weco.storage.store.VersionedStoreWithOverwriteTestCases
 import weco.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
-
-import scala.language.higherKinds
-
 class DynamoVersionedHybridStoreTest
     extends VersionedStoreWithOverwriteTestCases[
       String,

@@ -10,8 +10,6 @@ import weco.storage.generators.Record
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType
 
-import scala.language.higherKinds
-
 class DynamoHashRangeReadableTest
     extends DynamoReadableTestCases[
       Version[String, Int],

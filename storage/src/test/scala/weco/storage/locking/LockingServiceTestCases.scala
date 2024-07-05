@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import weco.fixtures.TestWith
 import weco.storage.fixtures.LockingServiceFixtures
 import weco.storage.locking.memory.PermanentLock
-import weco.storage.fixtures.LockingServiceFixtures
 
 import scala.util.{Success, Try}
 

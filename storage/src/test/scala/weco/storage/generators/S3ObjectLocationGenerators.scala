@@ -25,7 +25,7 @@ trait S3ObjectLocationGenerators extends RandomGenerators {
         Seq(
           "_" + createBucket,
           randomAlphanumeric().toUpperCase() + createBucket,
-          createBucket + randomAlphanumeric().toUpperCase(),
+          createBucket.toString + randomAlphanumeric().toUpperCase(),
           randomAlphanumeric(length = randomInt(from = 50, to = 100))
         ))
       .head

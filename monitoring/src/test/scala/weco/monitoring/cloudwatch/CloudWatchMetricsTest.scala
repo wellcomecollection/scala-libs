@@ -2,7 +2,6 @@ package weco.monitoring.cloudwatch
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-
 import org.mockito.ArgumentCaptor
 import org.scalatest.Assertion
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
@@ -10,15 +9,12 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient
-import software.amazon.awssdk.services.cloudwatch.model.{
-  PutMetricDataRequest,
-  StandardUnit
-}
+import software.amazon.awssdk.services.cloudwatch.model.{PutMetricDataRequest, StandardUnit}
 import weco.akka.fixtures.Akka
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.monitoring.MetricsConfig
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
@@ -67,7 +63,7 @@ class CloudWatchMetricsTest
   it("groups 20 MetricDatum into one PutMetricDataRequest") {
     val amazonCloudWatch = mock[CloudWatchClient]
     withMetricsSender(amazonCloudWatch) { metricsSender =>
-      val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+      val capture: ArgumentCaptor[PutMetricDataRequest] = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val metricName = createMetricName
 
@@ -75,8 +71,9 @@ class CloudWatchMetricsTest
         (1 to 40).map { _ =>
           metricsSender.incrementCount(metricName)
         }
+      val sequence = Future.sequence(futures)
 
-      whenReady(Future.sequence(futures)) { _ =>
+      whenReady(sequence) { _ =>
         eventually {
           verify(amazonCloudWatch, times(2)).putMetricData(capture.capture())
 
@@ -94,7 +91,7 @@ class CloudWatchMetricsTest
   it("takes at least one second to make 150 PutMetricData requests") {
     val amazonCloudWatch = mock[CloudWatchClient]
     withMetricsSender(amazonCloudWatch) { metricsSender =>
-      val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+      val capture: ArgumentCaptor[PutMetricDataRequest] = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
       val metricName = createMetricName
 
@@ -107,10 +104,11 @@ class CloudWatchMetricsTest
         (1 to 3000).map { i =>
           metricsSender.incrementCount(s"${i}_$metricName")
         }
+      val sequence = Future.sequence(futures)
 
-      val promisedInstant = Promise[Instant]
+      val promisedInstant = Promise[Instant]()
 
-      whenReady(Future.sequence(futures)) { _ =>
+      whenReady(sequence) { _ =>
         eventually {
           verify(amazonCloudWatch, times(150))
             .putMetricData(capture.capture())
@@ -153,7 +151,7 @@ class CloudWatchMetricsTest
                                     expectedValue: Double = 1.0,
                                     maybeExpectedUnit: Option[StandardUnit] =
                                       None): Assertion = {
-    val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
+    val capture: ArgumentCaptor[PutMetricDataRequest] = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
     eventually {
       verify(amazonCloudWatch, times(1)).putMetricData(capture.capture())
 

@@ -13,7 +13,6 @@ import weco.storage.locking.{LockDao, LockFailure, UnlockFailure}
 import weco.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext
-import scala.language.higherKinds
 import scala.util.{Failure, Success, Try}
 
 class DynamoLockDao(

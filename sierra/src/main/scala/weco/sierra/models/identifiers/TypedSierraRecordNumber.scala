@@ -45,7 +45,7 @@ sealed trait TypedSierraRecordNumber extends SierraRecordNumber {
     */
   private def getCheckDigit: String = {
     val remainder = recordNumber.reverse
-      .zip(Stream from 2)
+      .zip(LazyList from 2)
       .map { case (char: Char, count: Int) => char.toString.toInt * count }
       .sum % 11
     if (remainder == 10) "x" else remainder.toString

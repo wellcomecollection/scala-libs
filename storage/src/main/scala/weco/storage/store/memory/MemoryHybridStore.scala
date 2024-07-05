@@ -2,7 +2,6 @@ package weco.storage.store.memory
 
 import weco.storage.store._
 import weco.storage.streaming.Codec
-import weco.storage.streaming.Codec
 
 class MemoryHybridStore[Ident, T](
   implicit val typedStore: MemoryTypedStore[String, T],

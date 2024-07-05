@@ -10,9 +10,6 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.maxima.MaximaTestCases
 import weco.storage.store.StoreWithoutOverwritesTestCases
-
-import scala.language.higherKinds
-
 class DynamoHashStoreTest
     extends StoreWithoutOverwritesTestCases[
       Version[IdentityKey, Int],

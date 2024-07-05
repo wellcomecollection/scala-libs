@@ -14,8 +14,6 @@ import weco.storage.{
   StoreReadError,
   StoreWriteError
 }
-import weco.storage.store.fixtures.TypedStoreFixtures
-import weco.storage.streaming.{Codec, InputStreamWithLength}
 
 trait TypedStoreTestCases[Ident,
                           T,

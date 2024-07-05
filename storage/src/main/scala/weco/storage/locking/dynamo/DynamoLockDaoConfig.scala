@@ -1,7 +1,6 @@
 package weco.storage.locking.dynamo
 
 import weco.storage.dynamo.DynamoConfig
-import weco.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration.Duration
 

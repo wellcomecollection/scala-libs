@@ -14,7 +14,6 @@ import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.Version
 import weco.storage.fixtures.DynamoFixtures.Table
 
-import scala.language.higherKinds
 
 class DynamoHashRangeWritableTest
     extends DynamoWritableTestCases[

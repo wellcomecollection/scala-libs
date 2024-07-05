@@ -10,7 +10,7 @@ object EnrichConfig {
     private def cleanUpPath(p: String): String =
       // Sometimes we may get a path that features two double dots, if there's an
       // empty namespace -- in this case, elide the two dots into one.
-      p.replaceAllLiterally("..", ".")
+      p.replace("..", ".")
 
     private def getPathValue[T](path: String)(f: String => T): Option[T] = {
       val cleanPath = cleanUpPath(path)

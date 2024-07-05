@@ -14,9 +14,6 @@ import org.scalatest.matchers.should.Matchers
 import weco.storage.fixtures.DynamoFixtures
 import weco.storage.fixtures.DynamoFixtures.Table
 import DynamoTimeFormat._
-
-import scala.language.higherKinds
-
 trait DynamoFormatTestCases[T]
     extends AnyFunSpec
     with Matchers

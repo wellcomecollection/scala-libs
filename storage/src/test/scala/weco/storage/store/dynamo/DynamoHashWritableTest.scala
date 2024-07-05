@@ -14,11 +14,6 @@ import software.amazon.awssdk.services.dynamodb.model.{
 }
 import weco.storage.Version
 import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.dynamo.DynamoHashEntry
-import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.generators.{Record, RecordGenerators}
-
-import scala.language.higherKinds
 
 class DynamoHashWritableTest
     extends DynamoWritableTestCases[

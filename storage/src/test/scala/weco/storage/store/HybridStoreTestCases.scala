@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import weco.fixtures.TestWith
 import weco.storage.generators.StreamGenerators
 import weco.storage.streaming.InputStreamWithLength
-import weco.storage._
 import weco.storage.{
   DanglingHybridStorePointerError,
   DoesNotExistError,
@@ -14,7 +13,6 @@ import weco.storage.{
   ReadError,
   WriteError
 }
-import weco.storage.generators.StreamGenerators
 
 trait HybridStoreTestCases[
   IndexedStoreId,

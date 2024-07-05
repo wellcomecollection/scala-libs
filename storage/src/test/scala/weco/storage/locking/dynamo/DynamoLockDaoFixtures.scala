@@ -22,7 +22,6 @@ import weco.storage.dynamo.DynamoTimeFormat._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.language.higherKinds
 
 trait DynamoLockDaoFixtures
     extends LockDaoFixtures[String, UUID, Table]

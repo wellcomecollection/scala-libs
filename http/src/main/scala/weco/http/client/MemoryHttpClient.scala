@@ -19,7 +19,7 @@ class MemoryHttpClient(
   implicit val ec: ExecutionContext
 ) extends HttpClient {
 
-  private val iterator = responses.toIterator
+  private val iterator = responses.iterator
 
   override def singleRequest(request: HttpRequest): Future[HttpResponse] =
     Future {
@@ -61,7 +61,7 @@ class MemoryHttpClient(
   private def getEntityString(entity: HttpEntity): String =
     entity match {
       case HttpEntity.Strict(ContentTypes.`application/json`, json) =>
-        parse(json.utf8String).right.get.spaces2
+        parse(json.utf8String).toOption.get.spaces2
       case HttpEntity.Strict(_, content) => content.utf8String
       case _                             => "<streaming entity>"
     }

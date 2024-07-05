@@ -14,14 +14,8 @@ import weco.storage.dynamo.DynamoHashRangeEntry
 import weco.storage.fixtures.DynamoFixtures
 import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.store._
-import weco.storage.dynamo.DynamoHashRangeEntry
-import weco.storage.fixtures.DynamoFixtures
-import weco.storage.fixtures.DynamoFixtures.Table
-import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.store.VersionedStoreWithoutOverwriteTestCases
 
-import scala.language.higherKinds
 
 class DynamoMultipleVersionStoreTest
     extends VersionedStoreWithoutOverwriteTestCases[String, Record, Table]

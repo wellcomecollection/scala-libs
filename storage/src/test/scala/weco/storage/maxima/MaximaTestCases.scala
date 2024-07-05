@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import weco.fixtures.TestWith
 import weco.storage.{Identified, IdentityKey, NoMaximaValueError, Version}
 import weco.storage.generators.{Record, RecordGenerators}
-import weco.storage.generators.{Record, RecordGenerators}
 
 trait MaximaTestCases
     extends AnyFunSpec

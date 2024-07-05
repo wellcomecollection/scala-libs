@@ -13,7 +13,7 @@ import software.amazon.awssdk.services.s3.model.{
 }
 import weco.storage.providers.s3.S3ObjectLocation
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 trait S3MultipartUploader extends Logging {

@@ -4,8 +4,6 @@ import weco.fixtures.TestWith
 import weco.storage.store.fixtures.StreamStoreFixtures
 import weco.storage.streaming.Codec.bytesCodec
 import weco.storage.streaming.InputStreamWithLength
-import weco.storage.store.fixtures.StreamStoreFixtures
-import weco.storage.streaming.InputStreamWithLength
 
 trait MemoryStreamStoreFixtures[Ident]
     extends StreamStoreFixtures[

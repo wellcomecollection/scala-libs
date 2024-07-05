@@ -8,8 +8,6 @@ import weco.storage.fixtures.S3Fixtures.Bucket
 import weco.storage.generators.Record
 import weco.storage.providers.s3.S3ObjectLocation
 
-import scala.language.higherKinds
-
 class DynamoHybridStoreTest
     extends DynamoHybridStoreTestCases[
       DynamoHashStore[String, Int, S3ObjectLocation]

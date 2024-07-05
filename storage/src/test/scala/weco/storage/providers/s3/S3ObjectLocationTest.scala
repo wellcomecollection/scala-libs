@@ -12,9 +12,6 @@ class S3ObjectLocationTest
     with EitherValues
     with S3ObjectLocationGenerators {
 
-  import S3ObjectLocation._
-  import S3ObjectLocationPrefix._
-
   describe("S3ObjectLocation") {
     describe("JSON") {
       it("can serialise and deserialise to JSON") {

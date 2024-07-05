@@ -22,7 +22,7 @@ import weco.storage.streaming.Codec._
 import weco.storage.streaming.InputStreamWithLength
 
 import java.net.URI
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 object S3Fixtures {
@@ -167,7 +167,7 @@ trait S3Fixtures
   }
 
   def getJsonFromS3(location: S3ObjectLocation): Json =
-    parse(getContentFromS3(location)).right.get
+    parse(getContentFromS3(location)).value
 
   def getObjectFromS3[T](location: S3ObjectLocation)(
     implicit decoder: Decoder[T]): T =

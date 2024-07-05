@@ -14,7 +14,7 @@ import weco.messaging.sqs._
 import weco.monitoring.Metrics
 import weco.monitoring.memory.MemoryMetrics
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
@@ -240,7 +240,7 @@ trait SQS
       }
       .get
       .messages()
-      .asScala
+      .asScala.toSeq
 
   def createSQSConfigWith(queue: Queue): SQSConfig =
     SQSConfig(queueUrl = queue.url)

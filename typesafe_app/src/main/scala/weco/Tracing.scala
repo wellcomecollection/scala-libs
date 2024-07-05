@@ -9,7 +9,7 @@ import co.elastic.apm.attach.ElasticApmAttacher
 import com.typesafe.config.Config
 import weco.typesafe.config.builders.EnrichConfig._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.ref.WeakReference
@@ -74,7 +74,7 @@ object Tracing {
     threadLocalTransactionReference.value.get
       .getOrElse(ElasticApm.currentTransaction())
 
-  def currentTransaction_=(t: Transaction) {
+  def currentTransaction_=(t: Transaction) = {
     threadLocalTransactionReference.value = new WeakReference[Transaction](t)
   }
 }

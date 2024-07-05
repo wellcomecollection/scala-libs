@@ -9,10 +9,6 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.generators.{Record, RecordGenerators}
 import weco.storage.store._
 import weco.storage.{MaximaReadError, StoreReadError, StoreWriteError, Version}
-import weco.storage.fixtures.DynamoFixtures
-import weco.storage.fixtures.DynamoFixtures.Table
-
-import scala.language.higherKinds
 
 class DynamoSingleVersionStoreTest
     extends VersionedStoreWithOverwriteTestCases[String, Record, Table]

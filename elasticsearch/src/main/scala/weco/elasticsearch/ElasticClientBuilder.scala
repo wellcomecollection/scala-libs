@@ -11,7 +11,7 @@ import org.apache.http.message.BasicHeader
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 private class ElasticHttpClientApiKeyConfig(encodedApiKey: String,
                                             apiCompatibleWith: Option[String])

@@ -17,7 +17,6 @@ import weco.storage.generators.Record
 import weco.storage.maxima.MaximaTestCases
 import weco.storage.{IdentityKey, Version}
 
-import scala.language.higherKinds
 
 class DynamoHashRangeMaximaTest extends MaximaTestCases with DynamoFixtures {
   type Entry = DynamoHashRangeEntry[IdentityKey, Int, Record]

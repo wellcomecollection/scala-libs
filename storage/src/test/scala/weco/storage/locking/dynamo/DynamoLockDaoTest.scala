@@ -18,7 +18,6 @@ import weco.storage.fixtures.DynamoFixtures.Table
 import weco.storage.locking.{LockDaoTestCases, LockFailure, UnlockFailure}
 
 import scala.concurrent.duration._
-import scala.language.higherKinds
 
 class DynamoLockDaoTest
     extends LockDaoTestCases[String, UUID, Table]

@@ -20,7 +20,7 @@ import weco.fixtures._
 import weco.storage.dynamo.DynamoConfig
 
 import java.net.URI
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable
 
 object DynamoFixtures {
@@ -42,7 +42,7 @@ trait DynamoFixtures
       .endpointOverride(new URI("http://localhost:45678"))
       .build()
 
-  implicit val scanamo = Scanamo(dynamoClient)
+  implicit val scanamo: Scanamo = Scanamo(dynamoClient)
 
   def nonExistentTable: Table =
     Table(
@@ -107,9 +107,9 @@ trait DynamoFixtures
 
   def getExistingTableItem[T: DynamoFormat](id: String, table: Table): T = {
     val record = getTableItem[T](id, table)
-    record shouldBe 'defined
-    record.get shouldBe 'right
-    record.get.right.get
+    record shouldBe Symbol("defined")
+    record.get shouldBe Symbol("right")
+    record.get.toOption.get
   }
 
   def scanTable[T: DynamoFormat](
