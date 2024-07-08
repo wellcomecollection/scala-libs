@@ -1,13 +1,13 @@
 package weco.http.monitoring
 
-import akka.http.scaladsl.model.{
+import org.apache.pekko.http.scaladsl.model.{
   ContentTypes,
   HttpEntity,
   HttpHeader,
   HttpRequest,
   HttpResponse
 }
-import akka.http.scaladsl.server.RouteResult.Complete
+import org.apache.pekko.http.scaladsl.server.RouteResult.Complete
 
 /** Constructs the log entries for every HTTP request/response pair.
   *

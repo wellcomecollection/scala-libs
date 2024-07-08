@@ -2,7 +2,7 @@ package weco.messaging.sqs
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import akka.stream.scaladsl.{Flow, Keep}
+import org.apache.pekko.stream.scaladsl.{Flow, Keep}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

@@ -22,9 +22,9 @@
 
 package de.heikoseeberger.akkahttpcirce
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.marshalling.Marshal
-import akka.http.scaladsl.model.{
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.marshalling.Marshal
+import org.apache.pekko.http.scaladsl.model.{
   ContentTypeRange,
   HttpCharsets,
   HttpEntity,
@@ -32,13 +32,13 @@ import akka.http.scaladsl.model.{
   RequestEntity,
   ResponseEntity
 }
-import akka.http.scaladsl.model.ContentTypes.{
+import org.apache.pekko.http.scaladsl.model.ContentTypes.{
   `application/json`,
   `text/plain(UTF-8)`
 }
-import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
-import akka.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
-import akka.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import cats.data.{NonEmptyList, ValidatedNel}
 import io.circe.{DecodingFailure, Encoder, Json, ParsingFailure, Printer}
 import io.circe.CursorOp.DownField

@@ -1,11 +1,11 @@
 package weco.http.monitoring
 
-import akka.http.scaladsl.model.headers.{
+import org.apache.pekko.http.scaladsl.model.headers.{
   Authorization,
   BasicHttpCredentials,
   ETag
 }
-import akka.http.scaladsl.model.{
+import org.apache.pekko.http.scaladsl.model.{
   HttpEntity,
   HttpMethods,
   HttpRequest,
@@ -13,7 +13,7 @@ import akka.http.scaladsl.model.{
   StatusCodes,
   Uri
 }
-import akka.http.scaladsl.server.RouteResult.Complete
+import org.apache.pekko.http.scaladsl.server.RouteResult.Complete
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

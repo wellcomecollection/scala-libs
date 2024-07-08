@@ -1,7 +1,7 @@
 package weco.http
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Directives, Route}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.{Directives, Route}
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil

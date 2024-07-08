@@ -1,6 +1,6 @@
 package weco.monitoring.typesafe
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient
 import weco.monitoring.MetricsConfig

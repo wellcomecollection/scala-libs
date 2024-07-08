@@ -1,12 +1,12 @@
 package weco.http
 
-import akka.http.scaladsl.model.StatusCodes.{
+import org.apache.pekko.http.scaladsl.model.StatusCodes.{
   BadRequest,
   InternalServerError,
   NotFound,
   UriTooLong
 }
-import akka.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model._
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

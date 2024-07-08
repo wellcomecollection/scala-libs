@@ -1,8 +1,8 @@
 package weco.http.json
 
-import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 import weco.json.JsonUtil._

@@ -1,6 +1,6 @@
 package weco.sierra.http
 
-import akka.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model._
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec

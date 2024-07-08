@@ -1,8 +1,8 @@
 package weco.sierra.typesafe
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.headers.BasicHttpCredentials
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.model.Uri
+import org.apache.pekko.http.scaladsl.model.headers.BasicHttpCredentials
 import com.typesafe.config.Config
 import weco.http.client.{AkkaHttpClient, HttpGet, HttpPost}
 import weco.sierra.http.SierraOauthHttpClient

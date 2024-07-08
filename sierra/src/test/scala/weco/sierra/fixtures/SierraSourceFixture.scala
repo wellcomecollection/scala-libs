@@ -1,6 +1,6 @@
 package weco.sierra.fixtures
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
