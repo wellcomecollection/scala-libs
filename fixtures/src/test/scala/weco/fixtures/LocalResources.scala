@@ -3,6 +3,7 @@ package weco.fixtures
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.io.FileNotFoundException
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
@@ -10,16 +11,15 @@ trait LocalResources {
 
   /** Returns the contents of a file in the "resources" folder. */
   def readResource(name: String): String = {
-    val resource = Source.fromResource(name)
-
     Try {
+      val resource = Source.fromResource(name)
       resource.getLines()
     } match {
       case Success(lines) => lines.mkString("\n")
 
-      case Failure(_: NullPointerException) if name.startsWith("/") =>
+      case Failure(_: FileNotFoundException) if name.startsWith("/") =>
         throw new RuntimeException(s"Could not find resource `$name`; try removing the leading slash")
-      case Failure(_: NullPointerException) =>
+      case Failure(_: FileNotFoundException) =>
         throw new RuntimeException(s"Could not find resource `$name`")
 
       case Failure(e) => throw e
