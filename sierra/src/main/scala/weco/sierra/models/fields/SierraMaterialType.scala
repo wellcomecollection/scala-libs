@@ -5,10 +5,11 @@ import io.circe.Decoder
 case class SierraMaterialType(code: String)
 
 object SierraMaterialType {
-  implicit val decoder: Decoder[SierraMaterialType] = Decoder.instance[SierraMaterialType](cursor =>
-    for {
-      id <- cursor.downField("code").as[String]
-    } yield {
-      SierraMaterialType(id.trim)
-  })
+  implicit val decoder: Decoder[SierraMaterialType] =
+    Decoder.instance[SierraMaterialType](cursor =>
+      for {
+        id <- cursor.downField("code").as[String]
+      } yield {
+        SierraMaterialType(id.trim)
+    })
 }
