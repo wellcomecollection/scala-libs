@@ -1,6 +1,9 @@
 package weco.http.json
 
-import org.apache.pekko.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.marshalling.{
+  Marshaller,
+  ToEntityMarshaller
+}
 import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import io.circe.{Decoder, Encoder}

@@ -8,7 +8,10 @@ import org.apache.pekko.http.scaladsl.model.headers.{
   BasicHttpCredentials,
   OAuth2BearerToken
 }
-import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal}
+import org.apache.pekko.http.scaladsl.unmarshalling.{
+  FromEntityUnmarshaller,
+  Unmarshal
+}
 import weco.http.client.{HttpClient, HttpGet, HttpPost, TokenExchange}
 import weco.http.json.CirceMarshalling
 

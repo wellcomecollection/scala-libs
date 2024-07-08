@@ -2,7 +2,13 @@ package weco.monitoring.cloudwatch
 
 import java.time.Instant
 
-import org.apache.pekko.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
+import org.apache.pekko.stream.scaladsl.{
+  Flow,
+  Keep,
+  Sink,
+  Source,
+  SourceQueueWithComplete
+}
 import org.apache.pekko.stream.{Materializer, OverflowStrategy, ThrottleMode}
 import org.apache.pekko.{Done, NotUsed}
 import grizzled.slf4j.Logging

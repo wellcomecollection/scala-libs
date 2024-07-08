@@ -3,7 +3,13 @@ package weco.messaging.sqs
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.connectors.sqs.MessageAction
 import org.apache.pekko.stream.connectors.sqs.scaladsl.{SqsAckSink, SqsSource}
-import org.apache.pekko.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
+import org.apache.pekko.stream.scaladsl.{
+  Flow,
+  Keep,
+  RunnableGraph,
+  Sink,
+  Source
+}
 import org.apache.pekko.stream.{ActorAttributes, Supervision}
 import org.apache.pekko.{Done, NotUsed}
 import grizzled.slf4j.Logging
