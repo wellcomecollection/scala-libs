@@ -4,7 +4,7 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.model.Uri
 import org.apache.pekko.http.scaladsl.model.headers.BasicHttpCredentials
 import com.typesafe.config.Config
-import weco.http.client.{PekkoHttpClient, HttpGet, HttpPost}
+import weco.http.client.{HttpGet, HttpPost, PekkoHttpClient}
 import weco.sierra.http.SierraOauthHttpClient
 import weco.typesafe.config.builders.EnrichConfig._
 
