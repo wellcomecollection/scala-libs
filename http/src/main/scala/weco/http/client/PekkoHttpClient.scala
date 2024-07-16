@@ -7,7 +7,7 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AkkaHttpClient(implicit system: ActorSystem)
+class PekkoHttpClient(implicit system: ActorSystem)
     extends HttpClient
     with Logging {
   implicit val ec: ExecutionContext = system.dispatcher

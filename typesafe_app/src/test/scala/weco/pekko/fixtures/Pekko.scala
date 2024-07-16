@@ -1,4 +1,4 @@
-package weco.akka.fixtures
+package weco.pekko.fixtures
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
@@ -7,7 +7,7 @@ import weco.fixtures._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-trait Akka {
+trait Pekko {
   def withActorSystem[R]: Fixture[ActorSystem, R] = fixture[ActorSystem, R](
     create = ActorSystem(),
     destroy = system => Await.ready(system.terminate(), 10 seconds)

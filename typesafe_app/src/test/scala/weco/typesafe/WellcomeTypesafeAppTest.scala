@@ -51,12 +51,13 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
     }
 
     it("sets the expected logging config") {
-      val loggers = calledWith.get.getList("akka.loggers")
+      val loggers = calledWith.get.getList("pekko.loggers")
+      println(loggers)
       loggers.size() shouldBe 1
-      loggers.get(0).unwrapped() shouldBe "akka.event.slf4j.Slf4jLogger"
+      loggers.get(0).unwrapped() shouldBe "org.apache.pekko.event.slf4j.Slf4jLogger"
 
-      val loggingFilter = calledWith.get.getString("akka.logging-filter")
-      loggingFilter shouldBe "akka.event.slf4j.Slf4jLoggingFilter"
+      val loggingFilter = calledWith.get.getString("pekko.logging-filter")
+      loggingFilter shouldBe "org.apache.pekko.event.slf4j.Slf4jLoggingFilter"
     }
 
     it("sets the expected overridden config") {

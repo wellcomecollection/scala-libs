@@ -5,7 +5,6 @@ import org.scalatest.EitherValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
 import weco.sierra.models.fields.{
   SierraHold,
@@ -15,6 +14,7 @@ import weco.sierra.models.fields.{
   SierraLocation
 }
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
+import weco.pekko.fixtures.Pekko
 import weco.sierra.generators.SierraIdentifierGenerators
 import weco.sierra.models.data.SierraItemData
 import weco.sierra.models.identifiers.{SierraItemNumber, SierraPatronNumber}
@@ -29,7 +29,7 @@ class SierraSourceTest
     extends AnyFunSpec
     with Matchers
     with EitherValues
-    with Akka
+    with Pekko
     with ScalaFutures
     with IntegrationPatience
     with SierraIdentifierGenerators {
