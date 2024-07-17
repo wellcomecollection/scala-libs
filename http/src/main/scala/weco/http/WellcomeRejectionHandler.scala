@@ -16,7 +16,7 @@ import weco.http.monitoring.HttpMetrics
 import scala.concurrent.ExecutionContext
 
 trait WellcomeRejectionHandler extends ErrorDirectives {
-  import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
+  import com.github.pjfanning.pekkohttpcirce.ErrorAccumulatingCirceSupport._
 
   val httpMetrics: HttpMetrics
 

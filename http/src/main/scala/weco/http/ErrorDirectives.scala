@@ -1,8 +1,8 @@
 package weco.http
 
+import com.github.pjfanning.pekkohttpcirce.ErrorAccumulatingCirceSupport
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.{Directives, Route}
-import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.models.DisplayError

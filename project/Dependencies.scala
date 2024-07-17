@@ -27,6 +27,7 @@ object Dependencies {
     val pekko = "1.0.3"
     val pekkoConnectors = "1.0.2"
     val pekkoHttp = "1.0.1"
+    val pekkoHttpJson = "2.6.0"
 
     // This needs to be set explicitly to match the language version
     // used by the version of shapeless that Circe uses, otherwise SBT
@@ -93,7 +94,8 @@ object Dependencies {
 
 
   val pekkoHttpDependencies = Seq(
-    "org.apache.pekko" %% "pekko-http" % versions.pekkoHttp
+    "org.apache.pekko" %% "pekko-http" % versions.pekkoHttp,
+    "com.github.pjfanning" %% "pekko-http-circe" % versions.pekkoHttpJson
   )
 
   val apacheCommons = Seq(

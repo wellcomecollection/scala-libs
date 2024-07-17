@@ -19,7 +19,7 @@ import scala.concurrent.Future
   *
   *   1.  The default [Un]marshallers aren't aware of all of Circe's features,
   *       e.g. the @JsonKey annotation.
-  *   2.  It means that any method doing akka-http marshalling can just require
+  *   2.  It means that any method doing pekko-http marshalling can just require
   *       an implicit Decoder[T] or Encoder[T], which is a more common interface
   *       in our codebase.
   *

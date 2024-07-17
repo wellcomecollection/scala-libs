@@ -104,11 +104,11 @@ class SQSStream[T](
       modifySource(source).toMat(sink)(Keep.right)
     }
 
-  // Defines a "supervision strategy" -- this tells Akka how to react
+  // Defines a "supervision strategy" -- this tells Pekko how to react
   // if one of the elements fails.  We want to log the failing message,
   // then drop it and carry on processing the next message.
   //
-  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
+  // https://pekko.apache.org/docs/pekko/current/stream/stream-error.html#supervision-strategies
   //
   private def decider(metricName: String): Supervision.Decider = {
     case e: JsonDecodingError =>
