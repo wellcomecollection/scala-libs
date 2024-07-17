@@ -52,7 +52,6 @@ class WellcomeTypesafeAppTest extends AnyFunSpec with Matchers {
 
     it("sets the expected logging config") {
       val loggers = calledWith.get.getList("pekko.loggers")
-      println(loggers)
       loggers.size() shouldBe 1
       loggers.get(0).unwrapped() shouldBe "org.apache.pekko.event.slf4j.Slf4jLogger"
 
