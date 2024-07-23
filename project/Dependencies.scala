@@ -2,24 +2,24 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val elasticApm = "1.22.0"
-    val elastic4s = "8.8.1"
+    val elasticApm = "1.48.1"
+    val elastic4s = "8.8.3"
 
     val aws = "2.25.28"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
-    val circe = "0.14.5"
+    val circe = "0.14.6"
     val circeGenericExtras = "0.14.3"
 
-    val typesafe = "1.4.2"
-    val logback = "1.4.7"
-    val mockito = "1.10.19"
-    val scalatest = "3.2.3"
+    val typesafe = "1.4.3"
+    val logback = "1.4.14"
+    val mockito = "5.11.0"
+    val scalatest = "3.2.18"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0-M13"
-    val apacheCommons = "2.6"
+    val scanamo = "1.0.1"
+    val apacheCommons = "2.15.1"
 
     // Provides slf4j-api
     val grizzled = "1.3.4"
@@ -65,7 +65,7 @@ object Dependencies {
     //
     //    java.lang.NoClassDefFoundError: scala/reflect/internal/Names$Name
     //
-    val scalaReflectVersion = "2.12.15"
+    val scalaReflectVersion = "2.12.19"
   }
 
   val circeDependencies = Seq(
@@ -149,7 +149,7 @@ object Dependencies {
   // See https://github.com/elastic/apm-agent-java/issues/2353 for an explanation
   // of the issue this addresses.
   val jnaDependencies: Seq[ModuleID] = Seq(
-    "net.java.dev.jna" % "jna" % "5.7.0"
+    "net.java.dev.jna" % "jna" % "5.14.0"
   )
 
   val localstackDependencies = Seq(
