@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.42.0 - 2024-07-24
+
+Migrate from Akka to Pekko
+
 ## v32.41.1 - 2024-06-10
 
 Add location to Sierrasource's requiredItemFields
