@@ -1,16 +1,16 @@
 package weco.http
 
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.directives.{
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.event.{Logging, LoggingAdapter}
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.HttpRequest
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.directives.{
   DebuggingDirectives,
   LogEntry,
   LoggingMagnet
 }
-import akka.http.scaladsl.settings.ServerSettings
+import org.apache.pekko.http.scaladsl.settings.ServerSettings
 import grizzled.slf4j.Logging
 import weco.http.errors.WellcomeParsingErrorHandler
 import weco.http.models.HTTPServerConfig

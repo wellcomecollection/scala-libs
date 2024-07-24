@@ -1,18 +1,18 @@
 package weco.sierra.http
 
-import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.headers.{
+import org.apache.pekko.http.scaladsl.model.Uri.Path
+import org.apache.pekko.http.scaladsl.model.headers.{
   Authorization,
   BasicHttpCredentials,
   OAuth2BearerToken
 }
-import akka.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model._
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import weco.akka.fixtures.Akka
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.http.fixtures.HttpFixtures
+import weco.pekko.fixtures.Pekko
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class SierraOauthHttpClientTest
     extends AnyFunSpec
     with Matchers
-    with Akka
+    with Pekko
     with HttpFixtures
     with IntegrationPatience {
   val credentials = BasicHttpCredentials("username", "password")

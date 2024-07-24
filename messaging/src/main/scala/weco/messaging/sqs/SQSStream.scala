@@ -1,11 +1,17 @@
 package weco.messaging.sqs
 
-import akka.actor.ActorSystem
-import akka.stream.alpakka.sqs.MessageAction
-import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
-import akka.stream.{ActorAttributes, Supervision}
-import akka.{Done, NotUsed}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.connectors.sqs.MessageAction
+import org.apache.pekko.stream.connectors.sqs.scaladsl.{SqsAckSink, SqsSource}
+import org.apache.pekko.stream.scaladsl.{
+  Flow,
+  Keep,
+  RunnableGraph,
+  Sink,
+  Source
+}
+import org.apache.pekko.stream.{ActorAttributes, Supervision}
+import org.apache.pekko.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
@@ -98,11 +104,11 @@ class SQSStream[T](
       modifySource(source).toMat(sink)(Keep.right)
     }
 
-  // Defines a "supervision strategy" -- this tells Akka how to react
+  // Defines a "supervision strategy" -- this tells Pekko how to react
   // if one of the elements fails.  We want to log the failing message,
   // then drop it and carry on processing the next message.
   //
-  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
+  // https://pekko.apache.org/docs/pekko/current/stream/stream-error.html#supervision-strategies
   //
   private def decider(metricName: String): Supervision.Decider = {
     case e: JsonDecodingError =>

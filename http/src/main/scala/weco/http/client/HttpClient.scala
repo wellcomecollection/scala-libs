@@ -1,9 +1,9 @@
 package weco.http.client
 
-import akka.http.scaladsl.marshalling.{Marshal, ToEntityMarshaller}
-import akka.http.scaladsl.model.Uri.Path.Slash
-import akka.http.scaladsl.model.Uri.{Path, Query}
-import akka.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.marshalling.{Marshal, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.model.Uri.Path.Slash
+import org.apache.pekko.http.scaladsl.model.Uri.{Path, Query}
+import org.apache.pekko.http.scaladsl.model._
 import io.circe.Encoder
 import weco.http.json.CirceMarshalling
 

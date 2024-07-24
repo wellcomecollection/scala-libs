@@ -1,6 +1,6 @@
 package weco.http.models
 
-import akka.http.scaladsl.model.StatusCode
+import org.apache.pekko.http.scaladsl.model.StatusCode
 import io.circe.generic.extras.JsonKey
 import io.circe.Encoder
 import io.circe.generic.extras.semiauto._

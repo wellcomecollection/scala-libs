@@ -1,13 +1,13 @@
 package weco.http.client
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse}
 import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AkkaHttpClient(implicit system: ActorSystem)
+class PekkoHttpClient(implicit system: ActorSystem)
     extends HttpClient
     with Logging {
   implicit val ec: ExecutionContext = system.dispatcher

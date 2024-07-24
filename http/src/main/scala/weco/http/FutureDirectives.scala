@@ -1,6 +1,6 @@
 package weco.http
 
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

@@ -1,12 +1,12 @@
 package weco.http.client
 
-import akka.http.scaladsl.model.{
+import org.apache.pekko.http.scaladsl.model.{
   ContentTypes,
   HttpEntity,
   HttpRequest,
   HttpResponse
 }
-import akka.util.ByteString
+import org.apache.pekko.util.ByteString
 import io.circe.Json
 import io.circe.parser.parse
 

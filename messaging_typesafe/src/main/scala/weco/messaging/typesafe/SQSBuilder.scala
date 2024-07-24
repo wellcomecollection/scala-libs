@@ -1,6 +1,6 @@
 package weco.messaging.typesafe
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import weco.messaging.sqs.{SQSConfig, SQSStream}

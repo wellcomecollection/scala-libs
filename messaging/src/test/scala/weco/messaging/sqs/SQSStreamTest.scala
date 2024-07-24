@@ -2,17 +2,17 @@ package weco.messaging.sqs
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import akka.stream.scaladsl.{Flow, Keep}
+import org.apache.pekko.stream.scaladsl.{Flow, Keep}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import software.amazon.awssdk.services.sqs.model.Message
-import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
 import weco.json.JsonUtil._
 import weco.messaging.fixtures.SQS
 import weco.messaging.fixtures.SQS.{Queue, QueuePair}
 import weco.monitoring.memory.MemoryMetrics
+import weco.pekko.fixtures.Pekko
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
@@ -24,7 +24,7 @@ class SQSStreamTest
     with IntegrationPatience
     with Eventually
     with SQS
-    with Akka {
+    with Pekko {
 
   case class NamedObject(name: String)
 

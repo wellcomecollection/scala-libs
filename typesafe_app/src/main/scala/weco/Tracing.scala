@@ -2,8 +2,8 @@ package weco
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
-import akka.dispatch._
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.dispatch._
 import co.elastic.apm.api.{ElasticApm, Transaction}
 import co.elastic.apm.attach.ElasticApmAttacher
 import com.typesafe.config.Config

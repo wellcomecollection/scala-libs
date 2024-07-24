@@ -1,6 +1,6 @@
 package weco.http.client
 
-import akka.http.scaladsl.model.{
+import org.apache.pekko.http.scaladsl.model.{
   ContentTypes,
   HttpEntity,
   HttpMethods,
