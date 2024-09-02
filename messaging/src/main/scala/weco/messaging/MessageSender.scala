@@ -23,9 +23,7 @@ trait MessageSender[Destination] extends Logging {
   def send(body: String): Try[Unit] =
     underlying.send(body)(subject, destination) match {
       case Failure(err) =>
-        error(
-          s"Unable to send message (body=$body) to destination $destination: $err",
-          err)
+        error(s"Unable to send message (body=$body) to destination $destination: $err", err)
         Failure(err)
 
       case Success(_) => Success(())
