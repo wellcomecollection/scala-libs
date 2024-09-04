@@ -1,9 +1,4 @@
 steps:
-  - label: format
-    command: .buildkite/scripts/format.py
-    agents:
-      queue: "scala"
-
   - group: "Test"
     steps:
       - label: "test {{ matrix }}"
