@@ -9,7 +9,7 @@ object Dependencies {
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
-    val circe = "0.14.5"
+    val circe = "0.14.9"
     val circeGenericExtras = "0.14.3"
 
     val typesafe = "1.4.3"
