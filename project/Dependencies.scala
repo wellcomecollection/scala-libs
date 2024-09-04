@@ -24,7 +24,7 @@ object Dependencies {
     // Provides slf4j-api
     val grizzled = "1.3.4"
 
-    val pekko = "1.0.3"
+    val pekko = "1.1.0"
     val pekkoConnectors = "1.0.2"
     val pekkoHttp = "1.0.1"
     val pekkoHttpJson = "2.6.0"
