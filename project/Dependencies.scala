@@ -18,7 +18,7 @@ object Dependencies {
     val scalatest = "3.2.19"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0.4"
+    val scanamo = "1.1.1"
     val apacheCommons = "2.16.1"
 
     // Provides slf4j-api
