@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val elasticApm = "1.22.0"
+    val elasticApm = "1.51.0"
     val elastic4s = "8.9.1"
 
     val aws = "2.25.28"
