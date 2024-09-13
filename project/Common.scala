@@ -42,7 +42,7 @@ object Common {
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
 //    pgpPublicRing := file(System.getProperty("user.home")) / ".gnupg" / "pubring.kbx",
 //    pgpSecretRing := file(System.getProperty("user.home")) / ".gnupg" / "secring.gpg",
-    pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
+//    pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
     sonatypeCredentialHost := "central.sonatype.com",
     sonatypeRepository := "https://central.sonatype.com/service/local",
     licenses := Seq("MIT" -> url("https://github.com/wellcomecollection/scala-libs/blob/main/LICENSE")),
