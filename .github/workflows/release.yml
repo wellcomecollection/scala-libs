@@ -55,7 +55,7 @@ jobs:
 
           git add CHANGELOG.md build.sbt
           git rm RELEASE.md
-          git commit -m "Release: Bump version to ${NEW_TAG} and update changelog\n\n[skip ci]"
+          git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
           git tag "test-${NEW_TAG}"
           git push origin Publish-packages-to-sonatype
           git push origin --tags
