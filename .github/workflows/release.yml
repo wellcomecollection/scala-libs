@@ -1,0 +1,83 @@
+name: "Create release and publish packages to Sonatype"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+#on:
+#  push:
+#    branches:
+#      - main
+
+permissions:
+  contents: write
+
+jobs:
+  check-for-release-file:
+    runs-on: ubuntu-latest
+    outputs:
+      has-release: ${{ steps.check-for-release-file.outputs.has-release }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for RELEASE.md file
+        id: check-for-release-file
+        run: |
+          if [ ! -f ./RELEASE.md ]; then
+            echo "has-release=false" >> $GITHUB_OUTPUT
+            echo "No release detected. Exiting."
+            exit 0
+          fi
+          echo "has-release=true" >> $GITHUB_OUTPUT
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: check-for-release-file
+    if: needs.check-for-release-file.outputs.has-release == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update CHANGELOG.md and build.sbt
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
+
+      - name: Commit and push changes
+        run: |
+          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+          
+          git config --global user.name "GitHub on behalf of Wellcome Collection"
+          git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
+          
+          git checkout Publish-packages-to-sonatype
+          git pull
+
+          git add CHANGELOG.md build.sbt
+          git rm RELEASE.md
+          git commit -m "Release: Bump version to ${NEW_TAG} and update changelog\n\n[skip ci]"
+          git tag "test-v${NEW_TAG}"
+          git push origin Publish-packages-to-sonatype
+          git push origin --tags
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [create-release, check-for-release-file]
+    if: needs.check-for-release-file.outputs.has-release == 'true'
+    strategy:
+      matrix:
+        service:
+          - http
+          - fixtures
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: new-release-process-test # Important!
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Publish to Sonatype
+        run: |
+          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}"; publishSigned; sonatypeBundleRelease
