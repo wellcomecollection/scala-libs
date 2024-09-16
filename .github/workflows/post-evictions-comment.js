@@ -1,4 +1,4 @@
-export const postEvictionsComment = async (github, context) => {
+const postEvictionsComment = async (github, context) => {
     const fs = require('fs');
     const reportContent = fs.readFileSync('unique_evictions.txt', 'utf8');
 
@@ -29,4 +29,4 @@ export const postEvictionsComment = async (github, context) => {
     }
 }
 
-export default postEvictionsComment;
+module.exports = postEvictionsComment;

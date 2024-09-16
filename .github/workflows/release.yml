@@ -5,7 +5,7 @@ on:
     types: [opened, edited, synchronize]
 
 env:
-  SERVICES: '["http", "fixtures"]'
+  SERVICES: '["http"]'
 
 permissions:
   id-token: write
