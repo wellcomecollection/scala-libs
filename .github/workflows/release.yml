@@ -80,9 +80,6 @@ jobs:
 
       - name: Collate evictions
         run: |
-          ls -la
-          ls -la .reports
-          ls -la .reports/evicted_fixtures
           mkdir -p .reports
           builds/report_unique_evictions.sh | tee unique_evictions.txt
 
@@ -90,13 +87,5 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const reportContent = fs.readFileSync('unique_evictions.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: reportContent
-            });
-
-
+            const postComment = require('./.github/scripts/post-comment.js');
+            await postComment(github, context);
