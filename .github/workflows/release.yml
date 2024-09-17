@@ -81,4 +81,6 @@ jobs:
 
       - name: Publish to Sonatype
         run: |
-          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}"; publishSigned; sonatypeBundleRelease
+          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" reload
+          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" publishSigned
+          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" sonatypeBundleRelease
