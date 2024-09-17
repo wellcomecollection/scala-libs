@@ -15,8 +15,19 @@ jobs:
     strategy:
       matrix:
         service:
-          - http
           - fixtures
+          - http
+          - json
+          - typesafe_app
+          - monitoring
+          - monitoring_typesafe
+          - messaging
+          - messaging_typesafe
+          - storage
+          - storage_typesafe
+          - elasticsearch
+          - elasticsearch_typesafe
+          - sierra
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4

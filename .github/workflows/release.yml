@@ -13,11 +13,12 @@ permissions:
   contents: write
 
 jobs:
+  # First, check if there is a RELEASE.md file in the root of the repository.
+  # If not, no release will be created and subsequent steps and jobs will be skipped.
   check-for-release-file:
     runs-on: ubuntu-latest
     outputs:
       has-release: ${{ steps.check-for-release-file.outputs.has-release }}
-
     steps:
       - uses: actions/checkout@v4
       - name: Check for RELEASE.md file
@@ -30,6 +31,10 @@ jobs:
           fi
           echo "has-release=true" >> $GITHUB_OUTPUT
 
+  # Creating a release involves the following two changes:
+  # - Updating the CHANGELOG.md file with the contents of the RELEASE.md file
+  # - Bumping the version number in the build.sbt file
+  # Once these changes are made, they are pushed to the main branch
   create-release:
     runs-on: ubuntu-latest
     needs: check-for-release-file
@@ -43,23 +48,29 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
 
-#      - name: Commit and push changes
-#        run: |
-#          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
-#
-#          git config --global user.name "GitHub on behalf of Wellcome Collection"
-#          git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
-#
-#          git checkout Publish-packages-to-sonatype
-#          git pull
-#
-#          git add CHANGELOG.md build.sbt
-#          git rm RELEASE.md
-#          git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
-#          git tag "test-${NEW_TAG}"
-#          git push origin Publish-packages-to-sonatype
-#          git push origin --tags
+      - name: Commit and push changes
+        run: |
+          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
 
+          git config --global user.name "GitHub on behalf of Wellcome Collection"
+          git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
+
+          git checkout Publish-packages-to-sonatype
+          git pull
+
+          git add CHANGELOG.md build.sbt
+          git rm RELEASE.md
+          git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
+          git tag "test-${NEW_TAG}"
+          git push origin Publish-packages-to-sonatype
+          git push origin --tags
+
+  # All sbt projects are published to Sonatype (https://central.sonatype.com/namespace/org.wellcomecollection).
+  # Publishing involves several steps:
+  # - Configuring a GPG key so that the packages can be signed
+  # - Configuring Sonatype credentials
+  # - Publishing the packages to a local staging repository using the sbt-sonatype plugin
+  # - Releasing the published bundle to Sonatype
   publish:
     runs-on: ubuntu-latest
     needs: [create-release, check-for-release-file]
@@ -67,12 +78,23 @@ jobs:
     strategy:
       matrix:
         service:
-          - http
           - fixtures
+          - http
+          - json
+          - typesafe_app
+          - monitoring
+          - monitoring_typesafe
+          - messaging
+          - messaging_typesafe
+          - storage
+          - storage_typesafe
+          - elasticsearch
+          - elasticsearch_typesafe
+          - sierra
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: Publish-packages-to-sonatype # Important!
+          ref: Publish-packages-to-sonatype
       - name: Set up GPG
         run: |
           echo "${{ secrets.BASE64_GPG_KEY }}" | base64 -d > secret-keys.gpg
