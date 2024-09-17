@@ -1,12 +1,9 @@
 name: "Create release and publish packages to Sonatype"
 
 on:
-  pull_request:
-    types: [opened, edited, synchronize]
-#on:
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -55,14 +52,14 @@ jobs:
           git config --global user.name "GitHub on behalf of Wellcome Collection"
           git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
 
-          git checkout Publish-packages-to-sonatype
+          git checkout main
           git pull
 
           git add CHANGELOG.md build.sbt
           git rm RELEASE.md
           git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
-          git tag "test-${NEW_TAG}"
-          git push origin Publish-packages-to-sonatype
+          git tag ${NEW_TAG}
+          git push origin main
           git push origin --tags
 
   # All sbt projects are published to Sonatype (https://central.sonatype.com/namespace/org.wellcomecollection).
@@ -94,7 +91,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: Publish-packages-to-sonatype
+          # Checkout the latest version, which includes the changes pushed by the previous step!
+          # If we didn't do this, we would be publishing using the previous version tag.
+          ref: main
       - name: Set up GPG
         run: |
           echo "${{ secrets.BASE64_GPG_KEY }}" | base64 -d > secret-keys.gpg
