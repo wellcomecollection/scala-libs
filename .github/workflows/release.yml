@@ -43,22 +43,22 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
 
-      - name: Commit and push changes
-        run: |
-          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
-          
-          git config --global user.name "GitHub on behalf of Wellcome Collection"
-          git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
-          
-          git checkout Publish-packages-to-sonatype
-          git pull
-
-          git add CHANGELOG.md build.sbt
-          git rm RELEASE.md
-          git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
-          git tag "test-${NEW_TAG}"
-          git push origin Publish-packages-to-sonatype
-          git push origin --tags
+#      - name: Commit and push changes
+#        run: |
+#          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+#
+#          git config --global user.name "GitHub on behalf of Wellcome Collection"
+#          git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
+#
+#          git checkout Publish-packages-to-sonatype
+#          git pull
+#
+#          git add CHANGELOG.md build.sbt
+#          git rm RELEASE.md
+#          git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
+#          git tag "test-${NEW_TAG}"
+#          git push origin Publish-packages-to-sonatype
+#          git push origin --tags
 
   publish:
     runs-on: ubuntu-latest
@@ -72,15 +72,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: new-release-process-test # Important!
-      - uses: aws-actions/configure-aws-credentials@v4
+          ref: Publish-packages-to-sonatype # Important!
+      - name: Set up GPG
+        run: |
+          echo "${{ secrets.BASE64_GPG_KEY }}" | base64 -d > secret-keys.gpg
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --import secret-keys.gpg
+          rm secret-keys.gpg
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
-          aws-region: eu-west-1
-          role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
-      - uses: aws-actions/amazon-ecr-login@v2
-
+          distribution: temurin
+          java-version: 8
+          cache: sbt
       - name: Publish to Sonatype
         run: |
-          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" reload
-          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" publishSigned
-          ./builds/run_sbt_task_in_docker.sh "project ${{ matrix.service }}" sonatypeBundleRelease
+          PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
