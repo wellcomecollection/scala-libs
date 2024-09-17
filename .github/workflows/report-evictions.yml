@@ -37,7 +37,7 @@ jobs:
       - uses: aws-actions/amazon-ecr-login@v2
 
       - name: Run eviction report for ${{ matrix.service }}
-        run: PGP_PASSPHRASE="" ./builds/report_sbt_evictions.sh ${{ matrix.service }}
+        run: ./builds/report_sbt_evictions.sh ${{ matrix.service }}
         continue-on-error: true
 
       - name: Upload eviction reports

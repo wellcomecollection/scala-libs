@@ -40,7 +40,6 @@ object Common {
     parallelExecution in Test := false,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
-    pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
     sonatypeCredentialHost := "central.sonatype.com",
     sonatypeRepository := "https://central.sonatype.com/service/local",
     licenses := Seq("MIT" -> url("https://github.com/wellcomecollection/scala-libs/blob/main/LICENSE")),
