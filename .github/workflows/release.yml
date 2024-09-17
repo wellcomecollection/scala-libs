@@ -78,12 +78,17 @@ jobs:
           echo "${{ secrets.BASE64_GPG_KEY }}" | base64 -d > secret-keys.gpg
           echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --import secret-keys.gpg
           rm secret-keys.gpg
+      - name: Set up Sonatype credentials
+        run: |
+          mkdir ~/.sbt
+          echo "${{ secrets.SONATYPE_CREDENTIALS }}" > ~/.sbt/sonatype.credentials
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 8
+          java-version: 17
           cache: sbt
       - name: Publish to Sonatype
         run: |
           PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
+          sbt "project ${{ matrix.service }}" sonatypeBundleRelease
