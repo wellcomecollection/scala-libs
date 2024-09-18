@@ -65,8 +65,7 @@ jobs:
   # - Releasing the published bundle to Sonatype
   publish:
     runs-on: ubuntu-latest
-    needs: [create-release, check-for-release-file]
-    if: needs.check-for-release-file.outputs.has-release == 'true'
+    needs: create-release
     strategy:
       matrix:
         service:
