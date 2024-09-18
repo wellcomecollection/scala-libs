@@ -18,10 +18,10 @@ object Common {
     ),
     developers ++= List(
       Developer(
-        id    = "sbrychta",
-        name  = "Stepan Brychta",
-        email = "s.brychta@wellcome.org",
-        url   = url("https://github.com/StepanBrychta")
+        id    = "weco",
+        name  = "Wellcome Collection",
+        email = "digital@wellcomecollection.org",
+        url   = url("https://github.com/wellcomecollection")
       )
     ),
     scalacOptions ++= Seq(
