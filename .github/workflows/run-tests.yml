@@ -1,0 +1,38 @@
+name: "Run tests"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  id-token: write
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - fixtures
+          - http
+          - json
+          - typesafe_app
+          - monitoring
+          - monitoring_typesafe
+          - messaging
+          - messaging_typesafe
+          - storage
+          - storage_typesafe
+          - elasticsearch
+          - elasticsearch_typesafe
+          - sierra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Run sbt tests
+        run: ./builds/run_sbt_tests.sh ${{ matrix.service }}
