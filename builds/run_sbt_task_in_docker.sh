@@ -51,6 +51,7 @@ docker run --tty --rm \
   -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}" \
   -e AWS_SECRET_KEY="${AWS_SECRET_KEY:-}" \
   -e AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN:-}" \
+  -e AWS_REGION="${AWS_REGION:-}" \
   --volume ~/.sbt:/root/.sbt \
   --volume ~/.ivy2:/root/.ivy2 \
   --volume "$HOST_COURSIER_CACHE:/root/$LINUX_COURSIER_CACHE" \

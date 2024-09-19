@@ -19,7 +19,6 @@ This library is meant to increase code reuse among our applications, not to be a
 [Typesafe]: https://lightbend.github.io/config/
 
 
-
 ## Usage
 
 If you work at Wellcome:
