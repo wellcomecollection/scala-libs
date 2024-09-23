@@ -46,6 +46,7 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
       - name: Configure git
+        # We need to give the GitHub action full repo privileges via a PAT so that it can push the release directly into main
         run: |
           git config --global user.name "GitHub on behalf of Wellcome Collection"
           git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
