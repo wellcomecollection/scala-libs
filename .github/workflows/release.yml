@@ -44,6 +44,8 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.FULL_REPO_PRIVILEGES_PAT }}
         run: |
           NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
           git config --global user.name "GitHub on behalf of Wellcome Collection"
