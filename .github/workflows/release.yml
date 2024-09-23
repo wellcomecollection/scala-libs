@@ -38,24 +38,32 @@ jobs:
     if: needs.check-for-release-file.outputs.has-release == 'true'
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Update CHANGELOG.md and build.sbt
         run: |
           git fetch --tags
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
-      - name: Commit and push changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.FULL_REPO_PRIVILEGES_PAT }}
+      - name: Configure git
         run: |
-          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
           git config --global user.name "GitHub on behalf of Wellcome Collection"
           git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
+          
+          git remote set-url origin https://x-access-token:${{ secrets.FULL_REPO_PRIVILEGES_PAT }}@github.com/${{ github.repository }}.git
+
+      - name: Commit and push changes
+        run: |
           git checkout main
           git pull
+          
           git add CHANGELOG.md build.sbt
           git rm RELEASE.md
+          
+          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
           git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
           git tag ${NEW_TAG}
+
           git push origin main
           git push origin --tags
 
