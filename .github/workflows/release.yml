@@ -45,13 +45,21 @@ jobs:
           git fetch --tags
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
+
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: 129326 # App ID of the Wellcome Collection app
+          private-key: ${{ secrets.WELLCOME_COLLECTION_APP_PRIVATE_KEY }}
+
       - name: Configure git
         # We need to give the GitHub action full repo privileges via a PAT so that it can push the release directly into main
         run: |
           git config --global user.name "GitHub on behalf of Wellcome Collection"
           git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
           
-          git remote set-url origin https://x-access-token:${{ secrets.FULL_REPO_PRIVILEGES_PAT }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/${{ github.repository }}.git
 
       - name: Commit and push changes
         run: |
