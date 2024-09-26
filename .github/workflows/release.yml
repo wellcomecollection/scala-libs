@@ -1,11 +1,9 @@
 name: "Create release and publish packages to Sonatype"
 
-on: push
-
-#on:
-#  push:
-#    branches:
-#      - main
+on:
+  push:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -127,4 +125,4 @@ jobs:
       - name: Publish to Sonatype
         run: |
           PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
-#          sbt "project ${{ matrix.service }}" sonatypeBundleRelease
+          sbt "project ${{ matrix.service }}" sonatypeBundleRelease
