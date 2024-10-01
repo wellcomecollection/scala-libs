@@ -50,7 +50,7 @@ jobs:
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
           
           VERSION_TAG="$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')"
-          echo "new-version=${VERSION_TAG:1}" >> $GITHUB_OUTPUT
+          echo "new-version=${VERSION_TAG:1}" >> $GITHUB_OUTPUT          
 
       - name: Generate a token
         id: generate-token
@@ -60,7 +60,7 @@ jobs:
           private-key: ${{ secrets.WELLCOME_COLLECTION_APP_PRIVATE_KEY }}
 
       - name: Configure git
-        # We need to give the GitHub action full repo privileges via a PAT so that it can push the release directly into main
+        # We need to give the GitHub action full repo privileges so that it can push the release directly into main
         run: |
           git config --global user.name "GitHub on behalf of Wellcome Collection"
           git config --global user.email "wellcomedigitalplatform@wellcome.ac.uk"
@@ -75,7 +75,7 @@ jobs:
           git add CHANGELOG.md build.sbt
           git rm RELEASE.md
           
-          NEW_TAG="v${{steps.create-release.outputs.new-version}}"
+          NEW_TAG="v${{ steps.create-release.outputs.new-version }}"
           git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
           git tag ${NEW_TAG}
 
@@ -131,15 +131,20 @@ jobs:
       - name: Publish to Sonatype
         run: |
           ARTIFACT_NAME="${{ matrix.service }}_2.12"
-          NEW_VERSION="${{needs.create-release.outputs.new-version}}"
-
-          SONATYPE_RESPONSE=$(curl "https://central.sonatype.com/solrsearch/select?q=g:org.wellcomecollection%20a:$ARTIFACT_NAME%20v:$NEW_VERSION")
-          ARTIFACT_COUNT=$(echo SONATYPE_RESPONSE | jq '.response | .numFound')
+          NEW_VERSION="${{ needs.create-release.outputs.new-version }}"
           
-          if [[ "ARTIFACT_COUNT" -eq 0 ]]; then
+          # Check if the current version already exists in Sonatype.
+          SONATYPE_RESPONSE=$(curl -s "https://central.sonatype.com/solrsearch/select?q=g:org.wellcomecollection%20a:$ARTIFACT_NAME%20v:$NEW_VERSION")
+          ARTIFACT_COUNT=$(echo $SONATYPE_RESPONSE | jq '.response | .numFound')
+          
+          # To check the status of the deployment in Sonatype, visit https://central.sonatype.com/publishing/deployments.
+          # (Credentials are stored in AWS Secrets Manager.)
+          if [[ $ARTIFACT_COUNT -eq 0 ]]; then
             echo "Publishing package $ARTIFACT_NAME, version $NEW_VERSION to Sonatype."
             PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
-            sbt "project ${{ matrix.service }}" sonatypeBundleRelease
+          
+            # See https://github.com/xerial/sbt-sonatype/issues/518
+            sbt -Dsun.net.client.defaultReadTimeout=60000 "project ${{ matrix.service }}" sonatypeBundleRelease
           else
             echo "Package $ARTIFACT_NAME, version $NEW_VERSION already exists in Sonatype. Exiting."
           fi
