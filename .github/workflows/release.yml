@@ -34,6 +34,8 @@ jobs:
   # Once these changes are made, they are pushed to the main branch
   create-release:
     runs-on: ubuntu-latest
+    outputs:
+      new-version: ${{ steps.create-release.outputs.new-version }}
     needs: check-for-release-file
     if: needs.check-for-release-file.outputs.has-release == 'true'
     steps:
@@ -41,10 +43,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Update CHANGELOG.md and build.sbt
+        id: create-release
         run: |
           git fetch --tags
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           python3 .github/scripts/create_release.py ${LATEST_TAG} $(pwd)
+          
+          VERSION_TAG="$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')"
+          echo "new-version=${VERSION_TAG:1}" >> $GITHUB_OUTPUT
 
       - name: Generate a token
         id: generate-token
@@ -69,7 +75,7 @@ jobs:
           git add CHANGELOG.md build.sbt
           git rm RELEASE.md
           
-          NEW_TAG=$(cat CHANGELOG.md | grep -m1 -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+          NEW_TAG="v${{steps.create-release.outputs.new-version}}"
           git commit -m "$(printf "Release: Bump version to ${NEW_TAG}\n\n[skip ci]")"
           git tag ${NEW_TAG}
 
@@ -124,5 +130,16 @@ jobs:
           cache: sbt
       - name: Publish to Sonatype
         run: |
-          PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
-          sbt "project ${{ matrix.service }}" sonatypeBundleRelease
+          ARTIFACT_NAME="${{ matrix.service }}_2.12"
+          NEW_VERSION="${{needs.create-release.outputs.new-version}}"
+
+          SONATYPE_RESPONSE=$(curl "https://central.sonatype.com/solrsearch/select?q=g:org.wellcomecollection%20a:$ARTIFACT_NAME%20v:$NEW_VERSION")
+          ARTIFACT_COUNT=$(echo SONATYPE_RESPONSE | jq '.response | .numFound')
+          
+          if [[ "ARTIFACT_COUNT" -eq 0 ]]; then
+            echo "Publishing package $ARTIFACT_NAME, version $NEW_VERSION to Sonatype."
+            PGP_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }} sbt "project ${{ matrix.service }}" publishSigned
+            sbt "project ${{ matrix.service }}" sonatypeBundleRelease
+          else
+            echo "Package $ARTIFACT_NAME, version $NEW_VERSION already exists in Sonatype. Exiting."
+          fi
