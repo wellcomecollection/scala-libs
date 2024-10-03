@@ -5,7 +5,7 @@ object Dependencies {
     val elasticApm = "1.51.0"
     val elastic4s = "8.9.5"
 
-    val aws = "2.25.37"
+    val aws = "2.25.70"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
@@ -24,9 +24,9 @@ object Dependencies {
     // Provides slf4j-api
     val grizzled = "1.3.4"
 
-    val pekko = "1.1.0"
+    val pekko = "1.1.1"
     val pekkoConnectors = "1.0.2"
-    val pekkoHttp = "1.0.1"
+    val pekkoHttp = "1.1.0"
     val pekkoHttpJson = "2.6.0"
 
     // This needs to be set explicitly to match the language version
