@@ -28,6 +28,7 @@ jobs:
           - elasticsearch
           - elasticsearch_typesafe
           - sierra
+          - sierra_typesafe
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
