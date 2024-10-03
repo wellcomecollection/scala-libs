@@ -19,7 +19,6 @@ This library is meant to increase code reuse among our applications, not to be a
 [Typesafe]: https://lightbend.github.io/config/
 
 
-
 ## Usage
 
 If you work at Wellcome:
@@ -48,9 +47,18 @@ Our process is [inspired by the Hypothesis library](https://hypothesis.works/art
     ```
 
 2.  When the pull request is merged, our CI system merges the release note into [the changelog](./CHANGELOG.md) and cuts a new release.
-    This release is uploaded to an S3 bucket.
+    This release is uploaded to our public Sonatype repository.
 
 3.  Our CI system then opens pull requests on our downstream repos, updating them to use the newly released version.
 
 This means that new changes are deployed quickly and consistently across the platform.
 If we've made breaking changes that need more changes in the downstream repo, that happens immediately (usually by the author of the original patch).
+
+### Maven Central (Sonatype)
+
+When a new release is merged into the main branch, all packages are automatically published to our [public Sonatype repository](https://central.sonatype.com/namespace/org.wellcomecollection).
+This is done through a [GitHub action](.github/workflows/release.yml).
+
+Packages are published into the `org.wellcomecollection` namespace, ownership of which had to be proven by adding a TXT record to the wellcomecollection.org Route 53 hosted zone. 
+
+The credentials to our Sonatype account and a base64 encoded GPG key (and corresponding passphrase) are stored in AWS Secrets Manager in the platform account.
