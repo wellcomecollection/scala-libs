@@ -14,9 +14,9 @@ import software.amazon.awssdk.services.cloudwatch.model.{
   PutMetricDataRequest,
   StandardUnit
 }
-import weco.akka.fixtures.Akka
 import weco.fixtures.{RandomGenerators, TestWith}
 import weco.monitoring.MetricsConfig
+import weco.pekko.fixtures.Pekko
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,7 +29,7 @@ class CloudWatchMetricsTest
     with Matchers
     with ScalaFutures
     with Eventually
-    with Akka
+    with Pekko
     with IntegrationPatience
     with RandomGenerators {
 

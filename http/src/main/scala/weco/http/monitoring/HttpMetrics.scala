@@ -1,6 +1,6 @@
 package weco.http.monitoring
 
-import akka.http.scaladsl.model.{HttpResponse, StatusCode}
+import org.apache.pekko.http.scaladsl.model.{HttpResponse, StatusCode}
 import grizzled.slf4j.Logging
 import weco.monitoring.Metrics
 

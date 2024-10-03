@@ -1,9 +1,9 @@
 package weco.sierra.http
 
-import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
-import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
-import akka.stream.Materializer
+import org.apache.pekko.http.scaladsl.model.Uri.Path
+import org.apache.pekko.http.scaladsl.model.{HttpEntity, StatusCodes}
+import org.apache.pekko.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
+import org.apache.pekko.stream.Materializer
 import weco.http.client.{HttpClient, HttpGet, HttpPost}
 import weco.http.json.CirceMarshalling
 import weco.json.JsonUtil._
@@ -234,7 +234,8 @@ object SierraSource {
     "holdCount",
     "suppressed",
     "status",
-    "varFields"
+    "varFields",
+    "location"
   )
 
   // cf. the fields in the case class `SierraHold`

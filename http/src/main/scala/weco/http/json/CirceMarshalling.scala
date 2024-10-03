@@ -1,8 +1,11 @@
 package weco.http.json
 
-import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.marshalling.{
+  Marshaller,
+  ToEntityMarshaller
+}
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import io.circe.{Decoder, Encoder}
 import io.circe.syntax._
 import weco.json.JsonUtil._
@@ -16,7 +19,7 @@ import scala.concurrent.Future
   *
   *   1.  The default [Un]marshallers aren't aware of all of Circe's features,
   *       e.g. the @JsonKey annotation.
-  *   2.  It means that any method doing akka-http marshalling can just require
+  *   2.  It means that any method doing pekko-http marshalling can just require
   *       an implicit Decoder[T] or Encoder[T], which is a more common interface
   *       in our codebase.
   *

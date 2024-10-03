@@ -2,9 +2,15 @@ package weco.monitoring.cloudwatch
 
 import java.time.Instant
 
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{Materializer, OverflowStrategy, ThrottleMode}
-import akka.{Done, NotUsed}
+import org.apache.pekko.stream.scaladsl.{
+  Flow,
+  Keep,
+  Sink,
+  Source,
+  SourceQueueWithComplete
+}
+import org.apache.pekko.stream.{Materializer, OverflowStrategy, ThrottleMode}
+import org.apache.pekko.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient
 import software.amazon.awssdk.services.cloudwatch.model.{

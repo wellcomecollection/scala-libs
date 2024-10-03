@@ -1,15 +1,15 @@
 package weco.sierra.fixtures
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import weco.akka.fixtures.Akka
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import weco.fixtures.TestWith
 import weco.http.client.{HttpGet, HttpPost, MemoryHttpClient}
 import weco.http.fixtures.HttpFixtures
+import weco.pekko.fixtures.Pekko
 import weco.sierra.http.SierraSource
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait SierraSourceFixture extends HttpFixtures with Akka {
+trait SierraSourceFixture extends HttpFixtures with Pekko {
   def withSierraSource[R](
     responses: Seq[(HttpRequest, HttpResponse)] = Seq()
   )(testWith: TestWith[SierraSource, R]): R =

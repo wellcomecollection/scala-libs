@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   lazy val versions = new {
     val elasticApm = "1.22.0"
-    val elastic4s = "8.8.1"
+    val elastic4s = "8.9.1"
 
     val aws = "2.25.37"
 
@@ -18,45 +18,16 @@ object Dependencies {
     val scalatest = "3.2.3"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.0-M13"
+    val scanamo = "1.0.4"
     val apacheCommons = "2.6"
 
     // Provides slf4j-api
     val grizzled = "1.3.4"
 
-    // This has to match the version of akka used by elastic4s
-    // Otherwise we get errors like:
-    //
-    //      An exception or error caused a run to abort: You are using version 2.6.14 of Akka,
-    //      but it appears you (perhaps indirectly) also depend on older versions of related
-    //      artifacts. You can solve this by adding an explicit dependency on version 2.6.14
-    //      of the [akka-slf4j, akka-stream, akka-testkit] artifacts to your project.
-    //
-    // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
-    //
-    val akka = "2.6.20"
-    val akkaStreamAlpakka = "3.0.4"
-
-    // Getting the akka-http dependencies right can be fiddly and takes some work.
-    // In particular you need to use the same version of akka-http everywhere, or you
-    // get errors (from LargeResponsesTest) like:
-    //
-    //      Detected possible incompatible versions on the classpath. Please note that
-    //      a given Akka HTTP version MUST be the same across all modules of Akka HTTP
-    //      that you are using, e.g. if you use [10.1.10] all other modules that are
-    //      released together MUST be of the same version.
-    //
-    //      Make sure you're using a compatible set of libraries.
-    //
-    // To work this out:
-    //
-    //   1. Look at the version of alpakka-streams used above.
-    //
-    //   2. Look at the corresponding akka-http dependency in alpakka:
-    //      https://github.com/akka/alpakka/blob/master/project/Dependencies.scala
-    //      (At time of writing, alpakka v3.0.1 pulls in akka-http 10.1.11)
-    //
-    val akkaHttp = "10.2.9"
+    val pekko = "1.0.3"
+    val pekkoConnectors = "1.0.2"
+    val pekkoHttp = "1.0.1"
+    val pekkoHttpJson = "2.6.0"
 
     // This needs to be set explicitly to match the language version
     // used by the version of shapeless that Circe uses, otherwise SBT
@@ -79,7 +50,7 @@ object Dependencies {
   val elasticsearchDependencies = Seq(
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-client-esjava" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-streams-pekko" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-json-circe" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
@@ -114,16 +85,17 @@ object Dependencies {
       // don't include the logging dependencies.
       loggingDependencies.map(_ % Test)
 
-  val akkaDependencies: Seq[ModuleID] = Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "com.typesafe.akka" %% "akka-stream" % versions.akka,
-    // Force Akka to use SL4J logging adapter
-    // https://doc.akka.io/docs/akka/current/logging.html#slf4j
-    "com.typesafe.akka" %% "akka-slf4j" % versions.akka
+  val pekkoDependencies: Seq[ModuleID] = Seq(
+    "org.apache.pekko" %% "pekko-actor-typed" % versions.pekko,
+    "org.apache.pekko" %% "pekko-actor-testkit-typed" % versions.pekko % Test,
+    "org.apache.pekko" %% "pekko-stream" % versions.pekko,
+    "org.apache.pekko" %% "pekko-slf4j" % versions.pekko,
   )
 
-  val akkaHttpDependencies = Seq(
-    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp
+
+  val pekkoHttpDependencies = Seq(
+    "org.apache.pekko" %% "pekko-http" % versions.pekkoHttp,
+    "com.github.pjfanning" %% "pekko-http-circe" % versions.pekkoHttpJson
   )
 
   val apacheCommons = Seq(
@@ -165,10 +137,7 @@ object Dependencies {
   val messagingDependencies = Seq(
     "software.amazon.awssdk" % "sns" % versions.aws,
     "software.amazon.awssdk" % "sqs" % versions.aws,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka
-    // This needs to be excluded because it conflicts with aws http client "netty-nio-client"
-    // and it also causes weird leaks between tests
-      exclude("com.github.matsluni", "aws-spi-akka-http_2.12")
+    "org.apache.pekko" %% "pekko-connectors-sqs" % versions.pekkoConnectors
   ) ++
     testDependencies
 
@@ -183,7 +152,7 @@ object Dependencies {
       localstackDependencies
 
   val typesafeAppDependencies =
-    akkaDependencies ++
+    pekkoDependencies ++
       loggingDependencies ++
       typesafeDependencies ++
       elasticApmAgentDependencies ++
@@ -198,5 +167,5 @@ object Dependencies {
     apacheCommons
 
   val httpDependencies: Seq[ModuleID] =
-    akkaHttpDependencies
+    pekkoHttpDependencies
 }

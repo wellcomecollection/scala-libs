@@ -1,13 +1,29 @@
-import java.io.File
+import com.jsuereth.sbtpgp.PgpKeys.*
 
 import com.tapad.docker.DockerComposePlugin
-import sbt.Keys._
-import sbt._
+import sbt.Keys.*
+import sbt.*
+import xerial.sbt.Sonatype.autoImport.{sonatypeCredentialHost, sonatypePublishToBundle, sonatypeRepository}
 
 object Common {
   def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.15",
-    organization := "weco",
+    organization := "org.wellcomecollection",
+    homepage := Some(url("https://github.com/wellcomecollection/scala-libs")),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/wellcomecollection/scala-libs"),
+        "scm:git:git@github.com:wellcomecollection/scala-libs.git"
+      )
+    ),
+    developers ++= List(
+      Developer(
+        id    = "weco",
+        name  = "Wellcome Collection",
+        email = "digital@wellcomecollection.org",
+        url   = url("https://github.com/wellcomecollection")
+      )
+    ),
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -22,9 +38,11 @@ object Common {
     ),
     parallelExecution in Test := false,
     publishMavenStyle := true,
-    publishTo := Some(
-      "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
-    ),
+    credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
+    sonatypeCredentialHost := "central.sonatype.com",
+    sonatypeRepository := "https://central.sonatype.com/service/local",
+    licenses := Seq("MIT" -> url("https://github.com/wellcomecollection/scala-libs/blob/main/LICENSE")),
+    publishTo := sonatypePublishToBundle.value,
     publishArtifact in Test := true,
     // Don't build scaladocs
     // https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#skip-packagedoc-task-on-stage
