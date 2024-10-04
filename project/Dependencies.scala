@@ -121,7 +121,7 @@ object Dependencies {
   // See https://github.com/elastic/apm-agent-java/issues/2353 for an explanation
   // of the issue this addresses.
   val jnaDependencies: Seq[ModuleID] = Seq(
-    "net.java.dev.jna" % "jna" % "5.14.0"
+    "net.java.dev.jna" % "jna" % "5.15.0"
   )
 
   val localstackDependencies = Seq(
