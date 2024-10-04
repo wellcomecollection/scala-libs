@@ -5,7 +5,7 @@ object Dependencies {
     val elasticApm = "1.51.0"
     val elastic4s = "8.9.5"
 
-    val aws = "2.25.70"
+    val aws = "2.28.15"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
