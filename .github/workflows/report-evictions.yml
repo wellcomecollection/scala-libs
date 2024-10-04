@@ -17,6 +17,7 @@ jobs:
         service:
           - fixtures
           - http
+          - http_typesafe
           - json
           - typesafe_app
           - monitoring
