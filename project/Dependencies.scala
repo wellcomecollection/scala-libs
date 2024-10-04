@@ -13,7 +13,7 @@ object Dependencies {
     val circeGenericExtras = "0.14.4"
 
     val typesafe = "1.4.3"
-    val logback = "1.4.14"
+    val logback = "1.5.8"
     val mockito = "5.13.0"
     val scalatest = "3.2.19"
     val scalatestPlus = "3.1.2.0"
