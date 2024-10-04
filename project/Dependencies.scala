@@ -27,7 +27,7 @@ object Dependencies {
     val pekko = "1.1.1"
     val pekkoConnectors = "1.0.2"
     val pekkoHttp = "1.1.0"
-    val pekkoHttpJson = "2.6.0"
+    val pekkoHttpJson = "2.8.0"
 
     // This needs to be set explicitly to match the language version
     // used by the version of shapeless that Circe uses, otherwise SBT
