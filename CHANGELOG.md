@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.43.1 - 2024-10-04
+
+Update dependencies.
+
 ## v32.43.0 - 2024-09-26
 
 Migrate release workflow from BuildKite to GitHub and publish new versions to Sonatype instead of S3.
