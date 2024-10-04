@@ -14,7 +14,7 @@ object Dependencies {
 
     val typesafe = "1.4.3"
     val logback = "1.5.8"
-    val mockito = "5.13.0"
+    val mockito = "5.14.1"
     val scalatest = "3.2.19"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
