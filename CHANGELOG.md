@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.43.2 - 2024-10-07
+
+S3StreamWritable bug fix (replace `read` by `readNBytes`).
+
 ## v32.43.1 - 2024-10-04
 
 Update dependencies.
