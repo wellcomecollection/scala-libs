@@ -41,7 +41,7 @@ trait S3StreamWritable
             if (inputStream.length > 0) {
               val bytes: Array[Byte] = new Array[Byte](inputStream.length.toInt)
               val bytesRead =
-                inputStream.read(bytes, 0, inputStream.length.toInt)
+                inputStream.readNBytes(bytes, 0, inputStream.length.toInt)
 
               if (bytesRead < inputStream.length) {
                 throw new RuntimeException(
@@ -93,7 +93,7 @@ trait S3StreamWritable
       val partLength = (end - start).toInt
 
       val bytes: Array[Byte] = new Array[Byte](partLength)
-      val bytesRead = inputStream.read(bytes, 0, partLength)
+      val bytesRead = inputStream.readNBytes(bytes, 0, partLength)
 
       if (bytesRead < partLength) {
         throw new RuntimeException(

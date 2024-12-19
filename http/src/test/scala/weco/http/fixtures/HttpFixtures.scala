@@ -1,15 +1,14 @@
 package weco.http.fixtures
 
 import org.scalatest.Assertion
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpMethods.{GET, POST}
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.HttpMethods.{GET, POST}
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.stream.scaladsl.Sink
 import io.circe.parser._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
-import weco.akka.fixtures.Akka
 import weco.fixtures.TestWith
 import weco.json.JsonUtil.toJson
 import weco.json.utils.JsonAssertions
@@ -17,11 +16,12 @@ import weco.http.WellcomeHttpApp
 import weco.http.models.HTTPServerConfig
 import weco.http.monitoring.{HttpMetricResults, HttpMetrics}
 import weco.monitoring.memory.MemoryMetrics
+import weco.pekko.fixtures.Pekko
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait HttpFixtures
-    extends Akka
+    extends Pekko
     with ScalaFutures
     with Matchers
     with JsonAssertions {

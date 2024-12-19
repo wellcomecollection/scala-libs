@@ -1,6 +1,6 @@
 package weco.messaging.fixtures
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Assertion

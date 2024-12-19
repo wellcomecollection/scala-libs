@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## v32.43.2 - 2024-10-07
+
+S3StreamWritable bug fix (replace `read` by `readNBytes`).
+
+## v32.43.1 - 2024-10-04
+
+Update dependencies.
+
+## v32.43.0 - 2024-09-26
+
+Migrate release workflow from BuildKite to GitHub and publish new versions to Sonatype instead of S3.
+
+## v32.42.0 - 2024-07-24
+
+Migrate from Akka to Pekko
+
 ## v32.41.1 - 2024-06-10
 
 Add location to Sierrasource's requiredItemFields

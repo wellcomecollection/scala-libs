@@ -1,0 +1,76 @@
+name: "Report evictions"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  report-evictions:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - fixtures
+          - http
+          - http_typesafe
+          - json
+          - typesafe_app
+          - monitoring
+          - monitoring_typesafe
+          - messaging
+          - messaging_typesafe
+          - storage
+          - storage_typesafe
+          - elasticsearch
+          - elasticsearch_typesafe
+          - sierra
+          - sierra_typesafe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Run eviction report for ${{ matrix.service }}
+        run: ./builds/report_sbt_evictions.sh ${{ matrix.service }}
+        continue-on-error: true
+
+      # Upload the eviction report as a GitHub artifact
+      - name: Upload eviction reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evicted_${{ matrix.service }}
+          path: .reports/evicted_${{ matrix.service }}
+
+  collate-evictions:
+    runs-on: ubuntu-latest
+    needs: report-evictions
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Download ALL GitHub artifacts uploaded as part of this run
+      - name: Download eviction reports
+        uses: actions/download-artifact@v4
+        with:
+          path: .reports/
+
+      # Post the eviction report as a comment on the corresponding PR
+      - name: Collate evictions
+        run: |
+          mkdir -p .reports
+          builds/report_unique_evictions.sh | tee unique_evictions.txt
+      - name: Post eviction report comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const postComment = require('./.github/scripts/post-eviction-report-comment.js');
+            await postComment(github, context);

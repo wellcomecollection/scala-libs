@@ -1,7 +1,7 @@
 package weco.http.fixtures
 
-import akka.http.scaladsl.model.StatusCodes.Accepted
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes.Accepted
+import org.apache.pekko.http.scaladsl.server.Route
 import weco.http.FutureDirectives
 
 import scala.concurrent.Future

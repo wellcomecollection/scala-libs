@@ -1,9 +1,9 @@
 package weco.http.errors
 
-import akka.event.LoggingAdapter
-import akka.http.ParsingErrorHandler
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.settings.ServerSettings
+import org.apache.pekko.event.LoggingAdapter
+import org.apache.pekko.http.ParsingErrorHandler
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.settings.ServerSettings
 import grizzled.slf4j.Logging
 import weco.http.json.DisplayJsonUtil
 import weco.http.models.DisplayError
