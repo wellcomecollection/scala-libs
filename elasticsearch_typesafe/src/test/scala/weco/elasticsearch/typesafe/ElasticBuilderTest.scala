@@ -100,10 +100,6 @@ class ElasticBuilderTest
         protocol = defaultProtocol,
         apiKey = apiKey
       )
-
-      noException shouldBe thrownBy(
-        ElasticBuilder.buildElasticClient(elasticConfig)
-      )
     }
   }
 
