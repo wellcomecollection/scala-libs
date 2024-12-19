@@ -75,7 +75,7 @@ class ElasticBuilderTest
 
     it("builds a client directly") {
       noException shouldBe thrownBy(
-        ElasticBuilder.buildElasticClient(apiKeyConfig, "test")
+        ElasticBuilder.buildElasticClient(apiKeyConfig, namespace)
       )
     }
   }
@@ -105,14 +105,14 @@ class ElasticBuilderTest
 
   it("errors if there is not enough config to build a client") {
     val config = ConfigFactory.parseString(
-      """
-        |es.test.host = test.elastic
-        |es.test.username = test-username
+      f"""
+        |es.$namespace.host = $host
+        |es.$namespace.username = $username
         |""".stripMargin
     )
 
     a[Throwable] shouldBe thrownBy(
-      ElasticBuilder.buildElasticClient(config, "test")
+      ElasticBuilder.buildElasticClient(config, namespace)
     )
   }
 }
