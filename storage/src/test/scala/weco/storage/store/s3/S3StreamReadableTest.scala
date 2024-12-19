@@ -26,7 +26,8 @@ class S3StreamReadableTest
       override val maxRetries: Int = retries
     }
 
-  val s3ServerException = S3Exception.builder()
+  val s3ServerException = S3Exception
+    .builder()
     .message("We encountered an internal error. Please try again.")
     .statusCode(500)
     .build()
@@ -41,7 +42,8 @@ class S3StreamReadableTest
 
       when(mockClient.getObject(any[GetObjectRequest]))
         .thenThrow(
-          S3Exception.builder()
+          S3Exception
+            .builder()
             .statusCode(404)
             .build()
         )
@@ -64,7 +66,8 @@ class S3StreamReadableTest
         .thenThrow(s3ServerException)
         .thenReturn({
           val getRequest =
-            GetObjectRequest.builder()
+            GetObjectRequest
+              .builder()
               .bucket(location.bucket)
               .key(location.key)
               .build()
@@ -108,7 +111,10 @@ class S3StreamReadableTest
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
 
-      val exception = SdkClientException.builder().message("Unable to execute HTTP request").build()
+      val exception = SdkClientException
+        .builder()
+        .message("Unable to execute HTTP request")
+        .build()
 
       when(mockClient.getObject(any[GetObjectRequest]))
         .thenThrow(exception)
