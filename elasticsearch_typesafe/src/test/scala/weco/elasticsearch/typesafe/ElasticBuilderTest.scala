@@ -57,7 +57,7 @@ class ElasticBuilderTest
   )
 
   describe("when an API key is specified") {
-    it("can build and accept ElasticConfigUsernamePassword") {
+    it("can build and accept ElasticConfigApiKey") {
       val elasticConfig =
         ElasticBuilder.buildElasticClientConfig(apiKeyConfig, namespace)
 
