@@ -80,6 +80,33 @@ class ElasticBuilderTest
     }
   }
 
+  describe("when an API key and username and password is specified") {
+    it("uses the API key") {
+      val config = ConfigFactory.parseString(
+        f"""
+           |es.$namespace.host = $host
+           |es.$namespace.username = $username
+           |es.$namespace.password = $password
+           |es.$namespace.apikey = $apiKey
+           |""".stripMargin
+      )
+
+      val elasticConfig =
+        ElasticBuilder.buildElasticClientConfig(config, namespace)
+
+      elasticConfig shouldBe ElasticConfigApiKey(
+        host = host,
+        port = defaultPort,
+        protocol = defaultProtocol,
+        apiKey = apiKey
+      )
+
+      noException shouldBe thrownBy(
+        ElasticBuilder.buildElasticClient(elasticConfig)
+      )
+    }
+  }
+
   it("errors if there is not enough config to build a client") {
     val config = ConfigFactory.parseString(
       """
