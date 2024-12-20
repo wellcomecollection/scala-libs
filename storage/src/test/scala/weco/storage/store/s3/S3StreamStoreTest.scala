@@ -26,7 +26,8 @@ class S3StreamStoreTest
 
         val err = result.e
         err shouldBe a[SdkClientException]
-        err.getMessage should startWith("Received an UnknownHostException when attempting to interact with a service")
+        err.getMessage should startWith(
+          "Received an UnknownHostException when attempting to interact with a service")
       }
 
       it("errors if the key doesn't exist") {
@@ -76,7 +77,8 @@ class S3StreamStoreTest
 
         val err = result.e
         err shouldBe a[SdkClientException]
-        err.getCause.getMessage should startWith("Unable to execute HTTP request")
+        err.getCause.getMessage should startWith(
+          "Unable to execute HTTP request")
       }
 
       it("errors if the bucket doesn't exist") {
@@ -138,11 +140,13 @@ class S3StreamStoreTest
     withLocalS3Bucket { bucket =>
       val location = createS3ObjectLocationWith(bucket)
 
-      val result = store.put(location)(new InputStreamWithLength(inputStream, length))
+      val result =
+        store.put(location)(new InputStreamWithLength(inputStream, length))
       result shouldBe a[Right[_, _]]
 
       val getRequest =
-        GetObjectRequest.builder()
+        GetObjectRequest
+          .builder()
           .bucket(location.bucket)
           .key(location.key)
           .build()

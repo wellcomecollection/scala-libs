@@ -18,7 +18,8 @@ trait LocalResources {
       case Success(lines) => lines.mkString("\n")
 
       case Failure(_: NullPointerException) if name.startsWith("/") =>
-        throw new RuntimeException(s"Could not find resource `$name`; try removing the leading slash")
+        throw new RuntimeException(
+          s"Could not find resource `$name`; try removing the leading slash")
       case Failure(_: NullPointerException) =>
         throw new RuntimeException(s"Could not find resource `$name`")
 
