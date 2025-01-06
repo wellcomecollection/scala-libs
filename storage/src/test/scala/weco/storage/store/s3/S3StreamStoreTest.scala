@@ -60,10 +60,11 @@ class S3StreamStoreTest
         withStoreImpl(initialEntries = Map.empty) { store =>
           val invalidLocation = createS3ObjectLocationWith(createInvalidBucket)
           val err = store.get(invalidLocation).left.value
-          err shouldBe a[StoreReadError]
+          err shouldBe a[DoesNotExistError]
 
           err.e shouldBe a[S3Exception]
-          err.e.getMessage should startWith("The specified bucket is not valid")
+          err.e.getMessage should startWith(
+            "The specified bucket does not exist")
         }
       }
     }
@@ -104,7 +105,7 @@ class S3StreamStoreTest
 
           val err = result.e
           err shouldBe a[S3Exception]
-          err.getMessage should startWith("The specified bucket is not valid")
+          err.getMessage should startWith("The specified bucket does not exist")
         }
       }
 
@@ -123,7 +124,7 @@ class S3StreamStoreTest
             val value = store.put(id)(entry).left.value
 
             value shouldBe a[InvalidIdentifierFailure]
-            value.e.getMessage should startWith("Object key is too long")
+            value.e.getMessage should include("key is too long")
           }
         }
       }

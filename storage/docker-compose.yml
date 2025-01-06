@@ -5,19 +5,9 @@ services:
     ports:
       - "45678:8000"
   s3:
-    image: "zenko/cloudserver:8.1.8"
+    image: "public.ecr.aws/localstack/localstack:4.0.0"
     environment:
-      - "S3BACKEND=mem"
+      - SERVICES=s3
+      - ALLOW_NONSTANDARD_REGIONS=1
     ports:
-      - "33333:8000"
-
-    # We've seen flakiness when this container doesn't start fast enough,
-    # and the first few tests to interact with S3 fail.  This uses
-    # docker-compose healthchecks to check the container is returning
-    # a 401 Unauthorized before continuing.
-    # See https://docs.docker.com/compose/compose-file/#/healthcheck
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:33333"]
-      interval: 2s
-      timeout: 10s
-      retries: 5
+      - "33333:4566"
