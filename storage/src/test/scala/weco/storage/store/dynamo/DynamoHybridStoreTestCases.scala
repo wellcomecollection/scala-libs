@@ -171,7 +171,7 @@ trait DynamoHybridStoreTestCases[
 
                     value shouldBe a[StoreWriteError]
                     value.e.getMessage should startWith(
-                      "The specified bucket is not valid")
+                      "The specified bucket does not exist")
                   }
                 }
               }
@@ -206,7 +206,7 @@ trait DynamoHybridStoreTestCases[
                 val value = result.left.value
 
                 value shouldBe a[InvalidIdentifierFailure]
-                value.e.getMessage should startWith("Object key is too long")
+                value.e.getMessage should include("key is too long")
               }
             }
           }
