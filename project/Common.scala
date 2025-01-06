@@ -36,14 +36,14 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
     sonatypeCredentialHost := "central.sonatype.com",
     sonatypeRepository := "https://central.sonatype.com/service/local",
     licenses := Seq("MIT" -> url("https://github.com/wellcomecollection/scala-libs/blob/main/LICENSE")),
     publishTo := sonatypePublishToBundle.value,
-    publishArtifact in Test := true,
+    Test / publishArtifact := true,
     // Don't build scaladocs
     // https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#skip-packagedoc-task-on-stage
     mappings in (Compile, packageDoc) := Nil,
