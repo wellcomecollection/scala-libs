@@ -46,7 +46,7 @@ object Common {
     Test / publishArtifact := true,
     // Don't build scaladocs
     // https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#skip-packagedoc-task-on-stage
-    mappings in (Compile, packageDoc) := Nil,
+    Compile /  packageDoc / mappings := Nil,
     version := projectVersion
   )
 
