@@ -92,10 +92,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: create-release
     strategy:
+      fail-fast: false
       matrix:
         service:
           - fixtures
           - http
+          - http_typesafe
           - json
           - typesafe_app
           - monitoring

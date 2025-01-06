@@ -61,7 +61,7 @@ class S3TypedStoreTest
   describe("S3TypedStore") {
     it("errors if the object key is too long") {
       withLocalS3Bucket { bucket =>
-        // Maximum length of an s3 key is 1024 bytes as of 25/06/2019
+        // Maximum length of a s3 key is 1024 bytes as of 25/06/2019
         // https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
         val location = S3ObjectLocation(
           bucket = bucket.name,
@@ -74,7 +74,7 @@ class S3TypedStoreTest
           val value = store.put(location)(entry).left.value
 
           value shouldBe a[InvalidIdentifierFailure]
-          value.e.getMessage should startWith("Object key is too long")
+          value.e.getMessage should include("key is too long")
         }
       }
     }

@@ -1,7 +1,5 @@
 # scala-libs
 
-[![Build status](https://badge.buildkite.com/4a84a28feca6865e192e0adaba1c2e33f1e773e58957459c47.svg?branch=main)](https://buildkite.com/wellcomecollection/scala-libraries)
-
 This is a collection of utilities that are shared across our Scala-based repositories ([catalogue-api], [catalogue-pipeline], [storage-service]).
 
 It includes:
