@@ -1,4 +1,4 @@
-val projectVersion = "32.43.2-SNAPSHOT"
+val projectVersion = "32.43.3"
 
 Global / excludeLintKeys += composeNoBuild
 
