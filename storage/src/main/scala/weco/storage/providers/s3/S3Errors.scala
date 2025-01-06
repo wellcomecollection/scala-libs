@@ -28,6 +28,10 @@ object S3Errors {
         if exc.getMessage.startsWith("The specified bucket is not valid") =>
       StoreReadError(exc)
 
+    case exc: S3Exception
+      if exc.getMessage.startsWith("The specified bucket does not exist") =>
+      StoreReadError(exc)
+
     case exc: SdkClientException
         if exc.getMessage.startsWith("Unable to execute HTTP request") =>
       new StoreReadError(exc) with RetryableError
@@ -53,6 +57,9 @@ object S3Errors {
     // e.g. S3Exception: Object key is too long. Maximum number of bytes allowed in keys is 915.
     case exc: S3Exception
         if exc.getMessage.startsWith("Object key is too long") =>
+      InvalidIdentifierFailure(exc)
+    case exc: S3Exception
+      if exc.getMessage.startsWith("Your key is too long") =>
       InvalidIdentifierFailure(exc)
 
     case exc => StoreWriteError(exc)
