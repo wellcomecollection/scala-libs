@@ -29,7 +29,7 @@ object S3Errors {
       StoreReadError(exc)
 
     case exc: S3Exception
-      if exc.getMessage.startsWith("The specified bucket does not exist") =>
+        if exc.getMessage.startsWith("The specified bucket does not exist") =>
       StoreReadError(exc)
 
     case exc: SdkClientException
@@ -59,7 +59,7 @@ object S3Errors {
         if exc.getMessage.startsWith("Object key is too long") =>
       InvalidIdentifierFailure(exc)
     case exc: S3Exception
-      if exc.getMessage.startsWith("Your key is too long") =>
+        if exc.getMessage.startsWith("Your key is too long") =>
       InvalidIdentifierFailure(exc)
 
     case exc => StoreWriteError(exc)
