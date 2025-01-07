@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.43.4 - 2025-01-07
+
+This is a change to the build process to fix a bug in the way that the `sbt` build is run.
+
 ## v32.43.3 - 2025-01-06
 
 Update ElasticBuilder to generate and accept config case classes to enable 
