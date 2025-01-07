@@ -7,7 +7,7 @@ import xerial.sbt.Sonatype.autoImport.{sonatypeCredentialHost, sonatypePublishTo
 
 object Common {
   def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
-    scalaVersion := "2.12.19",
+    scalaVersion := "2.12.20",
     organization := "org.wellcomecollection",
     homepage := Some(url("https://github.com/wellcomecollection/scala-libs")),
     scmInfo := Some(
@@ -36,17 +36,17 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-    parallelExecution in Test := false,
+    Test / parallelExecution := false,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
     sonatypeCredentialHost := "central.sonatype.com",
     sonatypeRepository := "https://central.sonatype.com/service/local",
     licenses := Seq("MIT" -> url("https://github.com/wellcomecollection/scala-libs/blob/main/LICENSE")),
     publishTo := sonatypePublishToBundle.value,
-    publishArtifact in Test := true,
+    Test / publishArtifact := true,
     // Don't build scaladocs
     // https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#skip-packagedoc-task-on-stage
-    mappings in (Compile, packageDoc) := Nil,
+    Compile /  packageDoc / mappings := Nil,
     version := projectVersion
   )
 
