@@ -53,7 +53,8 @@ trait S3Fixtures
       AwsBasicCredentials.create("accessKey1", "verySecretKey1"))
 
   def createS3ClientWithEndpoint(endpoint: String): S3Client =
-    S3Client.builder()
+    S3Client
+      .builder()
       .credentialsProvider(s3Credentials)
       .forcePathStyle(true)
       .endpointOverride(new URI(endpoint))
@@ -66,13 +67,15 @@ trait S3Fixtures
     createS3ClientWithEndpoint("http://nope.nope")
 
   implicit val s3Presigner: S3Presigner =
-    S3Presigner.builder()
+    S3Presigner
+      .builder()
       .credentialsProvider(
         StaticCredentialsProvider.create(
           AwsBasicCredentials.create("accessKey1", "verySecretKey1"))
       )
       .serviceConfiguration(
-        S3Configuration.builder()
+        S3Configuration
+          .builder()
           .pathStyleAccessEnabled(true)
           .build()
       )
@@ -83,14 +86,15 @@ trait S3Fixtures
     // This is based on a method called doesBucketExistV2 in the V1 Java SDK,
     // which used GetBucketAcl under the hood to check if a bucket existed.
     val request =
-      GetBucketAclRequest.builder()
+      GetBucketAclRequest
+        .builder()
         .bucket(bucketName)
         .build()
 
     Try { s3Client.getBucketAcl(request) } match {
-      case Success(_) => true
+      case Success(_)                                       => true
       case Failure(e: S3Exception) if e.statusCode() == 404 => false
-      case Failure(e) => throw e
+      case Failure(e)                                       => throw e
     }
   }
 
@@ -103,7 +107,8 @@ trait S3Fixtures
         val bucketName: String = createBucketName
 
         val request =
-          CreateBucketRequest.builder()
+          CreateBucketRequest
+            .builder()
             .bucket(bucketName)
             .build()
 
@@ -133,7 +138,8 @@ trait S3Fixtures
 
   def deleteBucket(bucket: Bucket): Unit = {
     val deleteBucketRequest =
-      DeleteBucketRequest.builder()
+      DeleteBucketRequest
+        .builder()
         .bucket(bucket.name)
         .build()
 
@@ -142,7 +148,8 @@ trait S3Fixtures
 
   def deleteObject(location: S3ObjectLocation): Unit = {
     val deleteObjectRequest =
-      DeleteObjectRequest.builder()
+      DeleteObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -152,7 +159,8 @@ trait S3Fixtures
 
   def getContentFromS3(location: S3ObjectLocation): String = {
     val getRequest =
-      GetObjectRequest.builder()
+      GetObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -175,7 +183,8 @@ trait S3Fixtures
 
   def putString(location: S3ObjectLocation, contents: String): Unit = {
     val putRequest =
-      PutObjectRequest.builder()
+      PutObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .build()
@@ -189,13 +198,15 @@ trait S3Fixtures
     location: S3ObjectLocation,
     inputStream: InputStreamWithLength = createInputStream()): Unit = {
     val putRequest =
-      PutObjectRequest.builder()
+      PutObjectRequest
+        .builder()
         .bucket(location.bucket)
         .key(location.key)
         .contentLength(inputStream.length)
         .build()
 
-    val requestBody = RequestBody.fromInputStream(inputStream, inputStream.length)
+    val requestBody =
+      RequestBody.fromInputStream(inputStream, inputStream.length)
 
     s3Client.putObject(putRequest, requestBody)
 
@@ -212,15 +223,21 @@ trait S3Fixtures
     */
   def listKeysInBucket(bucket: Bucket): List[String] = {
     val listRequest =
-      ListObjectsV2Request.builder()
+      ListObjectsV2Request
+        .builder()
         .bucket(bucket.name)
         .build()
 
-    s3Client.listObjectsV2Paginator(listRequest)
+    s3Client
+      .listObjectsV2Paginator(listRequest)
       .iterator()
       .asScala
-      .flatMap { resp: ListObjectsV2Response => resp.contents().asScala }
-      .map { s3Obj: S3Object => s3Obj.key() }
+      .flatMap { resp: ListObjectsV2Response =>
+        resp.contents().asScala
+      }
+      .map { s3Obj: S3Object =>
+        s3Obj.key()
+      }
       .toList
   }
 

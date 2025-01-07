@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v32.43.3 - 2025-01-06
+
+Update ElasticBuilder to generate and accept config case classes to enable 
+pushing typesafe config to the edge of consuming services.
+
 ## v32.43.2 - 2024-10-07
 
 S3StreamWritable bug fix (replace `read` by `readNBytes`).
