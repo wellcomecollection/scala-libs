@@ -7,7 +7,7 @@ import xerial.sbt.Sonatype.autoImport.{sonatypeCredentialHost, sonatypePublishTo
 
 object Common {
   def createSettings(projectVersion: String): Seq[Def.Setting[_]] = Seq(
-    scalaVersion := "2.12.19",
+    scalaVersion := "2.12.20",
     organization := "org.wellcomecollection",
     homepage := Some(url("https://github.com/wellcomecollection/scala-libs")),
     scmInfo := Some(
