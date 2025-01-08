@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.43.5 - 2025-01-08
+
+Update dependencies
+
 ## v32.43.4 - 2025-01-07
 
 This is a change to the build process to fix a bug in the way that the `sbt` build is run.
