@@ -2,24 +2,24 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val elasticApm = "1.51.0"
-    val elastic4s = "8.9.5"
+    val elasticApm = "1.52.0"
+    val elastic4s = "8.11.5"
 
-    val aws = "2.25.70"
+    val aws = "2.28.15"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
-    val circe = "0.14.9"
+    val circe = "0.14.10"
     val circeGenericExtras = "0.14.4"
 
     val typesafe = "1.4.3"
-    val logback = "1.4.14"
-    val mockito = "5.13.0"
+    val logback = "1.5.8"
+    val mockito = "5.14.1"
     val scalatest = "3.2.19"
     val scalatestPlus = "3.1.2.0"
     val scalatestPlusMockitoArtifactId = "mockito-3-2"
-    val scanamo = "1.1.1"
-    val apacheCommons = "2.16.1"
+    val scanamo = "2.0.0"
+    val apacheCommons = "2.17.0"
 
     // Provides slf4j-api
     val grizzled = "1.3.4"
@@ -27,7 +27,7 @@ object Dependencies {
     val pekko = "1.1.1"
     val pekkoConnectors = "1.0.2"
     val pekkoHttp = "1.1.0"
-    val pekkoHttpJson = "2.6.0"
+    val pekkoHttpJson = "2.8.0"
 
     // This needs to be set explicitly to match the language version
     // used by the version of shapeless that Circe uses, otherwise SBT
@@ -36,7 +36,7 @@ object Dependencies {
     //
     //    java.lang.NoClassDefFoundError: scala/reflect/internal/Names$Name
     //
-    val scalaReflectVersion = "2.12.19"
+    val scalaReflectVersion = "2.12.20"
   }
 
   val circeDependencies = Seq(
@@ -121,7 +121,7 @@ object Dependencies {
   // See https://github.com/elastic/apm-agent-java/issues/2353 for an explanation
   // of the issue this addresses.
   val jnaDependencies: Seq[ModuleID] = Seq(
-    "net.java.dev.jna" % "jna" % "5.14.0"
+    "net.java.dev.jna" % "jna" % "5.15.0"
   )
 
   val localstackDependencies = Seq(
