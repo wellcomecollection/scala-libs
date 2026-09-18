@@ -23,8 +23,9 @@ object SQSBuilder {
     )
   }
 
-  def buildSQSStream[T](config: Config)(implicit actorSystem: ActorSystem,
-                                        ec: ExecutionContext): SQSStream[T] =
+  def buildSQSStream[T](
+    config: Config
+  )(implicit actorSystem: ActorSystem, ec: ExecutionContext): SQSStream[T] =
     new SQSStream[T](
       sqsClient = SqsAsyncClient.builder().build(),
       sqsConfig = buildSQSConfig(config),

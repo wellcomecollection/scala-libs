@@ -42,11 +42,13 @@ class WellcomeHttpLogger(
   ): String = {
     val loggedHeaders =
       headers
-        .filter { h =>
-          allowedHeaderNames.contains(h.name)
+        .filter {
+          h =>
+            allowedHeaderNames.contains(h.name)
         }
-        .map { h =>
-          s"; ${h.name}=${h.value}"
+        .map {
+          h =>
+            s"; ${h.name}=${h.value}"
         }
 
     // We only log the entity ("body") if it contains anything interesting.  If the entity

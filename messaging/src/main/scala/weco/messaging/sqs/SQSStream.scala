@@ -40,7 +40,8 @@ import scala.concurrent.Future
 class SQSStream[T](
   sqsClient: SqsAsyncClient,
   sqsConfig: SQSConfig,
-  metricsSender: Metrics[Future])(implicit val actorSystem: ActorSystem)
+  metricsSender: Metrics[Future]
+)(implicit val actorSystem: ActorSystem)
     extends Logging {
 
   implicit val dispatcher = actorSystem.dispatcher
@@ -51,7 +52,8 @@ class SQSStream[T](
     SqsAckSink.grouped(sqsConfig.queueUrl)(sqsClient)
 
   def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T]): Future[Done] =
+    implicit decoderT: Decoder[T]
+  ): Future[Done] =
     runStream(
       streamName = streamName,
       source =>
@@ -60,34 +62,39 @@ class SQSStream[T](
             case (message, t) =>
               debug(s"Processing message ${message.messageId()}")
               process(t).map(_ => message)
-        }
+          }
     )
 
   def runGraph(streamName: String)(
-    graphBetween: (Source[(Message, T), NotUsed],
-                   Sink[Message, Future[Done]]) => RunnableGraph[Future[Done]]
+    graphBetween: (
+      Source[(Message, T), NotUsed],
+      Sink[Message, Future[Done]]
+    ) => RunnableGraph[Future[Done]]
   )(implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
     val decodedSource = source
-      .map { message =>
-        (message, fromJson[T](message.body).get)
+      .map {
+        message =>
+          (message, fromJson[T](message.body).get)
       }
 
     val loggingSink = Flow[Message]
-      .map { m =>
-        metricsSender.incrementCount(s"${metricName}_success")
-        debug(s"Deleting message ${m.messageId()}")
-        MessageAction.Delete(m)
+      .map {
+        m =>
+          metricsSender.incrementCount(s"${metricName}_success")
+          debug(s"Deleting message ${m.messageId()}")
+          MessageAction.Delete(m)
       }
       .toMat(sink)(Keep.right)
 
     graphBetween(decodedSource, loggingSink)
       .withAttributes(ActorAttributes.supervisionStrategy(decider(metricName)))
       .run()
-      .map { _ =>
-        logger.info("SQSStream finished processing messages.");
-        Done
+      .map {
+        _ =>
+          logger.info("SQSStream finished processing messages.");
+          Done
       }
       .recover {
         case err =>
@@ -98,10 +105,11 @@ class SQSStream[T](
 
   def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
-    implicit decoder: Decoder[T]): Future[Done] =
-    runGraph(streamName) { (source, sink) =>
-      modifySource(source).toMat(sink)(Keep.right)
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed]
+  )(implicit decoder: Decoder[T]): Future[Done] =
+    runGraph(streamName) {
+      (source, sink) =>
+        modifySource(source).toMat(sink)(Keep.right)
     }
 
   // Defines a "supervision strategy" -- this tells Pekko how to react
@@ -131,6 +139,7 @@ class SQSStream[T](
       case exception: Exception =>
         logger.error(
           s"Unrecognised failure while: ${exception.getMessage}",
-          exception)
+          exception
+        )
     }
 }

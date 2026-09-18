@@ -16,9 +16,11 @@ case class SierraHoldRequest(
 )
 
 case object SierraHoldRequest {
-  def apply(item: SierraItemNumber,
-            neededBy: Option[LocalDate],
-            note: Option[String]): SierraHoldRequest =
+  def apply(
+    item: SierraItemNumber,
+    neededBy: Option[LocalDate],
+    note: Option[String]
+  ): SierraHoldRequest =
     new SierraHoldRequest(
       recordType = "i",
       recordNumber = item.withoutCheckDigit.toLong,

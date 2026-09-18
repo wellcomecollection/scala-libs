@@ -27,8 +27,7 @@ class WellcomeHttpApp(
   val appName: String,
   httpLogger: WellcomeHttpLogger = new WellcomeHttpLogger()
 )(
-  implicit
-  val as: ActorSystem,
+  implicit val as: ActorSystem,
   val ec: ExecutionContext
 ) extends Runnable
     with WellcomeExceptionHandler
@@ -38,8 +37,9 @@ class WellcomeHttpApp(
   private val appId = UUID.randomUUID()
   private val appTag = s"$appName/$appId"
 
-  private def createLogLine(logger: LoggingAdapter)(req: HttpRequest)(
-    response: Any): Unit = {
+  private def createLogLine(
+    logger: LoggingAdapter
+  )(req: HttpRequest)(response: Any): Unit = {
     val logLine = httpLogger.createLogLine(req, response)
 
     LogEntry(s"$appTag - $logLine", Logging.InfoLevel).logTo(logger)
@@ -48,10 +48,11 @@ class WellcomeHttpApp(
   def run(): Future[_] = {
     val handler: Route = handleExceptions(exceptionHandler) {
       handleRejections(rejectionHandler) {
-        mapResponse { response =>
-          httpMetrics.sendMetric(response)
+        mapResponse {
+          response =>
+            httpMetrics.sendMetric(response)
 
-          response
+            response
         }(routes)
       }
     }

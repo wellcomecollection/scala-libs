@@ -8,9 +8,10 @@ import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 
 object LockingBuilder {
-  def buildDynamoLockingService[Out, OutMonad[_]](config: Config,
-                                                  namespace: String = "")(
-    implicit ec: ExecutionContext): DynamoLockingService[Out, OutMonad] = {
+  def buildDynamoLockingService[Out, OutMonad[_]](
+    config: Config,
+    namespace: String = ""
+  )(implicit ec: ExecutionContext): DynamoLockingService[Out, OutMonad] = {
     implicit val dynamoLockDao: DynamoLockDao =
       DynamoLockDaoBuilder.buildDynamoLockDao(config, namespace = namespace)
 

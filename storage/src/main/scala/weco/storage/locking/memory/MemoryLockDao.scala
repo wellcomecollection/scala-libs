@@ -24,7 +24,8 @@ class MemoryLockDao[MemoryIdent, MemoryContextId]
             LockFailure(
               id,
               new Throwable(
-                s"Failed to lock <$id> in context <$contextId>; already locked as <$existingContextId>")
+                s"Failed to lock <$id> in context <$contextId>; already locked as <$existingContextId>"
+              )
             )
           )
         case _ =>

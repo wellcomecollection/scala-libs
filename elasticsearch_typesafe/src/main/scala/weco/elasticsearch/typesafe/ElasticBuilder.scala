@@ -66,11 +66,11 @@ object ElasticBuilder {
   def buildElasticClient(config: ElasticConfig): ElasticClient =
     config match {
       case ElasticConfigUsernamePassword(
-          hostname,
-          port,
-          protocol,
-          username,
-          password
+            hostname,
+            port,
+            protocol,
+            username,
+            password
           ) =>
         ElasticClientBuilder.create(
           hostname,

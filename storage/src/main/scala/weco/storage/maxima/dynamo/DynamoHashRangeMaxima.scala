@@ -17,7 +17,8 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
   implicit protected val formatHashKey: DynamoFormat[HashKey]
   implicit protected val formatRangeKey: DynamoFormat[RangeKey]
   implicit protected val format: DynamoFormat[
-    DynamoHashRangeEntry[HashKey, RangeKey, T]]
+    DynamoHashRangeEntry[HashKey, RangeKey, T]
+  ]
 
   protected val client: DynamoDbClient
   protected val table: Table[DynamoHashRangeEntry[HashKey, RangeKey, T]]
@@ -35,7 +36,8 @@ trait DynamoHashRangeMaxima[HashKey, RangeKey, T]
         Left(MaximaReadError(error))
       case Success(Nil) =>
         val error = new Error(
-          s"There are no Dynamo items with hash key id=$hashKey")
+          s"There are no Dynamo items with hash key id=$hashKey"
+        )
         Left(NoMaximaValueError(error))
       case Failure(err) => Left(MaximaReadError(err))
 

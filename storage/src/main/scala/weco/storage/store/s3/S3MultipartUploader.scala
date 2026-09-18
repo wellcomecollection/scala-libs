@@ -38,10 +38,12 @@ trait S3MultipartUploader extends Logging {
       createResponse.uploadId()
     }
 
-  def uploadPart(location: S3ObjectLocation,
-                 uploadId: String,
-                 bytes: Array[Byte],
-                 partNumber: Int): Try[CompletedPart] =
+  def uploadPart(
+    location: S3ObjectLocation,
+    uploadId: String,
+    bytes: Array[Byte],
+    partNumber: Int
+  ): Try[CompletedPart] =
     Try {
       val uploadPartRequest =
         UploadPartRequest
@@ -67,7 +69,8 @@ trait S3MultipartUploader extends Logging {
   def completeMultipartUpload(
     location: S3ObjectLocation,
     uploadId: String,
-    completedParts: List[CompletedPart]): Try[CompleteMultipartUploadResponse] =
+    completedParts: List[CompletedPart]
+  ): Try[CompleteMultipartUploadResponse] =
     Try {
       val completedMultipartUpload =
         CompletedMultipartUpload

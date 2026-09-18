@@ -81,8 +81,9 @@ case class S3ObjectLocationPrefix(
 //
 // These decoders allow you to read JSON that was encoded with the old code.
 trait S3Decodable {
-  def createDecoder[T](keyField: String)(
-    constructor: (String, String) => T): Decoder[T] =
+  def createDecoder[T](
+    keyField: String
+  )(constructor: (String, String) => T): Decoder[T] =
     (cursor: HCursor) => {
       val oldStyle: Either[DecodingFailure, T] =
         for {

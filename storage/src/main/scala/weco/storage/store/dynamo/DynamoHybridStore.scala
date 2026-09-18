@@ -13,14 +13,17 @@ class DynamoHybridStore[T](prefix: S3ObjectLocationPrefix)(
 ) extends HybridStore[Version[String, Int], S3ObjectLocation, T] {
 
   override protected def createTypeStoreId(
-    id: Version[String, Int]): S3ObjectLocation =
+    id: Version[String, Int]
+  ): S3ObjectLocation =
     prefix.asLocation(
       id.id,
       id.version.toString,
-      UUID.randomUUID().toString + ".json")
+      UUID.randomUUID().toString + ".json"
+    )
 
-  override protected def getTypedStoreEntry(typedStoreId: S3ObjectLocation)
-    : Either[ReadError, Identified[S3ObjectLocation, T]] =
+  override protected def getTypedStoreEntry(
+    typedStoreId: S3ObjectLocation
+  ): Either[ReadError, Identified[S3ObjectLocation, T]] =
     super.getTypedStoreEntry(typedStoreId) match {
       case Right(t) => Right(t)
       case Left(err: StoreReadError)

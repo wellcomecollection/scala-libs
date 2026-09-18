@@ -20,7 +20,8 @@ trait TypedStore[Ident, T] extends Store[Ident, T] {
 
   private def ensureStreamClosed(
     entry: Identified[Ident, InputStreamWithLength],
-    decodeResult: Either[DecoderError, T]): Either[ReadError, T] = {
+    decodeResult: Either[DecoderError, T]
+  ): Either[ReadError, T] = {
     val underlying = entry.identifiedT
 
     // We need to ensure the underlying stream is closed, unless we're

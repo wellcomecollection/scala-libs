@@ -15,8 +15,9 @@ trait RetryableReadable[Ident, T] extends Readable[Ident, T] with Logging {
   protected def buildGetError(throwable: Throwable): ReadError
 
   def get(id: Ident): ReadEither =
-    getOnce.retry(maxRetries)(id) map { t =>
-      Identified(id, t)
+    getOnce.retry(maxRetries)(id) map {
+      t =>
+        Identified(id, t)
     }
 
   private def getOnce: Ident => Either[ReadError, T] =
@@ -29,5 +30,5 @@ trait RetryableReadable[Ident, T] extends Readable[Ident, T] with Logging {
           val error = buildGetError(err)
           warn(s"Error when trying to get $id: $error")
           Left(error)
-    }
+      }
 }

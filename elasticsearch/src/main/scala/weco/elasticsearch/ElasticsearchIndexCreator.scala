@@ -11,7 +11,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ElasticsearchIndexCreator(
   elasticClient: ElasticClient,
   index: Index,
-  config: IndexConfig)(implicit ec: ExecutionContext)
+  config: IndexConfig
+)(implicit ec: ExecutionContext)
     extends Logging {
 
   def create: Future[Unit] = createOrUpdate
@@ -59,6 +60,7 @@ class ElasticsearchIndexCreator(
   private def handleEsError[T](resp: Response[T]) =
     if (resp.isError) {
       throw new RuntimeException(
-        s"Index creation error on index:${index.name} resp: $resp")
+        s"Index creation error on index:${index.name} resp: $resp"
+      )
     }
 }

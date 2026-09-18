@@ -20,8 +20,9 @@ object JsonUtil extends AutoDerivation with Logging with URIConverters {
     Try(value.asJson.noSpaces)
   }
 
-  def toMap[T](json: String)(
-    implicit decoder: Decoder[T]): Try[Map[String, T]] = {
+  def toMap[T](
+    json: String
+  )(implicit decoder: Decoder[T]): Try[Map[String, T]] = {
     assert(decoder != null)
     fromJson[Map[String, T]](json)
   }

@@ -25,8 +25,9 @@ trait S3StreamWritable
     s"Parts must be at least 5 MB in size, got $partSize < ${5 * FileUtils.ONE_MB}; see https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPart.html"
   )
 
-  override def put(location: S3ObjectLocation)(
-    inputStream: InputStreamWithLength): WriteEither = {
+  override def put(
+    location: S3ObjectLocation
+  )(inputStream: InputStreamWithLength): WriteEither = {
     val result =
       if (inputStream.length <= partSize) {
         val putObjectRequest =
@@ -52,7 +53,8 @@ trait S3StreamWritable
               if (inputStream.available() > 0) {
                 throw new RuntimeException(
                   s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
-                    .available()} bytes still available")
+                      .available()} bytes still available"
+                )
               }
 
               RequestBody.fromBytes(bytes)
@@ -84,33 +86,35 @@ trait S3StreamWritable
     val partCount = (inputStream.length.toFloat / partSize).ceil.toInt
 
     // part numbers in MultiPart uploads are 1-indexed
-    val result = Range(1, partCount + 1).map { partNumber =>
-      // We need to know how many bytes to read from the InputStream for
-      // this part; remember that the final part may be shorter than the
-      // other parts.
-      val start = (partNumber - 1) * partSize
-      val end = Math.min(partNumber * partSize, inputStream.length)
-      val partLength = (end - start).toInt
+    val result = Range(1, partCount + 1).map {
+      partNumber =>
+        // We need to know how many bytes to read from the InputStream for
+        // this part; remember that the final part may be shorter than the
+        // other parts.
+        val start = (partNumber - 1) * partSize
+        val end = Math.min(partNumber * partSize, inputStream.length)
+        val partLength = (end - start).toInt
 
-      val bytes: Array[Byte] = new Array[Byte](partLength)
-      val bytesRead = inputStream.readNBytes(bytes, 0, partLength)
+        val bytes: Array[Byte] = new Array[Byte](partLength)
+        val bytesRead = inputStream.readNBytes(bytes, 0, partLength)
 
-      if (bytesRead < partLength) {
-        throw new RuntimeException(
-          s"Input stream is too short: tried to read $partLength bytes, only got $bytesRead"
-        )
-      }
+        if (bytesRead < partLength) {
+          throw new RuntimeException(
+            s"Input stream is too short: tried to read $partLength bytes, only got $bytesRead"
+          )
+        }
 
-      if (partNumber == partCount && inputStream.available() > 0) {
-        throw new RuntimeException(
-          s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
-            .available()} bytes still available")
-      }
+        if (partNumber == partCount && inputStream.available() > 0) {
+          throw new RuntimeException(
+            s"Not all bytes read from input stream: read ${inputStream.length} bytes, but ${inputStream
+                .available()} bytes still available"
+          )
+        }
 
-      uploadPart(location, uploadId, bytes, partNumber)
+        uploadPart(location, uploadId, bytes, partNumber)
     }.toList
 
-    val successes = result.collect { case Success(s)     => s }
+    val successes = result.collect { case Success(s) => s }
     val failures = result.collectFirst { case Failure(e) => e }
 
     failures match {
@@ -123,7 +127,8 @@ trait S3StreamWritable
     throwable match {
       case exc: RuntimeException
           if exc.getMessage.startsWith(
-            "Not all bytes read from input stream") =>
+            "Not all bytes read from input stream"
+          ) =>
         IncorrectStreamLengthError(exc)
       case exc: RuntimeException
           if exc.getMessage.startsWith("Input stream is too short") =>

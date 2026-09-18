@@ -23,8 +23,9 @@ class MemoryStreamStore[Ident](val memoryStore: MemoryStore[Ident, Array[Byte]])
   override def put(id: Ident)(entry: InputStreamWithLength): WriteEither =
     bytesCodec.fromStream(entry) match {
       case Right(bytes) =>
-        memoryStore.put(id)(bytes).map { _ =>
-          Identified(id, entry)
+        memoryStore.put(id)(bytes).map {
+          _ =>
+            Identified(id, entry)
         }
 
       case Left(err: IncorrectStreamLengthError) => Left(err)

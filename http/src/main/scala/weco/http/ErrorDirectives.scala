@@ -27,7 +27,8 @@ trait ErrorDirectives
     error(
       DisplayError(
         statusCode = StatusCodes.BadRequest,
-        description = description)
+        description = description
+      )
     )
 
   private def error(err: DisplayError): Route =

@@ -15,8 +15,9 @@ class MemoryIndividualMessageSender extends IndividualMessageSender[String] {
 
   var messages: List[MemoryMessage] = List.empty
 
-  override def send(body: String)(subject: String,
-                                  destination: String): Try[Unit] = Try {
+  override def send(
+    body: String
+  )(subject: String, destination: String): Try[Unit] = Try {
     this.synchronized {
       messages = messages :+ MemoryMessage(body, subject, destination)
     }

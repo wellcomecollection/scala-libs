@@ -12,8 +12,7 @@ import scala.concurrent.ExecutionContext
 
 object SierraOauthHttpClientBuilder {
   def build(config: Config)(
-    implicit
-    as: ActorSystem,
+    implicit as: ActorSystem,
     ec: ExecutionContext
   ): SierraOauthHttpClient = {
     val username = config.requireString("sierra.api.key")
