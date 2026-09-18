@@ -50,12 +50,13 @@ trait SierraRecordNumberOps[T <: SierraRecordNumber] {
           case (Left(err), _)    => Left(err)
         }
 
-      idString.flatMap { id =>
-        Try { apply(id) } match {
-          case Success(number) => Right(number)
-          case Failure(err) =>
-            Left(DecodingFailure(err.toString, ops = List.empty))
-        }
+      idString.flatMap {
+        id =>
+          Try { apply(id) } match {
+            case Success(number) => Right(number)
+            case Failure(err) =>
+              Left(DecodingFailure(err.toString, ops = List.empty))
+          }
       }
     }
 

@@ -21,7 +21,8 @@ object S3Errors {
     //
     case exc: S3Exception
         if exc.getMessage.startsWith(
-          "Your socket connection to the server was not read from or written to within the timeout period") =>
+          "Your socket connection to the server was not read from or written to within the timeout period"
+        ) =>
       new StoreReadError(exc) with RetryableError
 
     case exc: S3Exception

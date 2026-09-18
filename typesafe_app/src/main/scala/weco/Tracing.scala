@@ -47,12 +47,15 @@ object Tracing {
           .getStringOption("apm.secret")
           .getOrElse(""),
         "span_frames_min_duration" -> "250ms"
-      ).asJava)
+      ).asJava
+    )
     actorSystem.dispatchers.registerConfigurator(
       "tracing-dispatcher",
       new TraceableDispatcherConfigurator(
         actorSystem.dispatchers.defaultDispatcherConfig,
-        actorSystem.dispatchers.prerequisites))
+        actorSystem.dispatchers.prerequisites
+      )
+    )
     ec = actorSystem.dispatchers.lookup("tracing-dispatcher")
   }
 
@@ -86,24 +89,27 @@ trait Tracing {
     name: String,
     spanType: String = "",
     subType: String = "",
-    action: String = "")(wrappedFunction: => Future[T]): Future[T] = {
+    action: String = ""
+  )(wrappedFunction: => Future[T]): Future[T] = {
     val span = Tracing.currentTransaction
       .startSpan(spanType, subType, action)
       .setName(name)
 
-    wrappedFunction.transform { res =>
-      res match {
-        case Success(_)      =>
-        case Failure(reason) => span.captureException(reason)
-      }
-      span.end()
-      res
+    wrappedFunction.transform {
+      res =>
+        res match {
+          case Success(_)      =>
+          case Failure(reason) => span.captureException(reason)
+        }
+        span.end()
+        res
     }
   }
 
-  def transactFuture[T](name: String,
-                        transactionType: String = Transaction.TYPE_REQUEST)(
-    wrappedFunction: => Future[T]): Future[T] = {
+  def transactFuture[T](
+    name: String,
+    transactionType: String = Transaction.TYPE_REQUEST
+  )(wrappedFunction: => Future[T]): Future[T] = {
     val transaction = ElasticApm
       .startTransaction()
       .setName(name)
@@ -111,14 +117,15 @@ trait Tracing {
     Tracing.currentTransaction = transaction
 
     wrappedFunction
-      .transform { res =>
-        res match {
-          case Success(_) =>
-          case Failure(reason) =>
-            transaction.captureException(reason)
-        }
-        transaction.end()
-        res
+      .transform {
+        res =>
+          res match {
+            case Success(_) =>
+            case Failure(reason) =>
+              transaction.captureException(reason)
+          }
+          transaction.end()
+          res
       }
   }
 
@@ -146,9 +153,10 @@ object Helpers {
 }
 
 // This ensures that the currentTransaction is always valid: see comments on `currentTransaction` above.
-class TraceableDispatcherConfigurator(config: Config,
-                                      prerequisites: DispatcherPrerequisites)
-    extends MessageDispatcherConfigurator(config, prerequisites) {
+class TraceableDispatcherConfigurator(
+  config: Config,
+  prerequisites: DispatcherPrerequisites
+) extends MessageDispatcherConfigurator(config, prerequisites) {
 
   import Helpers._
 
@@ -163,10 +171,12 @@ class TraceableDispatcherConfigurator(config: Config,
     ) { dispatcher =>
       override def execute(runnable: Runnable): Unit = {
         val transaction = Tracing.currentTransaction
-        super.execute(() => {
-          Tracing.currentTransaction = transaction
-          runnable.run()
-        })
+        super.execute(
+          () => {
+            Tracing.currentTransaction = transaction
+            runnable.run()
+          }
+        )
       }
     }
 }

@@ -16,5 +16,6 @@ case class SierraItemData(
 ) {
   require(
     holdCount.getOrElse(0) >= 0,
-    s"Item has a negative hold count, how? $holdCount")
+    s"Item has a negative hold count, how? $holdCount"
+  )
 }

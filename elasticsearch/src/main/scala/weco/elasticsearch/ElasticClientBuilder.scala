@@ -13,9 +13,10 @@ import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
 import scala.collection.JavaConverters._
 
-private class ElasticHttpClientApiKeyConfig(encodedApiKey: String,
-                                            apiCompatibleWith: Option[String])
-    extends ElasticHttpClientConfig(apiCompatibleWith) {
+private class ElasticHttpClientApiKeyConfig(
+  encodedApiKey: String,
+  apiCompatibleWith: Option[String]
+) extends ElasticHttpClientConfig(apiCompatibleWith) {
   override protected def defaultHeaders: Seq[BasicHeader] =
     super.defaultHeaders :+ new BasicHeader(
       HttpHeaders.AUTHORIZATION,
@@ -26,14 +27,15 @@ private class ElasticHttpClientApiKeyConfig(encodedApiKey: String,
 private class ElasticHttpClientBasicAuthConfig(
   username: String,
   password: String,
-  apiCompatibleWith: Option[String])
-    extends ElasticHttpClientConfig(apiCompatibleWith) {
+  apiCompatibleWith: Option[String]
+) extends ElasticHttpClientConfig(apiCompatibleWith) {
   private val credentials = new UsernamePasswordCredentials(username, password)
   private val credentialsProvider = new BasicCredentialsProvider()
   credentialsProvider.setCredentials(AuthScope.ANY, credentials)
 
   override def customizeHttpClient(
-    httpClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder =
+    httpClientBuilder: HttpAsyncClientBuilder
+  ): HttpAsyncClientBuilder =
     super
       .customizeHttpClient(httpClientBuilder)
       .setDefaultCredentialsProvider(credentialsProvider)
@@ -44,17 +46,19 @@ private class ElasticHttpClientConfig(apiCompatibleWith: Option[String])
   // See https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-api-compatibility.html#_rest_api_compatibility_workflow
   protected def defaultHeaders: Seq[BasicHeader] =
     apiCompatibleWith
-      .map { compatVersion =>
-        val compatHeader =
-          s"application/vnd.elasticsearch+json;compatible-with=$compatVersion"
-        Seq(
-          new BasicHeader(HttpHeaders.ACCEPT, compatHeader),
-          new BasicHeader(HttpHeaders.CONTENT_TYPE, compatHeader)
-        )
+      .map {
+        compatVersion =>
+          val compatHeader =
+            s"application/vnd.elasticsearch+json;compatible-with=$compatVersion"
+          Seq(
+            new BasicHeader(HttpHeaders.ACCEPT, compatHeader),
+            new BasicHeader(HttpHeaders.CONTENT_TYPE, compatHeader)
+          )
       }
       .getOrElse(Nil)
   override def customizeHttpClient(
-    httpClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder =
+    httpClientBuilder: HttpAsyncClientBuilder
+  ): HttpAsyncClientBuilder =
     httpClientBuilder
       .setDefaultHeaders(defaultHeaders.asJava)
       // Enabling TCP keepalive
@@ -74,19 +78,24 @@ object ElasticClientBuilder {
     hostname: String,
     port: Int,
     protocol: String,
-    clientConfig: ElasticHttpClientConfig): ElasticClient =
+    clientConfig: ElasticHttpClientConfig
+  ): ElasticClient =
     ElasticClient(
       JavaClient.fromRestClient(
         RestClient
           .builder(new HttpHost(hostname, port, protocol))
           .setHttpClientConfigCallback(clientConfig)
           .setCompressionEnabled(true)
-          .build()))
+          .build()
+      )
+    )
 
-  def create(hostname: String,
-             port: Int,
-             protocol: String,
-             encodedApiKey: String): ElasticClient =
+  def create(
+    hostname: String,
+    port: Int,
+    protocol: String,
+    encodedApiKey: String
+  ): ElasticClient =
     fromClientConfig(
       hostname = hostname,
       port = port,
@@ -95,11 +104,13 @@ object ElasticClientBuilder {
         new ElasticHttpClientApiKeyConfig(encodedApiKey, apiCompatibility)
     )
 
-  def create(hostname: String,
-             port: Int,
-             protocol: String,
-             username: String,
-             password: String): ElasticClient =
+  def create(
+    hostname: String,
+    port: Int,
+    protocol: String,
+    username: String,
+    password: String
+  ): ElasticClient =
     fromClientConfig(
       hostname = hostname,
       port = port,

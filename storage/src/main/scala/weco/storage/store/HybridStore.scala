@@ -21,8 +21,9 @@ trait HybridStore[IndexedStoreId, TypedStoreId, T]
   // If the indexed store points to a typed store entry that doesn't exist, that
   // suggests an internal error in the store, so we don't want to bubble up
   // the DoesNotExistError directly.
-  protected def getTypedStoreEntry(typedStoreId: TypedStoreId)
-    : Either[ReadError, Identified[TypedStoreId, T]] =
+  protected def getTypedStoreEntry(
+    typedStoreId: TypedStoreId
+  ): Either[ReadError, Identified[TypedStoreId, T]] =
     typedStore.get(typedStoreId) match {
       case Right(t) => Right(t)
       case Left(err: DoesNotExistError) =>

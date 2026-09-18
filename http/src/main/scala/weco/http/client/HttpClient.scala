@@ -26,8 +26,10 @@ trait HttpClientWithBaseUri extends HttpClient {
 }
 
 trait HttpGet extends HttpClientWithBaseUri {
-  def get(path: Path,
-          params: Map[String, String] = Map.empty): Future[HttpResponse] = {
+  def get(
+    path: Path,
+    params: Map[String, String] = Map.empty
+  ): Future[HttpResponse] = {
     val request = HttpRequest(
       method = HttpMethods.GET,
       uri = buildUri(path, params)
@@ -42,10 +44,12 @@ trait HttpPost extends HttpClientWithBaseUri {
 
   implicit val ec: ExecutionContext
 
-  def post[In](path: Path,
-               body: Option[In] = None,
-               params: Map[String, String] = Map.empty,
-               headers: List[HttpHeader] = Nil)(
+  def post[In](
+    path: Path,
+    body: Option[In] = None,
+    params: Map[String, String] = Map.empty,
+    headers: List[HttpHeader] = Nil
+  )(
     implicit encoder: Encoder[In]
   ): Future[HttpResponse] = {
     implicit val um: ToEntityMarshaller[In] = CirceMarshalling.fromEncoder[In]

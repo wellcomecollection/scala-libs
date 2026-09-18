@@ -13,18 +13,19 @@ object CloudWatchBuilder {
   private def buildCloudWatchMetrics(
     cloudWatchClient: CloudWatchClient,
     metricsConfig: MetricsConfig
-  )(implicit
-    materializer: Materializer,
-    ec: ExecutionContext): CloudWatchMetrics =
+  )(
+    implicit materializer: Materializer,
+    ec: ExecutionContext
+  ): CloudWatchMetrics =
     new CloudWatchMetrics(
       cloudWatchClient = cloudWatchClient,
       metricsConfig = metricsConfig
     )
 
   def buildCloudWatchMetrics(config: Config)(
-    implicit
-    materializer: Materializer,
-    ec: ExecutionContext): CloudWatchMetrics =
+    implicit materializer: Materializer,
+    ec: ExecutionContext
+  ): CloudWatchMetrics =
     buildCloudWatchMetrics(
       cloudWatchClient = CloudWatchClient.builder().build(),
       metricsConfig = buildMetricsConfig(config)

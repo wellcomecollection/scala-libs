@@ -18,8 +18,9 @@ object RetryOps extends Logging {
       (in: In) => retryInternal(maxAttempts)(in)
 
     @tailrec
-    private def retryInternal(remainingAttempts: Int)(
-      in: In): Either[OutError, Out] =
+    private def retryInternal(
+      remainingAttempts: Int
+    )(in: In): Either[OutError, Out] =
       f(in) match {
         case Right(out) =>
           debug(s"Success: retryable operation for in=$in succeeded")
@@ -34,7 +35,8 @@ object RetryOps extends Logging {
         // the compiler can't see that.
         case Left(err) if err.isInstanceOf[RetryableError] =>
           debug(
-            s"Retryable error: remaining attempts = $remainingAttempts for in=$in")
+            s"Retryable error: remaining attempts = $remainingAttempts for in=$in"
+          )
           if (remainingAttempts == 1) {
             debug(s"Retryable error: marking operation as failed with $err")
             Left(err)

@@ -21,8 +21,7 @@ import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraSource(client: HttpClient with HttpGet with HttpPost)(
-  implicit
-  ec: ExecutionContext,
+  implicit ec: ExecutionContext,
   mat: Materializer
 ) {
   import SierraSource._
@@ -58,25 +57,26 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
 
       result <- response.status match {
         case StatusCodes.OK =>
-          Unmarshal(response).to[SierraItemDataEntries].map { itemDataEntries =>
-            // There are a number of edge cases ignored here e.g.
-            // - there are more items returned than requested for this query
-            // - there are different items ids returned than requested for this query
-            // These cases are far less likely than requesting missing items which is
-            // dealt with here, so we ignore them for simplicity.
-            val foundItemNumbers = itemDataEntries.entries.map(_.id)
+          Unmarshal(response).to[SierraItemDataEntries].map {
+            itemDataEntries =>
+              // There are a number of edge cases ignored here e.g.
+              // - there are more items returned than requested for this query
+              // - there are different items ids returned than requested for this query
+              // These cases are far less likely than requesting missing items which is
+              // dealt with here, so we ignore them for simplicity.
+              val foundItemNumbers = itemDataEntries.entries.map(_.id)
 
-            if (itemDataEntries.entries.size < itemNumbers.size) {
-              Left(
-                SierraItemLookupError.MissingItems(
-                  missingItems =
-                    itemNumbers.filterNot(foundItemNumbers.contains(_)),
-                  itemsReturned = itemDataEntries.entries
+              if (itemDataEntries.entries.size < itemNumbers.size) {
+                Left(
+                  SierraItemLookupError.MissingItems(
+                    missingItems =
+                      itemNumbers.filterNot(foundItemNumbers.contains(_)),
+                    itemsReturned = itemDataEntries.entries
+                  )
                 )
-              )
-            } else {
-              Right(itemDataEntries)
-            }
+              } else {
+                Right(itemDataEntries)
+              }
           }
 
         // When none of the item ids requested exist, sierra will 404
@@ -155,7 +155,7 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
 
       result <- resp.status match {
         case StatusCodes.NoContent => Future.successful(Right(()))
-        case _                     => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
+        case _ => Unmarshal(resp).to[SierraErrorCode].map(Left(_))
       }
     } yield result
 
@@ -174,8 +174,9 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
     * method return a failed Future.
     *
     */
-  def lookupPatronExpirationDate(patron: SierraPatronNumber)
-    : Future[Either[SierraErrorCode, Option[LocalDate]]] =
+  def lookupPatronExpirationDate(
+    patron: SierraPatronNumber
+  ): Future[Either[SierraErrorCode, Option[LocalDate]]] =
     for {
       resp <- client.get(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}"),
@@ -190,7 +191,8 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
             .map {
               case Some(d) =>
                 Some(
-                  LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                  LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                )
               case None => None
             }
             .map(Right(_))
@@ -200,7 +202,8 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
     } yield result
 
   def lookupPatronType(
-    patron: SierraPatronNumber): Future[Either[SierraErrorCode, Option[Int]]] =
+    patron: SierraPatronNumber
+  ): Future[Either[SierraErrorCode, Option[Int]]] =
     for {
       resp <- client.get(
         path = Path(s"v5/patrons/${patron.withoutCheckDigit}"),
@@ -218,8 +221,10 @@ class SierraSource(client: HttpClient with HttpGet with HttpPost)(
       }
     } yield result
 
-  private case class PatronRecord(expirationDate: Option[String],
-                                  patronType: Option[Int])
+  private case class PatronRecord(
+    expirationDate: Option[String],
+    patronType: Option[Int]
+  )
 
   private implicit val umPatronRecord: Unmarshaller[HttpEntity, PatronRecord] =
     CirceMarshalling.fromDecoder[PatronRecord]

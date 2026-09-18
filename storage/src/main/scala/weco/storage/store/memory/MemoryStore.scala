@@ -33,7 +33,8 @@ class MemoryStore[Ident, T](initialEntries: Map[Ident, T])
         Left(
           DoesNotExistError(
             new Throwable(s"There is no entry for id=$id")
-          ))
+          )
+        )
     }
 
     debug(s"Got $result")

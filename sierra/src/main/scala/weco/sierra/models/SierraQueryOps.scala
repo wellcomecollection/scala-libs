@@ -14,8 +14,9 @@ trait SierraQueryOps extends Logging {
     // VarFields are returned in the same order as in the original bib.
     def varfieldsWithTags(tags: String*): List[VarField] =
       tags
-        .flatMap { t =>
-          bibData.varFieldIndex.get(t)
+        .flatMap {
+          t =>
+            bibData.varFieldIndex.get(t)
         }
         .flatten
         .sortBy { case (position, _) => position }
@@ -75,8 +76,9 @@ trait SierraQueryOps extends Logging {
     def withFieldTags(tags: String*): List[VarField] =
       varfields
         .filter { _.fieldTag.exists(tag => tags.contains(tag)) }
-        .sortBy { varfield =>
-          tags.indexOf(varfield.fieldTag.get)
+        .sortBy {
+          varfield =>
+            tags.indexOf(varfield.fieldTag.get)
         }
 
     def withFieldTag(tag: String): List[VarField] = withFieldTags(tag)
@@ -123,16 +125,18 @@ trait SierraQueryOps extends Logging {
 
     def withTags(tags: String*): List[Subfield] =
       subfields
-        .filter { subfield =>
-          tags.contains(subfield.tag)
+        .filter {
+          subfield =>
+            tags.contains(subfield.tag)
         }
 
     def withTag(tag: String): List[Subfield] = withTags(tag)
 
     def withoutTags(tags: String*): List[Subfield] =
       subfields
-        .filterNot { subfield =>
-          tags.contains(subfield.tag)
+        .filterNot {
+          subfield =>
+            tags.contains(subfield.tag)
         }
 
     def contents: List[String] = subfields.map(_.content)

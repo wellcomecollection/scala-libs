@@ -101,13 +101,15 @@ class DynamoLockDao(
     } yield ()
 
   private def deleteLocks(
-    rowLocks: List[ExpiringLock]): Either[Throwable, Unit] =
+    rowLocks: List[ExpiringLock]
+  ): Either[Throwable, Unit] =
     Try {
       val ids = rowLocks.map { _.id }.toSet
       val ops = table.deleteAll("id" in ids)
       scanamo.exec(ops)
-    }.map { _ =>
-      ()
+    }.map {
+      _ =>
+        ()
     }.toEither
 
   private def queryLocks(contextId: ContextId) = Try {

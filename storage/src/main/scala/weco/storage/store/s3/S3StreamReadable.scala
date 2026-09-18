@@ -12,7 +12,8 @@ trait S3StreamReadable
   implicit val s3Client: S3Client
 
   override protected def retryableGetFunction(
-    location: S3ObjectLocation): InputStreamWithLength = {
+    location: S3ObjectLocation
+  ): InputStreamWithLength = {
     val getRequest =
       GetObjectRequest
         .builder()

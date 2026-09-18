@@ -64,7 +64,8 @@ trait DynamoHashReadable[HashKey, V, T]
       Version[HashKey, V],
       HashKey,
       DynamoHashEntry[HashKey, V, T],
-      T] {
+      T
+    ] {
   implicit protected val formatHashKey: DynamoFormat[HashKey]
 
   protected def createKeyExpression(id: HashKey): UniqueKey[_] =
@@ -73,12 +74,13 @@ trait DynamoHashReadable[HashKey, V, T]
   override def get(id: Version[HashKey, V]): ReadEither = {
     val storedEntry = getEntry(id.id)
 
-    storedEntry.flatMap { entry =>
-      if (entry.version == id.version) {
-        Right(Identified(id, entry.payload))
-      } else {
-        Left(NoVersionExistsError(s"There is no Dynamo item with id=$id"))
-      }
+    storedEntry.flatMap {
+      entry =>
+        if (entry.version == id.version) {
+          Right(Identified(id, entry.payload))
+        } else {
+          Left(NoVersionExistsError(s"There is no Dynamo item with id=$id"))
+        }
     }
   }
 }
@@ -89,17 +91,20 @@ trait DynamoHashRangeReadable[HashKey, RangeKey, T]
       Version[HashKey, RangeKey],
       Version[HashKey, RangeKey],
       DynamoHashRangeEntry[HashKey, RangeKey, T],
-      T] {
+      T
+    ] {
 
   implicit val formatHashKey: DynamoFormat[HashKey]
   implicit val formatRangeKey: DynamoFormat[RangeKey]
 
   protected def createKeyExpression(
-    id: Version[HashKey, RangeKey]): UniqueKey[_] =
+    id: Version[HashKey, RangeKey]
+  ): UniqueKey[_] =
     "id" === id.id and "version" === id.version
 
   override def get(id: Version[HashKey, RangeKey]): ReadEither =
-    getEntry(id).map { entry =>
-      Identified(id, entry.payload)
+    getEntry(id).map {
+      entry =>
+        Identified(id, entry.payload)
     }
 }

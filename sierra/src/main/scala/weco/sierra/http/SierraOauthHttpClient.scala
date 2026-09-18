@@ -25,8 +25,7 @@ class SierraOauthHttpClient(
   val credentials: BasicHttpCredentials,
   val expiryGracePeriod: Duration = 60.seconds
 )(
-  implicit
-  val system: ActorSystem,
+  implicit val system: ActorSystem,
   val ec: ExecutionContext
 ) extends HttpClient
     with HttpGet
@@ -57,11 +56,13 @@ class SierraOauthHttpClient(
       accessToken <- tokenResponse.status match {
         case StatusCodes.OK => Unmarshal(tokenResponse).to[SierraAccessToken]
         case code =>
-          Unmarshal(tokenResponse).to[String].flatMap { resp =>
-            Future.failed(
-              new Throwable(
-                s"Unexpected status code $code from $tokenPath: $resp")
-            )
+          Unmarshal(tokenResponse).to[String].flatMap {
+            resp =>
+              Future.failed(
+                new Throwable(
+                  s"Unexpected status code $code from $tokenPath: $resp"
+                )
+              )
           }
       }
 
@@ -86,7 +87,8 @@ class SierraOauthHttpClient(
         }
         require(
           existingAuthHeaders.isEmpty,
-          s"HTTP request already has auth headers: $request")
+          s"HTTP request already has auth headers: $request"
+        )
 
         request.withHeaders(request.headers :+ Authorization(token))
       }

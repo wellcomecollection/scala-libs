@@ -59,15 +59,16 @@ object EnrichConfig {
       }
 
     def getDurationOption(path: String): Option[Duration] =
-      getPathValue(path) { s =>
-        // The getDuration method returns a Java Duration, but we want a
-        // Scala duration.
-        //
-        // TODO: When we upgrade to Scala 2.13, we can use the built-in converters
-        // rather than going via the number of nanoseconds.
-        // See https://stackoverflow.com/a/55412743/1558022
-        val nanos = underlying.getDuration(s).toNanos
-        Duration.fromNanos(nanos)
+      getPathValue(path) {
+        s =>
+          // The getDuration method returns a Java Duration, but we want a
+          // Scala duration.
+          //
+          // TODO: When we upgrade to Scala 2.13, we can use the built-in converters
+          // rather than going via the number of nanoseconds.
+          // See https://stackoverflow.com/a/55412743/1558022
+          val nanos = underlying.getDuration(s).toNanos
+          Duration.fromNanos(nanos)
       }
 
     def requireDuration(path: String): Duration =
