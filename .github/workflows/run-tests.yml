@@ -11,6 +11,8 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     strategy:
+      # One broken project shouldn't cancel the others and hide their results
+      fail-fast: false
       matrix:
         service:
           - fixtures
@@ -38,3 +40,12 @@ jobs:
 
       - name: Run sbt tests
         run: ./builds/run_sbt_tests.sh ${{ matrix.service }}
+
+      # A failed test run skips dockerComposeStop, so the containers are still there
+      - name: Show Docker Compose container logs
+        if: failure()
+        run: |
+          for id in $(docker ps --all --quiet); do
+            docker inspect --format '==> {{.Name}} ({{.Config.Image}}): {{.State.Status}}, exit code {{.State.ExitCode}}' "$id"
+            docker logs --tail 300 "$id" 2>&1
+          done
