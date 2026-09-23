@@ -5,7 +5,10 @@ object Dependencies {
     val elasticApm = "1.52.0"
     val elastic4s = "8.11.5"
 
-    val aws = "2.28.15"
+    val aws = "2.55.0"
+
+    // elastic4s 8.11.5 brings in jackson 2.14.3, which has open security advisories
+    val jackson = "2.18.10"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
@@ -52,7 +55,10 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-client-esjava" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-streams-pekko" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-json-circe" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
+    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test",
+    "com.fasterxml.jackson.core" % "jackson-core" % versions.jackson,
+    "com.fasterxml.jackson.core" % "jackson-databind" % versions.jackson,
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson
   )
 
   val sl4jDependencies = Seq(

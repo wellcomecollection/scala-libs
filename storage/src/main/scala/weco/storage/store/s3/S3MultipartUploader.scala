@@ -4,6 +4,7 @@ import grizzled.slf4j.Logging
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{
+  ChecksumAlgorithm,
   CompleteMultipartUploadRequest,
   CompleteMultipartUploadResponse,
   CompletedMultipartUpload,
@@ -27,6 +28,8 @@ trait S3MultipartUploader extends Logging {
           .builder()
           .bucket(location.bucket)
           .key(location.key)
+          // Newer SDKs checksum every part by default, so declare the algorithm up front
+          .checksumAlgorithm(ChecksumAlgorithm.CRC32)
           .build()
 
       val createResponse = s3Client.createMultipartUpload(createRequest)
@@ -50,6 +53,7 @@ trait S3MultipartUploader extends Logging {
           .key(location.key)
           .uploadId(uploadId)
           .partNumber(partNumber)
+          .checksumAlgorithm(ChecksumAlgorithm.CRC32)
           .build()
 
       val requestBody = RequestBody.fromBytes(bytes)
@@ -60,6 +64,8 @@ trait S3MultipartUploader extends Logging {
       CompletedPart
         .builder()
         .eTag(uploadPartResponse.eTag())
+        // S3 wants each part's checksum back on completion
+        .checksumCRC32(uploadPartResponse.checksumCRC32())
         .partNumber(partNumber)
         .build()
     }
