@@ -5,8 +5,9 @@ import weco.storage.store._
 import weco.storage.streaming.Codec
 import weco.storage.streaming.Codec
 
-class MemoryTypedStore[Ident, T](initialEntries: Map[Ident, T] =
-                                   Map.empty[Ident, T])(
+class MemoryTypedStore[Ident, T](
+  initialEntries: Map[Ident, T] = Map.empty[Ident, T]
+)(
   implicit val streamStore: MemoryStreamStore[Ident],
   val codec: Codec[T]
 ) extends TypedStore[Ident, T] {
@@ -18,8 +19,7 @@ class MemoryTypedStore[Ident, T](initialEntries: Map[Ident, T] =
       )
   }
 
-  streamStore.memoryStore.entries =
-    streamStore.memoryStore.entries ++ initial
+  streamStore.memoryStore.entries = streamStore.memoryStore.entries ++ initial
 }
 
 object MemoryTypedStore {

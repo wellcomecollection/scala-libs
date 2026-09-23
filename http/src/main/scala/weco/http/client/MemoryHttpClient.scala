@@ -35,24 +35,28 @@ class MemoryHttpClient(
       // checks are meant to make it easier to debug particular issues.
       if (nextReq.method != request.method) {
         throw new RuntimeException(
-          s"Expected request with method ${nextReq.method}, got method with URI ${request.method}")
+          s"Expected request with method ${nextReq.method}, got method with URI ${request.method}"
+        )
       }
 
       if (nextReq.uri != request.uri) {
         throw new RuntimeException(
-          s"Expected request with URI ${nextReq.uri}, got request with URI ${request.uri}")
+          s"Expected request with URI ${nextReq.uri}, got request with URI ${request.uri}"
+        )
       }
 
       if (nextReq.headers != request.headers) {
         throw new RuntimeException(
-          s"Expected request with headers ${nextReq.headers}, got request with headers ${request.headers}")
+          s"Expected request with headers ${nextReq.headers}, got request with headers ${request.headers}"
+        )
       }
 
       if (!areEquivalent(nextReq.entity, request.entity)) {
         val str1 = getEntityString(nextReq.entity)
         val str2 = getEntityString(request.entity)
         throw new RuntimeException(
-          s"Requests have different entities: $str1 / $str2")
+          s"Requests have different entities: $str1 / $str2"
+        )
       }
 
       nextResp
@@ -70,9 +74,9 @@ class MemoryHttpClient(
     (e1, e2) match {
       case (entity1, entity2) if entity1 == entity2 => true
       case (
-          HttpEntity.Strict(ContentTypes.`application/json`, json1),
-          HttpEntity.Strict(ContentTypes.`application/json`, json2))
-          if parseOrElse(json1) == parseOrElse(json2) =>
+            HttpEntity.Strict(ContentTypes.`application/json`, json1),
+            HttpEntity.Strict(ContentTypes.`application/json`, json2)
+          ) if parseOrElse(json1) == parseOrElse(json2) =>
         true
 
       case _ => false

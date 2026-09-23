@@ -10,8 +10,7 @@ import scala.concurrent.duration._
 
 object DynamoLockDaoBuilder {
   def buildDynamoLockDao(config: Config, namespace: String = "locking")(
-    implicit
-    ec: ExecutionContext,
+    implicit ec: ExecutionContext
   ) = new DynamoLockDao(
     client = DynamoDbClient.builder().build(),
     config = DynamoLockDaoConfig(

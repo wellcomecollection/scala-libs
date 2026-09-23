@@ -43,19 +43,23 @@ trait DynamoHashWritable[HashKey, V, T]
     extends DynamoWritable[
       Version[HashKey, V],
       DynamoHashEntry[HashKey, V, T],
-      T] {
+      T
+    ] {
   implicit protected val formatV: DynamoFormat[V]
   assert(formatV != null)
 
   override protected def parseEntry(entry: DynamoHashEntry[HashKey, V, T]): T =
     entry.payload
 
-  override protected def createEntry(id: Version[HashKey, V],
-                                     t: T): DynamoHashEntry[HashKey, V, T] =
+  override protected def createEntry(
+    id: Version[HashKey, V],
+    t: T
+  ): DynamoHashEntry[HashKey, V, T] =
     DynamoHashEntry(id.id, id.version, t)
 
-  override protected def tableGiven(id: Version[HashKey, V])
-    : ConditionalOperation[DynamoHashEntry[HashKey, V, T], _] =
+  override protected def tableGiven(
+    id: Version[HashKey, V]
+  ): ConditionalOperation[DynamoHashEntry[HashKey, V, T], _] =
     table.when(
       not(attributeExists("id")) or
         (attributeExists("id") and "version" < id.version)
@@ -66,21 +70,25 @@ trait DynamoHashRangeWritable[HashKey, RangeKey, T]
     extends DynamoWritable[
       Version[HashKey, RangeKey],
       DynamoHashRangeEntry[HashKey, RangeKey, T],
-      T] {
+      T
+    ] {
   implicit protected val formatRangeKey: DynamoFormat[RangeKey]
   assert(formatRangeKey != null)
 
   override protected def parseEntry(
-    entry: DynamoHashRangeEntry[HashKey, RangeKey, T]): T =
+    entry: DynamoHashRangeEntry[HashKey, RangeKey, T]
+  ): T =
     entry.payload
 
   override protected def createEntry(
     id: Version[HashKey, RangeKey],
-    t: T): DynamoHashRangeEntry[HashKey, RangeKey, T] =
+    t: T
+  ): DynamoHashRangeEntry[HashKey, RangeKey, T] =
     DynamoHashRangeEntry(id.id, id.version, t)
 
-  override protected def tableGiven(id: Version[HashKey, RangeKey])
-    : ConditionalOperation[DynamoHashRangeEntry[HashKey, RangeKey, T], _] =
+  override protected def tableGiven(
+    id: Version[HashKey, RangeKey]
+  ): ConditionalOperation[DynamoHashRangeEntry[HashKey, RangeKey, T], _] =
     table.when(
       not(attributeExists("id"))
     )

@@ -24,10 +24,10 @@ import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
-                        metricsConfig: MetricsConfig)(
-  implicit mat: Materializer,
-  ec: ExecutionContext)
+class CloudWatchMetrics(
+  cloudWatchClient: CloudWatchClient,
+  metricsConfig: MetricsConfig
+)(implicit mat: Materializer, ec: ExecutionContext)
     extends Metrics[Future]
     with Logging {
 
@@ -45,7 +45,8 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
           .namespace(metricsConfig.namespace)
           .metricData(metricDataSeq: _*)
           .build()
-    ))
+      )
+  )
 
   val source: Source[MetricDatum, SourceQueueWithComplete[MetricDatum]] =
     Source
@@ -80,8 +81,9 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
       .timestamp(Instant.now())
       .build()
 
-    sourceQueue.offer(metricDatum).map { _ =>
-      ()
+    sourceQueue.offer(metricDatum).map {
+      _ =>
+        ()
     }
   }
 
@@ -94,8 +96,9 @@ class CloudWatchMetrics(cloudWatchClient: CloudWatchClient,
 
     val metricDatum = metricDatumBuilder.build()
 
-    sourceQueue.offer(metricDatum).map { _ =>
-      ()
+    sourceQueue.offer(metricDatum).map {
+      _ =>
+        ()
     }
   }
 }

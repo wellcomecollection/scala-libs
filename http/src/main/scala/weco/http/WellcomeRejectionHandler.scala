@@ -42,28 +42,30 @@ trait WellcomeRejectionHandler extends ErrorDirectives {
           transformToJsonErrorResponse(statusCode, res)
         case x => x
       }
-      .mapRejectionResponse { resp: HttpResponse =>
-        httpMetrics.sendMetric(resp)
-        resp
+      .mapRejectionResponse {
+        resp: HttpResponse =>
+          httpMetrics.sendMetric(resp)
+          resp
       }
 
   private def handleDecodingFailures(
     causes: DecodingFailures
   ): Route = {
-    val message = causes.failures.map { cause =>
-      val path = CursorOp.opsToPath(cause.history)
+    val message = causes.failures.map {
+      cause =>
+        val path = CursorOp.opsToPath(cause.history)
 
-      // Error messages returned by Circe are somewhat inconsistent and we also return our
-      // own error messages when decoding enums (DisplayIngestType and DisplayStorageProvider).
-      val reason = cause.message match {
-        // "Attempt to decode value on failed cursor" seems to mean in circeworld
-        // that a required field was not present.
-        case s if s.contains("Attempt to decode value on failed cursor") =>
-          "required property not supplied."
-        case s => s
-      }
+        // Error messages returned by Circe are somewhat inconsistent and we also return our
+        // own error messages when decoding enums (DisplayIngestType and DisplayStorageProvider).
+        val reason = cause.message match {
+          // "Attempt to decode value on failed cursor" seems to mean in circeworld
+          // that a required field was not present.
+          case s if s.contains("Attempt to decode value on failed cursor") =>
+            "required property not supplied."
+          case s => s
+        }
 
-      s"Invalid value at $path: $reason"
+        s"Invalid value at $path: $reason"
     }
 
     invalidRequest(description = message.toList.mkString("\n"))
@@ -75,20 +77,22 @@ trait WellcomeRejectionHandler extends ErrorDirectives {
   ): HttpResponse = {
 
     val errorResponseMarshallingFlow = Flow[ByteString]
-      .mapAsync(parallelism = 1)(data => {
-        val description = data.utf8String
-        if (statusCode.intValue() >= 500) {
-          val response = DisplayError(statusCode = statusCode)
-          Marshal(response).to[MessageEntity]
-        } else {
-          val response =
-            DisplayError(
-              statusCode = statusCode,
-              description = description
-            )
-          Marshal(response).to[MessageEntity]
+      .mapAsync(parallelism = 1)(
+        data => {
+          val description = data.utf8String
+          if (statusCode.intValue() >= 500) {
+            val response = DisplayError(statusCode = statusCode)
+            Marshal(response).to[MessageEntity]
+          } else {
+            val response =
+              DisplayError(
+                statusCode = statusCode,
+                description = description
+              )
+            Marshal(response).to[MessageEntity]
+          }
         }
-      })
+      )
       .flatMapConcat(_.dataBytes)
 
     response

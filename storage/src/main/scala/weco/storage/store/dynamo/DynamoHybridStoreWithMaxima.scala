@@ -13,9 +13,11 @@ class DynamoHybridStoreWithMaxima[Id, V, T](prefix: S3ObjectLocationPrefix)(
 ) extends HybridStoreWithMaxima[Id, V, S3ObjectLocation, T] {
 
   override protected def createTypeStoreId(
-    id: Version[Id, V]): S3ObjectLocation =
+    id: Version[Id, V]
+  ): S3ObjectLocation =
     prefix.asLocation(
       id.id.toString,
       id.version.toString,
-      UUID.randomUUID().toString + ".json")
+      UUID.randomUUID().toString + ".json"
+    )
 }

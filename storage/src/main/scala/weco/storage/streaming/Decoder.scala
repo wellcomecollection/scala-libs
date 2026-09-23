@@ -31,11 +31,12 @@ object DecoderInstances {
           checkLengthIsCorrect(inputStream, bytes = bytes)
 
         case Failure(err) => Left(ByteDecodingError(err))
-    }
+      }
 
   private def checkLengthIsCorrect(
     originalStream: InputStream,
-    bytes: Array[Byte]): Either[DecoderError, Array[Byte]] =
+    bytes: Array[Byte]
+  ): Either[DecoderError, Array[Byte]] =
     originalStream match {
       case is: InputStreamWithLength => {
         if (bytes.length == is.length)
@@ -56,17 +57,18 @@ object DecoderInstances {
     implicit charset: Charset = StandardCharsets.UTF_8
   ): Decoder[String] =
     (inputStream: InputStream) =>
-      bytesDecoder.fromStream(inputStream).flatMap { bytes =>
-        // TODO: We don't have a test for this String construction failing, because
-        // we can't find a sequence of bugs that triggers an exception!
-        //
-        // We should either satisfy ourselves that this code can't throw, or add
-        // a test for this case.
-        Try { new String(bytes, charset) } match {
-          case Success(string) => Right(string)
-          case Failure(err)    => Left(StringDecodingError(err))
-        }
-    }
+      bytesDecoder.fromStream(inputStream).flatMap {
+        bytes =>
+          // TODO: We don't have a test for this String construction failing, because
+          // we can't find a sequence of bugs that triggers an exception!
+          //
+          // We should either satisfy ourselves that this code can't throw, or add
+          // a test for this case.
+          Try { new String(bytes, charset) } match {
+            case Success(string) => Right(string)
+            case Failure(err)    => Left(StringDecodingError(err))
+          }
+      }
 
   implicit val jsonDecoder: Decoder[Json] =
     (inputStream: InputStream) => {

@@ -30,14 +30,17 @@ object WellcomeParsingErrorHandler
     extends ParsingErrorHandler
     with DisplayJsonUtil
     with Logging {
-  override def handle(statusCode: StatusCode,
-                      info: ErrorInfo,
-                      log: LoggingAdapter,
-                      settings: ServerSettings): HttpResponse = {
+  override def handle(
+    statusCode: StatusCode,
+    info: ErrorInfo,
+    log: LoggingAdapter,
+    settings: ServerSettings
+  ): HttpResponse = {
     warn(s"Illegal request, responding with status '$statusCode': $info")
 
     val json = toJson(
-      DisplayError(statusCode = statusCode, description = info.summary))
+      DisplayError(statusCode = statusCode, description = info.summary)
+    )
 
     HttpResponse(
       status = statusCode,

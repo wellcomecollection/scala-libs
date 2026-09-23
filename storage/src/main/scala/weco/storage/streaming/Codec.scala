@@ -14,7 +14,8 @@ object Codec {
 
   implicit val bytesCodec: Codec[Array[Byte]] = new Codec[Array[Byte]] {
     override def fromStream(
-      inputStream: InputStream): DecoderResult[Array[Byte]] =
+      inputStream: InputStream
+    ): DecoderResult[Array[Byte]] =
       bytesDecoder.fromStream(inputStream)
 
     override def toStream(bytes: Array[Byte]): EncoderResult =

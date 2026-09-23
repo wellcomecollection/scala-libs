@@ -28,12 +28,14 @@ object CirceMarshalling {
   def fromDecoder[T: Decoder]: Unmarshaller[HttpEntity, T] =
     Unmarshaller.stringUnmarshaller
       .forContentTypes(ContentTypes.`application/json`)
-      .flatMap { _ => _ => json =>
-        Future.fromTry(fromJson[T](json))
+      .flatMap {
+        _ => _ => json =>
+          Future.fromTry(fromJson[T](json))
       }
 
   def fromEncoder[T: Encoder]: ToEntityMarshaller[T] =
-    Marshaller.withFixedContentType(ContentTypes.`application/json`) { t =>
-      HttpEntity(ContentTypes.`application/json`, t.asJson.noSpaces)
+    Marshaller.withFixedContentType(ContentTypes.`application/json`) {
+      t =>
+        HttpEntity(ContentTypes.`application/json`, t.asJson.noSpaces)
     }
 }

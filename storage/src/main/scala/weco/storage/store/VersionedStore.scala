@@ -101,14 +101,17 @@ class VersionedStore[Id, V, T](
         Right(Identified(id, t))
 
       case Right(latest) if O.gt(latest.id.version, id.version) =>
-        Left(HigherVersionExistsError(
-          s"Tried to store ${id.id} at version ${id.version}, but version ${latest.id.version} already exists"
-        ))
+        Left(
+          HigherVersionExistsError(
+            s"Tried to store ${id.id} at version ${id.version}, but version ${latest.id.version} already exists"
+          )
+        )
       case Right(latest) if latest.id.version == id.version =>
         Left(
           VersionAlreadyExistsError(
             s"Tried to store ${id.id} at version ${id.version}, but that version already exists"
-          ))
+          )
+        )
       case _ =>
         store.put(id)(t)
     }
@@ -137,11 +140,12 @@ class VersionedStore[Id, V, T](
       //
       // See VersionedStoreRaceConditionsTest for examples of how this can occur.
       case Left(_: VersionAlreadyExistsError) | Left(
-            _: HigherVersionExistsError) =>
+            _: HigherVersionExistsError
+          ) =>
         Left(
           new StoreWriteError(
-            new Throwable(s"Another process wrote to id=$id simultaneously"))
-          with RetryableError
+            new Throwable(s"Another process wrote to id=$id simultaneously")
+          ) with RetryableError
         )
 
       case Left(err) => Left(err)

@@ -14,6 +14,7 @@ object SierraRecordTypeBuilder {
       case s: String if s == orders.toString   => orders
       case s: String =>
         throw new IllegalArgumentException(
-          s"$s is not a valid Sierra record type")
+          s"$s is not a valid Sierra record type"
+        )
     }
 }

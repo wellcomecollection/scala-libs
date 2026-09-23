@@ -7,11 +7,12 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 import scala.concurrent.duration.Duration
 
-case class ExpiringLock(id: String,
-                        contextId: UUID,
-                        created: Instant,
-                        expires: Instant)
-    extends Lock[String, UUID]
+case class ExpiringLock(
+  id: String,
+  contextId: UUID,
+  created: Instant,
+  expires: Instant
+) extends Lock[String, UUID]
 
 object ExpiringLock {
   def create(id: String, contextId: UUID, duration: Duration): ExpiringLock = {

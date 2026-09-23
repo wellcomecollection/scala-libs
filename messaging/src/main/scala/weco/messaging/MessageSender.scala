@@ -10,7 +10,8 @@ trait IndividualMessageSender[Destination] {
   def send(body: String)(subject: String, destination: Destination): Try[Unit]
 
   def sendT[T](t: T)(subject: String, destination: Destination)(
-    implicit encoder: Encoder[T]): Try[Unit] =
+    implicit encoder: Encoder[T]
+  ): Try[Unit] =
     toJson(t).flatMap { send(_)(subject, destination) }
 }
 
@@ -25,7 +26,8 @@ trait MessageSender[Destination] extends Logging {
       case Failure(err) =>
         error(
           s"Unable to send message (body=$body) to destination $destination: $err",
-          err)
+          err
+        )
         Failure(err)
 
       case Success(_) => Success(())
@@ -36,7 +38,8 @@ trait MessageSender[Destination] extends Logging {
       case Failure(err) =>
         error(
           s"Unable to send message (t=$t) to destination $destination: $err",
-          err)
+          err
+        )
         Failure(err)
 
       case Success(_) => Success(())

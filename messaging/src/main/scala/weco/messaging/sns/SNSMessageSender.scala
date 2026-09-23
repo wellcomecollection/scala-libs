@@ -7,10 +7,11 @@ import weco.messaging.{IndividualMessageSender, MessageSender}
 import scala.util.Try
 
 class SNSIndividualMessageSender(
-  snsClient: SnsClient,
+  snsClient: SnsClient
 ) extends IndividualMessageSender[SNSConfig] {
-  override def send(message: String)(subject: String,
-                                     destination: SNSConfig): Try[Unit] = Try {
+  override def send(
+    message: String
+  )(subject: String, destination: SNSConfig): Try[Unit] = Try {
     snsClient.publish(
       PublishRequest
         .builder()

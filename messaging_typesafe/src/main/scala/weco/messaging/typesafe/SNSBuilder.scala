@@ -13,9 +13,11 @@ object SNSBuilder {
     SNSConfig(topicArn = topicArn)
   }
 
-  def buildSNSMessageSender(config: Config,
-                            namespace: String = "",
-                            subject: String): SNSMessageSender =
+  def buildSNSMessageSender(
+    config: Config,
+    namespace: String = "",
+    subject: String
+  ): SNSMessageSender =
     new SNSMessageSender(
       snsClient = SnsClient.builder().build(),
       snsConfig = buildSNSConfig(config, namespace = namespace),
