@@ -8,12 +8,15 @@ object Dependencies {
     val aws = "2.55.0"
 
     // elastic4s 8.11.5 brings in jackson 2.14.3, which has open security advisories
-    val jackson = "2.18.10"
+    val jackson = "2.18.11"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
     val circe = "0.14.10"
     val circeGenericExtras = "0.14.4"
+
+    // circe 0.14.10 brings in jawn-parser 1.6.0, which has open security advisories
+    val jawn = "1.7.0"
 
     val typesafe = "1.4.3"
     val logback = "1.5.8"
@@ -47,6 +50,7 @@ object Dependencies {
     "io.circe" %% "circe-generic" % versions.circe,
     "io.circe" %% "circe-generic-extras" % versions.circeGenericExtras,
     "io.circe" %% "circe-parser" % versions.circe,
+    "org.typelevel" %% "jawn-parser" % versions.jawn,
     "org.scala-lang" % "scala-reflect" % versions.scalaReflectVersion
   )
 
