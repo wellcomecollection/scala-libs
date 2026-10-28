@@ -3,20 +3,18 @@ import sbt._
 object Dependencies {
   lazy val versions = new {
     val elasticApm = "1.52.0"
-    val elastic4s = "8.11.5"
+    // nl.gn0s1s publishes elastic4s 9.x only for Scala 2.13 and 3; 8.19.2 is the last for 2.12
+    val elastic4s = "8.19.2"
 
     val aws = "2.55.0"
 
-    // elastic4s 8.11.5 brings in jackson 2.14.3, which has open security advisories
-    val jackson = "2.18.11"
+    // Matches the jackson that elastic4s brings in
+    val jackson = "2.22.2"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/sksamuel/elastic4s/blob/master/project/Dependencies.scala
-    val circe = "0.14.10"
+    val circe = "0.14.16"
     val circeGenericExtras = "0.14.4"
-
-    // circe 0.14.10 brings in jawn-parser 1.6.0, which has open security advisories
-    val jawn = "1.7.0"
 
     val typesafe = "1.4.3"
     val logback = "1.5.8"
@@ -30,7 +28,8 @@ object Dependencies {
     // Provides slf4j-api
     val grizzled = "1.3.4"
 
-    val pekko = "1.1.1"
+    // elastic4s-streams-pekko brings pekko-stream 1.7.0, and pekko modules must share a version
+    val pekko = "1.7.0"
     val pekkoConnectors = "1.0.2"
     val pekkoHttp = "1.1.0"
     val pekkoHttpJson = "2.8.0"
@@ -50,16 +49,15 @@ object Dependencies {
     "io.circe" %% "circe-generic" % versions.circe,
     "io.circe" %% "circe-generic-extras" % versions.circeGenericExtras,
     "io.circe" %% "circe-parser" % versions.circe,
-    "org.typelevel" %% "jawn-parser" % versions.jawn,
     "org.scala-lang" % "scala-reflect" % versions.scalaReflectVersion
   )
 
   val elasticsearchDependencies = Seq(
-    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-client-esjava" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-streams-pekko" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-json-circe" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test",
+    "nl.gn0s1s" %% "elastic4s-core" % versions.elastic4s,
+    "nl.gn0s1s" %% "elastic4s-client-esjava" % versions.elastic4s,
+    "nl.gn0s1s" %% "elastic4s-streams-pekko" % versions.elastic4s,
+    "nl.gn0s1s" %% "elastic4s-json-circe" % versions.elastic4s,
+    "nl.gn0s1s" %% "elastic4s-testkit" % versions.elastic4s % "test",
     "com.fasterxml.jackson.core" % "jackson-core" % versions.jackson,
     "com.fasterxml.jackson.core" % "jackson-databind" % versions.jackson,
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson
