@@ -13,7 +13,7 @@ This library is meant to increase code reuse among our applications, not to be a
 [catalogue-api]: https://github.com/wellcomecollection/catalogue-api
 [catalogue-pipeline]: https://github.com/wellcomecollection/catalogue-pipeline
 [storage-service]: https://github.com/wellcomecollection/storage-service
-[elastic4s]: https://github.com/sksamuel/elastic4s
+[elastic4s]: https://github.com/Philippus/elastic4s
 [Typesafe]: https://lightbend.github.io/config/
 
 
