@@ -38,6 +38,15 @@ jobs:
           role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
       - uses: aws-actions/amazon-ecr-login@v2
 
+      # localstack and dynamodb-local come from ECR Public, where anonymous pulls
+      # hit the data limit. run_sbt_task_in_docker.sh mounts ~/.docker, so
+      # docker compose inside the sbt container uses this login.
+      - uses: aws-actions/amazon-ecr-login@v2
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry-type: public
+
       - name: Run sbt tests
         run: ./builds/run_sbt_tests.sh ${{ matrix.service }}
 
