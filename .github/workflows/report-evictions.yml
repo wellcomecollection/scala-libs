@@ -31,8 +31,8 @@ jobs:
           - sierra
           - sierra_typesafe
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: eu-west-1
           role-to-assume: ${{ secrets.GHA_SCALA_LIBS_ROLE_ARN }}
@@ -45,7 +45,7 @@ jobs:
       # Upload the eviction report as a GitHub artifact
       - name: Upload eviction reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evicted_${{ matrix.service }}
           path: .reports/evicted_${{ matrix.service }}
@@ -55,11 +55,11 @@ jobs:
     needs: report-evictions
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Download ALL GitHub artifacts uploaded as part of this run
       - name: Download eviction reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: .reports/
 
@@ -69,7 +69,7 @@ jobs:
           mkdir -p .reports
           builds/report_unique_evictions.sh | tee unique_evictions.txt
       - name: Post eviction report comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const postComment = require('./.github/scripts/post-eviction-report-comment.js');

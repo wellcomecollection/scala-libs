@@ -17,7 +17,7 @@ jobs:
     outputs:
       has-release: ${{ steps.check-for-release-file.outputs.has-release }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check for RELEASE.md file
         id: check-for-release-file
         run: |
@@ -39,7 +39,7 @@ jobs:
     needs: check-for-release-file
     if: needs.check-for-release-file.outputs.has-release == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Update CHANGELOG.md and build.sbt
@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate a token
         id: generate-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: 129326 # App ID of the Wellcome Collection app
           private-key: ${{ secrets.WELLCOME_COLLECTION_APP_PRIVATE_KEY }}
@@ -111,7 +111,7 @@ jobs:
           - sierra
           - sierra_typesafe
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Checkout the latest version, which includes the changes pushed by the previous step!
           # If we didn't do this, we would be publishing using the previous version tag.
@@ -126,13 +126,13 @@ jobs:
           mkdir ~/.sbt
           echo "${{ secrets.SONATYPE_CREDENTIALS }}" > ~/.sbt/sonatype.credentials
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
           cache: sbt
       - name: Setup sbt
-        uses: sbt/setup-sbt@v1.1.0
+        uses: sbt/setup-sbt@v1.5.12
       - name: Publish to Sonatype
         run: |
           ARTIFACT_NAME="${{ matrix.service }}_2.12"
