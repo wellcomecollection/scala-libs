@@ -69,7 +69,7 @@ jobs:
           mkdir -p .reports
           builds/report_unique_evictions.sh | tee unique_evictions.txt
       - name: Post eviction report comment
-        uses: actions/github-script@v6
+        uses: actions/github-script@v8
         with:
           script: |
             const postComment = require('./.github/scripts/post-eviction-report-comment.js');
