@@ -41,8 +41,16 @@ then
 fi
 
 # Start the project's service mocks on the host; tests reach them on the ports in the compose file.
+# Prefer the Compose v2 plugin; fall back to the standalone v1 binary where only that is installed.
+if docker compose version > /dev/null 2>&1
+then
+  COMPOSE=(docker compose)
+else
+  COMPOSE=(docker-compose)
+fi
+
 compose() {
-  docker compose --project-name "sbt-tests-$PROJECT_NAME" --file "$COMPOSE_FILE" "$@"
+  "${COMPOSE[@]}" --project-name "sbt-tests-$PROJECT_NAME" --file "$COMPOSE_FILE" "$@"
 }
 
 compose up --detach
