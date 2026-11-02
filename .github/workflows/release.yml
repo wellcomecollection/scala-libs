@@ -132,7 +132,7 @@ jobs:
           java-version: 17
           cache: sbt
       - name: Setup sbt
-        uses: sbt/setup-sbt@v1.5.12
+        uses: sbt/setup-sbt@v1.5.13
       - name: Publish to Sonatype
         run: |
           ARTIFACT_NAME="${{ matrix.service }}_2.12"
