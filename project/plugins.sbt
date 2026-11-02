@@ -1,4 +1,3 @@
-addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.35")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "2.0.2")
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.2.1")

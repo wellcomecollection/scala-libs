@@ -1,6 +1,5 @@
 import com.jsuereth.sbtpgp.PgpKeys.*
 
-import com.tapad.docker.DockerComposePlugin
 import sbt.Keys.*
 import sbt.*
 import xerial.sbt.Sonatype.autoImport.{sonatypeCredentialHost, sonatypePublishToBundle, sonatypeRepository}
@@ -70,8 +69,6 @@ object Common {
     project
       .in(new File(folder))
       .settings(settings: _*)
-      .settings(DockerCompose.settings: _*)
-      .enablePlugins(DockerComposePlugin)
       .dependsOn(dependsOn: _*)
       .settings(libraryDependencies ++= externalDependencies)
   }

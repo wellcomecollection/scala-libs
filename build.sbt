@@ -1,7 +1,5 @@
 val projectVersion = "32.45.0"
 
-Global / excludeLintKeys += composeNoBuild
-
 lazy val fixtures = Common.setupProject(
   project,
   "fixtures",
