@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v32.45.1 - 2026-11-03
+
+Bump jackson from 2.22.2 to 2.22.4 and logback from 1.5.8 to 1.5.38, to clear open security advisories (Inspector findings on the deployed catalogue-pipeline images and Dependabot alerts in catalogue-api).
+
 ## v32.45.0 - 2026-10-28
 
 Move elastic4s from `com.sksamuel.elastic4s` 8.11.5 to `nl.gn0s1s` 8.19.0, the project's new group. This brings pekko 1.1.5 and circe 0.14.14, which downstream repos pick up through this library; repos that pin pekko to match scala-libs need to move to 1.1.5. The elasticsearch tests now run against Elasticsearch 9.5.5, the version of the catalogue cluster.
