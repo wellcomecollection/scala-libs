@@ -9,7 +9,7 @@ object Dependencies {
     val aws = "2.55.0"
 
     // Kept above the jackson 2.19.2 that elastic4s brings in, for security fixes
-    val jackson = "2.22.2"
+    val jackson = "2.22.4"
 
     // Note: this should probably match the version of Circe used by elastic4s.
     // See https://github.com/Philippus/elastic4s/blob/main/project/Dependencies.scala
@@ -20,7 +20,7 @@ object Dependencies {
     val jawn = "1.7.0"
 
     val typesafe = "1.4.3"
-    val logback = "1.5.8"
+    val logback = "1.5.38"
     val mockito = "5.14.1"
     val scalatest = "3.2.19"
     val scalatestPlus = "3.1.2.0"
